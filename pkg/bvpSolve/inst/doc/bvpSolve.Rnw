@@ -281,18 +281,32 @@ eps <- 0.001
 x <- seq(0,1,len=100)
 @
 This model cannot be solved with the shooting method. However, it can be
-solved using \code{bvpcolmod} and \code{bvptwp}:
+solved using \code{bvptwp} and (at least on windows platforms)
+also with \code{bvpcolmod}:
 <<>>=
 print(system.time(
 Soltwp <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
                   yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA))
 ))
 print(system.time(
-Solmod <- bvpcolmod(x=x,func=fsub,guess= c(2,0,0),
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA))
+Solmod <- try(bvpcolmod(x=x,func=fsub,guess= c(2,0,0), atol=1e-5,
+                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA)),
+    silent=TRUE)
 ))
 @
 where the reported system time is in seconds
+
+The problem cannot be solved with too small values of eps:
+<<>>=
+eps <- 1e-9
+Soltwp2 <- NA
+Soltwp2 <- try(bvptwp(x=x,func=fsub,guess= c(2,0,0),
+                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA)),
+    silent = TRUE)
+
+cat(Soltwp2)
+
+@
 <<label=swirl,include=FALSE>>=
 pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 @
@@ -312,6 +326,7 @@ pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 The problem is more efficiently solved if an initial guess of the solution
 is given (only applicable for \code{bvptwp}):
 <<>>=
+eps <- 0.001
 xguess <- x
 yguess <- matrix(nr=6, nc=length(xguess), data=0.)
 slope  <- 0.375-0.9129
