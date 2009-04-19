@@ -2624,8 +2624,8 @@ C
                Goto 228
             Endif
  227     Continue
- 228  Endif
-
+      Endif
+ 228  Continue
       Avrg = Accum(Nold+1)/Dfloat(Nold)
       Degequ = Avrg/Max(Slphmx,Precis)
 C
