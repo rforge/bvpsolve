@@ -46,6 +46,9 @@ bvpcolmod<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       y[inix] <- guess
     inix   <- which (!is.na(yini))
     finalx <- which (!is.na(yend))
+    ll <- length(finalx) + length(inix)
+    if (ll != mstar)
+      stop (paste("number of boundary conditions wrong: should be ",mstar," but is", ll))
     zeta   <- c(rep(aleft,length(inix)),rep(aright,length(finalx)))
   } else   {      # the conditions specified by boundary function 'bound'
     mstar   <- length (posbound)    # summed order of the differential equations
@@ -120,6 +123,8 @@ bvpcolmod<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   if (!is.list(tmp))
      stop("Model function must return a list\n")
   ncomp  <- length(tmp[[1]])    # number of differential equations
+  if (ncomp > 20)
+    stop ("number of equations must be <= 20 for colmod")
   if (ncomp != mstar)
     stop(paste("The number of function evaluations returned by func() (",
         ncomp, "must equal than the length of the initial conditions vector (",
@@ -194,12 +199,12 @@ bvpcolmod<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     stop ("colp must be smaller than 8")
 
   ipar   <- rep(0,13)
-  itol   <- ncomp
+  itol   <- 1:ncomp
   tol    <- rep(atol,ncomp)
   ipar[1] <- 1          # nonlinear problem
   ipar[2] <- colp       # no of colocation points per subinterval
   ipar[3] <- 0          # no of subintervals in original mesh
-  ipar[4] <- 1          # no of tolerances
+  ipar[4] <- ncomp      # no of tolerances
   if (verbose)
     ipar[7] <- 0 else ipar[7]<-1
   if (! is.null(epsini))

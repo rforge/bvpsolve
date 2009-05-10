@@ -576,7 +576,7 @@ C----------------------------------------------------------------------
       Dimension M(*), Zeta(*), Ipar(*), Ltol(*), Tol(*), Dummy(1),
      +          Fixpnt(*), Ispace(*), Fspace(*)
       Dimension Phi(3), E(3), Pmax(2), Hord(2)
-	CHARACTER(len=180) msg
+  	  CHARACTER(len=180) msg
 
       Parameter ( Zero = 0.0d+0, One = 1.0d+0, Two = 2.0d+0 )
       Parameter ( Three = 3.0d+0, Third = 1.0d+0/3.0d+0, Huge = 1.d+30 )
@@ -754,15 +754,15 @@ C.... Ispace  And  Fspace.
       Endif
       Nmaxf = (Ndimf - Nfixf) / Nsizef
       Nmaxi = (Ndimi - Nfixi) / Nsizei
-      If ( Iprint .lt. 0 )  THEN 
- 	   Write(msg,1009) Nmaxf, Nmaxi
+      If ( Iprint .lt. 0 )  THEN
+ 	       Write(msg,1009) Nmaxf, Nmaxi
          CALL rwarn(msg)
       ENDIF
-	Nmax = Min( Nmaxf, Nmaxi )
+	    Nmax = Min( Nmaxf, Nmaxi )
       If ( Nmax .lt. N )                            Return
       If ( Nmax .lt. Nfxpnt+1 )                     Return
       If (Nmax .lt. 2*Nfxpnt+2 .and. Iprint .lt. 1)  THEN
- 	   Write(msg,1010)
+ 	       Write(msg,1010)
          CALL rwarn(msg)
       ENDIF
 C.... Generate Pointers To Break Up Fspace And Ispace.
@@ -816,10 +816,10 @@ C.... Locations In  Fspace.
   160 Continue
 
 C.... Initialize Collocation Points And Constants.
-
       Call xConsts ( K, Rho, Coef )
 
 C.... Initialize Mesh.
+
 
       Call Newmsh (3+Iread, Fspace(Lxi), Fspace(Lxiold), Dummy,
      +  Dummy, Dummy, Dummy, Dummy, Nfxpnt, Fixpnt, Dummy, Dummy)
@@ -1648,7 +1648,7 @@ C
       Common /Convg/ Nits
 C
       External Fsub, Dfsub, Gsub, Dgsub, Guess
-	CHARACTER(len=180) msg
+	    CHARACTER(len=180) msg
 
 *  The Parameter Inumb Is A Counter Used To Limit To Three The Number 
 *  Of Mesh Selections Performed For The Final Continuation Problem. 
@@ -1693,7 +1693,7 @@ C
       If ( Msing .eq. 0 )                      Go To 400
  30   If ( Msing .lt. 0 )                      Go To 40
       If ( Iprint .lt. 1 ) Then
-	   Write (msg,1000)
+	       Write (msg,1000)
          CALL rwarn(msg)
       Endif
       Go To 460
@@ -1728,11 +1728,11 @@ C
      +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
 C     
       If ( Iprint .lt. 0 ) Then
-	   Write(msg,1002)
+	       Write(msg,1002)
          CALL rwarn(msg)
       Endif
       If ( Iprint .lt. 0 )  Then
-	    Write (msg,1003) Iter, Rnold
+	       Write (msg,1003) Iter, Rnold
          CALL rwarn(msg)
       Endif
       Go To 70
@@ -2911,6 +2911,8 @@ C**********************************************************************
 C
       Implicit Double Precision (A-H,O-Z)
       Dimension Rho(7), Coef(K,*), Cnsts1(28), Cnsts2(28), Dummy(1)
+    	CHARACTER(len=180) msg
+
 C
       Common /Colord/ Kdum, Ncomp, Mstar, Kd, Mmax, M(20)
       Common /Colbas/ B(28), Acol(28,7), Asave(28,4)
@@ -2932,6 +2934,7 @@ C
 C
 C.... Assign Weights For Error Estimate
 C
+
       Koff = K * ( K + 1 ) / 2
       Iz = 1
       Do 10 J = 1, Ncomp

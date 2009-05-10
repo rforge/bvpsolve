@@ -55,7 +55,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{boundaryValueProblems}
+%\VignetteIndexEntry{bvpSolve: Test Problem Set}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -161,9 +161,10 @@ col2  <- bvpcolmod(yini=c(1,NA),yend=c(0,NA),x=seq(0,1,by=0.01),
 @
 and the output plotted
 <<label=prob1,include=FALSE>>=
-plot(shoot[,1],shoot[,2],type="l",main="test problem 1",xlab="x",ylab="y")
-lines(shoot2[,1],shoot2[,2],lty=2)
-lines(shoot3[,1],shoot3[,2],lty=3)
+plot(shoot[,1],shoot[,2],type="l",main="test problem 1",col="blue",
+  xlab="x",ylab="y")
+lines(shoot2[,1],shoot2[,2],col="red")
+lines(shoot3[,1],shoot3[,2],col="green")
 # exact solution
 curve(exp(-x/sqrt(xi))-exp((x-2)/sqrt(xi))/(1-exp(-2/sqrt(xi))),
       0,1,add=TRUE,type="p")
@@ -214,9 +215,10 @@ mod   <- bvpcolmod(yini=c(1,NA),yend=c(0,NA),x=seq(0,1,by=0.01),
 @
 The solution can be compared with the analytical solution:
 <<label=prob2,include=FALSE>>=
-plot(shoot[,1],shoot[,2],type="l",main="test problem 2",xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+plot(shoot[,1],shoot[,2],type="l",main="test problem 2",col="blue",
+  xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 curve((1-exp((x-1)/xi))/(1-exp(-1/xi)),0,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -255,8 +257,9 @@ twp    <- bvptwp(yini=c(-1,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
            func=Prob3, guess=0)
 @
 <<label=prob3,include=FALSE>>=
-plot(shoot[,1],shoot[,2],type="l",main="test problem 3",xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
+plot(shoot[,1],shoot[,2],type="l",main="test problem 3",col="blue",
+  xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
 curve(cos(pi*x),-1,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -302,9 +305,9 @@ mod    <- bvpcolmod(yini=yini,yend=yend,x=seq(-1,1,by=0.01),
 @
 <<label=prob4,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 4",ylim=c(0,1.2),
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 curve(exp(x-1)+exp(-(1+xi)*(1+x)/xi),-1,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -340,7 +343,7 @@ twp    <- bvptwp(yini=c(-1,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
 @
 <<label=prob5,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 5",
-  xlab="x",ylab="y")
+  col="blue",xlab="x",ylab="y")
 curve(cos(pi*x),-1,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -386,9 +389,9 @@ mod  <- bvpcolmod(yini=c(-2,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
 
 <<label=prob6,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 6",
-     ylim =c(-2,2),xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+     ylim =c(-2,2),col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 
 erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1
 curve(cos(pi*x)+erf(x/sqrt(2*xi))/erf(1/sqrt(2*xi)),-1,1,type="p",add=TRUE)
@@ -434,7 +437,7 @@ twp2  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7, guess=0)
 @
 <<label=prob7,include=FALSE>>=
 plot(twp[,1],twp[,2],type="l",main="test problem 7",
-  xlab="x",ylab="y")
+  col="blue",xlab="x",ylab="y")
 erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1
 curve(cos(pi*x)+x+(x*erf(x/sqrt(2*xi))+sqrt(2*xi/pi)*exp(-x^2/2/xi))/
          (erf(1/(2*xi))+sqrt(2*xi/pi)*exp(-1/2/xi)),-1,1,type="p",add=TRUE)
@@ -449,14 +452,14 @@ curve(cos(pi*x)+x+(x*erf(x/sqrt(2*xi))+sqrt(2*xi/pi)*exp(-x^2/2/xi))/
 @
 
 \end{center}
-\caption{Solution of the BVP ODE problem 7, y' versus x- see text for R-code}
+\caption{Solution of the BVP ODE problem 7, y versus x- see text for R-code}
 \label{fig:pr7}
 \end{figure}
 <<label=prob7b,include=FALSE>>=
 plot(twp[,1],twp[,3],type="l",main="test problem 7",
-  xlab="x",ylab="y'")
-lines(mod[,1],mod[,3],lty=2)
-lines(twp2[,1],twp2[,3],lty=3)
+  col="blue",xlab="x",ylab="y'")
+lines(mod[,1],mod[,3],col="red")
+lines(twp2[,1],twp2[,3],col="green")
 
 @
 
@@ -496,9 +499,9 @@ mod  <- bvpcolmod(yini=c(1,NA),yend=c(2,NA),x=x,func=prob8, guess=0)
 @
 <<label=prob8,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 8",
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 
 # analytical solution
 curve(2-exp(-1/xi)-exp(-x/xi)/(1-exp(-1/xi)),0,1,add=TRUE,type="p")
@@ -547,9 +550,9 @@ mod  <- bvpcolmod(yini=c(1/(1+xi),NA),yend=c(1/(1+xi),NA),x=seq(-1,1,by=0.01),
 
 <<label=prob9,include=FALSE>>=
 plot(twp[,1],twp[,2],type="l",main="test problem 9", ylim=c(0,100),
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 # exact
 curve(1/(xi+x^2),-1,1,type="p",add=TRUE)
 @
@@ -590,9 +593,9 @@ mod  <- bvpcolmod(yini=c(0,NA),yend=c(2,NA),x=seq(-1,1,by=0.01),
 @
 <<label=prob10,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 10",
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1
 curve(1+erf(x/sqrt(2*xi))/erf(1/sqrt(2*xi)),-1,1,type="p",add=TRUE)
 
@@ -639,9 +642,9 @@ mod  <- bvpcolmod(yini=c(-1,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
 @
 <<label=prob11,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 11",
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 
 curve(cos(pi*x),-1,1,type="p",add=TRUE)
 
@@ -673,20 +676,20 @@ Prob12 <- function(x, y, pars) {
 
 xi <-0.01
 shoot  <- bvpshoot(yini=c(-1,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob12, guess=0,atol=1e-10)
+        func=Prob12, guess=0)
 xi <-0.0025
 twp  <- bvptwp(yini=c(-1,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob12, guess=0,atol=1e-10)
+        func=Prob12, guess=0)
 xi <-0.0001
 mod  <- bvpcolmod(yini=c(-1,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob12, guess=0,atol=1e-10)
+        func=Prob12, guess=0)
 
 @
 <<label=prob12,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 12",
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 curve(cos(pi*x)+exp((x-1)/sqrt(xi)),-1,1,type="p",add=TRUE)
 
 @
@@ -718,19 +721,19 @@ Prob13 <- function(x, y, pars)  {
 
 xi <-0.01
 shoot  <- bvpshoot(yini=c(0,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
-        func=Prob13, guess=0,atol=1e-10)
+        func=Prob13, guess=0)
 xi <-0.0025
 twp  <- bvptwp(yini=c(0,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
-        func=Prob13, guess=0,atol=1e-10)
+        func=Prob13, guess=0)
 xi <-0.0001
 mod  <- bvpcolmod(yini=c(0,NA),yend=c(-1,NA),x=seq(-1,1,by=0.01),
-        func=Prob13, guess=0,atol=1e-10)
+        func=Prob13, guess=0)
 @
 <<label=prob13,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 13",
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 curve(cos(pi*x)+exp(-(x+1)/sqrt(xi)),-1,1,type="p",add=TRUE)
 
 @
@@ -761,19 +764,19 @@ Prob14 <- function(x, y, pars)  {
 
 xi <-0.01
 shoot  <- bvpshoot(yini=c(0,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob14, guess=0,atol=1e-10)
+        func=Prob14, guess=0)
 xi <-0.0025
 twp  <- bvptwp(yini=c(0,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob14, guess=0,atol=1e-10)
+        func=Prob14, guess=0)
 xi <-0.0001
 mod  <- bvpcolmod(yini=c(0,NA),yend=c(0,NA),x=seq(-1,1,by=0.01),
-        func=Prob14, guess=0,atol=1e-10)
+        func=Prob14, guess=0)
 @
 <<label=prob14,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 14", ylim=c(-1,1),
-  xlab="x",ylab="y")
-lines(mod[,1],mod[,2],lty=2)
-lines(twp[,1],twp[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod[,1],mod[,2],col="red")
+lines(twp[,1],twp[,2],col="green")
 curve(cos(pi*x)+exp((x-1)/sqrt(xi))+exp(-(x+1)/sqrt(xi)),-1,1,type="p",add=TRUE)
 
 @
@@ -804,7 +807,7 @@ xi <-0.003
 # Shooting
 print(system.time(
 shoot  <- bvpshoot(yini=c(1,NA),yend=c(1,NA),x=seq(-1,1,by=0.01),
-           func=Prob15, guess=0,atol=1e-10)
+           func=Prob15, guess=0)
 ))
 xi <- 0.005
 
@@ -820,9 +823,9 @@ mod  <- bvpcolmod(yini=c(1,NA),yend=c(1,NA),x=seq(-1,1,by=0.01),
 @
 <<label=prob15,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 15",
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -857,7 +860,7 @@ shoot  <- bvpshoot(yini=c(0,NA),yend=c(sin(pi/2/xi),NA),x=seq(0,1,by=0.01),
 @
 <<label=prob16,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 16",
-  xlab="x",ylab="y")
+  col="blue",xlab="x",ylab="y")
 curve(sin(pi*x/2/xi),0,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -904,9 +907,9 @@ twp3  <- bvptwp(yini=c(-0.1/sqrt(xi+0.01),NA),
 @
 <<label=prob17,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 17",ylim=c(-1,1),
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=2)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="red")
 curve(x/sqrt(xi+x^2),-0.1,0.1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -947,9 +950,9 @@ mod  <- bvpcolmod(yini=c(1,NA),yend=c(exp(-1/xi),NA),x=xseq,
 @
 <<label=prob18,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 18",ylim=c(0,1),
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 curve(exp(-x/xi),0,1,type="p",add=TRUE)
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -998,9 +1001,9 @@ solcol3  <- bvpcolmod(yini=c(0,NA),yend=c(0,NA),x=seq(0,1,by=0.01),
 @
 <<label=prob19,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 19", ylim=c(-0.7,0),
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -1049,9 +1052,9 @@ mod3  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob20,include=FALSE>>=
 plot(mod1[,1],mod1[,2],type="l",main="test problem 20", ylim=c(1,1.8),
-  xlab="x",ylab="y")
-lines(mod2[,1],mod2[,2],lty=2)
-lines(mod3[,1],mod3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod2[,1],mod2[,2],col="red")
+lines(mod3[,1],mod3[,2],col="green")
 curve(1+xi * log(cosh((x-0.745)/xi)),0,1,add=TRUE,type="p")
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -1099,9 +1102,9 @@ mod  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob21,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 21", ylim=c(0,1),
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 curve(exp(-x/sqrt(xi)),0,1,add=TRUE,type="p")
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -1146,9 +1149,9 @@ mod  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob22,include=FALSE>>=
 plot(shoot[,1],shoot[,2],type="l",main="test problem 22", ylim=c(0,1),
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1192,9 +1195,9 @@ mod  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob23,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 23",
-  xlab="x",ylab="y")
-lines(twp[,1],twp[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp[,1],twp[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1250,9 +1253,9 @@ mod3  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 
 <<label=prob24,include=FALSE>>=
 plot(mod1[,1],mod1[,2],type="l",main="test problem 24", ylim=c(0.2,1.4),
-  xlab="x",ylab="y")
-lines(mod2[,1],mod2[,2],lty=2)
-lines(mod3[,1],mod3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(mod2[,1],mod2[,2],col="red")
+lines(mod3[,1],mod3[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1303,9 +1306,9 @@ mod  <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob25,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 25",
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(mod[,1],mod[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(mod[,1],mod[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1348,9 +1351,9 @@ twp3  <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob26,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 26",
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1392,9 +1395,9 @@ twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob27,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 27", ylim=c(0,1),
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1438,9 +1441,9 @@ twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
 
 <<label=prob28,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 28", ylim=c(0.4,1.5),
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1482,9 +1485,9 @@ twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob29,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 29",
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
 
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -1527,9 +1530,9 @@ twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob30,include=FALSE>>=
 plot(twp1[,1],twp1[,2],type="l",main="test problem 30",
-  xlab="x",ylab="y")
-lines(twp2[,1],twp2[,2],lty=2)
-lines(twp3[,1],twp3[,2],lty=3)
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1588,9 +1591,9 @@ mod2 <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob31,include=FALSE>>=
 plot(twp[,1],twp[,4],type="l",main="test problem 31",
-  xlab="x",ylab="y3")
-lines(mod[,1],mod[,4],lty=2)
-lines(mod2[,1],mod2[,4],lty=3)
+  col="blue",xlab="x",ylab="y3")
+lines(mod[,1],mod[,4],col="red")
+lines(mod2[,1],mod2[,4],col="green")
 
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -1637,9 +1640,9 @@ mod <- bvpcolmod(yini=ini,yend=end,x=seq(0,1,by=0.01),
 @
 <<label=prob32,include=FALSE>>=
 plot(twp[,1],twp[,3],type="l",main="test problem 32",
-  xlab="x",ylab="y'")
-lines(twp2[,1],twp2[,3],lty=2)
-lines(mod[,1],mod[,3],lty=3)
+  col="blue",xlab="x",ylab="y'")
+lines(twp2[,1],twp2[,3],col="red")
+lines(mod[,1],mod[,3],col="green")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -1650,6 +1653,103 @@ lines(mod[,1],mod[,3],lty=3)
 \end{center}
 \caption{Solution of the BVP ODE problem 32, see text for R-code}
 \label{fig:pr32}
+\end{figure}
+\clearpage
+
+
+\subsection{problem 33}
+  \begin{eqnarray*}
+    \xi z'''' &=& -z\cdot z''' -y \cdot y' \\
+    \xi y'' &=& y\cdot z' -z \cdot y'
+
+  \end{eqnarray*}
+  where
+  \[
+   y_{x=0}=-1\\
+   y_{x=1}=1\\
+   z_{x=0}=z'_{x=0}=z_{x=1}=z'_{x=1}=0\\  \]
+<<>>=
+Prob33 <- function(t, z, pars, xi) {
+  list(c( z[2], z[3], z[4], 1/xi*(z[1]*z[4]-z[5]*z[6]),
+          z[6], 1/xi*(z[5]*z[2]-z[1]*z[6])))
+
+}
+ini <- c(0,0,NA,NA,-1,NA)
+end <- c(0,0,NA,NA,1,NA)
+
+xi <-0.1
+twp <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob33, guess=c(0,0,0), xi=xi)
+
+xi <-0.01
+twp2 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob33, guess=c(0,0,0), xi=xi)
+
+xi <-0.001
+twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob33, guess=c(0,0,0), xi=xi)
+@
+<<label=prob33,include=FALSE>>=
+plot(twp[,1],twp[,2],type="l",main="test problem 33",
+  col="blue",xlab="x",ylab="y",ylim=c(-0.05,0.05))
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=prob33,fig=TRUE,echo=FALSE>>=
+<<prob33>>
+@
+\end{center}
+\caption{Solution of the BVP ODE problem 33, see text for R-code}
+\label{fig:pr33}
+\end{figure}
+\clearpage
+
+\subsection{problem 34}
+  \begin{eqnarray*}
+    y'' &=& -\xi \cdot exp(y)
+  \end{eqnarray*}
+  where
+  \[
+   y_{x=0}=y_{x=1}=0
+  \]
+<<>>=
+Prob34 <- function(t, y, pars, xi) {
+  list(c( y[2], -xi*exp(y[1])))
+
+}
+ini <- c(0,NA)
+end <- c(0,NA)
+
+xi <-0.1
+twp <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob34, guess=c(0), xi=xi)
+
+xi <-0.01
+twp2 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob34, guess=c(0), xi=xi)
+
+xi <-0.001
+twp3 <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
+           func=Prob34, guess=c(0), xi=xi)
+@
+<<label=prob34,include=FALSE>>=
+plot(twp[,1],twp[,2],type="l",main="test problem 34",
+  col="blue",xlab="x",ylab="y")
+lines(twp2[,1],twp2[,2],col="red")
+lines(twp3[,1],twp3[,2],col="green")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=prob34,fig=TRUE,echo=FALSE>>=
+<<prob34>>
+@
+\end{center}
+\caption{Solution of the BVP ODE problem 34, see text for R-code}
+\label{fig:pr342}
 \end{figure}
 \clearpage
 

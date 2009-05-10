@@ -73,7 +73,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{boundaryValueProblems}
+%\VignetteIndexEntry{Solving Boundary Value Problems of Ordinary Differential Equations}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}

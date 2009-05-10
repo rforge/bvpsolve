@@ -33,11 +33,12 @@ static void colsys_derivs (double *x, double *y,
 {
   int i;
   SEXP R_fcall, ans;
-                                REAL(EPS)[0] = *eps;
+                                 REAL(EPS)[0] = *eps;
                                 REAL(X)[0]   = *x;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i]   = y[i];
 
   PROTECT(R_fcall = lang4(colsys_deriv_func,X,Y,EPS)); incr_N_Protect();
+
   PROTECT(ans = eval(R_fcall, bvpcolmod_envir));      incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
@@ -67,7 +68,6 @@ static void colsys_bound (int *ii, double *y, double *gout, double *eps)
 {
   int i;
   SEXP R_fcall, ans;
-
                              REAL(EPS)[0]  = *eps;
                              INTEGER(J)[0] = *ii;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i] = y[i];
@@ -130,7 +130,7 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft, SEXP 
   int  j, k, ii, nx, ncomp;
   double *aleft, *aright, *zeta, *guess, *fspace, *tol, *fixpnt, *z;
   double eps, epsmin, xout;
-  int *m, *ispace, *ipar, ltol, iflag;
+  int *m, *ispace, *ipar, *ltol, iflag;
 
   deriv_func2    *derivs;
   jac_func2      *jac;
@@ -165,11 +165,16 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft, SEXP 
 
   ii = LENGTH(Ipar);    /* length of ipar */
   ipar  = (int *)    R_alloc(ii, sizeof(int));
-  for (j = 0; j < ii;j++) ipar[j] = INTEGER(Ipar)[j];
+    for (j = 0; j < ii;j++) ipar[j] = INTEGER(Ipar)[j];
 
-  ltol = INTEGER(Ltol)[0];
-  tol   =(double *) R_alloc(ltol, sizeof(double));
-    for (j = 0; j < ltol;j++) tol[j] = REAL(Tol)[j];
+  ii = LENGTH(Tol);
+  tol   =(double *) R_alloc(ii, sizeof(double));
+    for (j = 0; j < ii;j++) tol[j] = REAL(Tol)[j];
+    
+  ltol = (int *)    R_alloc(ii, sizeof(int));
+    for (j = 0; j < ii;j++) ltol[j] = INTEGER(Ltol)[j];
+
+/*      error("mstar, ncomp,ltol %i %i %i %f",ncomp,mstar,ltol,tol[0]);*/
 
   ii =  LENGTH(Fixpnt);
   fixpnt   =(double *) R_alloc(ii, sizeof(double));
@@ -216,8 +221,7 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft, SEXP 
       Subroutine Colmod(Ncomp, M, Aleft, Aright, Zeta, Ipar, Ltol,
      +     Tol, Fixpnt, Ispace, Fspace, Iflag, Eps, Epsmin,
      +     Fsub, Dfsub, Gsub, Dgsub, Guess)             */
-
-	  F77_CALL(colmod) (&ncomp, m, aleft, aright, zeta, ipar, &ltol,
+	  F77_CALL(colmod) (&ncomp, m, aleft, aright, zeta, ipar, ltol,
         tol, fixpnt, ispace, fspace, &iflag, &eps, &epsmin,
         derivs,jac,bound,jacbound,colsys_guess);
 
