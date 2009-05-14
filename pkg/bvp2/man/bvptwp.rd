@@ -159,7 +159,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   two-point boundary value problems: implementation and numerical evaluation,
   SIAM J. Sci. Stat. Comput., 12 (1991) 971 989.
 
-  \url{http://www.ma.ic.ac.uk/~jcash/BVP_software}
+  \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
 
 \examples{
