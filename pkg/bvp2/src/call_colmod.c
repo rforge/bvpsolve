@@ -136,7 +136,7 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   linear = INTEGER(Linear)[0];   /* true if linear problem */
   givu   = INTEGER(Givu)[0];     /* true if initial trial solution given */
   givmesh = INTEGER(Givmesh)[0]; /* true if initial mesh given */
-  nmesh  = INTEGER(Nmesh)[0];     /* true if initial mesh given */
+  nmesh  = INTEGER(Nmesh)[0];     /* size of mesh */
 
   aleft  =REAL(Aleft)[0];
   aright =REAL(Aright)[0];
@@ -159,8 +159,8 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   ii = nmax*ncomp;
   u   =(double *) R_alloc(ii, sizeof(double));
-   for (j = 0; j < ii; j++) u[j] = REAL(Yguess)[j];
-   for (j = ii; j < nmax*ncomp; j++) u[j] = 0;
+   for (j = 0; j < nmesh*ncomp; j++) u[j] = REAL(Yguess)[j];
+   for (j = nmesh*ncomp; j < nmax*ncomp; j++) u[j] = 0;
 
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
   iwrk= (int *)    R_alloc(lwrkin, sizeof(int));

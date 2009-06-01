@@ -1,4 +1,4 @@
- 
+
 *  twpbvp, a fortran 77 package 
 *  for solving two-point boundary value problems, written by
 *  J.R Cash and M.H. Wright.  The code is fully documented 
@@ -229,18 +229,18 @@ C
 *
 *double d1mach_(long *i)
 *{
-*	switch(*i){
-*	  case 1: return DBL_MIN;
-*	  case 2: return DBL_MAX;
-*	  case 3: return DBL_EPSILON/FLT_RADIX;
-*	  case 4: return DBL_EPSILON;
-*	  case 5: return log10(FLT_RADIX);
-*	  }
+*     switch(*i){
+*       case 1: return DBL_MIN;
+*       case 2: return DBL_MAX;
+*       case 3: return DBL_EPSILON/FLT_RADIX;
+*       case 4: return DBL_EPSILON;
+*       case 5: return log10(FLT_RADIX);
+*       }
 *
-*	fprintf(stderr, "invalid argument: d1mach(%ld)\n", *i);
-*	exit(1);
-*	return 0; /* for compilers that complain of missing return values */
-*	}
+*     fprintf(stderr, "invalid argument: d1mach(%ld)\n", *i);
+*     exit(1);
+*     return 0; /* for compilers that complain of missing return values */
+*     }
       END
 
 
@@ -262,7 +262,7 @@ C
       dimension wrk(lwrkfl), iwrk(lwrkin)
       logical linear, givmsh, giveu
       external fsub, dfsub, gsub, dgsub
-    	character (len=80) MSG
+      character (len=180) MSG
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -2118,7 +2118,7 @@ c
       parameter (zero = 0.0d+0, one = 1.0d+0)
       parameter (third = 0.33d+0, fourth = 0.25d+0)
       parameter (quan6 = 0.1d+0 )
-    	character (len=80) MSG
+      character (len=180) MSG
 
 *  blas: dload
 *  double precision d1mach
@@ -2132,7 +2132,7 @@ c
          flmax = d1mach(2)
          epsmch = d1mach(3)
          if (pdebug) then 
-	     write(msg,901) epsmch
+           write(msg,901) epsmch
            call rwarn(msg)
          endif
          mchset = .false.
@@ -2189,10 +2189,10 @@ c
 
   400 continue
       if (iprint .eq. 1) THEN
-	      write(msg,903) nmsh
+            write(msg,903) nmsh
         call rwarn(msg)
-    	endif
-	    
+      endif
+          
 *  Set the def (deferred correction) array to zero.
 
       call mtload(ncomp, nmsh-1, zero, ncomp, def)
@@ -2242,10 +2242,10 @@ c
      *           ratdc, rerr, ipivlu, nmold, xxold,
      *           smooth, reaft6, onto6, strctr, trst6, double,
      *           fsub, maxmsh, succes, first4)
-      if (pdebug .and. .not. onto6) then
-   	   write (msg,904)
-	     call rwarn(msg)
-   	  endif
+        if (pdebug .and. .not. onto6) then
+           write (msg,904)
+           call rwarn(msg)
+        endif
 
       else
 
@@ -2273,7 +2273,7 @@ c
 **** logic for 6th order ****
 
       if (iprint .eq. 1) then
-	      write(msg,905)
+            write(msg,905)
         call rwarn(msg)
       endif
 *  Save the 4th order solution on this mesh in uold. 
@@ -2347,7 +2347,7 @@ c
 ***** logic for trying to calculate 8th order solution *****
 
       if (iprint .eq. 1) then
-	      write(msg,906)
+        write(msg,906)
         call rwarn(msg)
       endif
       call matcop(nudim, ncomp, ncomp, nmsh, u, uold)
@@ -2461,7 +2461,7 @@ c
       subroutine initu(ncomp, nmsh, xx, nudim, u)
       implicit double precision (a-h,o-z)
       dimension xx(*), u(nudim, *)
-    	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -2473,7 +2473,7 @@ c
 *  This version sets all elements of u to the constant uval0.
 
       if (iprint .ne. -1) then 
-	      write(msg,99) uval0
+        write(msg,99) uval0
         call rwarn(msg)
       endif
    99 format('initu, uval0',1pd15.5)
@@ -2531,7 +2531,7 @@ c
       parameter (hundth = 1.0d+5, rerfct = 1.5d+0)
       parameter (power = 1.0d+0/6.0d+0, one = 1.0d+0)
       parameter (zero = 0.0d+0, huge = 1.0d+30)
-      character(len=80) msg
+      character(len=180) msg
       intrinsic abs, max
 
       save  dfold, oldrt1, savedu, reposs
@@ -2541,7 +2541,7 @@ c
 *  The Newton iteration converged for a 4th order solution.
 
       if (iprint .eq. 1) then 
-     	  write(msg,901)
+        write(msg,901)
         call rwarn(msg)
       endif
       if (first4) then
@@ -2572,11 +2572,11 @@ c
  
       if ( smooth .or. reaft6) then
          if (smooth .and. pdebug) then
-	      write(msg,902)
+            write(msg,902)
             call rwarn(msg)
          endif
          if (reaft6 .and. pdebug) then
-	      write(msg,903)
+            write(msg,903)
             call rwarn(msg)
          endif 
          onto6 = .true.
@@ -2616,34 +2616,34 @@ c
 
       if (pdebug) then
          if (smooth) then
-	      write(msg,904)
-	      call rwarn(msg)
+            write(msg,904)
+            call rwarn(msg)
          endif
          if (callrt) then
-	      write(msg,905)
+            write(msg,905)
             call rwarn(msg)
          endif
-	   if (oscchk) then 
-	      write(msg,906)
+         if (oscchk) then 
+            write(msg,906)
             call rwarn(msg)
          endif
-	   if (strctr) then
-	      write(msg,907)
+         if (strctr) then
+            write(msg,907)
             call rwarn(msg)
          endif
-	   if (reposs) then
-	      write(msg,908)
+         if (reposs) then
+            write(msg,908)
             call rwarn(msg)
          endif
-	   if (savedu) then
-	      write(msg,909)
+         if (savedu) then
+            write(msg,909)
             call rwarn(msg)
          endif
-	   if (onto6) then 
-	      write(msg,910)
+         if (onto6) then 
+            write(msg,910)
             call rwarn(msg)
          endif
-	   write(msg,911) rat1, oldrt1
+         write(msg,911) rat1, oldrt1
          call rwarn(msg)
       endif
       oldrt1 = rat1
@@ -2709,7 +2709,7 @@ c
       endif
 
       if (pdebug .and. reposs .and. .not. onto6) then
-	  write(msg,912)
+        write(msg,912)
         call rwarn(msg)
       endif       
       if (.not. onto6) then 
@@ -2727,10 +2727,10 @@ c
             drat = dfexmx/
      *               (max(one, abs(u(incmp,inmsh)))*tol(intol))
             if (pdebug) then
-		    write(msg,913) drat, u(incmp,inmsh), tol(intol)
+              write(msg,913) drat, u(incmp,inmsh), tol(intol)
               call rwarn(msg)
             endif       
-		  numadd = drat**power
+            numadd = drat**power
             call smpmsh (nmsh, nmax, xx, inmsh, numadd,
      *             nmold, xxold, maxmsh) 
          endif
@@ -2772,14 +2772,14 @@ c
       dimension xx(*), u(nudim, *), rhs(*)
       dimension xxold(*), uold(ncomp, *), tmwork(*)
       logical linear, double, maxmsh
-      character (len=80) msg
+      character (len=180) msg
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
 
 *  The Newton procedure failed to obtain a 4th order solution.
 
       if (iprint .eq. 1) then
-	      write(msg,901)
+        write(msg,901)
         call rwarn(msg)
       endif 
       maxmsh = .false.
@@ -2837,7 +2837,7 @@ c
       dimension u(nudim,*), tol(ntol) 
       dimension uold(ncomp,*), etest6(*)
       logical trst6, onto8, reaft6, succes
-      character (len=80) msg
+      character (len=180) msg
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
 
@@ -2846,7 +2846,7 @@ c
 *  The Newton iteration converged for a 6th-order solution.
 
       if (iprint .eq. 1) then
-    	  write(msg,901)
+        write(msg,901)
         call rwarn(msg)
       endif 
       succes = .false.
@@ -2890,7 +2890,7 @@ c
       dimension rerr(ncomp,*), ermx(*), tmwork(*)
       logical reaft6, double, succes, maxmsh
       logical adjrer
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -2907,10 +2907,10 @@ c
 *  Non-convergence of 6th order.
 
       if (iprint .eq. 1) then
-	      write(msg,901)
+        write(msg,901)
         call rwarn(msg)
       endif      
-	succes = .false.
+      succes = .false.
       maxmsh = .false.
   
 *  NB: the problem must be nonlinear.  Linear problems will either
@@ -2922,23 +2922,23 @@ c
       call matcop(ncomp, nudim, ncomp, nmsh, uold, u)
 
       if (reaft6) then
-	  write(msg,9999)
+        write(msg,9999)
         call rwarn(msg)
       endif
  9999 format('in fail6, reaft6is true')
       if (.not.reaft6) then
-	  write(msg,9998)
+        write(msg,9998)
         call rwarn(msg)
       endif
  9998 format('in fail6, not reaft6')
       if (double) then
-	  write(msg,9997)
+        write(msg,9997)
         call rwarn(msg)
       endif
  9997 format('in fail6, double is true')
       if (.not.double) then
-	  write(msg,9996)
-	  call rwarn(msg)
+        write(msg,9996)
+        call rwarn(msg)
       endif
  9996 format('in fail6, not double')
 
@@ -2957,7 +2957,6 @@ c
          reaft6 = .true.
 
 *  Save the current 4th order solution in usave.
-
          call matcop(nudim, ncomp, ncomp, nmsh, u, usave)
 
 *  Use the distribution of sizes in the rhs vector to refine the mesh.
@@ -2966,7 +2965,13 @@ c
      *              iorder, rhs, tmwork,
      *              nmax, xx, nmold, xxold, double, maxmsh,
      *              numbig, nummed)
-         if (.not. maxmsh) call interp(ncomp, nmsh, xx, nudim, u, 
+
+CCCC  KSKSKS: problem in interp...  CCCCC
+C KSKS HAD TO REMOVE call to INTERP by setting maxmsh = true!!!!!
+C            write(msg,'(4I8)') ncomp,nmsh,nudim,nmold
+C            call rwarn(msg)
+        maxmsh = .TRUE.
+         if (.not. maxmsh) call interp(ncomp, nmsh, xx, nudim, u,
      *                        nmold, xxold, uold)
       
       else
@@ -3084,7 +3089,7 @@ c
       dimension ihcomp(*), irefin(*)
       dimension ermx(*), xxold(*)
       logical linear, strctr, double, maxmsh, succes, first8
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -3103,7 +3108,7 @@ c
 *  The Newton iteration converged for the 8th order solution.
 
       if (iprint .eq. 1) then
-	      write(msg,901)
+            write(msg,901)
         call rwarn(msg)
       endif
       if (first8) then
@@ -3142,7 +3147,7 @@ c
 *  At this point, the 8th order solution converged, but did not
 *  satisfy the test for termination.
       if (pdebug) then
-	  write(msg,902) err6, err8, er6old, er8old
+        write(msg,902) err6, err8, er6old, er8old
         call rwarn(msg)
       endif
       if (nmsh .lt. nmold. and.
@@ -3229,7 +3234,7 @@ c
       endif
 
       if (pdebug .and. .not.succes) then
-	  write(msg,903)
+        write(msg,903)
         call rwarn(msg)
       endif
       return
@@ -3254,13 +3259,13 @@ c
       dimension ihcomp(*), irefin(*)
       dimension ermx(*)
       logical double, maxmsh
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
 
       if (pdebug) then
-	  write(msg,901)
+        write(msg,901)
         call rwarn(msg)
       endif
 *  8th order solution did not converge (the problem must be nonlinear)
@@ -3293,7 +3298,7 @@ c
      *                     derivm, dfimmx, rat1, rat2)
 
       implicit double precision  (a-h,o-z)
-	character(len=80) msg
+      character(len=180) msg
 
       dimension  ltol(ntol)
       dimension  defexp(ncomp,nmsh-1), defimp(ncomp,nmsh-1)
@@ -3340,7 +3345,7 @@ c
       idmx = idamax(nmsh, fval(incmp, 1), ncomp)
       derivm = abs(fval(incmp, idmx))
       if (pdebug) then
-	  write(msg,903) derivm
+        write(msg,903) derivm
         call rwarn(msg)
       endif
 *  For component incmp, go through the mesh intervals to calculate
@@ -3388,7 +3393,7 @@ c
   100 continue
 
       if (pdebug) then
-	  write(msg,905) rat1, rat2, dfimmx
+        write(msg,905) rat1, rat2, dfimmx
         call rwarn(msg)
       endif 
       return
@@ -3410,7 +3415,7 @@ c
 
       logical linear, onto6, smooth, callrt, strctr, 
      *     oscchk, double, reposs
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -3438,11 +3443,11 @@ c
 *  rat2 is always greater than or equal to rat1.
 
       if (pdebug) then
-  	 write(msg,901)
+       write(msg,901)
        call rwarn(msg)
       endif
       if (pdebug) then
-	  write(msg,902) tolval, rtst
+        write(msg,902) tolval, rtst
         call rwarn(msg)
       endif
       stest = .true.
@@ -3461,7 +3466,7 @@ c
 
       thttol = thrtwo*tolval
       if (pdebug) then
-	  write(msg,903) thttol
+        write(msg,903) thttol
         call rwarn(msg)
       endif      
       if (rat1 .lt. rtst .and. dfexmx .lt. thttol) then
@@ -3722,7 +3727,7 @@ c
       dimension defcor(ncomp, *), ratdc(*)
 
       logical double, onto6, trst6, smooth
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -3758,7 +3763,7 @@ c
       ninter = nmsh - 1
 
       if (pdebug) then
-	 write(msg,901)
+       write(msg,901)
         call rwarn(msg)
       endif 
       allsum = zero
@@ -3784,7 +3789,7 @@ c
 *  relative to the maximum.
 
          if (pdebug) then
-	    write(msg,902) im, ratdc(im), abdef, frac2*dfexmx
+          write(msg,902) im, ratdc(im), abdef, frac2*dfexmx
           call rwarn(msg)
          endif
          if (ratdc(im).lt.zero .and. abdef.ge.frac2*dfexmx) then
@@ -3807,7 +3812,7 @@ c
    30 continue
 
       if (pdebug) then
-	  write(msg,903) rmax, jsndif
+        write(msg,903) rmax, jsndif
         call rwarn(msg)
       endif 
       
@@ -3818,7 +3823,7 @@ c
       ave = allsum/ninter
 
       if (pdebug) then 
-	  write(msg,904) ave, avsm, avbg
+        write(msg,904) ave, avsm, avbg
         call rwarn(msg)
       endif
       if (avsm.gt.frac1*avbg .or. ave.gt.half*avbg) then
@@ -4011,7 +4016,7 @@ c
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
       common/mchprs/flmin, flmax, epsmch
-    	character(len=80) msg
+      character(len=180) msg
 
       intrinsic  abs, max 
 
@@ -4029,7 +4034,7 @@ c
 *  their calculation.
 
       if (iprint .eq. 1) then
-	      write(msg,901)
+            write(msg,901)
         call rwarn(msg)
       endif 
       ninter = nmsh - 1
@@ -4061,10 +4066,10 @@ c
       if (rnsq.gt.huge .or. 
      *      (iorder.eq. 8 .and. rnsq.gt.xlarge)) then
          if (iprint .eq. 1) then
-	       write (msg,902) rnsq
-   	     call rwarn(msg)
+             write (msg,902) rnsq
+           call rwarn(msg)
          endif
-	   iflag = -2
+         iflag = -2
          return
       end if
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
@@ -4076,7 +4081,7 @@ c
 *  If rnsq is sufficiently small, terminate immediately.
 
       if (iprint .eq. 1) then
-	      write(msg,903) iter, rnsq
+            write(msg,903) iter, rnsq
         call rwarn(msg)
       endif
       if (rnsq .le. epsmch) then
@@ -4136,7 +4141,7 @@ c
             iflag = -2
          endif
          if (iprint .eq. 1) then
-	         write(msg,904) iflag
+               write(msg,904) iflag
            call rwarn(msg)
          endif
          return
@@ -4155,7 +4160,7 @@ c
 *  been passed.
 
       if (iprint .ge. 0) then
-	      write(msg,905) iter, rnsq
+            write(msg,905) iter, rnsq
         call rwarn(msg)
       endif
       iflag = 0
@@ -4324,7 +4329,7 @@ c
       data  shrfct/100.0d+0/, stpfct/2.0d+0/
       data  gtpdeb/.false./, mfsrch/5/
       data  eta/.999999d+0/, rmu/1.0d-6/
-	character(len=80) msg
+      character(len=180) msg
 
 
 *  The routine newteq performs Newton iterations with a line
@@ -4344,7 +4349,7 @@ c
       ninter = nmsh - 1
 
       if (iprint .eq. 1) then
-	      write(msg,901)
+            write(msg,901)
         call rwarn(msg)
       endif  
 *  A Newton method with line search and watchdog safeguarding
@@ -4372,8 +4377,8 @@ c
       rnprev = flmax
 
       if (.not. pdebug .and. iprint .eq. 0) then
-    	  write (msg,902)
-	      call rwarn(msg)
+        write (msg,902)
+            call rwarn(msg)
       endif
 
 *  Initialize counter of watchdog iterations.
@@ -4387,14 +4392,14 @@ c
       iter = iter + 1
 
       if (iprint .eq. 1) then
-	      write(msg,910) iter
+            write(msg,910) iter
         call rwarn(msg)
       endif 
 *  If there have been too many Newton iterations, terminate.
 
       if (iter .ge. lmtnwt) then
          if (iprint .ge. 0) then
-	         write(msg,903)
+               write(msg,903)
            call rwarn(msg)
          endif
          iflag = -2
@@ -4413,7 +4418,7 @@ c
  
       if (iflwat .ne. 0) then
          if (iprint .ge. 0) then
-	         write(msg,904) iter
+               write(msg,904) iter
            call rwarn(msg)
          endif
          iflag = -3
@@ -4433,7 +4438,7 @@ c
 
       if (rnsq .le. epsmch) then
          if (iprint .ge. 0)  then
-	         write(msg,906) iter, rnsq
+               write(msg,906) iter, rnsq
            call rwarn(msg)
          endif 
          iflag = 0
@@ -4481,8 +4486,8 @@ c  at the initial point of the line search.
       oldg = -two*fa
       alfa = zero
       if (iprint .eq. 1) then 
-	     write (msg,908) alfa, fmtry, rnsq
-	     call rwarn(msg)
+           write (msg,908) alfa, fmtry, rnsq
+           call rwarn(msg)
       endif
 
 *  On the first Newton iteration, the initial trial step is unity.   
@@ -4527,7 +4532,7 @@ c  at the initial point of the line search.
 *  number)
 
       if (pdebug) then
-	  write(msg,907) inform, alfa
+        write(msg,907) inform, alfa
         call rwarn(msg)
       endif
 
@@ -4580,11 +4585,11 @@ c  at the initial point of the line search.
             fmtry = rnsqtr
          end if
          if (iprint .eq. 1) then
-	        write (msg,908) alfa, fmtry, rnsqtr
-       	 call rwarn(msg)
+              write (msg,908) alfa, fmtry, rnsqtr
+           call rwarn(msg)
          endif
 
-	   go to 150
+         go to 150
       endif
 
 *  To reach here, inform must be 1, 2, 3, or 6, and the line search 
@@ -4597,7 +4602,7 @@ c  at the initial point of the line search.
       call matcop (ncomp, nudim, ncomp, nmsh, utrial, u)
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
       if (iprint .eq. 0) then
-	      write(msg,909) iter, alfa, fmtry, rnsq
+            write(msg,909) iter, alfa, fmtry, rnsq
         call rwarn(msg)
       endif 
 *  Now test for convergence using the ratio of the Newton step 
@@ -4613,7 +4618,7 @@ c  at the initial point of the line search.
   160 continue
   
       if (iprint .eq. 0) then
-	      write(msg, 906) iter+1, rnsq
+            write(msg, 906) iter+1, rnsq
         call rwarn(msg)
       endif
 
@@ -4938,7 +4943,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       common/algprs/ nminit, pdebug, iprint, idum, uval0
       common/mchprs/flmin, flmax, epsmch
       intrinsic abs
-      character(len=80) msg
+      character(len=180) msg
 
 *  blas: dssq
 
@@ -4993,7 +4998,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          write (msg,902) rnsq
 *         write(6,903)
 *         write(6,904) (rhs(i), i=1,ncomp*nmsh)
-	  call rwarn(msg)
+        call rwarn(msg)
       endif
       return
 
@@ -5007,7 +5012,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       implicit double precision (a-h,o-z)
       dimension xx(*), xxold(*)
       logical maxmsh
-	character(len=80) msg
+          character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -5040,7 +5045,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmnew = ninnew + 1
       if(nmnew .ge. nmax) then
          if (iprint .ge. 0)  then
-	         write(msg,901) nmnew
+               write(msg,901) nmnew
            call rwarn(msg)
          endif 
          maxmsh = .true.
@@ -5062,7 +5067,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       xx(2) = half*(xx(3) + xx(1))
       nmsh = nmnew
       if(iprint .ge. 0)  then 
-	      write(msg,902) nmsh
+            write(msg,902) nmsh
         call rwarn(msg)
       endif
       return
@@ -5095,7 +5100,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       parameter  ( zero = 0.0d+0, one = 1.0d+0, onep1 = 1.1d+0 ) 
       parameter  ( erdcid = 5.0d+0 )
       parameter  ( phitst = 0.1d+0 )
-	character(len=80) msg
+        character(len=180) msg
   
       logical first
       save    first, rlndec
@@ -5112,7 +5117,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       maxmsh = .false.
 
       if (pdebug) then 
-	  write(msg,901) nmsh, ipow
+            write(msg,901) nmsh, ipow
         call rwarn(msg)
       endif
 
@@ -5153,7 +5158,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
   120 continue
 
       if (pdebug) then
-	  write(msg,903) errmax
+            write(msg,903) errmax
         call rwarn(msg)
       endif 
       if (errmax .gt. zero .and. errmax .le. erdcid) then
@@ -5351,7 +5356,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) then 
-  	     write(msg,905) nmsh
+           write(msg,905) nmsh
         call rwarn(msg)
       endif
       return
@@ -5403,7 +5408,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       implicit double precision (a-h,o-z)
       logical maxmsh
       dimension xx(*), xxold(*)
-	character(len=80) msg
+          character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -5417,7 +5422,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 *  interval. 
 
       if (pdebug) then
-	      write(msg,901)
+            write(msg,901)
         call rwarn(msg)
       endif
       nmold = nmsh
@@ -5431,8 +5436,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          numadd = 4
       endif
       if (pdebug) then
-  	  write (msg,902) nmsh, intref, numadd
- 	  call rwarn(msg)
+        write (msg,902) nmsh, intref, numadd
+            call rwarn(msg)
       endif
 
       maxmsh = .false.
@@ -5443,7 +5448,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0)  then
-		          write(msg,903) nmnew
+                    write(msg,903) nmnew
               call rwarn(msg)
             endif
             maxmsh = .true.
@@ -5468,7 +5473,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0)  then
-		          write(msg,903) nmnew
+                    write(msg,903) nmnew
               call rwarn(msg)
             endif 
             maxmsh = .true.
@@ -5491,7 +5496,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          nmnew = nmsh + 3*numadd 
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0)  then
-		          write(msg,903) nmnew
+                    write(msg,903) nmnew
               call rwarn(msg)
             endif
             maxmsh = .true.
@@ -5534,7 +5539,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmsh = nmnew
 
       if(iprint .ge. 0)  then
-	      write(msg,904) nmsh
+            write(msg,904) nmsh
         call rwarn(msg)
       endif
       return
@@ -5549,7 +5554,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       implicit double precision (a-h,o-z)
       integer  nmsh, nfxpnt
       dimension fixpnt(*), xx(nmsh)
-	character(len=80) msg
+      character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -5577,7 +5582,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 *  The array xx (of dimension nmsh) contains the mesh points.
 
       if (iprint .ge. 0) then
-	      write(msg,901) nmsh
+            write(msg,901) nmsh
         call rwarn(msg)
       endif
       if (nfxpnt .eq. 0) then
@@ -5693,7 +5698,7 @@ c
       dimension  rhs(ncomp*nmsh), tmwork(nmsh-1)
       dimension  xx(nmsh), xxold(nmold)
       logical    double, maxmsh
-	character(len=80) msg
+          character(len=180) msg
       
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -5736,7 +5741,7 @@ c
 *  corresponding to components for which a tolerance is specified.
 
       if (pdebug) then
-	  write(msg,901) nummed, numbig
+            write(msg,901) nummed, numbig
         call rwarn(msg)
       endif
       ninter = nmsh-1
@@ -5770,7 +5775,7 @@ c
      *                 sumrhs, intref)
          tstval = bigfac*(sumrhs-rbigst)/ninter
          if (pdebug) then 
-	     write(msg,902) ic, tstval, rbigst, rsecnd
+               write(msg,902) ic, tstval, rbigst, rsecnd
            call rwarn(msg)
          endif
          if (rbigst .ge. small .and. rbigst .ge. tstval) go to 100
@@ -5783,7 +5788,7 @@ c
       nummed = 0
       double = .true.
       if (pdebug) then 
-	  write(msg,903)
+            write(msg,903)
         call rwarn(msg)
       endif
       call dblmsh(nmsh, nmax, xx, nmold, xxold, maxmsh)
@@ -5817,11 +5822,11 @@ c
 
 *  Refine the mesh.
       if (pdebug) then
-	  write(msg,904) numbig, nummed
+            write(msg,904) numbig, nummed
         call rwarn(msg)
       endif
       if (double .and. pdebug) then
-	  write(msg,905)
+            write(msg,905)
         call rwarn(msg)
       endif      
       if (double) then
@@ -5847,7 +5852,7 @@ c
       dimension ltol(ntol), tol(ntol), u(nudim,nmsh), 
      *              uold(ncomp,nmsh), etest(ntol)
       logical errok
-	character(len=80) msg
+          character(len=180) msg
 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
@@ -5873,7 +5878,7 @@ c
 *      corresponding values of etest.
 
       if (pdebug) then
-	  write(msg,900)
+            write(msg,900)
         call rwarn(msg)
       endif
       errsum = zero
@@ -5891,7 +5896,7 @@ c
    10 continue
 
       if (pdebug) then
-	  write(msg,902) errsum
+            write(msg,902) errsum
         call rwarn(msg)
       endif 
       return
@@ -6568,7 +6573,7 @@ c  end of getptq
       dimension xx(*), u(nudim,*), xxold(*), uold(ncomp,*) 
       logical pdebug
       common/algprs/ nminit, pdebug, iprint, idum, uval0
-	character(len=80) msg
+          character(len=180) msg
 
 * blas: dcopy
 
@@ -6583,7 +6588,7 @@ c  end of getptq
 *  and last points are identical).
 
       if (pdebug) then
-	  write(msg,900)
+        write(msg,900)
         call rwarn(msg)
       endif
 *  By construction, xx(1) = xxold(1).  Copy the first ncomp
