@@ -1,0 +1,13 @@
+Package: colmod
+Version: 1.0
+Title: General solver for boundary value problems of ordinary differential equations
+Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Maintainer: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Depends: R (>= 2.01), rootSolve, deSolve
+Description: Functionsthat solve boundary value problems (BVP) of systems of ordinary
+             differential equations (ODE).
+             The functions provide an interface to the FORTRAN functions
+             colmod.
+License: GPL
+LazyData: yes
+
