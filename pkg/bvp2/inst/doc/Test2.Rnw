@@ -1619,7 +1619,6 @@ lines(twp3[,1],twp3[,3],col="green")
   \begin{eqnarray*}
     \xi z'''' &=& -z\cdot z''' -y \cdot y' \\
     \xi y'' &=& y\cdot z' -z \cdot y'
-
   \end{eqnarray*}
   where
   \[
