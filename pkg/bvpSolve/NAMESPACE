@@ -1,2 +1,0 @@
-useDynLib(bvpSolve)
-export(bvpshoot,bvptwp,bvpcolmod)
