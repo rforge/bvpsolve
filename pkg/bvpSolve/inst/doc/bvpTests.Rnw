@@ -63,7 +63,7 @@
 \SweaveOpts{keep.source=TRUE}
 
 <<preliminaries,echo=FALSE,results=hide>>=
-library("bvp2")
+library("bvpSolve")
 options(prompt = "> ")
 options(width=70)
 @ 

@@ -181,7 +181,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
             as.integer(nmax),as.integer(lwrkfl),as.integer(lwrkin),
             as.double(Xguess), as.double(Yguess),
             Func, JacFunc, Bound, JacBound,
-            rho, PACKAGE="bvp2")
+            rho, PACKAGE="bvpSolve")
   nn <- attr(out,"istate")
   mesh <- nn[3]
   attr(out,"istate") <- NULL

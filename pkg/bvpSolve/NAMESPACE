@@ -1,2 +1,2 @@
-useDynLib(bvp2)
+useDynLib(bvpSolve)
 export(bvpshoot,bvptwp)
