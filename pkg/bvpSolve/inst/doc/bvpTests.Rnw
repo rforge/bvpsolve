@@ -55,7 +55,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{bvpSolve: Test Problem Set}
+%\VignetteIndexEntry{bvpSolve: a set of 35 test Problems}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -109,6 +109,13 @@ options(width=70)
   
   If available, then the analytical solution of the problem is plotted (as dots).
 
+  Note that another package \ds \citep{deSolve} is designed for
+  solving initial value problems, i.e. where the boundary conditions are
+  provided at the initial boundary point only.
+
+  Package \rs \citep{rootSolve} has functions to solve certain
+  boundary value problems, using the method of lines approach.
+  This is usually more efficient than the boundary value solvers from \bvp
 
 \section{Linear problems}
 \subsection{problem 1}
@@ -410,7 +417,7 @@ curve(cos(pi*x)+erf(x/sqrt(2*xi))/erf(1/sqrt(2*xi)),-1,1,type="p",add=TRUE)
     y(-1) &=& -1 \\
     y(1) &=& 1
   \end{eqnarray*}
-This problem cannot be solved with the shooting method for large xi.
+This problem cannot be solved with the shooting method for small xi.
 <<>>=
 prob7 <- function(x, y, pars) {
   list(c(y[2],
@@ -431,44 +438,32 @@ twp3  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7, guess=0)
 
 @
 <<label=prob7,include=FALSE>>=
+par(mfrow=c(1,2))
 plot(twp[,1],twp[,2],type="l",main="test problem 7",
   col="blue",xlab="x",ylab="y")
 erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1
 curve(cos(pi*x)+x+(x*erf(x/sqrt(2*xi))+sqrt(2*xi/pi)*exp(-x^2/2/xi))/
          (erf(1/(2*xi))+sqrt(2*xi/pi)*exp(-1/2/xi)),-1,1,type="p",add=TRUE)
 
-@
-
-\setkeys{Gin}{width=0.4\textwidth}
-\begin{figure}
-\begin{center}
-<<label=prob7,fig=TRUE,echo=FALSE>>=
-<<prob7>>
-@
-
-\end{center}
-\caption{Solution of the BVP ODE problem 7, y versus x- see text for R-code}
-\label{fig:pr7}
-\end{figure}
-<<label=prob7b,include=FALSE>>=
 plot(twp[,1],twp[,3],type="l",main="test problem 7",
   col="blue",xlab="x",ylab="y'")
 lines(twp2[,1],twp2[,3],col="red")
 lines(twp3[,1],twp3[,3],col="green")
-
+par(mfrow=c(1,1))
 @
 
-\setkeys{Gin}{width=0.4\textwidth}
+\setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=prob7b,fig=TRUE,echo=FALSE>>=
-<<prob7b>>
+<<label=prob7,fig=TRUE,echo=FALSE, width=13, height=6>>=
+<<prob7>>
 @
 
 \end{center}
-\caption{Solution of the BVP ODE problem 7, y' versus x- see text for R-code}
+\caption{Solution of the BVP ODE problem 7, y and y' versus x- see text for R-code}
 \label{fig:pr7}
 \end{figure}
+
 \clearpage
 \subsection{problem 8}
   \begin{eqnarray*}
@@ -1223,8 +1218,34 @@ Prob24 <- function(t, y, pars, xi) {
 
 ini <- c(0.9129,NA)
 end <- c(0.375,NA)
+
+xi <-0.05
+mod1  <- bvpshoot(yini=ini,yend=end,x=seq(0,1,by=0.01),
+        func=Prob24, guess=0.9 ,xi=xi)
+xi <-0.025
+mod2  <- bvpshoot(yini=ini,yend=end,x=seq(0,1,by=0.01),
+        func=Prob24, guess=0.9 ,xi=xi)
+xi <-0.02
+mod3  <- bvpshoot(yini=ini,yend=end,x=seq(0,1,by=0.01),
+        func=Prob24, guess=0.9 ,xi=xi)
+attributes(mod3)         # has FAILED: f.root too large!
 @
-Neither shooting nor bvptwp can solve this problem ...
+Neither bvpshoot nor bvptwp can solve this problem for small $\xi$
+<<label=prob24,include=FALSE>>=
+plot(mod1[,1],mod1[,2],type="l",main="test problem 24",
+  col="blue",xlab="x",ylab="y",ylim=c(0,1.5))
+lines(mod2[,1],mod2[,2],col="red")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=prob24,fig=TRUE,echo=FALSE>>=
+<<prob24>>
+@
+\end{center}
+\caption{Solution of the BVP ODE problem 24, see text for R-code}
+\label{fig:pr24}
+\end{figure}
 
 \clearpage
 \subsection{problem 25}
