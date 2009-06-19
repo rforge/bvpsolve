@@ -93,7 +93,7 @@ options(width=70)
   can be written as:
 
   \begin{eqnarray*}
-    \frac{dy}{dx}=f(x,y) \\
+    \frac{d^2y}{dx^2}=f(x,y,\frac{dy}{dx})
     a \leq x\leq b \\
     g_1(y) |_a = 0 \\
     g_2(y) |_b = 0

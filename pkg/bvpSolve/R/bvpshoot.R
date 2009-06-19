@@ -54,7 +54,9 @@ bvpshoot<- function(yini, x, func, yend, parms=NULL, guess=NULL, extra=NULL,
   if (lini > 0)
     y[inix] <- guess
 
-  sol <- multiroot(start = c(guess,extra), cost, atol=atol, rtol=rtol,
+  if (lini+lex==0)
+    stop ("this is not a boundary value problem - use initial value problem solver instead")
+    sol <- multiroot(start = c(guess,extra), cost, atol=atol, rtol=rtol,
                    maxiter=maxiter, positive =positive, ...)
 
 

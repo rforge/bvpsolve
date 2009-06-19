@@ -27,12 +27,13 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 ## Boundary conditions  specified by yini and yend
 ##---------------------
 
-  if (! is.null(yini))  {    # yini is either a vectoror a function
+  if (! is.null(yini))  {    # yini is either a vector or a function
     y       <- yini
     Y       <- y
     inix    <- which (is.na(y))
     nas     <- length(inix)
     leftbc  <- length(which (!is.na(y)))   # NA when initial condition not known
+
     if (is.null(guess)&& ! is.null(yguess))
       guess <- yguess[1,inix]
 
@@ -50,10 +51,13 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   } else   {               # boundaries specified by boundary function 'bound'
     if (is.null(leftbc))
       stop("leftbc should be inputted if bound is given")
+      
     if (! is.null(yguess))
       guess <- yguess[1,]
     Y <- y <- guess  # trick
   }
+  if (leftbc==length(y))
+    stop ("this is not a boundary value problem - use initial value problem solver instead")
   Ynames <- attr(y,"names")
   if (is.null(Ynames) & is.matrix(yguess)) Ynames <- colnames(yguess)
   if (is.null(Ynames) & is.vector(yguess)) Ynames <- names(yguess)
