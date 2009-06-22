@@ -123,7 +123,7 @@ options(width=70)
   This problem is:
   \begin{eqnarray*}
     \xi y'' -y = 0 \\
-    y_{(x=0)} = y_{(x=1)} = 0
+    y_{(x=0)} = 1, y_{(x=1)} = 0
   \end{eqnarray*}
 
   which is rewritten as:
@@ -187,7 +187,7 @@ curve(exp(-x/sqrt(xi))-exp((x-2)/sqrt(xi))/(1-exp(-2/sqrt(xi))),
   This problem is:
   \begin{eqnarray*}
     \xi y'' -y' = 0 \\
-    y_{(x=0)} = y_{(x=1)} = 0
+    y_{(x=0)} = 1, y_{(x=1)} = 0
   \end{eqnarray*}
 
   which is rewritten as:
@@ -744,7 +744,7 @@ curve(cos(pi*x)+exp(-(x+1)/sqrt(xi)),-1,1,type="p",add=TRUE)
   \begin{eqnarray*}
     \xi y''= y = -(\xi \pi^2 +1) cos(\pi x)\\
     y_{(x=-1)} = 0 \\
-    y_{(x= 1)} = -1
+    y_{(x= 1)} = 0
   \end{eqnarray*}
 
 <<>>=
@@ -833,7 +833,7 @@ lines(twp2[,1],twp2[,2],col="green")
   \begin{eqnarray*}
     \xi^2 y'' +\pi^2 y/4 = 0\\
     y_{(x=0)} = 0 \\
-    y_{(x=1)} = \sin(\pi x / 2 \xi)
+    y_{(x=1)} = \sin(\pi / (2 \xi))
   \end{eqnarray*}
 
 <<>>=
@@ -868,7 +868,7 @@ curve(sin(pi*x/2/xi),0,1,type="p",add=TRUE)
  \subsection{problem 17}
   \begin{eqnarray*}
    y'' =-3 \xi y/(\xi +x^2)^2\\
-   y_{(x=0.1)} = -y(-0.1) = 0.1 \sqrt(\xi + 0.01)
+   y_{(x=0.1)} = -y(-0.1) = \frac{0.1}{\sqrt(\xi + 0.01)}
   \end{eqnarray*}
 
 only bvptwp works.
@@ -919,8 +919,8 @@ curve(x/sqrt(xi+x^2),-0.1,0.1,type="p",add=TRUE)
   \begin{eqnarray*}
    \xi y'' =-y'\\
    y_{(x=0)} = 1\\
-   y_{(x=1)} = -x / \xi
-  \end{eqnarray*}
+   y_{(x=1)} = exp(-1 / \xi)
+   \end{eqnarray*}
 
 <<>>=
 Prob18 <- function(x, y, pars) {
@@ -1249,7 +1249,7 @@ lines(mod2[,1],mod2[,2],col="red")
 
 \clearpage
 \subsection{problem 25}
-Now come a series of similar problems (problem 25-29), that differ only
+Now come a series of similar problems (problem 25-30), that differ only
 by their boundary conditions:
 
 The differential equation is:
