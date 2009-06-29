@@ -39,7 +39,7 @@
 
 \Abstract{This document is about package \bvp \citep{bvpSolve},
   designed for the numerical
-  solution of boundary value problems for (first-order) ordinary differential
+  solution of boundary value problems for ordinary differential
   equations (ODE) in \R.
 
   Package \bvp contains:
@@ -89,7 +89,7 @@ options(width=70)
 \section{Introduction}
 
   \pkg{bvpSolve} numerically solves boundary value problems (BVP) of
-  first-order ordinary differential equations (ODE), which for one ODE
+  ordinary differential equations (ODE), which for one (second-order) ODE
   can be written as:
 
   \begin{eqnarray*}

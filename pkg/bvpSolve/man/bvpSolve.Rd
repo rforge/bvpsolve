@@ -6,7 +6,7 @@
   Solvers for Boundary Value Problems (BVP) of Ordinary Differential Equations
 }
 \description{
-  Functions that solve boundary value problems of a system of stiff first-order
+  Functions that solve boundary value problems of a system of stiff
   ordinary differential equations (ODE)
 
   The functions provide an interface to the FORTRAN code
