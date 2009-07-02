@@ -18,8 +18,7 @@
   \tabular{ll}{
     Package: \tab bvpSolve\cr
     Type:    \tab Package\cr
-    Version: \tab 1.0\cr
-    Date:    \tab 2009-06-12\cr
+    Version: \tab 1.1\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
