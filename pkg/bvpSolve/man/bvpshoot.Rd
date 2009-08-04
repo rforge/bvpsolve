@@ -177,13 +177,13 @@ fun <- function(t,y,pars)
 p    <-1e-5
 
 # initial and final condition; second conditions unknown
-init <- c(-0.1/sqrt(p+0.01), NA)
+init <- c(y=-0.1/sqrt(p+0.01), dy=NA)
 end  <- c(0.1/sqrt(p+0.01), NA)
 
 # Solve bvp
 sol  <- as.data.frame(bvpshoot(yini=init, x=seq(-0.1,0.1,by=0.001),
         func=fun, yend=end, guess=1))
-plot(sol$time,sol[,2],type="l")
+plot(sol$x,sol$y,type="l")
 
 # add analytical solution
 curve(x/sqrt(p+x*x),add=TRUE,type="p")
@@ -207,10 +207,13 @@ f2 <- function(x,y,parms)
 }
 
 x    <- seq(1,6,0.1)
-sol  <- bvpshoot(yini=c(1,NA), yend=c(-0.5,NA), x=x, func=f2, guess=1)
+sol  <- bvpshoot(yini=c(y=1,dy=NA), yend=c(-0.5,NA), x=x, func=f2, guess=1)
+
+# plot both state variables
 plot(sol)
 
-# add the analytic solution
+# plot only y and add the analytic solution
+plot(sol, which="y")
 curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
       1/4*x^(3/2)*sin(x),add=TRUE,type="l")
 

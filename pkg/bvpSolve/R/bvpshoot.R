@@ -67,5 +67,6 @@ bvpshoot<- function(yini, x, func, yend, parms=NULL, guess=NULL, extra=NULL,
   attr(out,"rstate") <- NULL
   attr(out,"roots")  <- data.frame(root=sol$root,
                                    f.root=sol$f.root, iter=sol$iter)
+  colnames(out)[1] <- "x"
   out
 }

@@ -1,6 +1,6 @@
 #include <time.h>
 #include <string.h>
-#include "twbvp.h"
+#include "twpbvp.h"
 
 /* definition of the calls to the fortran functions -
       subroutine twpbvp(ncomp, nlbc, aleft, aright,

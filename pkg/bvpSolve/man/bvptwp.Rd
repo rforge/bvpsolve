@@ -192,13 +192,13 @@ fun <- function(t,y,pars)
 p    <-1e-5
 
 # initial and final condition; second conditions unknown
-init <- c(-0.1/sqrt(p+0.01), NA)
+init <- c(y=-0.1/sqrt(p+0.01), dy=NA)
 end  <- c(0.1/sqrt(p+0.01), NA)
 
 # Solve bvp
 sol  <- as.data.frame(bvptwp(yini=init,x=seq(-0.1,0.1,by=0.001),
         func=fun, yend=end, guess=1))
-plot(sol$time,sol[,2],type="l")
+plot(sol$x,sol$y,type="l")
 
 # add analytical solution
 curve(x/sqrt(p+x*x),add=TRUE,type="p")
@@ -222,8 +222,8 @@ f2 <- function(x,y,parms)
 }
 
 x    <- seq(1,6,0.1)
-sol  <- bvptwp(yini=c(1,NA),yend=c(-0.5,NA),x=x,func=f2,guess=1)
-plot(sol)
+sol  <- bvptwp(yini=c(y=1,dy=NA),yend=c(-0.5,NA),x=x,func=f2,guess=1)
+plot(sol,which="y")
 
 # add the analytic solution
 curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
@@ -275,10 +275,17 @@ dg2 <- function(i,y,parms,R)
 require(bvpSolve)
 init <- c(1,NA)
 R    <- 0.01
-sol  <- as.data.frame(bvptwp(x=seq(0,1,by=0.01), leftbc=2,
+sol  <- bvptwp(x=seq(0,1,by=0.01), leftbc=2,
         func=f2, guess=1,R=R,
-        bound=g2, jacfunc=df2, jacbound=dg2))
-plot(sol[,1:2])
+        bound=g2, jacfunc=df2, jacbound=dg2)
+plot(sol[,1:2])  # columns do not have names
+
+mf <- par ("mfrow")
+sol  <- bvptwp(x=seq(0,1,by=0.01), leftbc=2,
+        func=f2, guess=c(y=1,dy=1,dy2=1,dy3=1),R=R,
+        bound=g2, jacfunc=df2, jacbound=dg2)
+plot(sol)        # here they do
+par(mfrow=mf)
 
 }
 

@@ -1,7 +1,7 @@
 
 ##==============================================================================
 ## Solving boundary value problems of ordinary differential equations
-## using using collocation method "twpbvp"
+## using MIRK method "twpbvp"
 ##==============================================================================
 
 bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
@@ -121,8 +121,13 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
        {y   <- yini(state,parms,...)
         bb  <- c(y[!is.na(y)],yend[!is.na(yend)])
        }
-       return(state[iibb[i]]-bb[i]) }        # too simple for now..
-   }       
+       return(state[iibb[i]]-bb[i]) }        # too simple ?
+   } else {
+     tmp <- eval(bound(1, y), rho)
+     if (length(tmp) > 1)
+       stop ("function 'bound' should return only ONE value")
+   }
+
   if ( is.null(jacbound)) {
     JacBound <- function (ii, state) {
       BJAC        <- numeric(ncomp)
@@ -190,9 +195,10 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   mesh <- nn[3]
   attr(out,"istate") <- NULL
 
-  nm <- c("time",
+  nm <- c("x",
           if (!is.null(attr(y,"names"))) names(y) else as.character(1:ncomp))
   out <- cbind(out[1:mesh],matrix(nr=mesh,out[-(1:mesh)],byrow=TRUE))
   dimnames(out) <- list(NULL,nm)
+  class(out) <- c("deSolve","matrix")  # a differential equation
   out
 }

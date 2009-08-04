@@ -429,7 +429,7 @@ sol  <- bvpshoot(yini=init,yend=c(NA,0),x=seq(0,pi,by=0.01),
 @
 and plotted:
 <<label=mat,include=FALSE>>=
-plot(sol)
+plot(sol[,1:2])
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
