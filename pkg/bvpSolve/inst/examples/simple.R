@@ -31,7 +31,7 @@ yend <- c(0,NA)
 
 print(system.time(sol  <- as.data.frame(bvpshoot(yini=yini,yend=yend,x=x,
        guess=1,func=fun, atol=1e-6))))
-plot(sol$time,sol[,2],type="l")
+plot(sol$x,sol[,2],type="l")
 
 #---------------------
 # Solution method 2

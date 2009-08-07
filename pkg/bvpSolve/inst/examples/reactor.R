@@ -23,6 +23,6 @@ n  <- 2
 
 yini <- function (x,parms) c(x,Pe*(x-1))
 
-sol<-bvpshoot(func=Reactor,yend=c(NA,0),yini=yini,x=seq(0,1,by=0.01),extra=1)
+sol<-bvpshoot(func=Reactor,yend=c(y=NA,dy=0),yini=yini,x=seq(0,1,by=0.01),extra=1)
 plot(sol)
 

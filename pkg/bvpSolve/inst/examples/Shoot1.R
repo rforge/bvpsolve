@@ -16,12 +16,12 @@ f2 <- function(x,y,parms)
 
 x    <- seq(1,6,0.1)
 print(system.time(sol  <- bvpshoot(yini=c(1,NA),yend=c(-0.5,NA),x=x,func=f2 ,guess=1)))
-plot(sol)
+plot(sol[,1:2])
 
 # the analytic solution
 curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
       1/4*x^(3/2)*sin(x),add=TRUE,type="l")
 
 print(system.time(sol2  <- bvptwp(yini=c(1,NA),yend=c(-0.5,NA),x=x,func=f2 ,guess=1)))
-points(sol2,col="red",pch="+")
+points(sol2[,1:2],col="red",pch="+")
 

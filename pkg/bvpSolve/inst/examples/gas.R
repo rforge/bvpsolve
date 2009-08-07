@@ -25,7 +25,7 @@ n  <- 5
 # 1. shooting method
 #=======================
 print(system.time(
-sol <- bvpshoot(func=Gas,yini=c(NA,0),yend=c(sqrt(3/4),NA),x=x,guess=0)
+sol <- bvpshoot(func=Gas,yini=c(y=NA,dy=0),yend=c(sqrt(3/4),NA),x=x,guess=0)
 ))
 
 plot(sol)
@@ -33,7 +33,7 @@ plot(sol)
 curve(1/sqrt(1+(x^2)/3),type="l",add=TRUE)
 
 #=======================
-# 2. collocation methods
+# 2. mirk method
 #=======================
 
 print(system.time(

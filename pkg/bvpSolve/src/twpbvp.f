@@ -243,14 +243,14 @@ C
 *     }
       END
 
-
+c ks: changed function call to also include rpar, ipar...
 
       subroutine twpbvp(ncomp, nlbc, aleft, aright,
      *       nfxpnt, fixpnt, ntol, ltol, tol,
      *       linear, givmsh, giveu, nmsh,
      *       xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk,
-     *       fsub, dfsub, gsub, dgsub, iflbvp)
+     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp)
 
 *  subroutine twpbvp is intended to solve two-point boundary
 *  value problems.  For information about its use, parameters,
@@ -258,7 +258,7 @@ C
 
       implicit double precision (a-h,o-z)
       dimension fixpnt(*), ltol(*), tol(*)
-      dimension xx(*), u(nudim,*)
+      dimension xx(*), u(nudim,*), rpar(*), ipar(*)
       dimension wrk(lwrkfl), iwrk(lwrkin)
       logical linear, givmsh, giveu
       external fsub, dfsub, gsub, dgsub
@@ -480,7 +480,7 @@ C
      *   wrk(itmp), wrk(idsq), wrk(idexr), wrk(irtdc), 
      *   wrk(irerr), wrk(ietst6), wrk(ietst8), wrk(iermx), 
      *   iwrk(iihcom), iwrk(iiref), wrk(idef6), wrk(idef8),
-     *   fsub,dfsub,gsub,dgsub,iflbvp)
+     *   fsub,dfsub,gsub,dgsub,iflbvp, rpar, ipar)
 
       return
       end
@@ -2072,12 +2072,12 @@ c
      *   utrial, rhstri, xmerit, xxold, uold, usave,
      *   tmp, dsq, dexr, ratdc, rerr, 
      *   etest6, etest8, ermx, ihcomp, irefin, 
-     *   def6, def8, fsub, dfsub, gsub, dgsub, iflbvp)
+     *   def6, def8, fsub, dfsub, gsub, dgsub, iflbvp, rpar, ipar)
 
       implicit double precision (a-h,o-z)
 
       dimension  fixpnt(*), ltol(ntol), tol(ntol)
-      dimension  xx(*), u(nudim, *)
+      dimension  xx(*), u(nudim, *), rpar(*), ipar(*)
       dimension  defexp(ncomp,*), defimp(ncomp,*), def(ncomp,*)
       dimension  delu(ncomp, *), rhs(*), fval(ncomp,*)
       dimension  topblk(nlbc,*), botblk(ncomp-nlbc,*)
@@ -2201,7 +2201,7 @@ c
 *  The routine fneval calls fsub at the mesh xx and the
 *  solution u, and saves the values in the array fval.
 
-      call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub)
+      call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub, rpar, ipar)
 
 *  Try to compute a 4th order solution by solving a system of nonlinear
 *  equations.
@@ -2214,13 +2214,13 @@ c
      *    delu, rhs, fval, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs,
      *    ajac, topblk, botblk, bhold, chold, ipvblk,
-     *    fsub, dfsub, gsub, dgsub, iflnwt)
+     *    fsub, dfsub, gsub, dgsub, iflnwt, rpar, ipar)
 
 *  Call fneval to evaluate the fval array at the new solution u.
 *  (Such a call is not necessary for the nonlinear case because
 *  fval is called within newteq for the new u.)
 
-         call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub)
+         call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub, rpar, ipar)
 
       else
          rhsgiv = .false.
@@ -2231,7 +2231,7 @@ c
      *    utrial, rhstri, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit, 
      *    ajac, topblk, botblk, bhold, chold, ipvblk,
-     *    fsub, dfsub, gsub, dgsub, itnwt, iflnwt)
+     *    fsub, dfsub, gsub, dgsub, itnwt, iflnwt, rpar, ipar)
       endif
 
       if (iflnwt .eq. 0) then
@@ -2241,7 +2241,7 @@ c
      *           tmp, bhold, chold, dsq, dexr, usave,
      *           ratdc, rerr, ipivlu, nmold, xxold,
      *           smooth, reaft6, onto6, strctr, trst6, double,
-     *           fsub, maxmsh, succes, first4)
+     *           fsub, maxmsh, succes, first4, rpar, ipar)
         if (pdebug .and. .not. onto6) then
            write (msg,904)
            call rwarn(msg)
@@ -2287,7 +2287,7 @@ c
      *    delu, rhs, fval, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs,
      *    ajac, topblk, botblk, chold, bhold, ipvblk,
-     *    fsub, dfsub, gsub, dgsub, iflnwt)
+     *    fsub, dfsub, gsub, dgsub, iflnwt, rpar, ipar)
 
       else
          call fixjac(ncomp, nmsh, nlbc, 
@@ -2296,7 +2296,7 @@ c
      *     rhs, fval, utrial, rhstri, 
      *     rnsq, uint, ftmp, tmprhs,
      *     ajac, topblk, botblk, ipvblk,
-     *     fsub, gsub, iflnwt)
+     *     fsub, gsub, iflnwt, rpar, ipar)
 
 *  If the fixed Jacobian iterations fail but rnsq is small,
 *  try a Newton procedure.  Set rhsgiv to indicate that
@@ -2312,7 +2312,7 @@ c
      *           utrial, rhstri, 
      *           uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit, 
      *           ajac, topblk, botblk, bhold, chold, ipvblk,
-     *           fsub, dfsub, gsub, dgsub, iter, iflnwt)
+     *           fsub, dfsub, gsub, dgsub, iter, iflnwt, rpar, ipar)
          endif
       endif
 
@@ -2359,12 +2359,13 @@ c
 *  For linear problems, calculate the fval array for the
 *  new solution u.
 
-      if (linear) call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub)
+      if (linear) 
+     *    call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub, rpar, ipar)
 
 *  Calculate 8th order deferred corrections (the array def8).
 
       call df8cal (ncomp, nmsh, xx, nudim, u, fval, def8, 
-     *      tmp, fsub) 
+     *      tmp, fsub, rpar, ipar) 
 
 
 *  For linear problems, the def array is the def8 array.
@@ -2385,7 +2386,7 @@ c
      *    delu, rhs, fval, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs,
      *    ajac, topblk, botblk, chold, bhold, ipvblk,
-     *    fsub, dfsub, gsub, dgsub, iflnwt)
+     *    fsub, dfsub, gsub, dgsub, iflnwt, rpar, ipar)
       else
          call fixjac(ncomp, nmsh, nlbc, 
      *     iorder, ntol, ltol, tol, 
@@ -2393,7 +2394,7 @@ c
      *     rhs, fval, utrial, rhstri, 
      *     rnsq, uint, ftmp, tmprhs,
      *     ajac, topblk, botblk, ipvblk,
-     *     fsub, gsub, iflnwt)
+     *     fsub, gsub, iflnwt, rpar, ipar)
 
 *  If the fixed Jacobian iterations fail but rnsq is small,
 *  try a Newton procedure.  Set rhsgiv to indicate that
@@ -2409,7 +2410,7 @@ c
      *           utrial, rhstri, 
      *           uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit, 
      *           ajac, topblk, botblk, bhold, chold, ipvblk,
-     *           fsub, dfsub, gsub, dgsub, iter, iflnwt)
+     *           fsub, dfsub, gsub, dgsub, iter, iflnwt, rpar, ipar)
          endif
       endif
       if (iflnwt .eq. 0) then
@@ -2506,10 +2507,10 @@ c
      *             tmp, bhold, chold, dsq, dexr, usave,
      *             ratdc, rerr, ipivot, nmold, xxold,
      *             smooth, reaft6, onto6, strctr, trst6, double,
-     *             fsub, maxmsh, succes, first4)
+     *             fsub, maxmsh, succes, first4, rpar, ipar)
                                                                       
       implicit double precision (a-h,o-z)
-      dimension ltol(ntol), ipivot(*)
+      dimension ltol(ntol), ipivot(*), rpar(*), ipar(*)
       dimension xx(*), u(nudim,*), tol(ntol)
       dimension defexp(ncomp,*), defimp(ncomp,*), def(ncomp,*)
       dimension fval(ncomp,*), tmp(ncomp,4)
@@ -2561,7 +2562,7 @@ c
 *  by a previous call to fneval for this mesh and solution.
 
       call dfexcl( ncomp, nmsh, xx, nudim, u, defexp, fval, 
-     *                tmp, fsub )
+     *                tmp, fsub, rpar, ipar)
 
       call matcop(ncomp, ncomp, ncomp, nmsh-1, defexp, def)
 
@@ -3536,12 +3537,12 @@ C            call rwarn(msg)
 
 
       subroutine dfexcl (ncomp, nmsh, xx, nudim, u, defexp, fval,
-     *               tmp, fsub)
+     *               tmp, fsub, rpar, ipar)
 
       implicit double precision (a-h, o-z)
       integer ncomp, nmsh
       dimension xx(nmsh), u(nudim,nmsh), fval(ncomp, nmsh)
-      dimension  defexp(ncomp,nmsh-1), tmp(ncomp,4)
+      dimension  defexp(ncomp,nmsh-1), tmp(ncomp,4), rpar(*), ipar(*)
       external fsub 
 
       logical pdebug
@@ -3574,9 +3575,9 @@ C            call rwarn(msg)
    10    continue
 
          call fsub (ncomp, xx(im) + fourth*hmsh, tmp(1,1), 
-     *          tmp(1,3))
+     *          tmp(1,3), rpar, ipar)
          call fsub (ncomp, xx(im) + thfrth*hmsh, tmp(1,2), 
-     *          tmp(1,4))
+     *          tmp(1,4), rpar, ipar)
 
          do 20 ic = 1, ncomp
             tmp(ic,1) = half*(u(ic,im+1) + u(ic,im))
@@ -3585,7 +3586,7 @@ C            call rwarn(msg)
    20    continue
 
          call fsub(ncomp, half*(xx(im) + xx(im+1)), tmp(1,1), 
-     *          tmp(1,2))
+     *          tmp(1,2), rpar, ipar)
          do 30 ic = 1, ncomp
             defexp(ic,im) = hmsh*(a6*(fval(ic,im+1) + fval(ic,im))
      *           + b6*(tmp(ic,3) + tmp(ic,4)) + c6*tmp(ic,2))
@@ -3598,7 +3599,7 @@ C            call rwarn(msg)
 
 
       subroutine df8cal (ncomp, nmsh, xx, nudim, u, fval, def8, 
-     *      tmp, fsub) 
+     *      tmp, fsub, rpar, ipar) 
 
 *   Given the mesh points xx, the solution u, and the function 
 *   values fval, df8cal computes eighth-order deferred corrections, 
@@ -3608,7 +3609,7 @@ C            call rwarn(msg)
       implicit double precision (a-h, o-z)
       integer ncomp, nmsh
       dimension xx(nmsh), u(nudim,nmsh), fval(ncomp,nmsh)
-      dimension def8(ncomp, nmsh-1),  tmp(ncomp,8)
+      dimension def8(ncomp, nmsh-1), tmp(ncomp,8), rpar(*), ipar(*)
       external fsub 
 
       logical pdebug
@@ -3633,8 +3634,10 @@ C            call rwarn(msg)
      *         - hmsh*(c1*fval(ic,im) + d1*fval(ic,im+1)) 
    10    continue
 
-         call fsub(ncomp, xx(im) + fc1*hmsh, tmp(1,1), tmp(1,3))
-         call fsub(ncomp, xx(im) + fc2*hmsh, tmp(1,2), tmp(1,4))
+         call fsub(ncomp, xx(im) + fc1*hmsh, tmp(1,1), tmp(1,3), 
+     *       rpar, ipar)
+         call fsub(ncomp, xx(im) + fc2*hmsh, tmp(1,2), tmp(1,4),
+     *       rpar, ipar)
          do 20 ic = 1, ncomp
             tmp(ic,1) = a2*u(ic,im+1) + b2*u(ic,im)
      *         + hmsh*(c2*fval(ic,im+1) + d2*fval(ic,im)
@@ -3645,9 +3648,9 @@ C            call rwarn(msg)
    20    continue
 
          call fsub(ncomp, xx(im) + (half + alp2)*hmsh, tmp(1,1), 
-     *               tmp(1,5))
+     *               tmp(1,5), rpar, ipar)
          call fsub(ncomp, xx(im) + (half - alp2)*hmsh, tmp(1,2),
-     *               tmp(1,6)) 
+     *               tmp(1,6), rpar, ipar) 
          do 30 ic = 1, ncomp
             tmp(ic,1) = a3*u(ic,im+1) + b3*u(ic,im)
      *         + hmsh*(c3*fval(ic,im+1) + d3*fval(ic,im)
@@ -3660,9 +3663,9 @@ C            call rwarn(msg)
    30    continue
 
          call fsub (ncomp, xx(im) + (half + alp3)*hmsh, tmp(1,1), 
-     *                 tmp(1,7)) 
+     *                 tmp(1,7), rpar, ipar) 
          call fsub (ncomp, xx(im) + (half - alp3)*hmsh, tmp(1,2),
-     *                 tmp(1,8)) 
+     *                 tmp(1,8), rpar, ipar) 
          do 40 ic = 1, ncomp
             tmp(ic,1) = a4*(u(ic,im+1) + u(ic,im))
      *         + hmsh*(c4*(fval(ic,im+1) - fval(ic,im)) 
@@ -3670,7 +3673,8 @@ C            call rwarn(msg)
      *         + x4*(tmp(ic,7) - tmp(ic,8)))
    40    continue
 
-         call fsub (ncomp, xx(im) + half*hmsh, tmp(1,1), tmp(1,2))
+         call fsub (ncomp, xx(im) + half*hmsh, tmp(1,1), tmp(1,2), 
+     *       rpar, ipar)
          do 50 ic = 1, ncomp
             def8(ic,im) = 
      *          hmsh*(bet0*(fval(ic,im) + fval(ic,im+1)) 
@@ -3994,13 +3998,13 @@ C            call rwarn(msg)
      *    rhs, fval, utrial, rhstri, 
      *    rnsq, uint, ftmp, tmprhs,
      *    ajac, topblk, botblk, ipivot,
-     *    fsub, gsub, iflag)
+     *    fsub, gsub, iflag, rpar, ipar)
 
 * Fixed Jacobian iterations.
 
       implicit double precision (a-h,o-z)
 
-      dimension  ltol(ntol), tol(ntol)
+      dimension  ltol(ntol), tol(ntol), rpar(*), ipar(*)
       dimension  xx(nmsh), u(nudim,nmsh), defcor(ncomp,nmsh-1) 
       dimension  defnew(ncomp,nmsh-1), delu(ncomp,nmsh)
       dimension  rhs(ncomp*nmsh), fval(ncomp,nmsh)
@@ -4110,9 +4114,10 @@ C            call rwarn(msg)
 *  two-norm at the trial point.
 
       rnold = rnsq
-      call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub)
+      call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub, 
+     *    rpar, ipar)
       call rhscal (ncomp, nmsh, nlbc, xx, ncomp, utrial, defcor,
-     *   fsub, gsub, rhstri, rnsq, fval, ftmp, uint) 
+     *   fsub, gsub, rhstri, rnsq, fval, ftmp, uint, rpar, ipar) 
 
 *  If rnsq strictly decreased, update the solution vector u 
 *  and the right-hand side rhs.
@@ -4179,12 +4184,12 @@ C            call rwarn(msg)
      *    delu, rhs, fval, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs,
      *    ajac, topblk, botblk, bhold, chold, ipivot,
-     *    fsub, dfsub, gsub, dgsub, iflag)
+     *    fsub, dfsub, gsub, dgsub, iflag, rpar, ipar)
 
       implicit double precision (a-h,o-z)
 
       dimension  xx(nmsh), u(nudim, nmsh), defcor(ncomp, nmsh-1)
-      dimension  delu(ncomp, nmsh), rhs(ncomp*nmsh)
+      dimension  delu(ncomp, nmsh), rhs(ncomp*nmsh), rpar(*), ipar(*)
       dimension  fval(ncomp,nmsh), uint(ncomp), ftmp(ncomp)
       dimension  topblk(nlbc,*), botblk(ncomp-nlbc,*)
       dimension  dftmp1(ncomp, ncomp), dftmp2(ncomp, ncomp)
@@ -4216,7 +4221,7 @@ C            call rwarn(msg)
 *  Compute the right-hand side vector rhs.
  
          call lnrhs (ncomp, nmsh, nlbc, xx, nudim, u, 
-     *          fsub, gsub, rhs, rnsq, fval, ftmp, uint) 
+     *          fsub, gsub, rhs, rnsq, fval, ftmp, uint, rpar, ipar) 
 
 
 *  If the Jacobian for this mesh has not previously been
@@ -4229,7 +4234,7 @@ C            call rwarn(msg)
          call jaccal (ncomp, nmsh, nlbc, 
      *      xx, nudim, u, fval, dgtm, dftmp1, dftmp2, uint,
      *      ajac, topblk, botblk, bhold, chold,
-     *      dfsub, dgsub)
+     *      dfsub, dgsub, rpar, ipar)
 
 *  Call blkdcm to calculate the LU factors of the Jacobian.
 *  The factors are overwritten on the matrices topblk, ajac and botblk.
@@ -4283,12 +4288,12 @@ C            call rwarn(msg)
      *    utrial, rhstri, 
      *    uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit, 
      *    ajac, topblk, botblk, bhold, chold, ipivot,
-     *    fsub, dfsub, gsub, dgsub, iter, iflag)
+     *    fsub, dfsub, gsub, dgsub, iter, iflag, rpar, ipar)
 
       implicit double precision (a-h,o-z)
 
       dimension  ltol(*), tol(*), xx(*)
-      dimension  fval(ncomp,*)
+      dimension  fval(ncomp,*), rpar(*), ipar(*)
       dimension  u(nudim, *), delu(ncomp, *), utrial(ncomp,nmsh)
       dimension  rhs(ncomp*nmsh),  defcor(ncomp,*)
       dimension  ajac(ncomp, 2*ncomp, *)
@@ -4368,7 +4373,7 @@ C            call rwarn(msg)
 *  If necessary, evaluate the right-hand side at the initial u. 
 
          call rhscal (ncomp, nmsh, nlbc, xx, nudim, u, defcor,
-     *      fsub, gsub, rhs, rnsq, fval, ftmp, uint) 
+     *      fsub, gsub, rhs, rnsq, fval, ftmp, uint, rpar, ipar) 
       endif
 
 *  At any given Newton iteration, rnprev is the value of rnsq at 
@@ -4448,7 +4453,7 @@ C            call rwarn(msg)
       call jaccal (ncomp, nmsh, nlbc, 
      *    xx, nudim, u, fval, dgtm, dftmp1, dftmp2, uint,
      *    ajac, topblk, botblk, bhold, chold,
-     *    dfsub, dgsub)
+     *    dfsub, dgsub, rpar, ipar)
 
 *  blkdcm is called to calculate the LU factors of the Jacobian, 
 *  which are overwritten on topblk, ajac and botblk.
@@ -4561,9 +4566,10 @@ c  at the initial point of the line search.
 
          call matcop ( nudim, ncomp, ncomp, nmsh, u, utrial)
          call maxpy ( ncomp, nmsh, alfa, delu, ncomp, utrial )
-         call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub)
+         call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub, 
+     *       rpar, ipar)
          call rhscal (ncomp, nmsh, nlbc, xx, ncomp, utrial, defcor,
-     *      fsub, gsub, rhstri, rnsqtr, fval, ftmp, uint) 
+     *      fsub, gsub, rhstri, rnsqtr, fval, ftmp, uint, rpar, ipar) 
 
          fmold = fmtry
          if (imerit .eq. 1) then
@@ -4715,19 +4721,21 @@ c  at the initial point of the line search.
       return
       end
 
-      subroutine fneval(ncomp, nmsh, xx, nudim, u, fval, fsub)
+      subroutine fneval(ncomp, nmsh, xx, nudim, u, fval, fsub, 
+     *    rpar, ipar)
       implicit double precision (a-h,o-z)
       dimension xx(nmsh), u(nudim,nmsh), fval(ncomp,nmsh)
+      dimension rpar(*), ipar(*)
       external fsub
 
 *  fneval evaluates the function values (from fsub) for
 *  a given mesh xx and array u, and stores the values
 *  in the array fval.
 
-      call fsub (ncomp, xx(1), u(1,1), fval(1,1))
+      call fsub (ncomp, xx(1), u(1,1), fval(1,1), rpar, ipar)
       do 50 im = 1, nmsh-1
          hmsh = xx(im+1) - xx(im)
-         call fsub (ncomp, xx(im+1), u(1,im+1), fval(1,im+1))
+       call fsub (ncomp, xx(im+1), u(1,im+1), fval(1,im+1), rpar, ipar)
    50 continue
       return
       end
@@ -4737,12 +4745,12 @@ c  at the initial point of the line search.
      *   xx, nudim, u, fval,
      *   dgtm, dftm1, dftm2, uint,
      *   ajac, topblk, botblk, bhold, chold,
-     *   dfsub, dgsub)
+     *   dfsub, dgsub, rpar, ipar)
 
       implicit double precision (a-h,o-z)
                                                                   
       dimension xx(nmsh), u(nudim,nmsh), fval(ncomp,nmsh)
-      dimension dgtm(ncomp)
+      dimension dgtm(ncomp), rpar(*), ipar(*)
       dimension dftm1(ncomp, ncomp), dftm2(ncomp, ncomp), 
      *             uint(ncomp)
       dimension ajac(ncomp, 2*ncomp, nmsh-1)
@@ -4768,12 +4776,12 @@ c  at the initial point of the line search.
       
 *      if (pdebug) write(6,902)
       do 110 i = 1, nlbc
-         call dgsub (i, ncomp, u(1,1), dgtm)
+         call dgsub (i, ncomp, u(1,1), dgtm, rpar, ipar)
          call dcopy(ncomp, dgtm(1), 1, topblk(i,1), nlbc)
 *         if (pdebug) write(6,903) i, (topblk(i,j),j=1,ncomp)
   110 continue
 
-      call dfsub (ncomp, xx(1), u(1,1), dftm1(1,1))
+      call dfsub (ncomp, xx(1), u(1,1), dftm1(1,1), rpar, ipar)
 
 *  on entry to jaccal, the array fval contains the function values
 *  at (xx(im), u(ic,im)), ic=1,...,ncomp and im = 1,...,nmsh,
@@ -4791,7 +4799,7 @@ c  at the initial point of the line search.
      *         - eighth*hmsh*(fval(ic,im+1) - fval(ic,im))
   120    continue
          xhalf = half*(xx(im+1) + xx(im))
-         call dfsub (ncomp, xhalf, uint, dftm2(1,1))
+         call dfsub (ncomp, xhalf, uint, dftm2(1,1), rpar, ipar)
          do 140 ic = 1, ncomp
             do 130 jc = 1, ncomp
                dsq = ddot(ncomp, dftm2(ic,1), ncomp,
@@ -4804,7 +4812,7 @@ c  at the initial point of the line search.
 *     *            (ajac(ic,jc,im), jc=1,ncomp)
   140    continue
 
-         call dfsub (ncomp, xx(im+1), u(1,im+1), dftm1(1,1))
+         call dfsub (ncomp, xx(im+1), u(1,im+1), dftm1(1,1), rpar, ipar)
          do 170 ic = 1, ncomp
             do 160 jc = 1, ncomp
                dsq = ddot(ncomp, dftm2(ic,1), ncomp,
@@ -4826,7 +4834,7 @@ c  at the initial point of the line search.
   200 continue
 *      if (pdebug) write(6,906)
       do 220 i = nlbc+1, ncomp
-         call dgsub (i, ncomp, u(1, nmsh), dgtm) 
+         call dgsub (i, ncomp, u(1, nmsh), dgtm, rpar, ipar) 
          call dcopy(ncomp, dgtm(1), 1, botblk(i-nlbc,1), ncomp-nlbc)
 *         if (pdebug) write(6,903) i,(botblk(i-nlbc,j), j=1,ncomp)
   220 continue
@@ -4861,14 +4869,14 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       subroutine lnrhs (ncomp, nmsh, nlbc,
      *   xx, nudim, u, fsub, gsub, 
-     *   rhs, rnsq, fval, ftmp, uint) 
+     *   rhs, rnsq, fval, ftmp, uint, rpar, ipar) 
 
        implicit double precision(a-h,o-z)
 
 *  This subroutine is designed to calculate the right-hand
 *  side for linear problems.
 
-      dimension xx(*), u(nudim,*)
+      dimension xx(*), u(nudim,*), rpar(*), ipar(*)
       dimension rhs(*), fval(ncomp,*), ftmp(*), uint(*)
       external fsub, gsub 
 
@@ -4886,7 +4894,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 *  first, process the left-hand boundary conditions.
 
       do 20 i = 1, nlbc
-         call gsub (i, ncomp, u(1,1), wg)
+         call gsub (i, ncomp, u(1,1), wg, rpar, ipar)
          rhs(i) = -wg
    20 continue
 
@@ -4900,7 +4908,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
      *         - eighth*hmsh*(fval(ic,im+1) - fval(ic,im))
    30    continue
          xhalf = half*(xx(im) + xx(im+1)) 
-         call fsub (ncomp, xhalf, uint, ftmp)
+         call fsub (ncomp, xhalf, uint, ftmp, rpar, ipar)
          loc = (im-1)*ncomp + nlbc
          do 40 ic = 1, ncomp
             rhs(loc+ic) = -u(ic,im+1) + u(ic,im)
@@ -4911,7 +4919,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       nrhs = ninter*ncomp
       do 60 ii = nlbc+1, ncomp
-         call gsub (ii, ncomp, u(1,nmsh), wg) 
+         call gsub (ii, ncomp, u(1,nmsh), wg, rpar, ipar) 
          rhs(nrhs+ii) = -wg
    60 continue
 
@@ -4925,7 +4933,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       subroutine rhscal (ncomp, nmsh, nlbc,
      *   xx, nudim, u, defcor,
      *   fsub, gsub, 
-     *   rhs, rnsq, fval, ftmp, uint) 
+     *   rhs, rnsq, fval, ftmp, uint, rpar, ipar) 
 
        implicit double precision(a-h,o-z)
 
@@ -4936,7 +4944,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       dimension  xx(nmsh), u(nudim,nmsh), defcor(ncomp,nmsh-1) 
       dimension  rhs(ncomp*nmsh), fval(ncomp,nmsh)
-      dimension  ftmp(ncomp), uint(ncomp)
+      dimension  ftmp(ncomp), uint(ncomp), rpar(*), ipar(*)
       external   fsub, gsub 
 
       logical pdebug
@@ -4961,7 +4969,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 *  First, process the left-hand boundary conditions.
 
       do 20 i = 1, nlbc
-         call gsub (i, ncomp, u(1,1), wg)
+         call gsub (i, ncomp, u(1,1), wg, rpar, ipar)
          rhs(i) = -wg
    20 continue
 
@@ -4975,7 +4983,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
      *         - eighth*hmsh*(fval(ic,im+1) - fval(ic,im))
    30    continue
          xhalf = half*(xx(im) + xx(im+1)) 
-         call fsub (ncomp, xhalf, uint, ftmp)
+         call fsub (ncomp, xhalf, uint, ftmp, rpar, ipar)
          loc = (im-1)*ncomp + nlbc
          do 40 ic = 1, ncomp
             rhs(loc+ic) = -u(ic,im+1) + u(ic,im) + defcor(ic,im)
@@ -4987,7 +4995,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       nrhs = ninter*ncomp
       do 60 ii = nlbc+1, ncomp
-         call gsub (ii, ncomp, u(1,nmsh), wg) 
+         call gsub (ii, ncomp, u(1,nmsh), wg, rpar, ipar) 
          rhs(nrhs+ii) = -wg
    60 continue
 

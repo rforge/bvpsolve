@@ -24,7 +24,7 @@ x = seq(0,pi,by=0.01)
 init <- c(1,0)
 sol  <- bvpshoot(yini=init,yend=c(NA,0),x=x,
         func=mathieu, guess=NULL,  extra=15)
-plot(sol)
+plot(sol[,1:2])
 
 #----------------------
 # Solution method 2
@@ -41,7 +41,7 @@ cost <- function(X)
 lam <- multiroot(f=cost,start=15)
 
 # solve the mode with this root...
-Sol<- bvptwp(yini=c(1,0), yend=c(NA,NA),x=x,parms=lam$root,
-        func=mathieu,atol=1e-10)
+Sol<- bvptwp(yini=c(1,NA), yend=c(NA,0),x=x,parms=lam$root,
+        func=mathieu,atol=1e-10,guess=1)
 lines(Sol,col="red")
 

@@ -43,7 +43,7 @@ x    <- seq(-0.1,0.1,by=0.001)
 
 print(system.time(sol  <- as.data.frame(bvpshoot(yini=init,x=x,
        func=fun, yend=end, guess=1, atol=1e-10))))
-plot(sol$time,sol[,2],type="l")
+plot(sol$x,sol[,2],type="l")
 
 # add analytical solution
 curve(x/sqrt(p+x*x),add=TRUE,type="p")

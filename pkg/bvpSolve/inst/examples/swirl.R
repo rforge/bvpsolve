@@ -48,7 +48,7 @@ yguess[2,] <- 2
 x     <- seq(A,B,len=100)
 #shooting does not work
 
-#collocation does...
+#mirk does...
 print(system.time(Sol <- bvptwp(atol=1e-5,x=x,func=fsub,guess= c(2,0,0),
                   yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
 
@@ -58,3 +58,24 @@ print(system.time(Sol <- bvptwp(atol=1e-5,
                   yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
 pairs(Sol,col="blue",lty=2)
 
+# For successively smaller values of eps:
+eps     <- 0.001
+print(system.time(Sol2 <- bvptwp(atol=1e-5,
+                  xguess=Sol[,1],yguess=t(Sol[,2:7]),x=x,func=fsub,
+                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+pairs(Sol2,col="red",lty=2)
+
+# For successively smaller values of eps:
+eps     <- 0.0001
+print(system.time(Sol3 <- bvptwp(atol=1e-5,
+                  xguess=Sol2[,1],yguess=t(Sol2[,2:7]),x=x,func=fsub,
+                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+pairs(Sol3,col="darkgreen",lty=2)
+
+
+# For successively smaller values of eps:
+eps     <- 1e-4
+print(system.time(Sol2 <- bvptwp(atol=1e-5,
+                  xguess=Sol[,1],yguess=t(Sol[,2:7]),x=x,func=fsub,
+                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+pairs(Sol2,col="red",lty=2)

@@ -30,14 +30,14 @@ res<- function (Y,yini,T)
     Y[2]-yini[2],
     T*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1)
   
-init <- c(NA,NA)
+init <- c(y1=NA,y2=NA)
 sol  <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
         func=nerve, guess=c(0.5,0.5), yend=res, extra=2*pi)
-attributes(sol)
+attributes(sol)$root
 plot(sol,type="l",lwd=2)
 
 ################################################################################
 #----------------------
 # Solution method 2
-#  ** bvpcol dord not work...
+#  ** bvptwp dord not work...
 #----------------------

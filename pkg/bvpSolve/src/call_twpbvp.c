@@ -8,7 +8,7 @@
      *       linear, givmsh, giveu, nmsh,
      *       xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk,
-     *       fsub, dfsub, gsub, dgsub, iflbvp)
+     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp)
 */
 
 void F77_NAME(twpbvp)(int*, int*, double *, double *,
@@ -16,18 +16,19 @@ void F77_NAME(twpbvp)(int*, int*, double *, double *,
          int *, int *, int *, int *,
          double *, int *, double *, int *,
          int *, double *, int*, int*,
-         void (*)(int *, double *, double *, double *), /* fsub(n,x,u,f)   */
-		     void (*)(int *, double *, double *, double *), /* dfsub(n,x,u,df) */
-			   void (*)(int *, int *, double *, double *),    /* gsub(i,n,u,g)   */
-		     void (*)(int *, int *, double *, double *),    /* dgsub(i,n,u,dg) */
-         int *);
+         void (*)(int *, double *, double *, double *, double *, int *), /* fsub(n,x,u,f,rp,ip)   */
+		     void (*)(int *, double *, double *, double *, double *, int *), /* dfsub(n,x,u,df,rp,ip) */
+			   void (*)(int *, int *, double *, double *, double *, int *),    /* gsub(i,n,u,g,rp,ip)   */
+		     void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
+         double *, int *, int *);
 
 /* interface between fortran function calls and R functions
    Fortran code calls col_derivs(m, x, y, ydot)
    R code called as col_deriv_func(x, y) and returns ydot
    Note: passing of parameter values and "..." is done in R-function bvpcol*/
 
-static void col_derivs (int *n,  double *x, double *y, double *ydot)
+static void col_derivs (int *n,  double *x, double *y, double *ydot,
+  double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -42,7 +43,8 @@ static void col_derivs (int *n,  double *x, double *y, double *ydot)
 }
 
 /* interface between fortran call to jacobian and R function */
-static void col_jac (int *n,  double *x, double *y, double *pd)
+static void col_jac (int *n,  double *x, double *y, double *pd,
+  double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -58,7 +60,8 @@ static void col_jac (int *n,  double *x, double *y, double *pd)
 
 /* interface between fortran call to boundary condition and corresponding R function */
 
-static void col_bound (int *ii, int *n, double *y, double *gout)
+static void col_bound (int *ii, int *n, double *y, double *gout,
+  double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -73,7 +76,8 @@ static void col_bound (int *ii, int *n, double *y, double *gout)
 }
 /*interface between fortran call to jacobian of boundary and corresponding R function */
 
-static void col_jacbound (int *ii, int *n, double *y, double *dg)
+static void col_jacbound (int *ii, int *n, double *y, double *dg,
+  double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -88,20 +92,20 @@ static void col_jacbound (int *ii, int *n, double *y, double *dg)
 }
 
 /* give name to data types */
-typedef void deriv_func    (int *, double *,double *, double *);
-typedef void bound_func    (int *, int *, double *,double *);
-typedef void jac_func      (int *, double *, double *,double *);
-typedef void jacbound_func (int *, int *, double *, double *);
+typedef void deriv_func    (int *, double *,double *, double *, double *, int *);
+typedef void bound_func    (int *, int *, double *,double *, double *, int *);
+typedef void jac_func      (int *, double *, double *,double *, double *, int *);
+typedef void jacbound_func (int *, int *, double *, double *, double *, int *);
 
 
 /* number of eqs, order of eqs, summed order of eqns, from, to,
 boundary points, settings, number of tolerances, tolerances,
 mesh points, initial value of continuation parameter */
 
-SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
+SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 		SEXP Tol, SEXP Linear, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
-		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin,
-    SEXP Xguess, SEXP Yguess, SEXP func, SEXP jacfunc, SEXP boundfunc,
+		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
+    SEXP Rpar, SEXP Ipar, SEXP func, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP rho)
 
 {
@@ -112,9 +116,9 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 /* These R-structures will be allocated and returned to R*/
   SEXP yout=NULL, ISTATE;
 
-  int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx;
-  double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx;
-  int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh;
+  int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar;
+  double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar;
+  int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
 
   deriv_func    *derivs;
   jac_func      *jac;
@@ -141,6 +145,12 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   aleft  =REAL(Aleft)[0];
   aright =REAL(Aright)[0];
 
+/* is function a dll ?*/
+  if (inherits(func, "NativeSymbol")) {
+   isDll = 1;
+  } else {
+   isDll = 0;
+  }
 
   ntol = LENGTH(Tol);
   tol   =(double *) R_alloc(ntol, sizeof(double));
@@ -165,16 +175,33 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
   iwrk= (int *)    R_alloc(lwrkin, sizeof(int));
 
+  ii = LENGTH(Ipar);
+  ipar = (int *) R_alloc(ii, sizeof(int));
+     for (j=0; j<ii; j++) ipar[j] = INTEGER(Ipar)[j];
+
+  ii = LENGTH(Rpar);
+  rpar = (double *) R_alloc(ii, sizeof(double));
+     for (j=0; j<ii; j++) rpar[j] = REAL(Rpar)[j];
+
 /* initialise global R-variables... */
-  PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
-  PROTECT(J = NEW_INTEGER(1));                incr_N_Protect();
-  PROTECT(Y = allocVector(REALSXP,ncomp));    incr_N_Protect();
+  if (isDll == 0) {
+    PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
+    PROTECT(J = NEW_INTEGER(1));                incr_N_Protect();
+    PROTECT(Y = allocVector(REALSXP,ncomp));    incr_N_Protect();
+  }
+  
 /*  PROTECT(bvp_gparms = parms);                incr_N_Protect();     error("Till here.\n");*/
 
 
       bvp_envir = rho;
 
-      /* interface function between fortran and R passed to Fortran*/
+  if (isDll) {   /* DLL addresses passed to fortran */
+      derivs = (deriv_func *) R_ExternalPtrAddr(func);
+      jac = (jac_func *) R_ExternalPtrAddr(jacfunc);
+      bound = (bound_func *) R_ExternalPtrAddr(boundfunc);
+      jacbound = (jacbound_func *) R_ExternalPtrAddr(jacboundfunc);
+
+  } else {      /* interface functions between fortran and R */
       derivs = (deriv_func *) col_derivs;
       col_deriv_func = func;
 
@@ -186,6 +213,7 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
       jacbound = col_jacbound;
       col_jacbound_func = jacboundfunc;
+    }
 
 /* Call the fortran function -
       subroutine twpbvp(ncomp, nlbc, aleft, aright,
@@ -195,12 +223,13 @@ SEXP call_colmod(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
      *       lwrkfl, wrk, lwrkin, iwrk,
      *       fsub, dfsub, gsub, dgsub, iflbvp)
   error("ncomp, nlbc, nfixpnt, ntol, atol, %f, %i, %i, %i, %i",tol[0],ncomp,nlbc,nfixpnt,ntol);
+  error("till here %i, %i, %i, %i",ncomp,nlbc,nfixpnt,ntol);
 
 */
 	  F77_CALL(twpbvp) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
         &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, xx, &ncomp,
         u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk,
-        derivs,jac,bound,jacbound,&iflag);
+        derivs,jac,bound,jacbound, rpar, ipar,&iflag);
 /*
 C....   iflag - The Mode Of Return From twpbvp
 C....         =  0  For Normal Return

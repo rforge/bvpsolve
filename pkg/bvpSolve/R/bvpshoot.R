@@ -8,22 +8,30 @@ bvpshoot<- function(yini, x, func, yend, parms=NULL, guess=NULL, extra=NULL,
     atol=1e-8, rtol=1e-8, maxiter=100, positive =FALSE, method="lsoda", ...)  {
 
 
-  init <- function(X) {  # initialises yini and parms..
+  inity <- function(X,parms) {  # initialises yini and parms..
     if (is.function(yini))
-      y <<-yini(X,parms,...) else y <- yini
+      Y <-yini(X,Parms,...)
+    else Y <- yini
     if (lini>0)
-      y[inix] <<- X[1:lini]
-    if(lex>0)
-      parms[1:lex] <<- X[(lini+1):(lini+lex)]
+      Y[inix] <- X[1:lini]
+    names(Y)<-Ynames
+    Y
   }
-  
+
+  initparms <- function (X) {
+    initparms <- parms
+    if(lex>0)
+      initparms[1:lex] <- X[(lini+1):(lini+lex)]
+  }
+
   cost <- function(X,...)  {  # objective function to minimise
     times <- c(x[1], x[length(x)])
-    init(X)
-    out   <- ode(y=y, times=times, fun=func, parms=parms, method=method,
+    Parms <- initparms(X)
+    Y     <- inity(X,Parms)
+    out   <- ode(y=Y, times=times, fun=func, parms=Parms, method=method,
                  atol=atol, rtol=rtol, ...)
     if (is.function(yend) )
-      Res   <- yend(out[nrow(out),2:(ly+1)], y, parms,...)
+      Res   <- yend(out[nrow(out),2:(ly+1)], Y, Parms,...)
     else {
       Res <-yend - out[nrow(out),2:(ly+1)]
       Res <- Res[! is.na(Res)]
@@ -32,14 +40,19 @@ bvpshoot<- function(yini, x, func, yend, parms=NULL, guess=NULL, extra=NULL,
   }
   if (is.function(yini))
     y <- yini(extra,parms,...)
-  else y <- yini
+  else
+    y <- yini
+
+  Ynames <- attr(y,"names")
+  if (is.null(Ynames) & ! is.null(yend)) Ynames <- names(yend)
 
   ly <- length(y)
   
   inix       <- which (is.na(y))
   lini       <- length(inix)
   lex        <- length(extra)
-  #Karline:check this...
+
+  #
   if (lini > 0 & is.null(guess))  {
     warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
     guess <- rep(0,lini)
@@ -60,13 +73,16 @@ bvpshoot<- function(yini, x, func, yend, parms=NULL, guess=NULL, extra=NULL,
                    maxiter=maxiter, positive =positive, ...)
 
 
-  init(sol$root)
-  out <- ode (t=x, fun=func, y=y, parms=parms, method=method,
+    Parms <- initparms(sol$root)
+    Y     <- inity(sol$root,Parms)
+
+  out <- ode (t=x, fun=func, y=Y, parms=Parms, method=method,
               atol=atol, rtol=rtol, ...)
   attr(out,"istate") <- NULL
   attr(out,"rstate") <- NULL
   attr(out,"roots")  <- data.frame(root=sol$root,
                                    f.root=sol$f.root, iter=sol$iter)
+  class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   colnames(out)[1] <- "x"
   out
 }

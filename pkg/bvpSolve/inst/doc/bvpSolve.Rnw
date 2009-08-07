@@ -271,7 +271,8 @@ solved using \code{bvptwp}:
 <<>>=
 print(system.time(
 Soltwp <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA))
+                      yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
+                      yend=c(1,NA,0,0,NA,NA))
 ))
 @
 where the reported system time is in seconds
@@ -281,7 +282,8 @@ The problem cannot be solved with too small values of eps:
 eps <- 1e-9
 Soltwp2 <- NA
 Soltwp2 <- try(bvptwp(x=x,func=fsub,guess= c(2,0,0),
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA)),
+                      yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
+                      yend=c(1,NA,0,0,NA,NA)),
     silent = TRUE)
 
 cat(Soltwp2)
@@ -291,31 +293,50 @@ cat(Soltwp2)
 pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 @
 
-\setkeys{Gin}{width=0.8\textwidth}
+\setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}
 \begin{center}
 <<label=swirl,fig=TRUE,echo=FALSE>>=
 <<swirl>>
 @
 \end{center}
-\caption{Solution of the swirling flow III problem - see text for \R-code.
+\caption{pairs plot of the swirling flow III problem - see text for \R-code.
   Note that this problem cannot be solved with \code{bvpshoot}}
 \label{fig:ode3}
 \end{figure}
 
-The problem is more efficiently solved if an initial guess of the solution
-is given:
+\clearpage
+\section{Solving a boundary value problem using continuation}
+The previous -swirl- problem can be solved for small values of \code{eps}
+if the previous solution (\code{Soltwp}) with eps = 0.001,
+is used as an initial guess for smaller value of eps, 0.0001:
 <<>>=
-eps <- 0.001
-xguess <- x
-yguess <- matrix(nr=6, nc=length(xguess), data=0.)
-slope  <- 0.375-0.9129
-yguess[1,] <- 2*xguess -1
-yguess[2,] <- 2
+eps <- 0.0001
+xguess <- Soltwp[,1]
+yguess <- t(Soltwp[,2:7])
+
 print(system.time(Sol2 <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
-  xguess=xguess,yguess=yguess,yini=c(-1,NA,0,0,NA,NA),
+  xguess=xguess,yguess=yguess,yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
   yend=c(1,NA,0,0,NA,NA))))
 @
+<<label=swirl2,include=FALSE>>=
+plot(Sol2, col="darkred", type="l", lwd=2)
+mtext(outer=TRUE, side=3, line=-1.5, cex=1.5,
+   "swirling flow III, eps=0.0001")
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=swirl2,fig=TRUE,echo=FALSE>>=
+<<swirl2>>
+@
+\end{center}
+\caption{Solution of the swirling flow III problem with small eps,
+ using continuation - see text for \R-code.
+}
+\label{fig:ode3b}
+\end{figure}
+
 \clearpage
 
 \section{More complex initial or end conditions}
@@ -382,10 +403,11 @@ sol   <-bvpshoot(yini= init, x=seq(0,1,by=0.05),func=musn,
 ))
 @
 <<label=musn,include=FALSE>>=
-pairs(sol,main="musn")
+plot(sol,type="l", lwd=2)
+mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "musn")
 @
 
-\setkeys{Gin}{width=0.8\textwidth}
+\setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}
 \begin{center}
 <<label=musn,fig=TRUE,echo=FALSE>>=
@@ -430,6 +452,7 @@ sol  <- bvpshoot(yini=init,yend=c(NA,0),x=seq(0,pi,by=0.01),
 and plotted:
 <<label=mat,include=FALSE>>=
 plot(sol[,1:2])
+mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "elastica")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -448,6 +471,341 @@ plot(sol[,1:2])
 attr(sol,"roots")  # root gives the value of "lam" (17.10684)
 @
 \clearpage
+\section{Specifying the analytic jacobians}
+By default, the Jacobian of the derivative function and of the boundary
+conditions, are estimated numerically. It is however possible - and faster -
+to provide the analytical solution of the jacobian.
+
+As an example, the \code{elastica} problem is implemented. First, using the
+default specification:
+<<>>=
+Elastica <- function (x, y, pars) {
+
+  list( c(cos(y[3]),
+          sin(y[3]),
+          y[4],
+          y[5]*cos(y[3]),
+          0))
+}
+
+Sol <- bvptwp(func=Elastica,
+              yini = c(x=0, y=0, p=NA,   k=0, F=NA),
+              yend = c(x=NA,y=0, p=-pi/2,k=NA,F=NA),
+              x = seq(0,0.5,len=16),
+              guess=c(0,0) )
+@
+<<label=elastica,include=FALSE>>=
+plot(Sol)
+
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=elastica,fig=TRUE,echo=FALSE>>=
+<<elastica>>
+@
+\end{center}
+\caption{Solution of the elastica problem - see text for R-code}
+\label{fig:elastica}
+\end{figure}
+
+Now several extra functions are defined, specifying
+\begin{enumerate}
+ \item the analytic Jacobian for the derivative function (\code{jacfunc})
+ \item the boundary function (\code{bound}). Here \code{i} is the boundary
+   condition "number". The conditions at the left are enumerated first,
+   then the ones at the right.  For instance, i = 1 specifies the boundary
+   for y(0) = 0, or BC(1) = y[1]-0; the fifth boundary condition is y[3] = -pi/2 or
+   BC = y[3] + pi/2
+ \item the analytic Jacobian for the boundary function (\code{jacbound})
+\end{enumerate}
+
+This is done in the \R-code below:
+<<>>=
+
+Jac <- matrix(nr=5,nc=5,0)
+Jac[3,4]=1.0
+Jac[4,4]=1.0
+
+jacfunc <- function (x, y, pars) {
+      Jac[1,3]=-sin(y[3])
+      Jac[2,3]=cos(y[3])
+      Jac[4,3]=-y[5]*sin(y[3])
+      Jac[4,5]=Jac[2,3]
+      Jac
+}
+
+bound <- function (i, y, pars)  {
+    if (i <=2) return(y[i])
+    else if (i == 3) return(y[4])
+    else if (i == 4) return(y[2])
+    else if (i == 5) return(y[3]+pi/2)
+}
+
+jacbound <- function(i, y, pars)  {
+    JJ <- rep(0,5)
+         if (i <=2) JJ[i] =1.0
+    else if (i ==3) JJ[4] =1.0
+    else if (i ==4) JJ[2] =1.0
+    else if (i ==5) JJ[3] =1.0
+    JJ
+}
+@
+If this input is used, the number of left boundary conditions \code{leftbc}
+needs to be specified.
+<<>>=
+Sol4 <- bvptwp(leftbc = 3,
+              func=Elastica, jacfunc = jacfunc,
+              bound = bound, jacbound = jacbound,
+              x = seq(0,0.5,len=16),
+              guess=c(0,0) )
+@
+
+Solving the model this way is about 3 times faster than the default.
+
+\clearpage
+\section{implementing a BVP problem in compiled code}
+Even more computing time is saved by specifying the problem in lower-level
+languages such as \proglang{FORTRAN} or \proglang{C}, or \proglang{C++},
+which are compiled into a dynamically linked library (DLL) and loaded
+into \R.
+
+This is similar as the differential equations from package \ds \citep{deSolve}.
+
+Its vignette ("compiledCode") can be consulted for more information.
+
+In order to create compiled models (.DLL = dynamic link libraries on Windows
+or .so = shared objects on other systems) you must have a recent version of
+the GNU compiler suite installed, which is quite standard for Linux.
+
+Windows users find all the required tools on
+\url{http://www.murdoch-sutherland.com/Rtools/}.
+Getting DLLs produced by other compilers to communicate with R is much more
+complicated and therefore not recommended. More details can be found on
+\url{http://cran.r-project.org/doc/manuals/R-admin.html}.
+
+The call to the derivative, boundary and Jacobian functions is more complex
+for compiled code compared to \R-code, because it has to comply with the
+interface needed by the integrator source codes.
+
+Below is an implementation of the elastica model in \proglang{fortran}:
+
+\begin{verbatim}
+c  The differential system:
+
+      SUBROUTINE fsub(NCOMP,X,Z,F,RPAR,IPAR)
+      IMPLICIT NONE
+      INTEGER NCOMP, IPAR  , I
+      DOUBLE PRECISION F, Z, RPAR, X
+      DIMENSION Z(*),F(*)
+      DIMENSION RPAR(*), IPAR(*)
+
+      F(1)=cos(Z(3))
+      F(2)=sin(Z(3))
+      F(3)=Z(4)
+      F(4)=Z(5)*cos(Z(3))
+      F(5)=0
+
+      RETURN
+      END
+
+c The analytic Jacobian for the F-function:
+
+      SUBROUTINE dfsub(NCOMP,X,Z,DF,RPAR,IPAR)
+      IMPLICIT NONE
+      INTEGER NCOMP, IPAR, I, J
+      DOUBLE PRECISION X, Z, DF, RPAR
+      DIMENSION Z(*),DF(NCOMP,*)
+      DIMENSION RPAR(*), IPAR(*)
+      CHARACTER (len=50) str
+
+      DO I=1,5
+         DO J=1,5
+            DF(I,J)=0.D0
+         END DO
+      END DO
+
+      DF(1,3)=-sin(Z(3))
+      DF(2,3)=cos(Z(3))
+      DF(3,4)=1.0D0
+      DF(4,3)=-Z(5)*sin(Z(3))
+      DF(4,4)=1.0D0
+      DF(4,5)=cos(Z(3))
+
+      RETURN
+      END
+
+c The boundary conditions:
+
+      SUBROUTINE gsub(I,NCOMP,Z,G,RPAR,IPAR)
+      IMPLICIT NONE
+      INTEGER I, NCOMP, IPAR
+      DOUBLE PRECISION Z, RPAR, G
+      DIMENSION Z(*)
+      DIMENSION RPAR(*), IPAR(*)
+
+
+      IF (I.EQ.1) G=Z(1)
+      IF (I.EQ.2) G=Z(2)
+      IF (I.EQ.3) G=Z(4)
+      IF (I.EQ.4) G=Z(2)
+      IF (I.EQ.5) G=Z(3)+1.5707963267948966192313216916397514D0
+
+      RETURN
+      END
+
+c The analytic Jacobian for the boundaries:
+
+      SUBROUTINE dgsub(I,NCOMP,Z,DG,RPAR,IPAR)
+      IMPLICIT NONE
+      INTEGER I, NCOMP, IPAR
+      DOUBLE PRECISION Z, DG, RPAR
+      DIMENSION Z(*),DG(*)
+      DIMENSION RPAR(*), IPAR(*)
+
+      DG(1)=0.D0
+      DG(2)=0.D0
+      DG(3)=0.D0
+      DG(4)=0.D0
+      DG(5)=0.D0
+
+C     dG1/dZ1
+      IF (I.EQ.1) DG(1)=1.D0
+C     dG2/dZ2
+      IF (I.EQ.2) DG(2)=1.D0
+C     dG3/dZ4
+      IF (I.EQ.3) DG(4)=1.D0
+C     dG4/dZ2
+      IF (I.EQ.4) DG(2)=1.D0
+C     dG5/dZ3
+      IF (I.EQ.5) DG(3)=1.D0
+
+      RETURN
+      END
+
+\end{verbatim}
+
+The same model, implemented in \proglang{C} is:
+\begin{verbatim}
+#include <math.h>
+
+//  The differential system:
+
+  void fsub(int *n, double *x, double *z, double *f,
+        double * RPAR, int * IPAR)  {
+
+      f[0]=cos(z[2]);
+      f[1]=sin(z[2]);
+      f[2]=z[3]     ;
+      f[3]=z[4]*cos(z[2]);
+      f[4]=0;
+  }
+
+// The analytic Jacobian for the F-function:
+
+  void dfsub(int * n, double *x, double *z, double * df,
+      double *RPAR, int *IPAR)  {
+
+      int j;
+      for (j = 0; j< *n * *n; j++) df[j] = 0;
+
+      df[*n *2]    = -sin(z[2]);
+      df[*n *2 +1] = cos(z[2]);
+      df[*n *3 +2] = 1.0;
+      df[*n *2 +3] = -z[4]*sin(z[2]);
+      df[*n *3 +3] = 1.0;
+      df[*n *4 +3] = cos(z[2]);
+  }
+
+// The boundary conditions:
+
+  void gsub(int *i, int *n, double *z, double *g,
+      double *RPAR, int *IPAR)  {
+
+      if (*i==1) *g=z[0];
+      else if (*i==2) *g=z[1];
+      else if (*i==3) *g=z[3];
+      else if (*i==4) *g=z[1];
+      else if (*i==5) *g=z[2]+1.5707963267948966192313216916397514;
+  }
+
+// The analytic Jacobian for the G-function:
+
+  void dgsub(int *i, int *n, double *z, double *dg,
+      double *RPAR, int *IPAR)  {
+
+      int j;
+      for (j = 0; j< *n; j++) dg[j] = 0;
+
+      if (*i == 1) dg[0] = 1.;
+      else if (*i == 2) dg[1] = 1.;
+      else if (*i == 3) dg[3] = 1.;
+      else if (*i == 4) dg[1] = 1.;
+      else if (*i == 5) dg[2] = 1.;
+  }
+
+\end{verbatim}
+
+In what follows, it is assumed that the codes are saved in a file called
+\code{elastica.f}, and \code{elasticaC.c} and that these files are in the
+working directory of \R. (if not, use \code{setwd()} )
+
+Before the functions can be executed, the \proglang{fortran} or \proglang{C}-
+code has to be compiled
+
+This can simply be done in R:
+
+\begin{verbatim}
+ system("R CMD SHLIB elastica.f")
+ system("R CMD SHLIB elasticaC.c")
+\end{verbatim}
+or
+
+\begin{verbatim}
+system("gfortran -shared -o elastica.dll elastica.f")
+system("gcc -shared -o elasticaC.dll elasticaC.c")
+\end{verbatim}
+
+This will create a file called \code{elastica.dll} and \code{elasticaC.dll}
+respectively (on windows).
+
+After loading the DLL, the model can be run, after which the dll is unloaded.
+For the Fortran, this is done as follows (the C code is similar, except for
+the name of the DLL):
+\begin{verbatim}
+
+dyn.load("elastica.dll")
+
+outF <- bvptwp(ncomp=5,
+               x = seq(0,0.5,len=16), leftbc = 3,
+               func="fsub",jacfunc="dfsub",bound="gsub",jacbound="dgsub",
+               dllname="elastica")
+
+dyn.unload("elastica.dll")
+
+\end{verbatim}
+
+Note that the number of components (equations) needs to be explicitly
+inputted (\code{ncomp}).
+
+This model is about 8-10 times faster than the pure \R implementation from
+previous section.
+
+The solver recognizes that the model is specified as a DLL due to
+the fact that arguments \code{func}, \code{jacfunc}, \code{bound} and
+\code{jacbound} are not regular \R-functions but character strings.
+
+Thus, the solver will check whether these functions are loaded in the DLL
+with name "elastica.dll".  Note that the name of the DLL should be
+specified without extension.
+
+This DLL should contain all the compiled function or subroutine definitions
+needed.
+
+Also, if \code{func} is specified in compiled code, then \code{jacfunc},
+\code{bound} and \code{jacbound} should also be specified in a compiled
+language. It is not allowed to mix R-functions and compiled functions.
+
 
 \clearpage
 
