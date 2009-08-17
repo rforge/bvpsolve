@@ -202,6 +202,7 @@ SEXP call_mebdfi(SEXP y, SEXP yprime, SEXP times, SEXP res, SEXP parms,
   /****** Initialization of Parameters and Forcings (DLL functions)    ******/
   /**************************************************************************/
   initParms(initfunc, parms);
+    //  error("till here");
 
   isForcing = initForcings(flist);
 
@@ -255,11 +256,15 @@ SEXP call_mebdfi(SEXP y, SEXP yprime, SEXP times, SEXP res, SEXP parms,
       tin = REAL(times)[i];
       tout = REAL(times)[i+1];
 
+	   //Rprintf(" tin, hini, itol, mf, lrw, mbnd %g %g %i %i %i %i %i %i %i\n", tin, hini, Itol, mf, lrw, mbnd[0], mbnd[1],mbnd[2] ,mbnd[3] );
+
       F77_CALL(mebdfi)(&n_eq, &tin, &hini, xytmp, xdytmp, &tout, &tcrit,
         &mf, &idid, &lrw, rwork, &liw, iwork, mbnd, &maxord,
 	      &Itol, Rtol, Atol, out, ipar,  jac, Resfun, &ierr);
-
-      if (idid == 1) {
+//	   Rprintf(" tin, xdytmp %g %g %g %g %g %g\n", tin, xdytmp[0], xdytmp[1],xdytmp[2] ,xdytmp[3], xdytmp[4] );
+//	   Rprintf(" hini, xytmp %g %g %g %g %g %g\n", hini, xytmp[0], xytmp[1],xytmp[2] ,xytmp[3], xytmp[4] );
+//   error("here");
+     if (idid == 1) {
         idid = 0;
         F77_CALL(mebdfi)(&n_eq, &tin, &hini, xytmp, xdytmp, &tout, &tcrit,
          &mf, &idid, &lrw, rwork, &liw, iwork, mbnd, &maxord,
@@ -294,7 +299,9 @@ SEXP call_mebdfi(SEXP y, SEXP yprime, SEXP times, SEXP res, SEXP parms,
 
 
     if (nout>0) {
-	    if (isDll == 1) Resfun (&tin, xytmp, xdytmp, &cj, delta, &ires, out, ipar) ;
+	    if (isDll == 1)
+        Resfun (&tin, xytmp, xdytmp, &cj, delta, &ires, out, ipar) ;
+
 	    else for (j = 0; j < n_eq; j++)
 	      REAL(dyout)[(i+1)*(n_eq) + j + 1] = xdytmp[j];
     }
@@ -322,8 +329,8 @@ SEXP call_mebdfi(SEXP y, SEXP yprime, SEXP times, SEXP res, SEXP parms,
   INTEGER(ISTATE)[0] = idid;
 
 
-  PROTECT(RWORK = allocVector(REALSXP, 2));incr_N_Protect();
-  for (k = 0;k<2;k++) REAL(RWORK)[k] = rwork[k];
+  PROTECT(RWORK = allocVector(REALSXP, 1));incr_N_Protect();
+   REAL(RWORK)[0] = rwork[1];
 
   if (idid >= 0)
     {

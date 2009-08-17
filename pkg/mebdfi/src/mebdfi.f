@@ -320,20 +320,10 @@ C     .. EXTERNAL SUBROUTINES ..
       EXTERNAL OVDRIV,pderv,resid
 C     ..
 C     .. SAVE STATEMENT ..
-      common/IIIS/  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10
+      SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10
 C     ..
 
       character (len=180) MSG
-c       write(msg,*)  iwork(1),iwork(14), mbnd(1),mbnd(2),mbnd(3),mbnd(4)
-c       call rwarn(msg)
-
-c       write(msg,*)  LIWORK, LWORK
-c       call rwarn(msg)
-
-c       write(msg,*)y0(1),y0(2),y0(3),yprime(1),yprime(2),yprime(3)
-c       call rwarn(msg)
-c       write(msg,*)  maxder,itol,rtol(1),atol(1)
-c       call rwarn(msg)
 
 
 C KS: hard-coded LOUT = 0 (never used anymore...)
@@ -364,7 +354,7 @@ c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             EPSJAC = SQRT(WORK(1))
 
 c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
-           IF (LWORK.LT.(I10+1+MBND(4)*N)) THEN
+           IF (LWORK.LT.(I10+1+MBND(4)*N)) THEN 
                IDID = -11
                WRITE (msg,9000) I10 + 1+MBND(4)*N
                call rexit(msg)
@@ -381,11 +371,8 @@ c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
          END IF
 
          IF (IDID.LT.0) RETURN
-
+         
       END IF
-c       write(msg,*)  I1, I2, I3, I4, I5, I6, I7, I8, I9, I10
-c       call rwarn(msg)
-       
 c
 c    THE DIMENSION OF THE REAL WORKSPACE, WORK, HAS TO BE AT LEAST
 c     (32 + MBND(4))*N+2 WHILE THE DIMENSION OF THE INTEGER
@@ -407,7 +394,6 @@ C     ERRORS(N) , SAVE1(N) , SAVE2(N) , SCALE(N) , ARH(N) , PW(MBND(4)*N)
 C     PWCOPY(MBND(4)*N)
 C     IF THE BANDED OPTION IS NOT BEING USED THEN MBND(4)=N.
 C     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
       RETURN
 
  9000 FORMAT (' >>> REAL WORKSPACE IS INSUFFICIENT <<< ',
@@ -451,13 +437,14 @@ C     ..
 C     .. COMMON BLOCKS ..
       INTEGER IDOUB,ISAMP,JSTART,KFLAG,L,MAXORD,NBSOL,NCOSET,NDEC,
      +     NEWPAR,NRE,NJE,NPSET,NQUSED,NRENEW,NSTEP
-      common/TTTS/ T,H,HMIN,HMAX,KFLAG,JSTART
+      SAVE T,H,HMIN,HMAX,KFLAG,JSTART
 C     ..
       character (len=180) MSG
 
       IF (IDID.EQ.0) THEN
 C        I.E. NORMAL CONTINUATION OF INTEGRATION
          T0=T
+CKS: hmax should become a parameter !
          HMAX = DABS(TEND-T0)*10.0D+0
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT THE OUTPUT POINT, SO INTERPOLATE
@@ -827,7 +814,6 @@ C        HAVE REDUCED H TEN TIMES
       HMIN = 0.1D+0*HMIN
       H = 0.1D+0*H
       JSTART = -1
-
       GO TO 20
 
  70   IF(DABS(T-TOUT).GT.1000.0D+0*UROUND) THEN
@@ -1969,11 +1955,16 @@ C     .. INTRINSIC FUNCTIONS ..
 C     ..
 C     .. COMMON BLOCKS ..
       INTEGER NBSOL,NRE
+
+CKS: add this save statement?
+C      SAVE D1
 C     ..
 C     .. DATA STATEMENTS ..
+      character(len=150) msg
 
       DATA  ZERO/0.0D+0/
 C     ..
+
       DO 5 I=1,N
          AYI = DABS(Y(I,1))
          IF(ITOL.EQ.1) THEN
@@ -1988,6 +1979,7 @@ C     ..
             SCALE(I) = RTOL(I)*AYI + ATOL(I)
          ENDIF
  5    CONTINUE
+
       IF(NIND2.NE.0) THEN
          DO 11 I = NIND1+1,NIND2+NIND1
             SCALE(I)=SCALE(I)/HUSED
@@ -2181,21 +2173,21 @@ C     .. INTRINSIC FUNCTIONS ..
       INTRINSIC DABS,DMAX1,DMIN1
 C     ..
 C     .. COMMON BLOCKS ..
-      COMMON/STPSZE/HSTPSZ
+      SAVE HSTPSZ
       INTEGER IDOUB,ISAMP,IWEVAL,JCHANG,JSINUP,JSNOLD,L,M1,M2,MAXORD,
      +        MEQC1,MEQC2,MQ1TMP,MQ2TMP,NBSOL,NCOSET,NDEC,NEWPAR,
      +        NRE,NJE,NPSET,NQ,NQUSED,NRENEW,NSTEP,NT
       LOGICAL CFAIL,JNEWIM,SAMPLE
 C     ..
 C     .. SAVE STATEMENT ..
-      common/cb2/MFOLD,LMAX,MITER,IBND,KFAIL,JNEWIM,IEMB,
+      SAVE MFOLD,LMAX,MITER,IBND,KFAIL,JNEWIM,IEMB,
      + NEWPAR,NRENEW,JSINUP,JSNOLD,IDOUB,JCHANG,L,NQ,MEQC1,
      + MEQC2,MQ1TMP,MQ2TMP,ISAMP,IER,IREDO,IWEVAL
-      common/cb2b/EDN,EUP,BND,EDDN,EL,TQ,ELST,E,QI,QQQ,
+      SAVE EDN,EUP,BND,EDDN,EL,TQ,ELST,E,QI,QQQ,
      + RH,RMAX,TOLD,CRATE1,CRATE2,HOLD,
      + TCRAT1,TCRAT2,AVNEW2,AVOLD2,AVNEWJ,AVOLDJ,UPBND,
      + RC,VTOL,OLDLO,OVRIDE
-      common/cb3/CFAIL,SAMPLE
+      SAVE CFAIL,SAMPLE
 C     ..
 C     .. DATA STATEMENTS ..
 
@@ -2516,6 +2508,7 @@ C     VECTOR  ERROR(I).  THE Y ARRAY IS NOT ALTERED IN THE CORRECTOR
 C     LOOP. THE UPDATED Y VECTOR IS STORED TEMPORARILY IN SAVE1.
 C **********************************************************************
       IF (.NOT.SAMPLE) THEN
+
          CALL ITRAT2(QQQ,Y,YPRIME,N,T,QI,BND,ARH,CRATE1,TCRAT1,M1,
      +        WORKED,YMAX,ERROR,SAVE1,SAVE2,SCALE,PW,MF,MBND,
      +        NIND1,NIND2,NIND3,IPIV,1,ITOL,RTOL,ATOL,IPAR,RPAR,
@@ -3125,10 +3118,12 @@ C ----------------------------------------------------------------------
          DO 460 I=1,N
             Y(I,J1)=YHOLD(I,J1)
  460  CONTINUE
+
       IF(DABS(H).LE.HMIN*1.00001D+0) THEN
 C
 C   CORRECTOR CONVERGENCE COULD NOT BE ACHIEVED
 C
+
          IF(NSTEP.EQ.0) THEN
             KFLAG=-1
          ELSE
@@ -3164,8 +3159,6 @@ C
          T= TOLD
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
-            WRITE (msg,*) T,TOUT,H
-            call rwarn(msg)
 
             CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
             HO = H
@@ -3429,9 +3422,9 @@ C
       EXTERNAL           DLAMC2
 *     ..
 *     .. Save statement ..
-      common/cb11/       EPS, SFMIN, BASE, T, RND, EMIN, RMIN,
+      SAVE      EPS, SFMIN, BASE, T, RND, EMIN, RMIN,
      $                   EMAX, RMAX, PREC
-      common/cb11b/      FIRST
+      SAVE      FIRST
 *     ..
 *     .. Data statements ..
       DATA               FIRST / .TRUE. /
@@ -3558,7 +3551,7 @@ C
       character (len=150) msg
 *     ..
 *     .. Save statement ..
-      common/here2/        FIRST, LIEEE1, LBETA, LRND, LT
+      SAVE        FIRST, LIEEE1, LBETA, LRND, LT
 *     ..
 *     .. Data statements ..
       DATA               FIRST / .TRUE. /
@@ -3766,9 +3759,9 @@ C
       INTRINSIC          ABS, MAX, MIN
 *     ..
 *     .. Save statement ..
-      common/c3/        IWARN, LBETA, LEMAX, LEMIN, LEPS, LRMAX,
+      SAVE       IWARN, LBETA, LEMAX, LEMIN, LEPS, LRMAX,
      $                   LRMIN, LT
-      common/c3b/      FIRST
+      SAVE     FIRST
 *     ..
 *     .. Data statements ..
       DATA               FIRST / .TRUE. / , IWARN / .FALSE. /

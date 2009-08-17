@@ -53,7 +53,7 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
   if (hini < 0)
     stop("`hini' must be a non-negative value")
   if (hini == 0)
-    hini = 1e-6   # arbitrary
+    hini = 1e-5   # arbitrary
   if (!is.numeric(maxord))
     stop("`maxord' must be numeric")
   if(maxord < 1 || maxord > 8)
@@ -61,25 +61,25 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
   if (maxsteps<1)
     stop("`maxsteps' must be >1 ")
 
-### Jacobian, method flag
+### Jacobian, method flag  - note: different from livermore solvers
   if (jactype == "fullint" )
     imp <- 22 # full, calculated internally
   else if (jactype == "fullusr" )
     imp <- 21 # full, specified by user function
   else if (jactype == "bandusr" )
-    imp <- 24 # banded, specified by user function
+    imp <- 23 # banded, specified by user function
   else if (jactype == "bandint" )
-    imp <- 25 # banded, calculated internally
+    imp <- 24 # banded, calculated internally
   else stop("'jactype' must be one of 'fullint', 'fullusr', 'bandusr' or 'bandint'")
 
-  if (imp %in% c(24,25) && is.null(bandup))
+  if (imp %in% c(23,24) && is.null(bandup))
     stop("'bandup' must be specified if banded Jacobian")
-  if (imp %in% c(24,25) && is.null(banddown))
+  if (imp %in% c(23,24) && is.null(banddown))
     stop("'banddown' must be specified if banded Jacobian")
 
-  #  if (imp == 24) Jacobian should have empty banddown empty rows
+  #  if (imp == 23) Jacobian should have empty banddown empty rows
   # similar as in vode+daspk only!    CHECK IT !
-  if (imp == 24)
+  if (imp == 23)
     erow<-matrix(nc=n,nr=banddown,0)
   else erow<-NULL
     
@@ -107,11 +107,15 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
   flist<-list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
 
   if (!is.null(dllname))  {
-    if (is.loaded(initfunc, PACKAGE = dllname, type = "") ||
+
+    if (! is.null(initfunc))  # KS: ADDED THAT to allow absence of initfunc
+      if (is.loaded(initfunc, PACKAGE = dllname, type = "") ||
         is.loaded(initfunc, PACKAGE = dllname, type = "Fortran")) {
-      ModelInit <- getNativeSymbolInfo(initfunc, PACKAGE = dllname)$address
+       ModelInit <- getNativeSymbolInfo(initfunc, PACKAGE = dllname)$address
     } else if (initfunc != dllname && ! is.null(initfunc))
        stop(paste("cannot integrate: initfunc not loaded ",initfunc))
+    # Easier to deal with NA in C-code
+    if (is.null(initfunc)) initfunc <- NA
     if (! is.null(forcings))
       flist <- checkforcings(forcings,times,dllname,initforc,verbose,fcontrol)
   }
@@ -194,7 +198,7 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
     ## the Jacobian
     if (! is.null(jacfunc)) {        # Jacobian associated with func
 
-      tmp <- eval(jacfunc(times[1], y, dy,parms, 1, ...), rho)
+      tmp <- eval(jacfunc(times[1], y, parms, ...), rho)
       if (! is.matrix(tmp))
         stop("jacfunc must return a matrix\n")
 
@@ -203,11 +207,12 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
           attr(y,"names")  <- Ynames
           attr(dy,"names") <- dYnames
         }
-        JF <- -1* rbind(jacfunc(Rin[1],y,dy,parms,...),erow)
-        if (imp %in% c(24,25))
+        JF <- -1* jacfunc(Rin[1],y,parms,...)
+        if (imp %in% c(23,24))  {
           JF[bandup+1,]<-JF[bandup+1,]+Rin[2]
-        else
-          JF           <-JF + diag(nc=n,x=Rin[2])
+          JF <- rbind(erow,JF)
+        } else
+          JF           <-JF + diag(nc=n,nr=n,x=Rin[2])
         return(JF)
       }
     } else if (! is.null(jacres)) { # Jacobian associated with res
@@ -215,7 +220,7 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
        if (! is.matrix(tmp))
          stop("jacres must return a matrix\n")
        dd <- dim(tmp)
-       if ((imp ==24 && dd != c(bandup+banddown+1,n)) ||
+       if ((imp ==23 && dd != c(bandup+banddown+1,n)) ||
            (imp ==21 && dd != c(n,n)))
          stop("Jacobian dimension not ok")
 
@@ -224,7 +229,7 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
            attr(y,"names")  <- Ynames
            attr(dy,"names") <- dYnames
          }
-         rbind(jacres(Rin[1],y,dy,parms,Rin[2],...),erow)
+         rbind(erow,jacres(Rin[1],y,dy,parms,Rin[2],...))
        }
     } else JacRes <- NULL
          
@@ -273,7 +278,7 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
       itol <-2
   }
 
-  if (imp %in% c(24,21) && is.null(jacfunc) && is.null(jacres))
+  if (imp %in% c(23,21) && is.null(jacfunc) && is.null(jacres))
     stop ("mebdfi: *jacfunc* or *jacres* NOT specified; either specify *jacfunc* or *jacres* or change *jactype*")
 
   if (is.null(tcrit)) tcrit = times[length(times)]
@@ -300,8 +305,8 @@ mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
   istate <- attr(out, "istate")
   rstate <- attr(out, "rstate")
 
-  out <- saveOutDAE(out, y, dy, n, Nglobal, Nmtot, res, Res2, iin = c(1,
-        12:21), iout = c(1:3, 14, 5:9, 15:16), nr = 5)
+  out <- saveOutDAE(out, y, dy, n, Nglobal, Nmtot, res, Res2,
+    iin = c(1,5:14), iout = c(1,5,2,13,3,4,10,19,20,21,18), nr = 1)
 
   ## ordinary output variables already estimated
   nm <- c("time", if (!is.null(attr(y, "names"))) names(y) else as.character(1:n))

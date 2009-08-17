@@ -47,6 +47,7 @@ note: forcing initialisation ftion is in forcings.c
 
 void initParms(SEXP Initfunc, SEXP Parms) {
 
+  if (Initfunc == NA_STRING) return;
   if (inherits(Initfunc, "NativeSymbol"))  {
     init_func *initializer;
 

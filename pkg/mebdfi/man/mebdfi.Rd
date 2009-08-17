@@ -164,7 +164,8 @@ mebdfi(y, times, func = NULL, parms, dy = NULL, res = NULL,
     that should be provided in \code{tcrit}.
   }
   \item{hini }{initial step size to be attempted; if 0, the initial step
-    size is determined by the solver
+    size is set to 1e-6. The solver is quite sensitive to hini; sometimes
+    if it fails, it helps to decrease/increase \code{hini}
   }
   \item{ynames }{if FALSE: names of state variables are not passed to
     function \code{func} ; this may speed up the simulation especially
@@ -351,67 +352,72 @@ max(abs(ODE-DAE))
 
 par(mfrow = opa)
 
-\dontrun{
-## =======================================================================
-## same DAE model, now with the Jacobian
-## =======================================================================
-jacres_DAE <- function (t, y, yprime, pars, cj)
-{
-    with (as.list(c(y, yprime, pars)), {
-##    res1 = -dD - dA + prod
-      PD[1,1] <- -1*cj      # d(res1)/d(A)-cj*d(res1)/d(dA)
-      PD[1,2] <- 0          # d(res1)/d(B)-cj*d(res1)/d(dB)
-      PD[1,3] <- -1*cj      # d(res1)/d(D)-cj*d(res1)/d(dD)
-##     res2 = -dB + dA - r*B
-      PD[2,1] <- 1*cj
-      PD[2,2] <- -r -1*cj
-      PD[2,3] <- 0
-##    eq = K*D - A*B
-      PD[3,1] <- -B
-      PD[3,2] <- -A
-      PD[3,3] <- K
-      return(PD)
-   })
+## =============================================================================
+## Car axis problem, index 3 DAE, 8 differential, 2 algebraic equations
+## from
+## F. Mazzia and C. Magherini. Test Set for Initial Value Problem Solvers,
+## release 2.4. Department
+## of Mathematics, University of Bari and INdAM, Research Unit of Bari,
+## February 2008.
+## Available at http://www.dm.uniba.it/~testset.
+## =============================================================================
+
+car <- function(t,y,dy,pars){
+  with(as.list(c(pars,y)), {
+      f <- rep(0,10)
+
+      yb  <- r*sin(w*t)
+      xb  <- sqrt(L*L-yb*yb)
+      Ll  <- sqrt(xl^2+yl^2)
+      Lr  <- sqrt((xr-xb)^2+(yr-yb)^2)
+
+      f[1:4] <- y[5:8]
+      k <- M*eps*eps/2
+
+      f[5]  <- (L0-Ll)*xl/Ll +lam1*xb+2*lam2*(xl-xr)
+      f[6]  <- (L0-Ll)*yl/Ll +lam1*yb+2*lam2*(yl-yr)-k*g
+      f[7]  <- (L0-Lr)*(xr-xb)/Lr -2*lam2*(xl-xr)
+      f[8]  <- (L0-Lr)*(yr-yb)/Lr -2*lam2*(yl-yr)-k*g
+
+      f[9]  <- xb*xl+yb*yl
+      f[10] <- (xl-xr)^2+(yl-yr)^2-L*L
+
+      delt       <- dy-f
+      delt[5:8]  <- k*dy[5:8]-f[5:8]
+      delt[9:10] <- -f[9:10]
+
+      list(delt=delt,f=f)
+  })
 }
 
-PD <- matrix(nc = 3, nr = 3, 0)
 
-DAE2 <- as.data.frame(mebdfi(y = y, dy = dy, times = times,
-          res = Res_DAE, jacres = jacres_DAE, jactype = "fullusr",
-          parms = pars, atol = 1e-10, rtol = 1e-10))
-         
-max(abs(DAE-DAE2))
+# parameters
+pars <- c(eps = 1e-2, M = 10, L = 1, L0 = 0.5,
+          r   = 0.1,  w = 10, g = 1)
 
-## See \dynload subdirectory for a FORTRAN implementation of this model
+# initial conditions: state variables
+yini <-  with (as.list(pars),
+   c(xl=0, yl=L0, xr=L, yr=L0, xla=-L0/L,
+     yla=0, xra=-L0/L, yra=0, lam1=0, lam2=0)
+              )
 
-## =======================================================================
-## The chemical model as a DLL, with production a forcing function
-## =======================================================================
-times <- seq(0, 100, by = 2)
+# initial conditions: derivates
+dyini <- rep(0,10)
+FF    <- car(0,yini,dyini,pars)
+dyini[1:4] <- yini[5:8]
+dyini[5:8] <- 2/pars["M"]/(pars["eps"])^2*FF$f[5:8]
 
-pars <- c(K = 1, ka   = 1e6, r    = 1)
+# check consistency of initial condition: delt should be = 0.
+car(0,yini,dyini,pars)
 
-## Initial conc; D is in equilibrium with A,B
-y     <- c(A = 2, B = 3, D = 2*3/pars["K"])
+# running the model
+times <- seq(0,3,by=0.01)
+nind  <- c(4,4,2)   # index 1, 2 and 3 variables
+out   <- mebdfi(y=yini,dy=dyini,times,res=car,parms=pars,
+                rtol=1e-5,atol=1e-5)
 
-## Initial rate of change
-dy  <- c(dA = 0, dB = 0, dD = 0)
-
-# production increases with time
-prod <- matrix(nc=2,data=c(seq(0,100,by=10),0.1*(1+runif(11)*1)))
-
-ODE_dll <- as.data.frame(mebdfi(y=y,dy=dy,times=times,res="chemres",
-          dllname="deSolve", initfunc="initparms",
-          initforc="initforcs", parms=pars, forcings=prod,
-          atol=1e-10,rtol=1e-10,nout=2, outnames=c("CONC","Prod")))
-
-opa <- par(mfrow = c(1,2))
-plot(ODE_dll$time,ODE_dll$Prod,xlab = "time",
-     ylab = "/day",main = "production rate",type = "l")
-plot(ODE_dll$time,ODE_dll$D,xlab = "time",
-     ylab = "conc",main = "D",type = "l")
-par(mfrow = opa)
-}
+plot(out,which=1:4,type="l",lwd=2)
+mtext(outer=TRUE,side=3,line=-0.5,cex=1.5,"car axis")
 }
 \references{
 J. R. Cash, The integration of stiff initial value problems
