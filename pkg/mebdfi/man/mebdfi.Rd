@@ -325,13 +325,13 @@ require(mebdfi)
 
 ## ODE model solved with mebdfi
 ODE <- as.data.frame(mebdfi(y = y, times = times, func = Fun_ODE,
-                     parms = pars, atol = 1e-10, rtol = 1e-10))
+                     parms = pars, atol = 1e-8, rtol = 1e-8))
 
 ## Initial rate of change
 dy  <- c(dA = 0, dB = 0, dD = 0) 
 ## DAE model solved with mebdfi
-DAE <- as.data.frame(mebdfi(y = y, dy = dy, times = times, hini=1e-10,
-         res = Res_DAE, parms = pars, atol = 1e-10, rtol = 1e-10))
+DAE <- as.data.frame(mebdfi(y = y, dy = dy, times = times, hini=1e-8,
+         res = Res_DAE, parms = pars, atol = 1e-8, rtol = 1e-8))
 
 ## ================
 ## plotting output
@@ -414,9 +414,9 @@ car(0,yini,dyini,pars)
 times <- seq(0,3,by=0.01)
 nind  <- c(4,4,2)   # index 1, 2 and 3 variables
 out   <- mebdfi(y=yini,dy=dyini,times,res=car,parms=pars,
-                rtol=1e-5,atol=1e-5)
+                nind=nind, rtol=1e-5,atol=1e-5)
 
-plot(out,which=1:4,type="l",lwd=2)
+plot(out[,1],out[,2:5],type="l",lwd=2)
 mtext(outer=TRUE,side=3,line=-0.5,cex=1.5,"car axis")
 }
 \references{
