@@ -1,7 +1,10 @@
 
-############################# TEST PROBLEM  ###################################
-# Standard problem from the twpbvp source code
-################################################################################
+## =============================================================================
+##
+## Standard problem from the twpbvp source code
+##
+## =============================================================================
+
  require(bvpSolve)
 
 #--------------------------------
@@ -21,7 +24,7 @@ eps    <-0.01
 # initial and final condition; second conditions unknown
 x <- seq(from=0,to=1,len=101)
 
-yini <- c(0,NA)
+yini <- c(y=0,dy=NA)
 yend <- c(0,NA)
 
 #---------------------
@@ -29,16 +32,16 @@ yend <- c(0,NA)
 #  **  shooting  **
 #---------------------
 
-print(system.time(sol  <- as.data.frame(bvpshoot(yini=yini,yend=yend,x=x,
-       guess=1,func=fun, atol=1e-6))))
-plot(sol$x,sol[,2],type="l")
+print(system.time(sol  <- bvpshoot(yini=yini,yend=yend,x=x,
+       guess=1,func=fun, atol=1e-6)))
+plot(sol,type="l")
 
 #---------------------
 # Solution method 2
-# Collocation methods
+# bvptwp
 #---------------------
 
-print(system.time(sol2  <- as.data.frame(bvptwp(yini=yini,yend=yend,x=x,
-       guess=1,func=fun, atol=1e-6))))
-points(sol2[,1:2])
+print(system.time(sol2  <- bvptwp(yini=yini,yend=yend,x=x,
+       guess=1,func=fun, atol=1e-6)))
+plot(sol2, which="y")
 

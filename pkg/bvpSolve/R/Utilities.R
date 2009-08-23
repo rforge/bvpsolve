@@ -4,8 +4,6 @@
 
 
 plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
-    if (is.null(ask))
-        ask <- prod(par("mfcol")) < length(which) && dev.interactive()
     t <- 1     # column with "times"
     var <- colnames(x)
     if (!is.numeric(which)) {
@@ -39,6 +37,8 @@ plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
     if (!is.null(mfrow)) {
         mf <- par(mfrow = mfrow)
     }
+    if (is.null(ask))
+        ask <- prod(par("mfcol")) < length(which) && dev.interactive()
     ## interactively wait if there are remaining figures
     if (ask) {
         oask <- devAskNewPage(TRUE)
@@ -61,3 +61,5 @@ plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
         do.call("plot", c(alist(x[, t], x[, i]), dots))
     }
 }
+
+

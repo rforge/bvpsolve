@@ -18,7 +18,8 @@
 bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
   leftbc=NULL, islin=FALSE, nmax=1000, colp= NULL, atol=1e-8,
-  allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL, ...)
+  allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
+  forcings=NULL, initforc = NULL, fcontrol=NULL, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) values for the ODE
@@ -146,7 +147,25 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{ncomp }{if the model is specified by compiled code, the number of
     components (or equations). See package vignette \code{"bvpSolve"}.
   }
-  \item{... }{additional arguments passed to the model functions.
+  \item{forcings }{only used if \file{dllname} is specified: a list with
+    the forcing function data sets, each present as a two-columned matrix,
+    with (time,value); interpolation outside the interval
+    [min(\code{times}), max(\code{times})] is done by taking the value at
+    the closest data extreme.
+
+    See package vignette \code{"bvpSolve"}.
+  }
+  \item{initforc }{if not \code{NULL}, the name of the forcing function
+    initialisation function, as provided in
+    \file{dllname}. It MUST be present if \code{forcings} has been given a
+    value.
+
+    See package vignette \code{"bvpSolve"}.
+  }
+  \item{fcontrol }{A list of control parameters for the forcing functions.
+    See "Details" or package vignette \code{"bvpSolve"}.
+  }
+   \item{... }{additional arguments passed to the model functions.
   }
 }
 
@@ -170,8 +189,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \details{
-  This is an implementation of the method twpbvp, to solve
-  two-point boundary value problems of ordinary differential equations.
+  This is an implementation of the method \emph{twpbvp}, written by
+  Cash and Wright, to solve two-point boundary value problems of
+  ordinary differential equations.
 
   A boundary value problem does not have all initial values of
   the state variable specified. Rather some conditions are specified at
@@ -188,15 +208,57 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   The user-requested tolerance is provided through \code{tol}. The
   default is \eqn{1e^-6}
 
-
   If the function terminates because the maximum
   number of subintervals was exceeded, then it is recommended that'
   the program be run again with a larger value for this maximum.'
 
-  For this method to work, there should be ONLY one solution.
-  This means that the number of specified boundary value problems must
-  equal the number of unspecified initial conditions (so that there is
-  exactly ONE root).
+
+  Models may be defined in \bold{compiled C or Fortran} code, as well as
+  in an  \bold{R}-function.
+
+  This is similar to the initial value problem solvers from package
+  \code{deSolve}. See package vignette \code{"bvpSolve"} for details.
+
+
+  The \bold{fcontrol} argument is a list that can supply any of the following
+  components (conform the definitions in the \link{approx} function):
+  \describe{
+    \item{method }{specifies the interpolation method to be used.
+      Choices are "linear" or "constant",}
+    \item{rule }{an integer describing how interpolation is to take place
+      outside the interval [min(times), max(times)].
+      If \code{rule} is \code{1} then an error will be triggered and the
+      calculation will stop if \code{times} extends the interval of the
+      forcing function data set. If it is \code{2}, the *default*, the
+      value at the closest data extreme is used, a warning will be printed if
+      \code{verbose} is TRUE,
+
+      Note that the default differs from the \code{approx} default}
+    \item{f }{For method=\code{"constant"} a number between \code{0} and
+      \code{1} inclusive, indicating a compromise between left- and
+      right-continuous step functions. If \code{y0} and \code{y1} are the
+      values to the left and right of the point then the value is
+      \code{y0*(1-f)+y1*f} so that \code{f=0} is right-continuous and
+      \code{f=1} is left-continuous,
+      }
+    \item{ties }{Handling of tied \code{times} values. Either a function
+      with a single vector argument returning a single number result or the
+      string "ordered".
+
+      Note that the default is "ordered", hence the existence of ties will
+      NOT be investigated; in the \code{C} code this will mean that -if ties
+      exist, the first value will be used; if the dataset is not ordered,
+      then nonsense will be produced.
+
+      Alternative values for \code{ties} are \code{mean}, \code{min} etc
+      }
+   }
+   The defaults are:
+
+   \code{fcontrol=list(method="linear", rule = 2,  f = 0, ties = "ordered")}
+
+   Note that only ONE specification is allowed, even if there is more than
+   one forcing function data set.
 }
 \seealso{
   \code{\link{bvpshoot}} for the shooting method

@@ -1,21 +1,22 @@
-################################################################################
-#   This is the example for MUSN in U. Ascher, R. Mattheij, and R. Russell,
-#   Numerical Solution of Boundary Value Problems for Ordinary Differential
-#   Equations, SIAM, Philadelphia, PA, 1995.  MUSN is a multiple shooting
-#   code for nonlinear BVPs.  The problem is
-#
-#      u' =  0.5*u*(w - u)/v
-#      v' = -0.5*(w - u)
-#      w' = (0.9 - 1000*(w - y) - 0.5*w*(w - u))/z
-#      z' =  0.5*(w - u)
-#      y' = -100*(y - w)
-#
-#   The interval is [0 1] and the boundary conditions are
-#
-#      u(0) = v(0) = w(0) = 1,  z(0) = -10,  w(1) = y(1)
-#
-# note: there are two solutions...
-################################################################################
+## =============================================================================
+##   This is the example for MUSN in U. Ascher, R. Mattheij, and R. Russell,
+##   Numerical Solution of Boundary Value Problems for Ordinary Differential
+##   Equations, SIAM, Philadelphia, PA, 1995.  MUSN is a multiple shooting
+##   code for nonlinear BVPs.  The problem is
+##
+##      u' =  0.5*u*(w - u)/v
+##      v' = -0.5*(w - u)
+##      w' = (0.9 - 1000*(w - y) - 0.5*w*(w - u))/z
+##      z' =  0.5*(w - u)
+##      y' = -100*(y - w)
+##
+##   The interval is [0 1] and the boundary conditions are
+##
+##      u(0) = v(0) = w(0) = 1,  z(0) = -10,  w(1) = y(1)
+##
+## note: there are two solutions...
+## =============================================================================
+
 require(bvpSolve)
 
 #--------------------------------

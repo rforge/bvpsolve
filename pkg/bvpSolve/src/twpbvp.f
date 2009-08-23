@@ -208,10 +208,10 @@ C  ***  ISSUE STOP 778 IF ALL DATA STATEMENTS ARE OBVIOUSLY WRONG...
 *      IF (I .LT. 1  .OR.  I .GT. 5)
 *     1   CALL SETERR('D1MACH - I OUT OF BOUNDS',24,1,2)
 *C/
-      IF (I .LT. 1 .OR. I .GT. 5) THEN
-         WRITE(*,*) 'D1MACH(I): I =',I,' is out of bounds.'
-         STOP
-         END IF
+c      IF (I .LT. 1 .OR. I .GT. 5) THEN
+c         WRITE(*,*) 'D1MACH(I): I =',I,' is out of bounds.'
+c         STOP
+c         END IF
       D1MACH = DMACH(I)
       RETURN
 C/6S

@@ -1,12 +1,12 @@
-
-################################################################################
-# Find the 4th eigenvalue of Mathieu's equation:
-# y''+(lam-10cos2t)y=0   on the interval [0,pi]
-# y(0)=1, y'(0)=0  and y'(pi)=0
-# 2nd order problem is rewritten as:
-# dy=y2
-# dy2= -(lam-10cos(2t))*y
-################################################################################
+## =============================================================================
+## Find the 4th eigenvalue of Mathieu's equation:
+## y''+(lam-10cos2t)y=0   on the interval [0,pi]
+## y(0)=1, y'(0)=0  and y'(pi)=0
+##
+## 2nd order problem is rewritten as:
+## dy=y2
+## dy2= -(lam-10cos(2t))*y
+## =============================================================================
 
 require(bvpSolve)
 
@@ -28,7 +28,7 @@ plot(sol[,1:2])
 
 #----------------------
 # Solution method 2
-# multiroot + collocation
+# multiroot + bvptwp
 #----------------------
 
 cost <- function(X)

@@ -7,7 +7,8 @@
 bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
      xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
      leftbc=NULL, islin=FALSE, nmax=1000, colp=NULL, atol=1e-8,
-     allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL, ...)   {
+     allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
+     forcings=NULL, initforc = NULL, fcontrol=NULL,...)   {
 
   rho <- environment(func)
 
@@ -85,9 +86,23 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   if (is.null(Ynames) & ! is.null(yend))   Ynames <- names(yend)
   if (is.null(Ynames) & is.matrix(yguess)) Ynames <- colnames(yguess)
   if (is.null(Ynames) & is.vector(yguess)) Ynames <- names(yguess)
-
+  flist     <- list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
+  ModelInit <- NULL
   # The functions are in a DLL
   if (is.character(func)) {
+    if (sum(duplicated (c(func,initfunc,jacfunc))) >0)
+      stop("func, initfunc, or jacfunc cannot be the same")
+
+    if (! is.null(initfunc))  # KS: ADDED THAT to allow absence of initfunc
+      if (is.loaded(initfunc, PACKAGE = dllname, type = "") ||
+        is.loaded(initfunc, PACKAGE = dllname, type = "Fortran"))  {
+        ModelInit <- getNativeSymbolInfo(initfunc, PACKAGE = dllname)$address
+      } else if (initfunc != dllname && ! is.null(initfunc))
+        stop(paste("'initfunc' not loaded ",initfunc))
+
+    # Easier to deal with NA in C-code
+    if (is.null(initfunc)) ModelInit <- NA
+
     funcname <- func
     ## get the pointer and put it in func
     if (is.loaded(funcname, PACKAGE = dllname)) {
@@ -113,6 +128,9 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       stop(paste("boundary jac function not loaded ",jacbound))
     Nglobal <-  0
     Nmtot <- NULL
+
+    if (! is.null(forcings))
+      flist <- checkforcings(forcings,x,dllname,initforc,FALSE,fcontrol)
 
   } else {      # The functions are R-code
   
@@ -239,6 +257,11 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     stop("tol must either be one number or a vector with length=number of state variables")
   Ipar <- 1
   Rpar <- 1.0
+    if(is.null(initfunc))
+      initpar <- NULL # parameter initialisation not needed if function is not a DLL
+    else
+      initpar <- as.double(parms)
+      
   out <- .Call("call_bvptwp",as.integer(ncomp),as.integer(leftbc),
             as.double(fixpt),as.double(aleft),as.double(aright),
             as.double(atol),as.integer(linear),
@@ -246,20 +269,20 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
             as.integer(nmax),as.integer(lwrkfl),as.integer(lwrkin),
             as.double(Xguess), as.double(Yguess),
             as.double(Rpar), as.integer(Ipar),
-            Func, JacFunc, Bound, JacBound,
-            rho, PACKAGE="bvpSolve")
+            Func, JacFunc, Bound, JacBound, ModelInit, initpar,
+            flist, rho, PACKAGE="bvpSolve")
   nn <- attr(out,"istate")
   mesh <- nn[3]
   attr(out,"istate") <- NULL
 
-  # select only the rows corresponding to x-values
-  if (! allpoints)
-    if (nrow(out) > length(x))
-      out <- out [which(out[,1]%in% x),]
 
   nm <- c("x",
           if (!is.null(attr(y,"names"))) names(y) else as.character(1:ncomp))
   out <- cbind(out[1:mesh],matrix(nr=mesh,out[-(1:mesh)],byrow=TRUE))
+  # select only the rows corresponding to x-values
+  if (! allpoints)
+    if (nrow(out) > length(x))
+      out <- out [which(out[,1]%in% x),]
   dimnames(out) <- list(NULL,nm)
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   out

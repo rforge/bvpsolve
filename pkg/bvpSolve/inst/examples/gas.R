@@ -1,12 +1,13 @@
-####################### Emden's equation #########################
-# Spherical body of gas
-# y''+2/x y' +y^n=0
-# y'0=0, y(1)=sqrt(3/4)
-#
-# becomes:
-# dy=y2
-# dy2=-2/x y2 -y^n
-####################### Emden's equation #########################
+## =============================================================================
+## Emden's equation
+## Spherical body of gas
+## y''+2/x y' +y^n=0
+## y'0=0, y(1)=sqrt(3/4)
+##
+## becomes:
+## dy=y2
+## dy2=-2/x y2 -y^n
+## =============================================================================
 
 Gas<-function(x,y,par)
 {
@@ -33,11 +34,12 @@ plot(sol)
 curve(1/sqrt(1+(x^2)/3),type="l",add=TRUE)
 
 #=======================
-# 2. mirk method
+# 2. bvptwp method
 #=======================
 
 print(system.time(
-Sol <- bvptwp(func=Gas,yini=c(NA,0),yend=c(sqrt(3/4),NA),x=x,guess=1,parms=NULL)
+Sol <- bvptwp(func=Gas,yini=c(NA,0),yend=c(sqrt(3/4),NA),x=x,
+  guess=1,parms=NULL)
 ))
 lines(Sol,col="red")
 
