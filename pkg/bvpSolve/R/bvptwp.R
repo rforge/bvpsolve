@@ -79,9 +79,11 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       stop("leftbc should be inputted if bound is given")
       
     if (! is.null(yguess))
-      guess <- yguess[1,]
+      guess <- yguess[,1]  #KS: or [,1]
     Y <- y <- guess  # trick
   }
+  if (length(y) == 0 && is.null(ncomp))
+    stop ("don't know the number of state variables - provide 'guess', a initial guess")
   Ynames <- attr(y,"names")
   if (is.null(Ynames) & ! is.null(yend))   Ynames <- names(yend)
   if (is.null(Ynames) & is.matrix(yguess)) Ynames <- colnames(yguess)
@@ -228,6 +230,11 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   nmesh  <- 0
   Xguess <- xguess
   Yguess <- yguess
+# check dimensions
+  if (! is.null(yguess) && ! is.null(yguess))
+     if (length(xguess) != ncol(yguess))
+       stop("yguess should have as many columns as length of xguess")
+       
   if (! is.null (xguess))  {
     givmesh <- TRUE
     nmesh   <- length(xguess)

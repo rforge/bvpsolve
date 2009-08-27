@@ -1,12 +1,15 @@
 \name{bvpshoot}
 \alias{bvpshoot}
 \title{
-  Solver for boundary value problems of ordinary differential equations
+  Solver for two-point boundary value problems of ordinary differential
+  equations, using the shooting method
 }
 
 \description{
   Solves a boundary value problem of a system of ordinary differential
-  equations using the shooting method.
+  equations using the shooting method. This combines the integration routines
+  from package \code{deSolve} with root-finding methods from package
+  \code{rootSolve}.
 }
 
 \usage{
@@ -16,15 +19,17 @@ bvpshoot(yini,x,func,yend,parms=NULL,
 }
 
 \arguments{
-  \item{yini }{either a vector with the initial (state) values for the ODE
-    system, or a function that calculates the initial condition.
+  \item{yini }{either a \emph{vector} with the initial (state) variable
+    values for the ODE system, or a \emph{function} that calculates the
+    initial condition.
 
-    If \code{yini} has a name attribute, the names will be used to label the
-    output matrix. If \code{yini} is a function, it will be called as:
+     If \code{yini} is a function, it will be called as:
     \code{yini(y,parms,...)};
 
     if \code{yini} is a vector then use \code{NA}
-    for an initial value which is not available.
+    for an initial value which is not available. If \code{yini} has a
+    \code{names} attribute, the names will be used to label the
+    output matrix.
   }
   \item{x }{ sequence of the independent variable for which output is wanted;
     the first value of \code{x} must be the initial value (at which
@@ -33,7 +38,7 @@ bvpshoot(yini,x,func,yend,parms=NULL,
   }
   \item{func }{an \R-function that computes the values of the derivatives in
     the ODE system (the model definition) at x. \code{func} must be defined as:
-    \code{yprime = func(x, y, parms,...)}.  \code{x} is the current point of
+    \code{func  = function(x, y, parms,...)}.  \code{x} is the current point of
     the independent variable in the integration, \code{y} is the current
     estimate of the (state) variables in the ODE system.  If the initial
     values \code{yini} has a names attribute, the names will be available
@@ -44,21 +49,26 @@ bvpshoot(yini,x,func,yend,parms=NULL,
     vector containing the derivatives of \code{y} with respect to
     \code{x}, and whose next elements are global values that are required at
     each point in \code{x}.
+    
+    Note that it is not possible to use \code{bvpshoot} with functions
+    defined in compiled code.
   }
-  \item{yend }{either a vector with the final (state) values for the
+  \item{yend }{either a vector with the final (state) variable values for the
     ODE system, or \code{NULL}; if \code{yend} is a vector use \code{NA}
     for a final value which is not available.
   }
   \item{parms }{parameters passed to \code{func}.
   }
-  \item{guess }{guess for the value(s) of the unknown initial conditions;
+  \item{guess }{guess for the value(s) of the unknown \emph{initial} conditions;
     i.e. one value for each \code{NA} in \code{yini}.
     The length of \code{guess} should thus equal the number of NAs
     in \code{yini}. If not provided, a value = 0 is assumed for each
     \code{NA} and a warning printed.
   }
-  \item{extra }{if too many boundary conditions are given, then an extra
-    parameter can be estimated. \code{extra} should contain the initial guess.
+  \item{extra }{if too many boundary conditions are given, then it is assumed
+    that an extra parameter has to be estimated.
+
+    \code{extra} should contain the initial guess of this extra parameter.
   }
   \item{atol }{absolute error tolerance, either a scalar or a vector, one
     value for each unknown element - passed to function
@@ -70,7 +80,7 @@ bvpshoot(yini,x,func,yend,parms=NULL,
   }
   \item{maxiter }{the maximal number of iterations allowed in the root solver.
   }
-  \item{positive }{set to \code{TRUE} if state variables have to be
+  \item{positive }{set to \code{TRUE} if dependent variables (y) have to be
     positive numbers.
   }
   \item{method }{the integration method used, one of ("lsoda", "lsode",
@@ -89,8 +99,9 @@ bvpshoot(yini,x,func,yend,parms=NULL,
   There will be one row for each element in \code{x} unless the solver
   returns with an unrecoverable error.
 
-  If \code{y} has a names attribute, it will be used to label the columns
-  of the output value.
+  If \code{yini} has a names attribute, it will be used to label the columns
+  of the output value. If \code{yini} is not named, the solver will try to find
+  the names in \code{yend}.
 
   The output will have the attribute \code{roots}, which returns the value(s)
   of the root(s) solved for (\code{root}), the function value (\code{f.root}),
@@ -109,13 +120,14 @@ bvpshoot(yini,x,func,yend,parms=NULL,
   the state variable specified. Rather some conditions are specified at
   the end of the integration interval.
 
-  The shooting method, is a root-solving method, where the unknown initial
+  The shooting method, is a root-solving method, where the unspecified initial
   conditions are the unknown values to be solved for; the function value
-  whose root has to be found are the deviations from the final conditions.
+  whose root has to be found are the deviations from the specified conditions
+  at the end of the integration interval.
 
   Thus, starting with an initial guess of the initial conditions (as
-  provided in \code{guess}, the ODE model is solved (as an initial value
-  problem), and after termination, the discrepancy of the modeled final
+  provided in \code{guess}), the ODE model is solved as an initial value
+  problem, and after termination, the discrepancy of the modeled final
   conditions with the known final condition is assessed (the cost function).
   The root of this cost function is to be found.
 
@@ -126,15 +138,20 @@ bvpshoot(yini,x,func,yend,parms=NULL,
   Function \code{multiroot} from package \code{rootSolve} is used to
   retrieve the root.
 
-  For this method to work, the model should be even determined, i.e.
-  the total number of specified boundary conditions (on both the start and
-  end of the integration interval) should equal the number of boundary value
-  problem equations.
-  An exception is when the number of boundary conditions specified exceeds
-  the number of equations. In this case, extra parameters have to be solved
+  For this method to work, the model should be even determined, i.e. the number
+  of equations should equal the number of unknowns.
+
+  \code{bvpshoot} distinguishes two cases:
+  
+  1. the total number of specified boundary conditions (on both the start and
+  end of the integration interval) equals the number of boundary value
+  problem equations (or the number of dependent variables \code{y}).
+  
+  2. The number of boundary conditions specified \emph{exceeds}
+  the number of equations. In this case, \code{extra} parameters have to be solved
   for to make the model even determined.
 
-  See examples
+  See example nr 4.
 }
 
 \seealso{
@@ -144,7 +161,10 @@ bvpshoot(yini,x,func,yend,parms=NULL,
     \code{\link[deSolve]{lsodes}}, \code{\link[deSolve]{vode}},
 
   \code{\link[deSolve]{rk}}, \code{\link[deSolve]{rkMethod}}
-    for details about the integration method}
+    for details about the integration method
+    
+  \code{\link[rootSolve]{multiroot}}, the root-solving method used
+}
 \keyword{math}
 
 \examples{

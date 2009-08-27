@@ -67,29 +67,25 @@ out$w[nrow(out)]-out$y[nrow(out)]
 # Solution method 2
 #  ** bvptwp **
 #----------------------
-# Does not work unless these initial conditions are used
-Cost <- function(x)
-{
-  Sol <- bvptwp(yini= init, x=c(0,1),func=musn, xguess=seq(0,1,len=5),
-              yguess=matrix(nr=5,(rep(c(1,1,1,-10,0.91),5)),byrow=TRUE),
-           yend=c(NA,NA,NA,NA,x),guess=1,atol=1e-10)
-  Sol[nrow(Sol),4]-x
+# Does not work unless good initial conditions are used
+
+bound <- function(i,y,pars) {
+  with (as.list(y), {
+    if (i ==1) return (u-1)
+    if (i ==2) return (v-1)
+    if (i ==3) return (w-1)
+    if (i ==4) return (z+10)
+    if (i ==5) return (w-y)
+ })
 }
 
-print(system.time(
-ye  <- multiroot(f=Cost, start=1)
-))
-
-
-
-xguess=seq(0,1,len=5)
-yguess=matrix(nr=5,(rep(c(1,1,1,-10,0.91),5)),byrow=TRUE)
-colnames(yguess) <- c("u","v","w","z","y")
+xguess <- seq(0,1,len=5)
+yguess <- matrix(nc=5,(rep(c(1,1,1,-10,0.91),5)))
+rownames(yguess) <- c("u","v","w","z","y")
 
 print(system.time(
-Sol <- bvptwp(yini= init, x=c(0,1),func=musn,
-              xguess=xguess, yguess=yguess,
-              yend=c(NA,NA,NA,NA,ye$root),guess=1,atol=1e-10)
+Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
+              xguess=xguess, yguess=yguess, leftbc = 4,
+              guess=1,atol=1e-10)
 ))
-pairs(Sol)
 

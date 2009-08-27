@@ -10,6 +10,7 @@
 ## Can be solved with bvpshoot
 ## =============================================================================
 
+# Not so simple to solve with bvpshoot
 Reactor<-function(x,y,parms)
 {
   list(c(y[2],Pe*(y[2]+R*(y[1]^n))))
@@ -24,4 +25,16 @@ yini <- function (x,parms) c(x,Pe*(x-1))
 sol<-bvpshoot(func=Reactor, yend=c(y=NA,dy=0), yini=yini,
               x=seq(0,1,by=0.01),extra=1)
 plot(sol)
+
+
+# Easier with bvptwp
+
+bound <- function(i,y,p) {
+  if (i ==1) return(y[2]-Pe*(y[1]-1))
+  if (i ==2) return(y[2])
+}
+
+Sol<-bvptwp(func=Reactor,x=seq(0,1,by=0.01),leftbc=1,
+            bound=bound,guess=c(y=1,dy=1))
+plot(Sol)
 

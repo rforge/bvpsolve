@@ -2,13 +2,13 @@
 \alias{bvptwp}
 \title{
   Solver for two-point boundary value problems of ordinary differential
-  equations, a mono-implicit Runge-Kutta (MIRK) formula
+  equations, using a mono-implicit Runge-Kutta formula
 }
 
 \description{
   Solves a boundary value problem of a system of ordinary differential
   equations. This is an implementation of the fortran
-  code twpbvp, based on mono-implicit Runge-Kutta formulae (MIRK)
+  code twpbvp, based on mono-implicit Runge-Kutta formulae
   of orders 4, 6 and 8 in a deferred correction framework
 
   written by J.R. Cash and M.H. Wright.
@@ -22,10 +22,15 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   forcings=NULL, initforc = NULL, fcontrol=NULL, ...)
 }
 \arguments{
-  \item{yini }{either a vector with the initial (state) values for the ODE
-    system, or \code{NULL}. If \code{yini} is a vector, use \code{NA} for an
-    initial value which is not available. If \code{yini} has a name attribute,
-    the names will be used to label the output matrix.
+  \item{yini }{either a vector with the initial (state) variable values for
+    the ODE system, or \code{NULL}.
+
+    If \code{yini} is a vector, use \code{NA} for an
+    initial value which is not available. If \code{yini} has a
+    \code{names} attribute, the names will be used to label the output matrix.
+    
+    If \code{yini = NULL}, then the boundary conditions must be specified
+    via function \code{bound}.
   }
   \item{x }{sequence of the independent variable for which output is wanted;
     the first value of \code{x} must be the initial value (at which
@@ -38,7 +43,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     dynamically loaded shared library.
     
     If \code{func} is an \R-function, it must be defined as:
-    \code{yprime = func(x, y, parms,...)}. \code{x} is the current point of
+    \code{func = function(x, y, parms,...)}. \code{x} is the current point of
     the independent variable in the integration, \code{y} is the current
     estimate of the (state) variables in the ODE system. If the initial
     values \code{yini} has a names attribute, the names will be available
@@ -54,24 +59,33 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     shared library (without extension) which must be loaded before
     \code{bvptwp} is called. See package vignette "bvpSolve" for more details.
   }
-  \item{yend }{either a vector with the final (state) values for the
-    ODE system, or \code{NULL}; if \code{yend} is a vector, use \code{NA}
+  \item{yend }{either a vector with the final (state) variable values for the
+    ODE system, or \code{NULL};
+
+    if \code{yend} is a vector, use \code{NA}
     for a final value which is not available.
+    
+    If \code{yend = NULL}, then the boundary conditions must be specified
+    via function \code{bound}.
   }
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
   }
-  \item{guess }{guess for the value(s) of the unknown initial conditions;
+  \item{guess }{guess for the value(s) of the unknown \emph{initial} conditions;
     i.e. one value for each \code{NA} in \code{yini}.
+    
     The length of \code{guess} should thus equal the number of \code{NA}s
     in \code{yini}. If not provided, a value = 0 is assumed for each
     \code{NA} in \code{yini} and a warning printed.
   }
-  \item{xguess }{Initial grid x, a vector. \code{bvptwp} requires the length
+  \item{xguess }{Initial grid \code{x}, a vector. \code{bvptwp} requires the length
     of \code{xguess} to be at least equal to the length of \code{x}. If this
     is not the case, then \code{xguess} and \code{yguess} will be interpolated
     to \code{x} and a warning printed. If \code{xguess} is given, so should
     \code{yguess} be.
+    
+    Supplying \code{xguess} and \code{yguess}, based on results from a previous
+    (simpler) BVP-ODE can be used for model continuation, see example 2.
   }
   \item{yguess }{First guess values of \code{y}, corresponding to initial grid
     \code{xguess}; a matrix with number of rows equal to the number of
@@ -79,11 +93,11 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   }
   \item{jacfunc }{jacobian (optional) - either an \R-function that evaluates the
     jacobian of \code{func} at point \code{x}, or a string with the name of a
-    function or subroutine in \code{dllname} that computes the Jacobian (see vignette
-    \code{"bvpSolve"} for more about this option).
+    function or subroutine in \code{dllname} that computes the Jacobian
+    (see vignette \code{"bvpSolve"} for more about this option).
     
     If \code{jacfunc} is an \R-function, it must be defined as:
-    \code{jac = func(x, y, parms,...)}.
+    \code{jacfunc = function(x, y, parms,...)}.
     It should return the partial derivatives of \code{func} with respect to
     \code{y}, i.e. df(i,j) = dfi/dyj. See last example.
     
@@ -97,9 +111,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     (see vignette \code{"bvpSolve"} for more about this option).
 
     If \code{bound} is an \R-function, it should be defined as:
-    \code{bound = func(i, y, parms, ...)}. It should return the i-th
+    \code{bound = function(i, y, parms, ...)}. It should return the i-th
     boundary condition. See last example.
-      }
+  }
   \item{jacbound }{jacobian of the boundary function (optional) - only if
     \code{bound} is defined. Either an \R function that evaluates
     the gradient of the i-th boundary element with respect to the state
@@ -108,7 +122,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     (see vignette \code{"bvpSolve"} for more about this option).
 
     If \code{jacbound} is an \R-function, it should be defined as:
-    \code{jacbound = func(i, y, parms, ...)}.
+    \code{jacbound = function(i, y, parms, ...)}.
     It should return the gradient of the i-th boundary condition.
     See last example.
 
@@ -128,15 +142,18 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{atol }{error tolerance, a scalar.
   }
   \item{allpoints }{sometimes the solver estimates the solution in a number
-    of extra points, and by default these extra values will also be returned.
+    of extra points, and by default the solutions at these extra points will
+    also be returned.
+
     By setting  \code{allpoints} equal to \code{FALSE},
     only output corresponding to the elements in \code{x} will be returned.
   }
   \item{dllname }{a string giving the name of the shared library
     (without extension) that contains all the compiled function or
-    subroutine definitions refered to in \code{func}, \code{jacfunc},
+    subroutine definitions referred to in \code{func}, \code{jacfunc},
     \code{bound} and  \code{jacbound}.  Note that ALL these subroutines
-    must be defined in the shared library.
+    must be defined in the shared library; it is not allowed to merge R-functions
+    with compiled functions.
     
     See package vignette \code{"bvpSolve"}.
   }
@@ -144,26 +161,28 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     (which initialises values of parameters), as provided in
     \file{dllname}. See package vignette \code{"bvpSolve"}.
   }
-  \item{ncomp }{if the model is specified by compiled code, the number of
+  \item{ncomp }{only used if the model is specified by compiled code, the number of
     components (or equations). See package vignette \code{"bvpSolve"}.
   }
   \item{forcings }{only used if \file{dllname} is specified: a list with
     the forcing function data sets, each present as a two-columned matrix,
     with (time,value); interpolation outside the interval
     [min(\code{times}), max(\code{times})] is done by taking the value at
-    the closest data extreme.
+    the closest data extreme. This feature is included for consistency with
+    the intial value problem solvers from packatge \code{deSolve}.
 
-    See package vignette \code{"bvpSolve"}.
+    See package vignette \code{"compiledCode"} from package \code{deSolve}.
   }
   \item{initforc }{if not \code{NULL}, the name of the forcing function
     initialisation function, as provided in
     \file{dllname}. It MUST be present if \code{forcings} has been given a
     value.
 
-    See package vignette \code{"bvpSolve"}.
+    See package vignette \code{"compiledCode"} from package \code{deSolve}.
   }
   \item{fcontrol }{A list of control parameters for the forcing functions.
-    See "Details" or package vignette \code{"bvpSolve"}.
+
+    See package vignette \code{"compiledCode"} from package \code{deSolve}.
   }
    \item{... }{additional arguments passed to the model functions.
   }
@@ -173,7 +192,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   A matrix with up to as many rows as elements in \code{x} and as many columns
   as elements in \code{yini} or \code{ncomp} plus the number of "global"
   values returned from \code{func}, plus an additional
-  column (the first) for the x-value.
+  column (the first) for the \code{x}-value.
 
   Typically, there will be one row for each element in \code{x} unless the
   solver returns with an unrecoverable error. In certain cases, \code{bvptwp}
@@ -181,9 +200,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   if the number of points as in \code{x} was not sufficient. In order to
   not return these extra points, set \code{allpoints} equal to \code{FALSE}.
 
-  If \code{yini} has a names attribute, it will be used to label the output
-  columns.
-
+  If \code{yini} has a names attribute, it will be used to label the columns
+  of the output value. If \code{yini} is not named, the solver will try to find
+  the names in \code{yend} and ultimately \code{yguess}.
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
@@ -195,30 +214,35 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 
   A boundary value problem does not have all initial values of
   the state variable specified. Rather some conditions are specified at
-  the end of the integration interval.
+  the end of the integration interval. The number of unknown boundary
+  conditions must be equal to the number of equations (or the number
+  of dependent variables \code{y}).
 
   The ODEs and boundary conditions are made available through the
   user-provided routines, \code{func} and vectors \code{yini} and \code{yend}
   or (optionally) \code{bound}.
 
-  The corresponding partial derivatives are optionally available through the
+  The corresponding partial derivatives for \code{func} and \code{bound}
+  are optionally available through the
   user-provided routines, \code{jacfunc} and \code{jacbound}. Default is that
-  they are automatically generated by \R, using numerical differences.
+  they are automatically generated by \code{bvptwp}, using numerical differences.
 
   The user-requested tolerance is provided through \code{tol}. The
   default is \eqn{1e^-6}
 
   If the function terminates because the maximum
-  number of subintervals was exceeded, then it is recommended that'
-  the program be run again with a larger value for this maximum.'
-
+  number of subintervals was exceeded, then it is recommended that
+  'the program be run again with a larger value for this maximum.'
+  It may also help to start with a simple version of the model, and use
+  its result as initial guess to solve the more complex problem
+  (continuation strategy, see example 2, and package vignette "bvpSolve").
 
   Models may be defined in \bold{compiled C or Fortran} code, as well as
   in an  \bold{R}-function.
 
   This is similar to the initial value problem solvers from package
-  \code{deSolve}. See package vignette \code{"bvpSolve"} for details.
-
+  \code{deSolve}. See package vignette \code{"bvpSolve"} for details about
+  writing compiled code.
 
   The \bold{fcontrol} argument is a list that can supply any of the following
   components (conform the definitions in the \link{approx} function):

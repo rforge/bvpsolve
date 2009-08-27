@@ -87,34 +87,3 @@ boundjac <- function (i,y,pars)
 print(system.time(Sol <- as.data.frame(bvptwp(x=x,leftbc=1,func=fun, guess=1,
         bound=boundfun,jacbound=boundjac,jacfunc=jacfun), verbose=TRUE)))
 lines(Sol[,1],Sol[,2],type="l",col="blue")
-
-#-------------------------------
-# Solution method 4
-#  ** fortran implementation **
-#-------------------------------
-
-# Make sure that file "boundary_for.f" is in the working directory
-
-## uncomment this statement to make the DLL
-#system("R CMD SHLIB boundary_for.f")
-
-## load the DLL (extension windows only)
-dyn.load("boundary_for.dll")
-
-## run the model several times
-Out <- NULL
-
-parms <- c(a=3, p=1e-7)
-
-p <- 10^-seq(0,6,0.5)
-for (pp in p) {
-  parms[2] <- pp
-  outFor <- bvptwp(ncomp=2,
-               x = x, leftbc = 1, initfunc="initbnd", parms=parms, guess=1,
-               func="funbnd",jacfunc="dfbnd",bound="gbnd",jacbound="dgbnd",
-               allpoints=FALSE,dllname="boundary_for")
-  Out <- cbind(Out, outFor[,2])
-}
-matplot(x,Out,type="l")
-legend("topleft",legend=log10(p),title="logp",col=1:length(p), lty=1:length(p),cex=0.6)
-
