@@ -598,7 +598,7 @@ mathieu2 <- function(x,y,p)
         -(y[3]-10*cos(2*x))*y[1],
         0) )
 @
-Note the third derivative, and the parameter \coded{lambda} from previous
+Note the third derivative, and the parameter \code{lambda} from previous
 chapter which is now \code{y[3]}.
 
 The initial condition, \code{yini} and final condition, \code{yend} now also 
@@ -607,16 +607,16 @@ We also provide initial guesses for the x- and y-values (\code{xguess, yguess}).
 \footnote{This problem is not correctly solved if the initial guess for 
  the y-values is 0; yet any value different from 0 works}
 <<>>=
-sol <- bvptwp (yini= c(y=1,dy=0,lam=NA), yend = c(NA,0,NA),
+Sol <- bvptwp (yini= c(y=1,dy=0,lam=NA), yend = c(NA,0,NA),
         x=seq(0,pi,by=0.01), func=mathieu2, xguess = c(0,1,2*pi),
         yguess = matrix(nr=3,rep(15,9)) )
 @
 The y-value, its derivative, and \code{lambda}, are plotted
 <<label=mat2,include=FALSE>>=
-plot(sol, type = "l", lwd=2)
+plot(Sol, type = "l", lwd=2)
 mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "mathieu - solved using bvptwp")
 @
-\setkeys{Gin}{width=0.4\textwidth}
+\setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
 <<label=mat2,fig=TRUE,echo=FALSE>>=
@@ -631,7 +631,7 @@ mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "mathieu - solved using bvptwp")
 
 \clearpage
 \section{Specifying the analytic jacobians}
-By default, the Jacobian of the derivative function and of the boundary
+By default, the Jacobians of the derivative function and of the boundary
 conditions, are estimated numerically. It is however possible - and faster -
 to provide the analytical solution of the jacobian.
 

@@ -63,18 +63,25 @@ yini <- NULL
 ## Third solution: augment + bvptwp - does not work...
 ## =============================================================================
 
+# terminates R!
+nerve3 <- function (t,y,p)
+  list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
+        (-1/3)*y[3]*(y[1] - 0.7 + 0.8*y[2]) ,
+        0,
+        0,
+        0)
+  )
+
 bound <- function(i,y,p) {
- if (i==1) {
-  yini <<- y
-  return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
- }
- if (i ==2) return(y[1]-yini[1])
- if (i ==3) return(y[2]-yini[2])
- 
+ if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
+ if (i ==2) return(y[1]-y[4])
+ if (i ==3) return(y[2]-y[5])
+ if (i ==4) return(y[1]-y[4])
+ if (i ==5) return(y[2]-y[5])
 }
 
-Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), guess=c(y=0.5,dy=0.5,T=2*pi),
-        func=nerve2,leftbc=1)
-plot(sol,type="l",lwd=2)
-Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01),
-        func=nerve2,leftbc=1,xguess=xguess,yguess=yguess)
+#Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
+#        func=nerve3,leftbc=3, xguess=c(0,1),yguess=matrix(nr=5,nc=2,1.))
+#plot(Sol,type="l",lwd=2)
+#Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01),
+#        func=nerve2,leftbc=1,xguess=xguess,yguess=yguess)

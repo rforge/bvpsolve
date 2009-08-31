@@ -15,7 +15,7 @@ void F77_NAME(twpbvp)(int*, int*, double *, double *,
          int *, double *, int *, int *, double *,
          int *, int *, int *, int *,
          double *, int *, double *, int *,
-         int *, double *, int*, int*,
+         int *, double *, int*, int*, double *,
          void (*)(int *, double *, double *, double *, double *, int *), /* fsub(n,x,u,f,rp,ip)   */
 		     void (*)(int *, double *, double *, double *, double *, int *), /* dfsub(n,x,u,df,rp,ip) */
 			   void (*)(int *, int *, double *, double *, double *, int *),    /* gsub(i,n,u,g,rp,ip)   */
@@ -117,7 +117,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   SEXP yout=NULL, ISTATE;
 
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
-  double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar;
+  double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis;
   int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
 
   deriv_func    *derivs;
@@ -175,6 +175,11 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
   iwrk= (int *)    R_alloc(lwrkin, sizeof(int));
 
+  precis = (double *) R_alloc(3,sizeof(double));
+  precis[0] = DBL_MIN;
+  precis[1] = DBL_MAX;
+  precis[2] = DBL_EPSILON/FLT_RADIX;
+  
   ii = LENGTH(Ipar);
   ipar = (int *) R_alloc(ii, sizeof(int));
      for (j=0; j<ii; j++) ipar[j] = INTEGER(Ipar)[j];
@@ -235,7 +240,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 */
 	  F77_CALL(twpbvp) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
         &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, xx, &ncomp,
-        u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk,
+        u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
         derivs,jac,bound,jacbound, rpar, ipar,&iflag);
 /*
 C....   iflag - The Mode Of Return From twpbvp
