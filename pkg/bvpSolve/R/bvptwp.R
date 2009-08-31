@@ -168,7 +168,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 
 ## in case jacobian function is not defined...
     if ( is.null(jacfunc)) {
-      JAC      <- matrix(nr=ncomp,nc=ncomp)
+      JAC      <- matrix(nrow=ncomp, ncol=ncomp)
       perturbfac  <- 1e-8
       JacFunc <- function (x, state) {
         state2 <- state
@@ -285,7 +285,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 
   nm <- c("x",
           if (!is.null(attr(y,"names"))) names(y) else as.character(1:ncomp))
-  out <- cbind(out[1:mesh],matrix(nr=mesh,out[-(1:mesh)],byrow=TRUE))
+  out <- cbind(out[1:mesh],matrix(data=out[-(1:mesh)],nrow=mesh,byrow=TRUE))
   # select only the rows corresponding to x-values
   if (! allpoints)
     if (nrow(out) > length(x))
