@@ -37,12 +37,11 @@
 
 \Plainauthor{Karline Soetaert}
 
-\Abstract{This document is about package \bvp \citep{bvpSolve},
-  designed for the numerical
+\Abstract{\R package \bvp \citep{bvpSolve} is designed for the numerical
   solution of boundary value problems (BVP) for ordinary differential
-  equations (ODE) in \R.
+  equations (ODE).
 
-  Package \bvp contains:
+  It comprizes:
   \begin{itemize}
     \item function \code{bvpshoot} which implements the shooting method.
       This method makes use of the initial value problem solvers from
@@ -99,7 +98,7 @@ options(width=70)
     g_2(y) |_b = 0
   \end{eqnarray*}
   where \code{y} is the dependent, \code{x} the independent variable,
-  function \code{f} is the differential equation, $g_a$ and $g_b$ the
+  function \code{f} is the differential equation, and $g_a$ and $g_b$ the
   boundary conditions at the end points a and b.
 
   In the current implementation, the boundary conditions must be
@@ -118,21 +117,25 @@ options(width=70)
     \frac{dy}{dx}=z \\
     \frac{dz}{dx}=f(x,y,z)
   \end{eqnarray*}
-
+  where \code{y} and \code{z} are now the two dependent variables. 
+  
   Two BVP solvers are included in \bvp:
   \begin{itemize}
     \item \code{bvpshoot}, implementing the shooting method. This method
       combines solutions of initial value problems (IVP) with solutions
       of nonlinear algebraic equations; it makes use of solvers from
-      packages \ds and \rs.
+      packages \ds, and \rs.
     \item \code{bvptwp}, the mono-implicit Runge-Kutta (MIRK)
-      method with deferred corrections, based on FORTRAN code TWPBVP
+      method with deferred corrections, based on the FORTRAN code TWPBVP
       \citep{Cash91}.
   \end{itemize}
+  
+  An S3 method for plotting is included. This will plot all variables in 
+  separate figures
 
-  Whereas the \code{bvptwp} function is much more efficient if
-  \emph{analytical} partial derivatives
-  of the differential equations and of boundary conditions are given, input
+  The \code{bvptwp} function is much more efficient if
+  \emph{analytical} partial derivatives of the differential 
+  equations and of boundary conditions are given.  However, input
   is much simpler if these are approximated by \emph{finite differences} by the
   solver. Then, the user need not be concerned with supplying functions
   that estimate these analytical partial derivatives.
@@ -142,8 +145,8 @@ options(width=70)
   conditions. This makes the definition of the problem very simple; only one
   function, estimating the derivatives needs to be specified.
 
-  However, it is possible to provide analytical functions,
-  in order to speed-up the simulations.
+  However, in order to speed-up the simulations, it is possible to provide 
+  analytical functions.
 
   Even more simulation time will be gained if the problem is specified in
   compiled code (\proglang{FORTRAN, C}). In this case, \R is used to trigger
@@ -161,7 +164,7 @@ options(width=70)
       This example is used to demonstrate how to
       continuate a solution, i.e. use the solution for one problem as initial
       guess for solving another, more complex problem.
-    \item How to implement more complex initial conditions is then examplified by
+    \item How to implement more complex initial conditions is then exemplified by
       means of problem "musn"  \citep{Asher95}.
     \item Next, solving for the fourth eigenvalue of
       "Mathieu's equation" \citep{shampine}, illustrates how to solve a BVP
@@ -177,8 +180,8 @@ options(width=70)
   \end{itemize}
   
   More examples of boundary value problems can be found in the packages
-  \url{examples} subdirectory. They include a.o. all problems found in
-  \url{http://www.ma.ic.ac.uk/~jcash/BVP_software}.
+  \url{examples} subdirectory. 
+  
   The \url{dynload} subdirectory includes models specified in compiled code.
   
   See also document "bvpSolve: a set of 35 test Problems", which can be
@@ -217,7 +220,8 @@ fun<- function(x,y,pars)
      )
 }
 @
-  and solved, using the two methods, as:
+  and solved, using the two methods, as \footnote{the system time, in seconds
+  is printed}:
 <<>>=
 ks <- 0.1
 x  <- seq(-1,1,by=0.01)
@@ -261,8 +265,8 @@ legend("topright",c("bvptwp", "bvpshoot"),
 \label{fig:ode}
 \end{figure}
 
-When the parameter  $\xi$ is decreased, \code{bvpshoot} cannot solve the problem
-anymore, due to the presence of a zone of rapid change near x=0.
+For very small values of the parameter  $\xi$, \code{bvpshoot} cannot solve 
+the problem anymore, due to the presence of a zone of rapid change near x=0.
 
 However, it can still easily be solved with the MIRK method:
 <<>>=
@@ -273,16 +277,17 @@ sol2  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=seq(-1,1,by=0.01),
            func=fun, guess=0)
 ))
 @
+Here we produce the output with the S3 plot method, which depicts both 
+dependent variables:
 <<label=pr7b,include=FALSE>>=
-plot(sol2[,1],sol2[,3],type="l",main="test problem 7, ksi=0.0001",
-     lwd=2,col="red")
+plot(sol2,type="l", lwd=2)
 
 @
 
-\setkeys{Gin}{width=0.4\textwidth}
+\setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=pr7b,fig=TRUE,echo=FALSE>>=
+<<label=pr7b,fig=TRUE,echo=FALSE,height=6,width=13>>=
 <<pr7b>>
 @
 \end{center}
@@ -323,10 +328,10 @@ plot(sol2[,1],sol2[,3],type="l",main="test problem 7, ksi=0.0001",
 fsub <- function (t,Y,pars)
 { return(list(c(f1 = Y[2],
                 f2 = (Y[1]*Y[4] - Y[3]*Y[2])/eps,
-	              f3 = Y[4],
-              	f4 = Y[5],
-              	f5 = Y[6],
-	              f6 = (-Y[3]*Y[6] - Y[1]*Y[2])/eps)))
+                f3 = Y[4],
+                f4 = Y[5],
+                f5 = Y[6],
+                f6 = (-Y[3]*Y[6] - Y[1]*Y[2])/eps)))
 }
 eps <- 0.001
 x <- seq(0,1,len=100)
@@ -359,7 +364,8 @@ pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 \label{fig:ode3}
 \end{figure}
 
-Using the same input as above, the problem cannot be solved with too small values of eps:
+Using the same input as above, the problem cannot be solved with too 
+small values of eps (but see next section):
 <<>>=
 eps <- 1e-9
 Soltwp2 <- NA
@@ -376,15 +382,18 @@ cat(Soltwp2)
 \section{Solving a boundary value problem using continuation}
 The previous -swirl- problem can be solved for small values of \code{eps}
 if the previous solution (\code{Soltwp}) with eps = 0.001,
-is used as an initial guess for smaller value of eps, 0.0001:
+is used as an initial guess for smaller value of eps, e.g. 0.0001:
 <<>>=
 eps <- 0.0001
 xguess <- Soltwp[,1]
 yguess <- t(Soltwp[,2:7])
-
-print(system.time(Sol2 <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
+@
+<<>>=
+print(system.time(
+  Sol2 <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
   xguess=xguess,yguess=yguess,yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
-  yend=c(1,NA,0,0,NA,NA))))
+  yend=c(1,NA,0,0,NA,NA))
+))
 @
 
 We use the S3 \code{plot} method to plot all dependent variables at once:
@@ -452,7 +461,7 @@ This model is solved differently whether \code{bvpshoot} or \code{bvptwp}
 is used.
 
 \subsection{solving musn with bvpshoot}
-It is simples to solve the musn model with \code{bvpshoot}:
+It is easiest to solve the musn model with \code{bvpshoot}:
 
 There are 4 boundary values specified at the start of the interval; a value
 for \code{y} is lacking (and set to \code{NA}):
@@ -471,8 +480,8 @@ the values at the end of the integration interval
 <<>>=
 yend  <- function (Y,yini,pars)  with (as.list(Y), w-y)
 @
-Note that the specification of the boundaries for \code{bvptwp} would
-be rather different.
+Note that the specification of the boundaries for \code{bvptwp} are rather 
+different (next section).
 
 The solution, using \code{bvpshoot} is obtained by:
   \footnote{Note that there are at least two solutions to this problem,
@@ -527,7 +536,7 @@ rownames(yguess) <- c("u","v","w","z","y")
 Note that the rows of \code{yguess} have been given a name, such
 that this name can be used in the derivative and boundary function.
 
-We specify that there are 4 left boundary conditions.
+We specify that there are 4 left boundary conditions (\code{leftbc}).
 <<>>=
 print(system.time(
 Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
@@ -547,7 +556,8 @@ Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
   on [0,$\pi$] with boundary conditions
   $\frac{dy}{dt}(0)=0$ and $\frac{dy}{dt}(\pi)=0$ and $y(0)=1$
 
-  Here all the initial values (at t=0) are prescribed. If $\lambda$ would
+  Here all the initial values (at t=0) are prescribed, in addition to one
+  condition at the end of the interval. If $\lambda$ would
   be known the problem would be overdetermined.
 
   The $2^{nd}$ order differential equation is first rewritten as two
@@ -564,7 +574,7 @@ mathieu <- function(x,y,lambda)
 @
 \subsection{Solving for an unknown parameter using bvpshoot}
 This problem is most easily solved using \code{bvpshoot}; an initial guess of 
-the extra parameter to be solved is simply passed via argument \code{guess}.
+the extra parameter to be solved is simply passed via argument \code{extra}.
 <<>>=
 init <- c(1,0)
 sol  <- bvpshoot(yini=init,yend=c(NA,0),x=seq(0,pi,by=0.01),
@@ -606,7 +616,7 @@ Note the third derivative, and the parameter \code{lambda} from previous
 chapter which is now \code{y[3]}.
 
 The initial condition, \code{yini} and final condition, \code{yend} now also 
-provides a value, \code{NA}, for the parameter (third y) that is unknown.
+provides a value, \code{NA}, for the parameter (y3) that is unknown.
 We also provide initial guesses for the x- and y-values (\code{xguess, yguess}).
 \footnote{This problem is not correctly solved if the initial guess for 
  the y-values is 0; yet any value different from 0 works}
@@ -649,6 +659,7 @@ on the interval [0,1] subject to boundary conditions:
  1= -T (y_1(0)-0.7+0.8*y_2(0))/3
 \end{eqnarray*}
 
+\subsection{Cyclic boundary conditions solved using bvpshoot}
 The problem is first solved using \code{bvpshoot}:
 
 The derivative function (where \code{T} is the parameter) is:
@@ -685,9 +696,9 @@ problems with periodic boundary conditions.
 This is done by assuming the boundary conditions as "parameters", and using the 
 strategy of defining extra variables, similar as in previous section.
 
-Given here without derivation, the augmented derivative function ; variable
+Given here without derivation, the augmented derivative function is (variable
 3 is the unknown parameter \code{T}, variables 4 and 5 the initial conditions of 
-\code{y_1}, and \code{y_2} respectively.
+\code{y_1}, and \code{y_2} respectively):
 <<>>=
 nerve3 <- function (t,y,p)
   list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
@@ -698,8 +709,7 @@ nerve3 <- function (t,y,p)
   )
 @ 
 The required boundary function, with the first 3 boundary conditions at the 
-left boundary; boundary condition 2 sets the left boundary of \code{y_1} 
-equal to parameter \code{y_4}.
+left boundary is:
 <<>>=
 bound <- function(i,y,p) {
  if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
@@ -709,7 +719,10 @@ bound <- function(i,y,p) {
  if (i ==5) return(y[2]-y[5])
 }
 @
-This also requires good initial conditions to find a solution:
+boundary condition 2 sets the left boundary of \code{y_1} 
+equal to parameter \code{y_4}.
+
+Solving this also requires good initial conditions to find a solution:
 <<>>=
 xguess = seq(0,1,by=0.1)
 yguess = matrix(nr=5,nc=length(xguess),5.)
@@ -792,25 +805,28 @@ Now several extra functions are defined, specifying
 This is done in the \R-code below:
 <<>>=
 
-Jac <- matrix(nr=5,nc=5,0)
-Jac[3,4]=1.0
-Jac[4,4]=1.0
 
 jacfunc <- function (x, y, pars) {
+      Jac <- matrix(nr=5,nc=5,0)
+      Jac[3,4]=1.0
+      Jac[4,4]=1.0
       Jac[1,3]=-sin(y[3])
       Jac[2,3]=cos(y[3])
       Jac[4,3]=-y[5]*sin(y[3])
       Jac[4,5]=Jac[2,3]
       Jac
 }
+@
 
+<<>>=
 bound <- function (i, y, pars)  {
     if (i <=2) return(y[i])
     else if (i == 3) return(y[4])
     else if (i == 4) return(y[2])
     else if (i == 5) return(y[3]+pi/2)
 }
-
+@
+<<>>=
 jacbound <- function(i, y, pars)  {
     JJ <- rep(0,5)
          if (i <=2) JJ[i] =1.0
@@ -1021,7 +1037,7 @@ In what follows, it is assumed that the codes are saved in a file called
 \code{elastica.f}, and \code{elasticaC.c} and that these files are in the
 working directory of \R. (if not, use \code{setwd()} )
 
-Before the functions can be executed, the \proglang{fortran} or \proglang{C}-
+Before the functions can be executed, the \proglang{FORTRAN} or \proglang{C}-
 code has to be compiled
 
 This can simply be done in R:
@@ -1041,7 +1057,7 @@ This will create a file called \code{elastica.dll} and \code{elasticaC.dll}
 respectively (on windows).
 
 After loading the DLL, the model can be run, after which the dll is unloaded.
-For the Fortran, this is done as follows (the C code is similar, except for
+For the FORTRAN version, this is done as follows (the C code is similar, except for
 the name of the DLL):
 \begin{verbatim}
 
@@ -1056,7 +1072,7 @@ dyn.unload("elastica.dll")
 
 \end{verbatim}
 %% the elastica problem implemented in C has been made a part of the package
-<<include=FALSE>>=
+<<include=FALSE, echo = FALSE>>=
 outF <- bvptwp(ncomp=5,
                x = seq(0,0.5,len=16), leftbc = 3,
                func="fsub",jacfunc="dfsub",bound="gsub",jacbound="dgsub",
@@ -1154,7 +1170,7 @@ plot(sol,type="l")
 \end{figure}
 
 Next the FORTRAN implementation is given, which requires writing the
-bounary and jacobian functions (\code{bound}, \code{jacfunc} and \code{jacbound})
+boundary and jacobian functions (\code{bound}, \code{jacfunc} and \code{jacbound})
 
 The two parameters are initialised in a function called \code{initbnd}; its
 name is passed to function \code{bvptwp} via argument \code{initfunc}.
@@ -1244,7 +1260,6 @@ We execute the model several times, for different values of parameter \code{p};
 we create a sequence of parameter values (\code{pseq}), over which the model
 then iterates (\code{for (pp in pseq)}); the resulting \code{y}-values
 ($2^{nd}$) column) of each iteration are added to matrix \code{Out}.
-added to
 
 <<>>=
 Out  <- NULL

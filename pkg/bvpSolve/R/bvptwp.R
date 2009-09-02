@@ -51,7 +51,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 ## Boundary conditions  specified by yini and yend
 ##---------------------
 
-  if (! is.null(yini))  {    # yini is either a vector or a function
+  if (! is.null(yini))  {    # yini is a vector
     y       <- yini
     Y       <- y
     inix    <- which (is.na(y))
@@ -83,7 +83,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     Y <- y <- guess  # trick
   }
   if (length(y) == 0 && is.null(ncomp))
-    stop ("don't know the number of state variables - provide 'guess', a initial guess")
+    stop ("don't know the number of state variables - provide 'ncomp' or 'guess', a initial guess")
   Ynames <- attr(y,"names")
   if (is.null(Ynames) & ! is.null(yend))   Ynames <- names(yend)
   if (is.null(Ynames) & is.matrix(yguess)) Ynames <- colnames(yguess)
@@ -190,12 +190,8 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       iibb <- c(which( !is.na(Y)),which(!is.na(yend)))
       bb    <- c(Y[!is.na(Y)],yend[!is.na(yend)])
       Bound  <- function(i,state)        {
-       if (is.function(yini))
-         {y   <- yini(state,parms,...)
-          bb  <- c(y[!is.na(y)],yend[!is.na(yend)])
-         }
          return(state[iibb[i]]-bb[i])
-      }        # too simple ?
+      }         
     }  else {
      tmp <- eval(bound(1, y), rho)
      if (length(tmp) > 1)
