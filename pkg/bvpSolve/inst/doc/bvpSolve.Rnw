@@ -153,22 +153,26 @@ options(width=70)
   In this package vignette it is shown how to formulate and solve BVPs. We
   use well-known test cases as examples.
   \begin{itemize}
-    \item We start with a simple example, comprising a second-order ODE (one from
-      the test problems of Jeff Cash)
-    \item This is followed
-      by a more complex example, which consists of 6 first-order ODEs, the
-      "swirling flow III" problem. This example is used to demonstrate how to
+    \item We start with a simple example, comprising a second-order ODE (
+      test problem 7 from the website of Jeff Cash 
+      (\url{http://www.ma.ic.ac.uk/~jcash/BVP_software/readme.php})
+    \item This is followed by a more complex example, which consists of 
+      6 first-order ODEs, the "swirling flow III" problem \citep{Asher95}. 
+      This example is used to demonstrate how to
       continuate a solution, i.e. use the solution for one problem as initial
       guess for solving another, more complex problem.
     \item How to implement more complex initial conditions is then examplified by
-      means of problem "musn".
+      means of problem "musn"  \citep{Asher95}.
     \item Next, solving for the fourth eigenvalue of
-      "Mathieu's equation" illustrates how to solve a BVP
+      "Mathieu's equation" \citep{shampine}, illustrates how to solve a BVP
       including an unknown parameter.
-    \item The "elastica" problem is used to demonstrate how
+    \item The "nerve impulse" model  \citep{Seidel}, is an example including 
+      periodic boundary conditions. 
+    \item The "elastica" problem (Jeff Cash's website) is used to demonstrate how
       to specify the analytic jacobians, and how to implement
       problems in \proglang{FORTRAN} or \proglang{C}.
-    \item Finally, a linear testcase which has a steep boundary layer is implemented in \proglang{FORTRAN},
+    \item Finally, a standard linear testcase \citep{shampine} which has a 
+      steep boundary layer is implemented in \proglang{FORTRAN},
       and run with several values of a model parameter.
   \end{itemize}
   
@@ -535,8 +539,8 @@ Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
 \clearpage
 
 \section{a BVP problem including an unknown parameter}
-  In the next BVP problem, \citep{shampine}
-  a parameter $\lambda$ is to be found such that:
+  In the next BVP problem \citep{shampine}, the fourth eigenvalue of the 
+  Mathieus equation (parameter $\lambda$) is computed. The equation:
   \[
     \frac{d^2y}{dt^2}+(\lambda-10 \cos(2t))\cdot y=0
   \]
@@ -628,6 +632,111 @@ mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "mathieu - solved using bvptwp")
 \label{fig:mat}
 \end{figure}
 
+
+\clearpage
+\section{A boundary value problem with periodic boundary conditions}
+A bvp with cyclic boundary conditions is the nerve impulse model, a problem 
+described in \citep{Seidel}.
+
+\begin{eqnarray*}
+ y_1' = 3 T (y_1+y_2-1/3 y_1^3-1.3)\\
+ y_2' = -T (y_1 - 0.7 + 0.8 y_2)/3
+\end{eqnarray*}
+on the interval [0,1] subject to boundary conditions:
+\begin{eqnarray*}
+ y_1(0) = y_1(1) \\
+ y_2(0) = y_2(1) \\
+ 1= -T (y_1(0)-0.7+0.8*y_2(0))/3
+\end{eqnarray*}
+
+The problem is first solved using \code{bvpshoot}:
+
+The derivative function (where \code{T} is the parameter) is:
+<<>>=
+nerve <- function (t,y,T)
+  list(c( 3*T*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
+        (-1/3)*T*(y[1] - 0.7 + 0.8*y[2]) ))
+@
+and the residual function, at the end of the interval is:
+<<>>=
+res<- function (Y,yini,T)
+  c(Y[1]-yini[1],
+    Y[2]-yini[2],
+    T*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1)
+@
+There are no initial conditions (\code{yini}); to solve this model, a reasonable
+guess of the missing initial conditions is necessary; the initial guess for the 
+unknown parameter is set to $2 \pi$ (\code{extra}):
+<<>>=  
+yini <- c(y1=NA,y2=NA)
+sol  <- bvpshoot(yini=yini, x=seq(0,1,by=0.01),
+        func=nerve, guess=c(0.5,0.5), yend=res, extra=2*pi)
+@
+T is estimated to be 10.710809; the root has been found in 11 iterations:
+<<>>=
+attributes(sol)$root
+@
+
+\subsection{Cyclic boundary conditions solved using bvptwp}
+Function \code{bvptwp} accepts only problems with separated boundary 
+conditions, however, it is possible to use it also for solving boundary value
+problems with periodic boundary conditions. 
+
+This is done by assuming the boundary conditions as "parameters", and using the 
+strategy of defining extra variables, similar as in previous section.
+
+Given here without derivation, the augmented derivative function ; variable
+3 is the unknown parameter \code{T}, variables 4 and 5 the initial conditions of 
+\code{y_1}, and \code{y_2} respectively.
+<<>>=
+nerve3 <- function (t,y,p)
+  list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
+        (-1/3)*y[3]*(y[1] - 0.7 + 0.8*y[2]) ,
+        0,
+        0,
+        0)
+  )
+@ 
+The required boundary function, with the first 3 boundary conditions at the 
+left boundary; boundary condition 2 sets the left boundary of \code{y_1} 
+equal to parameter \code{y_4}.
+<<>>=
+bound <- function(i,y,p) {
+ if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
+ if (i ==2) return(y[1]-y[4])
+ if (i ==3) return(y[2]-y[5])
+ if (i ==4) return(y[1]-y[4])
+ if (i ==5) return(y[2]-y[5])
+}
+@
+This also requires good initial conditions to find a solution:
+<<>>=
+xguess = seq(0,1,by=0.1)
+yguess = matrix(nr=5,nc=length(xguess),5.)
+yguess[1,] <- sin(2*pi*xguess)
+yguess[2,] <- cos(2*pi*xguess)
+rownames(yguess) <- c("y1", "y2", "T", "y1ini", "y2ini")
+@
+
+<<>>=
+Sol  <- bvptwp(func=nerve3, bound=bound, x=seq(0,1,by=0.01), 
+        guess = c(y=0.5, dy=0.5, T=2*pi, yi=0.5, yj=0.5),
+        leftbc=3, xguess=xguess, yguess=yguess)
+@
+<<label=nerve,include=FALSE>>=
+plot(Sol, type="l", lwd=2)
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=nerve,fig=TRUE,echo=FALSE>>=
+<<nerve>>
+@
+\end{center}
+\caption{Solution of the nerve impulse problem, comprising two state
+variables and 3 parameters - see text for R-code}
+\label{fig:nerve}
+\end{figure}
 
 \clearpage
 \section{Specifying the analytic jacobians}

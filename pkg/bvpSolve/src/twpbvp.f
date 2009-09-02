@@ -1132,9 +1132,12 @@ C
          INCRJ = INCR+J
          JPIVOT = PIVOT(INCRJ)
          IF (JPIVOT.EQ.INCRJ) GO TO 150 
-         SWAP = B(INCRJ)
-         B(INCRJ) = B(JPIVOT) 
-         B(JPIVOT) = SWAP
+c ks: added check to avoid illegal memory access...
+         if (jpivot .GT. 0) then         
+           SWAP = B(INCRJ)
+           B(INCRJ) = B(JPIVOT) 
+           B(JPIVOT) = SWAP
+         endif
   150    CONTINUE
          BINCRJ = -B(INCRJ)
          LOOP = J-NRWTP0

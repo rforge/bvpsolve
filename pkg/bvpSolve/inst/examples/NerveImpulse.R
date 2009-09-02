@@ -59,8 +59,9 @@ attributes(sol)$root
 plot(sol,type="l",lwd=2)
 
 yini <- NULL
+
 ## =============================================================================
-## Third solution: augment + bvptwp - does not work...
+## Third solution: augment two more for boundaries  
 ## =============================================================================
 
 # terminates R!
@@ -71,6 +72,21 @@ nerve3 <- function (t,y,p)
         0,
         0)
   )
+res3<- function (Y,yini,T)
+  c(Y[1]-yini[1],
+    Y[2]-yini[2],
+    Y[3]*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1,
+    Y[1]-Y[4],
+    Y[2]-Y[5]
+    )
+init <- c(y1=NA,y2=NA,T=NA,yi1=NA,yi2=NA)
+sol3 <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
+        func=nerve3, guess=c(0.5,0.5,2*pi,0.5,0.5), yend=res3)
+
+## =============================================================================
+## Fourth solution: use augmented equation with bvptwp... 
+## solvable only when good initial conditions are used...
+## =============================================================================
 
 bound <- function(i,y,p) {
  if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
@@ -80,8 +96,13 @@ bound <- function(i,y,p) {
  if (i ==5) return(y[2]-y[5])
 }
 
-#Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-#        func=nerve3,leftbc=3, xguess=c(0,1),yguess=matrix(nr=5,nc=2,1.))
-#plot(Sol,type="l",lwd=2)
-#Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01),
-#        func=nerve2,leftbc=1,xguess=xguess,yguess=yguess)
+# needs good initial guesses of the solution.
+xguess = seq(0,1,by=0.1)
+yguess = matrix(nr=5,nc=length(xguess),5.)
+yguess[1,] <- sin(2*pi*xguess)
+yguess[2,] <- cos(2*pi*xguess)
+
+Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
+        guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
+        func=nerve3,leftbc=3, xguess=xguess, yguess=yguess)
+plot(Sol)

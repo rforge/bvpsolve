@@ -8,6 +8,6 @@ Description: Functions that solve boundary value problems (BVP) of systems of or
              differential equations (ODE).
              The functions provide an interface to the FORTRAN function
              twpbvp and an R-implementation of the shooting method.
-License: GPL
+License: GPL (>= 2)
 LazyData: yes
 
