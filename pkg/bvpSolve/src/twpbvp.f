@@ -17,7 +17,7 @@ c ks: pass precision from C-code...
      *       linear, givmsh, giveu, nmsh,
      *       xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk, precis,
-     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp)
+     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp, full)
 
 *  subroutine twpbvp is intended to solve two-point boundary
 *  value problems.  For information about its use, parameters,
@@ -27,7 +27,7 @@ c ks: pass precision from C-code...
       dimension fixpnt(*), ltol(*), tol(*), precis(3)
       dimension xx(*), u(nudim,*), rpar(*), ipar(*)
       dimension wrk(lwrkfl), iwrk(lwrkin)
-      logical linear, givmsh, giveu
+      logical linear, givmsh, giveu, full
       external fsub, dfsub, gsub, dgsub
       character (len=180) MSG
 
@@ -40,7 +40,12 @@ c ks: pass precision from C-code...
 
 *  Check for invalid input parameters.  If any parameters are
 *  invalid, exit with the flag iflbvp set to -1.
-
+      if (full) then
+        iprint = 0
+      else
+        iprint = -1
+      endif
+          
       iflbvp = -1
       if (ncomp .le. 0)  return
       if (nlbc .lt. 0 .or. nlbc .gt. ncomp) return
@@ -2266,7 +2271,7 @@ c
 
       data nminit/7/
       data pdebug/.false./
-*      data iprint/0/
+*KS: changed      data iprint/0/
       data iprint/-1/
       data uval0/0.0d+0/
       end

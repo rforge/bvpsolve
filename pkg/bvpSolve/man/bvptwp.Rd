@@ -19,7 +19,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
   leftbc=NULL, islin=FALSE, nmax=1000, colp= NULL, atol=1e-8,
   allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
-  forcings=NULL, initforc = NULL, fcontrol=NULL, ...)
+  forcings=NULL, initforc = NULL, fcontrol=NULL, verbose=FALSE, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -183,6 +183,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{fcontrol }{A list of control parameters for the forcing functions.
 
     See package vignette \code{"compiledCode"} from package \code{deSolve}.
+  }
+  \item{verbose }{if \code{TRUE} then more verbose output will be generated
+    as "warnings".
   }
    \item{... }{additional arguments passed to the model functions.
   }
@@ -393,8 +396,10 @@ yguess <- matrix(nrow=2,ncol=2,data=1)
 
 # start with relatively large value of xi
 xi <-0.01
+print(system.time(
 mod1  <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
         func=Prob24,xi=xi, xguess=xguess,yguess=yguess)
+))        
 plot(mod1[,1:2], ylim = c(0.4,1.4), type="l", lwd=2)
 
 # use previous solution to initialise solver for smaller xi

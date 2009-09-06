@@ -26,6 +26,7 @@ nerve <- function (t,y,T)
   list(c( 3*T*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
         (-1/3)*T*(y[1] - 0.7 + 0.8*y[2]) ))
 
+# residual function at the end of the interval
 res<- function (Y,yini,T)
   c(Y[1]-yini[1],
     Y[2]-yini[2],
@@ -61,10 +62,9 @@ plot(sol,type="l",lwd=2)
 yini <- NULL
 
 ## =============================================================================
-## Third solution: augment two more for boundaries  
+## Third solution: augment two more for boundaries and solve with bvpshoot 
 ## =============================================================================
 
-# terminates R!
 nerve3 <- function (t,y,p)
   list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
         (-1/3)*y[3]*(y[1] - 0.7 + 0.8*y[2]) ,

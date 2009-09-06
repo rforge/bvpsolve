@@ -1,5 +1,7 @@
 ## =============================================================================
 ## Elastica equation
+## as from Jeff Cash's webpage 
+## http://www.ma.ic.ac.uk/~jcash/BVP_software
 ## =============================================================================
 
 Elastica <- function (t, y, pars) {

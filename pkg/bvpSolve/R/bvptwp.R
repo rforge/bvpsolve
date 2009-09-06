@@ -8,7 +8,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
      xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
      leftbc=NULL, islin=FALSE, nmax=1000, colp=NULL, atol=1e-8,
      allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
-     forcings=NULL, initforc = NULL, fcontrol=NULL,...)   {
+     forcings=NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE, ...)   {
 
   rho <- environment(func)
 
@@ -51,7 +51,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 ## Boundary conditions  specified by yini and yend
 ##---------------------
 
-  if (! is.null(yini))  {    # yini is a vector
+  if (! is.null(yini))  {    # yini is specified
     y       <- yini
     Y       <- y
     inix    <- which (is.na(y))
@@ -185,8 +185,6 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     }
 ## in case boundary function is not defined...
     if ( is.null(bound)) {
-      iini <- sum(!is.na(Y))
-      iend <- sum(!is.na(yend))
       iibb <- c(which( !is.na(Y)),which(!is.na(yend)))
       bb    <- c(Y[!is.na(Y)],yend[!is.na(yend)])
       Bound  <- function(i,state)        {
@@ -197,22 +195,30 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
      if (length(tmp) > 1)
        stop ("function 'bound' should return only ONE value")
     }
-
+# Jacobian of the boundary function
     if ( is.null(jacbound)) {
-      JacBound <- function (ii, state) {
-        BJAC        <- numeric(ncomp)
-        perturbfac  <- 1e-8
-        state2 <- state
-        tmp2     <- Bound(ii, state)
-        for (i in 1:ncomp) {
-          dstate   <-max(perturbfac,state[i]*perturbfac)
-          state[i] <- state[i]+ dstate
-          tmp      <- Bound(ii, state)
-          BJAC[i]  <- (tmp-tmp2)/dstate
-          state[i] <- state2[i]
+      if (is.null(bound)) {
+        JMat <- matrix(data=0, nrow=ncomp, ncol = ncomp)
+        iibb <- c(which( !is.na(Y)),which(!is.na(yend)))
+        JMat[cbind(1:ncomp,iibb)] <- 1
+        JacBound <- function (ii, state) 
+           return(JMat[ii,])
         }
-        return(BJAC)
-      }
+      else 
+        JacBound <- function (ii, state) {
+          BJAC        <- numeric(ncomp)
+          perturbfac  <- 1e-8
+          state2 <- state
+          tmp2     <- Bound(ii, state)
+          for (i in 1:ncomp) {
+            dstate   <-max(perturbfac,state[i]*perturbfac)
+            state[i] <- state[i]+ dstate
+            tmp      <- Bound(ii, state)
+            BJAC[i]  <- (tmp-tmp2)/dstate
+            state[i] <- state2[i]
+          }
+          return(BJAC)
+        }
     }
 
   Nglobal <- if (length(tmp) > 1)
@@ -264,10 +270,11 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       initpar <- NULL # parameter initialisation not needed if function is not a DLL
     else
       initpar <- as.double(parms)
+  if(verbose) ow <- options("warn"=1)   # print as warnings are generated
       
   out <- .Call("call_bvptwp",as.integer(ncomp),as.integer(leftbc),
             as.double(fixpt),as.double(aleft),as.double(aright),
-            as.double(atol),as.integer(linear),
+            as.double(atol),as.integer(linear), as.integer(verbose),
             as.integer(givmesh),as.integer(givu),as.integer(nmesh),
             as.integer(nmax),as.integer(lwrkfl),as.integer(lwrkin),
             as.double(Xguess), as.double(Yguess),
@@ -278,6 +285,8 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   mesh <- nn[3]
   attr(out,"istate") <- NULL
 
+#(  if(verbose) print(names(baseenv()$last.warning))  # dangerous...
+  if(verbose) options(ow)     # reset printing options
 
   nm <- c("x",
           if (!is.null(attr(y,"names"))) names(y) else as.character(1:ncomp))

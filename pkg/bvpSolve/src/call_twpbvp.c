@@ -8,7 +8,7 @@
      *       linear, givmsh, giveu, nmsh,
      *       xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk,
-     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp)
+     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp,full)
 */
 
 void F77_NAME(twpbvp)(int*, int*, double *, double *,
@@ -20,7 +20,7 @@ void F77_NAME(twpbvp)(int*, int*, double *, double *,
 		     void (*)(int *, double *, double *, double *, double *, int *), /* dfsub(n,x,u,df,rp,ip) */
 			   void (*)(int *, int *, double *, double *, double *, int *),    /* gsub(i,n,u,g,rp,ip)   */
 		     void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
-         double *, int *, int *);
+         double *, int *, int *, int *);
 
 /* interface between fortran function calls and R functions
    Fortran code calls twp_derivs(m, x, y, ydot)
@@ -103,7 +103,7 @@ boundary points, settings, number of tolerances, tolerances,
 mesh points, initial value of continuation parameter */
 
 SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
-		SEXP Tol, SEXP Linear, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
+		SEXP Tol, SEXP Linear, SEXP Full, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
 		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
     SEXP Rpar, SEXP Ipar, SEXP func, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP Initfunc, SEXP Parms, SEXP flist, SEXP rho)
@@ -119,7 +119,8 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis;
   int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
-
+  int full;
+  
   deriv_func    *derivs;
   jac_func      *jac;
   jacbound_func *jacbound;
@@ -138,6 +139,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   lwrkfl = INTEGER(Lwrkfl)[0];   /* length of double workspace */
   lwrkin = INTEGER(Lwrkin)[0];   /* length of integer workspace */
   linear = INTEGER(Linear)[0];   /* true if linear problem */
+  full = INTEGER(Full)[0];       /* true if full output */
   givu   = INTEGER(Givu)[0];     /* true if initial trial solution given */
   givmesh = INTEGER(Givmesh)[0]; /* true if initial mesh given */
   nmesh  = INTEGER(Nmesh)[0];    /* size of mesh */
@@ -233,15 +235,12 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
      *       linear, givmsh, giveu, nmsh,
      *       xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk,
-     *       fsub, dfsub, gsub, dgsub, iflbvp)
-  error("ncomp, nlbc, nfixpnt, ntol, atol, %f, %i, %i, %i, %i",tol[0],ncomp,nlbc,nfixpnt,ntol);
-  error("till here %i, %i, %i, %i",ncomp,nlbc,nfixpnt,ntol);
-
+     *       fsub, dfsub, gsub, dgsub, iflbvp,verbose)
 */
 	  F77_CALL(twpbvp) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
         &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, xx, &ncomp,
         u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
-        derivs,jac,bound,jacbound, rpar, ipar,&iflag);
+        derivs,jac,bound,jacbound, rpar, ipar,&iflag,&full);
 /*
 C....   iflag - The Mode Of Return From twpbvp
 C....         =  0  For Normal Return
@@ -262,9 +261,6 @@ C....         = -1  If There Is An Input Data Error.
 
   else
 	{
-/*  warning("nmesh, nmax, ncomp, iflag %i, %i, %i, %i, %i, %i",nmesh,nmax,ncomp,iflag);
-   error("TILL HERE");
-*/
    nx = nmesh;
 
     PROTECT(yout = allocVector(REALSXP,(ncomp+1)*(nx)));incr_N_Protect();
@@ -277,14 +273,7 @@ C....         = -1  If There Is An Input Data Error.
   INTEGER(ISTATE)[2] = nmesh;
   setAttrib(yout, install("istate"), ISTATE);
 
-/*     ii = ncomp+7;
-
-  ii = ispace[6];
-  PROTECT(RWORK = allocVector(REALSXP, ii));incr_N_Protect();
-  for (k = 0;k<ii;k++) REAL(RWORK)[k] = fspace[k];
-  setAttrib(yout, install("rstate"), RWORK);
-  }
-                    ####   termination   ####                            */
+/*               ####   termination   ####                            */
   unprotect_all();
   return(yout);
 }
