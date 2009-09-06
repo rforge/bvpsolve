@@ -4,7 +4,7 @@ C.... *****************************************************************
 
       Subroutine Colmod(Ncomp, M, Aleft, Aright, Zeta, Ipar, Ltol,
      +     Tol, Fixpnt, Ispace, Fspace, Iflag, Eps, Epsmin,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess)
+     +     fsub, dfsub, gsub, dgsub, guess)
 
 C.... ******************************************************************
 
@@ -576,7 +576,7 @@ C----------------------------------------------------------------------
       Dimension M(*), Zeta(*), Ipar(*), Ltol(*), Tol(*), Dummy(1),
      +          Fixpnt(*), Ispace(*), Fspace(*)
       Dimension Phi(3), E(3), Pmax(2), Hord(2)
-  	  CHARACTER(len=180) msg
+        CHARACTER(len=180) msg
 
       Parameter ( Zero = 0.0d+0, One = 1.0d+0, Two = 2.0d+0 )
       Parameter ( Three = 3.0d+0, Third = 1.0d+0/3.0d+0, Huge = 1.d+30 )
@@ -593,7 +593,7 @@ C----------------------------------------------------------------------
       Common /Colest/ Wgtmsh(40), Wgterr(40), Tolin(40),
      +                Root(40), Jtol(40), Lttol(40), Ntol
 
-      External Fsub, Dfsub, Gsub, Dgsub, Guess
+      External fsub, dfsub, gsub, dgsub, guess
 
 C.... *****************************************************************
 
@@ -687,16 +687,16 @@ c         Write (msg,1003) Nfxpnt, (Fixpnt(Ip), Ip = 1,Nfxpnt)
 c         CALL rwarn(msg)
 c      ENDIF
 c      Write (msg,1004) K
-c	   CALL rwarn(msg)
+c        CALL rwarn(msg)
 c      Write (msg,1005) (Ltol(Ip), Ip = 1,Ntol)
-c	   CALL rwarn(msg)
+c        CALL rwarn(msg)
 c      Write (msg,1006) (Tol(Ip), Ip = 1,Ntol)
-c	   CALL rwarn(msg)
+c        CALL rwarn(msg)
 c      If (Iguess .ge. 2) THEN
-c	  Write (msg,1007)
+c       Write (msg,1007)
 c         CALL rwarn(msg)
 c      ENDIF
-c	Write (msg,1008) Eps, Epsmin
+c     Write (msg,1008) Eps, Epsmin
 c         CALL rwarn(msg)
    80 Continue
 
@@ -755,14 +755,14 @@ C.... Ispace  And  Fspace.
       Nmaxf = (Ndimf - Nfixf) / Nsizef
       Nmaxi = (Ndimi - Nfixi) / Nsizei
       If ( Iprint .lt. 0 )  THEN
- 	       Write(msg,1009) Nmaxf, Nmaxi
+             Write(msg,1009) Nmaxf, Nmaxi
          CALL rwarn(msg)
       ENDIF
-	    Nmax = Min( Nmaxf, Nmaxi )
+          Nmax = Min( Nmaxf, Nmaxi )
       If ( Nmax .lt. N )                            Return
       If ( Nmax .lt. Nfxpnt+1 )                     Return
       If (Nmax .lt. 2*Nfxpnt+2 .and. Iprint .lt. 1)  THEN
- 	       Write(msg,1010)
+             Write(msg,1010)
          CALL rwarn(msg)
       ENDIF
 C.... Generate Pointers To Break Up Fspace And Ispace.
@@ -987,7 +987,7 @@ C.... Increase The Continuation Step Counter Ncs.
 
       Ncs = Ncs+1
       If (Iprint .lt. 1) THEN 
-	   Write(msg,1011) Ncs, Eps 
+         Write(msg,1011) Ncs, Eps 
          CALL rwarn(msg)
       endif
       Iflag = 1
@@ -1016,7 +1016,7 @@ C.... Attempt To Solve The Latest Continuation Problem.
      +     Fspace(Ldqdmz),Fspace(Lg),Fspace(Lw),Fspace(Lv),
      +     Fspace(Lvalst),Fspace(Lslope),Fspace(Lscl),Fspace(Ldscl),
      +     Fspace(Laccum),Ispace(Lpvtg),Ispace(Linteg),Ispace(Lpvtw),
-     +     Nfxpnt,Fixpnt,Iflag,Fsub,Dfsub,Gsub,Dgsub,Guess,
+     +     Nfxpnt,Fixpnt,Iflag,fsub,dfsub,gsub,dgsub,Guess,
      +     Fspace(Lext1),Fspace(Lext2),Eps)
 
 C.... *****************************************************************
@@ -1032,7 +1032,7 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
 
          If (Ifinal .eq. 1) Then 
             If (Iprint .lt. 1) Then
-		    Write(msg,1013) Eps
+              Write(msg,1013) Eps
               CALL rwarn(msg)
             endif 
             Goto 340
@@ -1071,7 +1071,7 @@ C.... The User Is Warned Of This Possibility.
  
          If (Iprec .eq. 0 .and. Phit .gt. Phimax) Then
             If (Iprint .lt. 1) Then
-		    Write(msg,1014) Eps
+              Write(msg,1014) Eps
               CALL rwarn(msg)
              Endif
             Epsp = Eps
@@ -1405,8 +1405,8 @@ C.... Tolerances. We Alter Epsmin Accordingly.
 C.... Insert Details For Backtracking
 
          If (Iprint .lt. 1) Then
-	     Write(msg,1019) 
-	     CALL rwarn(msg)
+           Write(msg,1019) 
+           CALL rwarn(msg)
          ENdif 
          Ifinal = 0
          N = Nbk1
@@ -1415,7 +1415,7 @@ C.... Insert Details For Backtracking
             Ep = E(3)
             Epsmin = One/Ep
             If (Iprint .lt. 1) Then 
-		     Write(msg,1015) Epsmin
+               Write(msg,1015) Epsmin
                CALL rwarn(msg)
             Endif
             Emin = Ep
@@ -1584,7 +1584,7 @@ C-----------------------------------------------------------------------
       Subroutine Contrl (Xi, Xiold, Z, Dmz, Rhs, Delz, Deldmz,
      +           Dqz, Dqdmz, G, W, V, Valstr, Slope, Scale, Dscale,
      +           Accum, Ipvtg, Integs, Ipvtw, Nfxpnt, Fixpnt, Iflag,
-     +           Fsub, Dfsub, Gsub, Dgsub, Guess, Slpold, Voldmsh, Eps )
+     +           fsub, dfsub, gsub, dgsub, guess, Slpold, Voldmsh, Eps )
 C
 C**********************************************************************
 C
@@ -1647,8 +1647,8 @@ C
       Common /Flags/ Ifinal,Iatt,Iback,Iprec
       Common /Convg/ Nits
 C
-      External Fsub, Dfsub, Gsub, Dgsub, Guess
-	    CHARACTER(len=180) msg
+      External fsub, dfsub, gsub, dgsub, guess
+          CHARACTER(len=180) msg
 
 *  The Parameter Inumb Is A Counter Used To Limit To Three The Number 
 *  Of Mesh Selections Performed For The Final Continuation Problem. 
@@ -1686,20 +1686,20 @@ C.... Set Up And Solve Equations
 C     
       Call Lsyslv (Msing, Xi, Xiold, Dummy, Dummy, Z, Dmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm, 0,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Check For A Singular Matrix
 C     
       If ( Msing .eq. 0 )                      Go To 400
  30   If ( Msing .lt. 0 )                      Go To 40
       If ( Iprint .lt. 1 ) Then
-	       Write (msg,1000)
+             Write (msg,1000)
          CALL rwarn(msg)
       Endif
       Go To 460
  40   If ( Iprint .lt. 1 )  Then
           Write (msg,1001)
-	    CALL rwarn(msg)
+          CALL rwarn(msg)
       Endif 
       Iflag = 0
       Return
@@ -1725,14 +1725,14 @@ C.... Find The First Newton Correction
 C     
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dqdmz, Integs, Ipvtg, Ipvtw, Rnold, 1,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
       If ( Iprint .lt. 0 ) Then
-	       Write(msg,1002)
+             Write(msg,1002)
          CALL rwarn(msg)
       Endif
       If ( Iprint .lt. 0 )  Then
-	       Write (msg,1003) Iter, Rnold
+             Write (msg,1003) Iter, Rnold
          CALL rwarn(msg)
       Endif
       Go To 70
@@ -1743,12 +1743,12 @@ C.... Newton Step ( = 0) Or A Fixed Jacobian Iteration ( = 1).
 C     
  60   If ( Iprint .lt. 0 ) Then
           Write (msg,1003) Iter, Rnorm
-	         CALL rwarn(msg)
+               CALL rwarn(msg)
       Endif
       Rnold = Rnorm
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm,
-     +     3+Ifreez, Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     3+Ifreez, fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Check For A Singular Matrix
 C     
@@ -1771,7 +1771,7 @@ C
  100  Continue
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm, 2,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Check Monotonicity. If The Norm Of  Rhs  Gets Smaller,
 C.... Proceed With A Fixed Jacobian; Else Proceed Cautiously,
@@ -1802,11 +1802,11 @@ C
 C.... Convergence Obtained
 C     
       If ( Iprint .eq. -1 )  Then
-	   Write (msg,1004) Iter
+         Write (msg,1004) Iter
          CALL rwarn(msg)
       Endif
       If ( Iprint .eq. 0 )  Then 
-	   Write (msg,1016) Iter
+         Write (msg,1016) Iter
          CALL rwarn(msg)
       Endif
       If (Iatt .eq. -1) Nits = Iter
@@ -1819,7 +1819,7 @@ C
          CALL rwarn(msg)
       Endif 
       If ( Iprint .lt. 0 )  Then
-	   Write (msg,1005)
+         Write (msg,1005)
          CALL rwarn(msg)
       Endif
       Iconv = 0
@@ -1851,7 +1851,7 @@ C
       endif       
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dqdmz, Integs, Ipvtg, Ipvtw, Rnold, 1,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Check For A Singular Matrix
 C     
@@ -1890,7 +1890,7 @@ C.... Find A Newton Direction
 C     
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm, 3,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Check For A Singular Matrix
 C     
@@ -1922,13 +1922,13 @@ C
  240  Continue
  250  Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Dqz, Dqdmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm, 2,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Compute A Fixed Jacobian Iterate (Used To Control Relax)
 C     
       Call Lsyslv (Msing, Xi, Xiold, Z, Dmz, Dqz, Dqdmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm, 4,
-     +     Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +     fsub, dfsub, gsub, dgsub, guess, Eps )
 C     
 C.... Find Scaled Norms Of Various Terms Used To Correct Relax
 C     
@@ -1946,11 +1946,11 @@ C
       Anfix = Sqrt(Anfix / Dfloat(Nz+Ndmz))
       If ( Icor .eq. 1 )                         Go To 280
       If (Iprint .lt. 0)  Then
-	Write (msg,1007) Iter, Relax, Anorm,
+      Write (msg,1007) Iter, Relax, Anorm,
      +     Anfix, Rnold, Rnorm
          CALL rwarn(msg)
       Endif      
-	Go To 290
+      Go To 290
  280  If (Iprint .lt. 0) Then 
        Write (msg,1008) Relax, Anorm, Anfix,
      +     Rnold, Rnorm
@@ -2012,11 +2012,11 @@ C
 C.... Convergence Obtained
 C     
       If ( Iprint .eq. -1 ) Then
-	 Write (msg,1004) Iter
+       Write (msg,1004) Iter
          CALL rwarn(msg)
       Endif  
       If ( Iprint .eq. 0 ) Then
-	   Write (msg,1016) Iter
+         Write (msg,1016) Iter
          CALL rwarn(msg)
       Endif
       If (Iatt .eq. -1) Nits = Iter
@@ -2033,11 +2033,11 @@ C
  390  If (Anfix .lt. Precis .or. Rnorm .lt. Precis) Then
          If (Iatt .eq. -1) Nits = Iter
          If ( Iprint .eq. -1 ) Then
-	      Write (msg,1004) Iter
+            Write (msg,1004) Iter
             CALL rwarn(msg)
          Endif 
          If ( Iprint .eq. 0 )  Then 
-	     Write (msg,1016) Iter
+           Write (msg,1016) Iter
          CALL rwarn(msg)
          endif
       Endif
@@ -2071,7 +2071,7 @@ C.... Diagnostics For Failure Of Nonlinear Iteration.
 C     
  430  If ( Iprint .lt. 1 ) then
        Write (msg,1011) Iter
-	         CALL rwarn(msg)
+               CALL rwarn(msg)
       endif
       Go To 450
  440  If( Iprint .lt. 1 )  then
@@ -2113,7 +2113,7 @@ C.... Pick A New Mesh
      +           Slope, Accum, Nfxpnt, Fixpnt, Slpold, Voldmsh)
             If (Iprec .eq. 2) Then
                If (Iprint .lt. 1) then
-			   Write(msg,1013)
+                 Write(msg,1013)
                 CALL rwarn(msg)
                Endif 
                Iflag = -1
@@ -2128,7 +2128,7 @@ C.... Pick A New Mesh
      +     Slope, Accum, Nfxpnt, Fixpnt, Slpold, Voldmsh)
       If (Iprec .eq. 2) Then
          If (Iprint .lt. 1) Then 
-	     Write(msg,1013)
+           Write(msg,1013)
            CALL rwarn(msg)
          Endif 
          Iflag = -1
@@ -2143,11 +2143,11 @@ C.... Exit If Expected N Is Too Large (But May Try N = Nmax Once)
       N = N / 2
       Iflag = -1
       If ( Iconv .eq. 0 .and. Iprint .lt. 1 ) Then
-	 Write (msg,1014)
+       Write (msg,1014)
          CALL rwarn(msg)
       endif
       If ( Iconv .eq. 1 .and. Iprint .lt. 1 ) Then
-	   Write (msg,1015)
+         Write (msg,1015)
          CALL rwarn(msg)
       endif
       Return
@@ -2317,7 +2317,7 @@ C
      +                Root(40), Jtol(40), Ltol(40), Ntol
       Common /Flags/ Ifinal,Iatt,Iback,Iprec
       Common /Mshvar/ Pmax,Hord,Hsml
-	CHARACTER(len=180) msg
+      CHARACTER(len=180) msg
 C
       Nfxp1 = Nfxpnt +1
       Iprec = Min(Iprec,1)
@@ -2332,7 +2332,7 @@ C
       Noldp1 = Nold + 1
 c ks: too much printing... toggled off
 c      If (Iprint .lt. 0)  Then 
-c	  Write(msg,1000) Nold,(Xiold(I), I = 1,Noldp1)
+c       Write(msg,1000) Nold,(Xiold(I), I = 1,Noldp1)
 c         CALL rwarn(msg)
 c      Endif
       If ( Iguess .ne. 3 )                          Go To 40
@@ -2633,7 +2633,7 @@ C.... Naccum = Expected N To Achieve .1x User Requested Tolerances
 C
       Naccum = Int(Accum(Nold+1) + 1.d0)
       If ( Iprint .lt. 0 ) Then 
-	 Write(msg,1002) Degequ, Naccum
+       Write(msg,1002) Degequ, Naccum
          CALL rwarn(msg)
       Endif
 C
@@ -2647,7 +2647,7 @@ C.... We Do Not Violate The Maximum Mesh Size.
 C
       If (Ifinal .eq. 1 .and. Iatt .eq. 0) Then
          If ( Iprint .lt. 1 ) Then
-	    Write(msg,1007) 
+          Write(msg,1007) 
          CALL rwarn(msg)
          endif 
          N = Min(Nmax2-10,Naccum/2)
@@ -2835,22 +2835,22 @@ C
       If (Mode .le. 2) Then
 c too much printing
 c         If ( Iprint .eq. -1 ) Then
-c	    Write(msg,1003) N, (Xi(I),I = 1,Np1)
+c         Write(msg,1003) N, (Xi(I),I = 1,Np1)
 c          CALL rwarn(msg)
 c         Endif 
          If ( Iprint .eq. 0 ) Then
-	    Write(msg,1004) N
+          Write(msg,1004) N
           CALL rwarn(msg)
          Endif 
 
       Else
 c         If ( Iprint .eq. -1 ) Then
-c	    Write(msg,1005) N, (Xi(I),I = 1,Np1)
+c         Write(msg,1005) N, (Xi(I),I = 1,Np1)
 c          CALL rwarn(msg)
 c         Endif 
 
          If ( Iprint .eq. 0 ) Then
-	    Write(msg,1006) N
+          Write(msg,1006) N
           CALL rwarn(msg)
          Endif 
 
@@ -2911,7 +2911,7 @@ C**********************************************************************
 C
       Implicit Double Precision (A-H,O-Z)
       Dimension Rho(7), Coef(K,*), Cnsts1(28), Cnsts2(28), Dummy(1)
-    	CHARACTER(len=180) msg
+      CHARACTER(len=180) msg
 
 C
       Common /Colord/ Kdum, Ncomp, Mstar, Kd, Mmax, M(20)
@@ -3061,7 +3061,7 @@ C
       Common /Colbas/ B(28), Acol(28,7), Asave(28,4)
       Common /Colest/ Wgtmsh(40), Wgterr(40), Tolin(40),
      +                Root(40), Jtol(40), Ltol(40), Ntol
-	CHARACTER(len=180) msg
+      CHARACTER(len=180) msg
 C
 C.... Error Estimates Are To Be Generated And Tested
 C.... To See If The Tolerance Requirements Are Satisfied.
@@ -3152,7 +3152,7 @@ C---------------------------------------------------------------------
 C
       Subroutine Lsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz,
      +           G, W, V, Rhs, Dmzo, Integs, Ipvtg, Ipvtw, Rnorm,
-     +           Mode, Fsub, Dfsub, Gsub, Dgsub, Guess, Eps )
+     +           Mode, fsub, dfsub, gsub, dgsub, guess, Eps )
 C*********************************************************************
 C
 C   Purpose
@@ -3211,7 +3211,7 @@ C
       Common /Colnln/ Nonlin, Iter, Limit, Iguess
       Common /Colbas/ B(28), Acol(28,7), Asave(28,4)
 C
-      External Dfsub, Dgsub
+      External dfsub, dgsub
 C
       M1 = Mode + 1
       Go To (10, 30, 30, 30, 310), M1
@@ -3299,14 +3299,14 @@ C
 C
 C....     Find  Rhs  Boundary Value.
 C
-  110      Call Gsub (Izeta, Zval, Gval, Eps)
+  110      Call gsub (Izeta, Zval, Gval, Eps)
            Rhs(Ndmz+Izeta) = -Gval
            Rnorm = Rnorm + Gval**2
            If ( Mode .eq. 2 )                       Go To 130
 C
 C....     Build A Row Of  A  Corresponding To A Boundary Point
 C
-  120      Call Gderiv (G(Ig), Nrow, Izeta, Zval, Dgz, 1, Dgsub, Eps)
+  120      Call Gderiv (G(Ig), Nrow, Izeta, Zval, Dgz, 1, dgsub, Eps)
   130      Izeta = Izeta + 1
            Go To 100
 C
@@ -3333,7 +3333,7 @@ C
              Call Approx (Iold, Xcol, Zval, At, Coef, Xiold, Nold,
      +            Z, Dmz, K, Ncomp, Mmax, M, Mstar, 2, Dmzo(Irhs), 1)
 C
-  170        Call Fsub (Xcol, Zval, F, Eps)
+  170        Call fsub (Xcol, Zval, F, Eps)
              Do 180 Jj = 1, Ncomp
                Value = Dmzo(Irhs) - F(Jj)
                Rhs(Irhs) = - Value
@@ -3350,7 +3350,7 @@ C
 C
 C....       Fill In  Rhs  Values (And Accumulate Its Norm).
 C
-             Call Fsub (Xcol, Zval, F, Eps)
+             Call fsub (Xcol, Zval, F, Eps)
              Do 195 Jj = 1, Ncomp
                Value = Dmz(Irhs) - F(Jj)
                Rhs(Irhs) = - Value
@@ -3361,13 +3361,13 @@ C
 C
 C....       The Linear Case
 C
-  200        Call Fsub (Xcol, Zval, Rhs(Irhs), Eps)
+  200        Call fsub (Xcol, Zval, Rhs(Irhs), Eps)
              Irhs = Irhs + Ncomp
 C
 C....       Fill In Ncomp Rows Of  W And V
 C
   210        Call Vwblok (Xcol, Hrho, J, W(Iw), V(Iv), Ipvtw(Idmz), Kd,
-     +       Zval, Df, Acol(1,J), Dmzo(Idmzo), Ncomp, Dfsub, Msing, Eps)
+     +       Zval, Df, Acol(1,J), Dmzo(Idmzo), Ncomp, dfsub, Msing, Eps)
              If ( Msing .ne. 0 )                    Return
   220      Continue
 C
@@ -3402,7 +3402,7 @@ C
 C
 C....     Find  Rhs  Boundary Value.
 C
- 250       Call Gsub (Izeta, Zval, Gval, Eps)
+ 250       Call gsub (Izeta, Zval, Gval, Eps)
            Rhs(Ndmz+Izeta) = - Gval
            Rnorm = Rnorm + Gval**2
            If ( Mode .eq. 2 )                       Go To 270
@@ -3410,7 +3410,7 @@ C
 C....     Build A Row Of  A  Corresponding To A Boundary Point
 C
  260       Izm = Izeta+Mstar
-           Call Gderiv (G(Ig), Nrow, Izm, Zval, Dgz, 2, Dgsub, Eps)
+           Call Gderiv (G(Ig), Nrow, Izm, Zval, Dgz, 2, dgsub, Eps)
  270       Izeta = Izeta + 1
            Go To 240
 C
@@ -3516,7 +3516,7 @@ C
 C
       Return
       End
-      Subroutine Gderiv ( Gi, Nrow, Irow, Zval, Dgz, Mode, Dgsub, Eps)
+      Subroutine Gderiv ( Gi, Nrow, Irow, Zval, Dgz, Mode, dgsub, Eps)
 C
 C**********************************************************************
 C
@@ -3551,7 +3551,7 @@ C
 C
 C.... Evaluate Jacobian Dg
 C
-      Call Dgsub (Izeta, Zval, Dg, Eps)
+      Call dgsub (Izeta, Zval, Dg, Eps)
 C
 C.... Evaluate  Dgz = Dg * Zval  Once For A New Mesh
 C
@@ -3585,7 +3585,7 @@ C
       Return
       End
       Subroutine Vwblok (Xcol, Hrho, Jj, Wi, Vi, Ipvtw, Kd, Zval,
-     +                   Df, Acol, Dmzo, Ncomp, Dfsub, Msing, Eps)
+     +                   Df, Acol, Dmzo, Ncomp, dfsub, Msing, Eps)
 C
 C**********************************************************************
 C
@@ -3645,7 +3645,7 @@ C.... U     -  Df(Id,1)*Z(1) - ... - Df(Id,Mstar)*Z(Mstar)
 C.... Id
 C.... For Id = 1 To Ncomp.
 C
-      Call Dfsub (Xcol, Zval, Df, Ncomp, Eps)
+      Call dfsub (Xcol, Zval, Df, Ncomp, Eps)
       I0 = (Jj-1) * Ncomp
       I1 = I0 + 1
       I2 = I0 + Ncomp
@@ -3874,7 +3874,7 @@ C
       Dimension Z(*), Dmz(*), Bm(4), Coef(*)
 C
       Common /Colout/ Precis, Iout, Iprint
-	CHARACTER(len=180) msg
+      CHARACTER(len=180) msg
 C
       Go To (10, 30, 80, 90), Mode
 C
@@ -3894,7 +3894,7 @@ C
       If ( X .ge. Xi(1)-Precis .and. X .le. Xi(N+1)+Precis )
      +                                              Go To 40
       If (Iprint .lt. 1) Then
-	 Write(msg,1000) X, Xi(1), Xi(N+1)
+       Write(msg,1000) X, Xi(1), Xi(N+1)
           CALL rwarn(msg)
          Endif 
 
