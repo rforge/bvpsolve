@@ -42,6 +42,8 @@
 }
 \author{
   Karline Soetaert (Maintainer)
+  
+  Jeff Cash
 }
 \references{
   J.R. Cash and M.H. Wright, (1991) A deferred correction method for nonlinear

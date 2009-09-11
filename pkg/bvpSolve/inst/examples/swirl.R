@@ -56,8 +56,8 @@ pairs(Sol3,col="darkgreen",lty=2)
 
 
 # For successively smaller values of eps:
-eps     <- 1e-5
+eps     <- 5e-5
 print(system.time(Sol4 <- bvptwp(atol=1e-5,
-                  xguess=Sol[,1],yguess=t(Sol3[,2:7]),x=x,func=fsub,
+                  xguess=Sol3[,1],yguess=t(Sol3[,2:7]),x=x,func=fsub,
                   yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
 pairs(Sol4,col="orange",lty=2)

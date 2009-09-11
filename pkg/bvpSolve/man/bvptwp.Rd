@@ -209,6 +209,8 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
+  
+  Jeff Cash <j.cash@imperial.ac.uk>
 }
 \details{
   This is an implementation of the method \emph{twpbvp}, written by

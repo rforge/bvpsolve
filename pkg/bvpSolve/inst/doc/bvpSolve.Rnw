@@ -33,9 +33,15 @@
   Centre for Estuarine and Marine Ecology\\
   Netherlands Institute of Ecology\\
   The Netherlands
+  \And
+  Jeff Cash\\
+  Imperial College London\\
+  South Kensington Campus\\
+  London SW7 2AZ\\
+  U.K.
 }
 
-\Plainauthor{Karline Soetaert}
+\Plainauthor{Karline Soetaert and Jeff Cash}
 
 \Abstract{\R package \bvp \citep{bvpSolve} is designed for the numerical
   solution of boundary value problems (BVP) for ordinary differential
@@ -65,6 +71,13 @@
   4401 NT Yerseke, Netherlands
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
   URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
+ \\
+  Jeff Cash\\
+  Imperial College London\\
+  South Kensington Campus\\
+  London SW7 2AZ, U.K.\\
+  E-mail: \email{j.cash@imperial.ac.uk}\\
+  URL: \url{http://www.ma.ic.ac.uk/\~jcash}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
@@ -526,13 +539,17 @@ bound <- function(i,y,pars) {
 }
 @
 
-Moreover, this problem can only be solved easily if good initial
+Moreover, this problem can only be solved if good initial
 conditions are given:
 <<>>=
 xguess <- seq(0,1,len=5)
 yguess <- matrix(nc=5,(rep(c(1,1,1,-10,0.91),5)))
 rownames(yguess) <- c("u","v","w","z","y")
+xguess
+yguess
 @
+
+
 Note that the rows of \code{yguess} have been given a name, such
 that this name can be used in the derivative and boundary function.
 
@@ -566,7 +583,7 @@ Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
     \frac{dy}{dt}&=& y2\\
     \frac{dy2}{dt}&=& -(\lambda-10 \cos(2t)) \cdot y
   \end{eqnarray*}
-  and the function that estimates these derivatives is written (\code{derivs}).
+  and the function that estimates these derivatives is written (\code{mathieu}).
 <<>>=
 mathieu <- function(x,y,lambda)
     list(c(y[2],
@@ -596,9 +613,9 @@ mtext(outer=TRUE, side=3, line=-1.5, cex=1.5, "mathieu")
   see text for R-code}
 \label{fig:mat}
 \end{figure}
-The  value of \code{lam} can be printed:
+The  value of \code{lambda} can be printed:
 <<>>=
-attr(sol,"roots")  # root gives the value of "lam" (17.10684)
+attr(sol,"roots")  # root gives the value of "lambda" (17.10684)
 @
 \subsection{Solving for an unknown parameter using bvptwp}
 To use \code{bvptwp}, we treat the unknown parameter as an extra 
@@ -613,7 +630,7 @@ mathieu2 <- function(x,y,p)
         0) )
 @
 Note the third derivative, and the parameter \code{lambda} from previous
-chapter which is now \code{y[3]}.
+chapter which is now \code{y[3]}, the third variable.
 
 The initial condition, \code{yini} and final condition, \code{yend} now also 
 provides a value, \code{NA}, for the parameter (y3) that is unknown.
@@ -621,7 +638,7 @@ We also provide initial guesses for the x- and y-values (\code{xguess, yguess}).
 \footnote{This problem is not correctly solved if the initial guess for 
  the y-values is 0; yet any value different from 0 works}
 <<>>=
-Sol <- bvptwp (yini= c(y=1,dy=0,lam=NA), yend = c(NA,0,NA),
+Sol <- bvptwp (yini= c(y=1,dy=0,lambda=NA), yend = c(NA,0,NA),
         x=seq(0,pi,by=0.01), func=mathieu2, xguess = c(0,1,2*pi),
         yguess = matrix(nr=3,rep(15,9)) )
 @
@@ -676,7 +693,7 @@ res<- function (Y,yini,T)
     T*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1)
 @
 There are no initial conditions (\code{yini}); to solve this model, a reasonable
-guess of the missing initial conditions is necessary; the initial guess for the 
+\code{guess} of the missing initial conditions is necessary; the initial guess for the 
 unknown parameter is set to $2 \pi$ (\code{extra}):
 <<>>=  
 yini <- c(y1=NA,y2=NA)
@@ -693,12 +710,13 @@ Function \code{bvptwp} accepts only problems with separated boundary
 conditions, however, it is possible to use it also for solving boundary value
 problems with periodic boundary conditions. 
 
-This is done by assuming the boundary conditions as "parameters", and using the 
-strategy of defining extra variables, similar as in previous section.
+This is done by considering the boundary conditions as "parameters", and using the 
+strategy of defining these parameters as extra variables, with derivatives = 0,
+similar as in previous section.
 
-Given here without derivation, the augmented derivative function is (variable
-3 is the unknown parameter \code{T}, variables 4 and 5 the initial conditions of 
-\code{y_1}, and \code{y_2} respectively):
+The augmented derivative function is, with variable
+3 the unknown parameter \code{T}, variables 4 and 5 the initial conditions of 
+\code{y_1}, and \code{y_2} respectively, is:
 <<>>=
 nerve3 <- function (t,y,p)
   list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
@@ -712,15 +730,17 @@ The required boundary function, with the first 3 boundary conditions at the
 left boundary is:
 <<>>=
 bound <- function(i,y,p) {
- if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
- if (i ==2) return(y[1]-y[4])
- if (i ==3) return(y[2]-y[5])
- if (i ==4) return(y[1]-y[4])
- if (i ==5) return(y[2]-y[5])
+ if (i ==1) return ( y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1 )
+ if (i ==2) return ( y[1]-y[4] )           
+ if (i ==3) return ( y[2]-y[5] )           # left bnd
+ if (i ==4) return ( y[1]-y[4] )           # right bnd
+ if (i ==5) return ( y[2]-y[5] )
 }
 @
 boundary condition 2 sets the left boundary of \code{y_1} 
-equal to parameter \code{y_4}.
+equal to parameter \code{y_4}, boundary condition 4 does the same for the 
+right boundary of \code{y_1}.
+
 
 Solving this also requires good initial conditions to find a solution:
 <<>>=
@@ -1118,7 +1138,7 @@ consulted for details.
 See \url{http://cran.r-project.org/package=deSolve}.
 
 Here we implement a simple linear boundary value problem, which is
-a standard test problem for BVP code (\ref{scott}). The model has a
+a standard test problem for BVP code (\citep{scott}). The model has a
 boundary layer at x=0.
 
 The differential equation depends on a parameter \code{a} and \code{p}:

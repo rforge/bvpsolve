@@ -88,6 +88,26 @@ sol3 <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
 ## solvable only when good initial conditions are used...
 ## =============================================================================
 
+nerve3 <- function (t,y,p)
+  list(c( 3*y[3]*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
+        (-1/3)*y[3]*(y[1] - 0.7 + 0.8*y[2]) ,
+        0,
+        0,
+        0)
+  )
+
+dnerve3 <- function (t,y,p)  {
+  df <- matrix(nr=5,nc=5,data=0)
+  
+  df[1,1] = 3.0*y[3] -3*y[3]*y[1]^2.
+  df[1,2] = 3.0*y[3]
+	df[1,3] = 3.0*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3)
+  df[2,1] = (-1.0/3)*y[3]
+	df[2,2] = 0.80* (-1.0/3)*y[3]
+  df[2,3] =(-1.0/3)*(y[1] - 0.7 + 0.8*y[2]) 
+  return(df)
+}
+
 bound <- function(i,y,p) {
  if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
  if (i ==2) return(y[1]-y[4])
@@ -106,3 +126,8 @@ Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01),
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
         func=nerve3,leftbc=3, xguess=xguess, yguess=yguess)
 plot(Sol)
+
+Sol2  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
+        guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
+        func=nerve3,jacfunc=dnerve3, leftbc=3, xguess=xguess, yguess=yguess)
+plot(Sol2)

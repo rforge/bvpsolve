@@ -32,9 +32,15 @@
   Centre for Estuarine and Marine Ecology\\
   Netherlands Institute of Ecology\\
   The Netherlands
+  \And
+  Jeff Cash\\
+  Imperial College London\\
+  South Kensington Campus\\
+  London SW7 2AZ\\
+  U.K.
 }
 
-\Plainauthor{Karline Soetaert}
+\Plainauthor{Karline Soetaert and Jeff Cash}
 
 \Abstract{
   This document implements several testproblems
@@ -51,6 +57,13 @@
   4401 NT Yerseke, Netherlands
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
   URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
+ \\
+  Jeff Cash\\
+  Imperial College London\\
+  South Kensington Campus\\
+  London SW7 2AZ, U.K.\\
+  E-mail: \email{j.cash@imperial.ac.uk}\\
+  URL: \url{http://www.ma.ic.ac.uk/\~jcash}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
