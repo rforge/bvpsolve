@@ -26,11 +26,14 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     the ODE system, or \code{NULL}.
 
     If \code{yini} is a vector, use \code{NA} for an
-    initial value which is not available. If \code{yini} has a
+    initial value which is not available. 
+    
+    If \code{yini} has a
     \code{names} attribute, the names will be used to label the output matrix.
     
     If \code{yini = NULL}, then the boundary conditions must be specified
-    via function \code{bound}.
+    via function \code{bound};
+    if not \code{NULL} then \code{yend} should also be not \code{NULL}.
   }
   \item{x }{sequence of the independent variable for which output is wanted;
     the first value of \code{x} must be the initial value (at which
@@ -65,18 +68,27 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     if \code{yend} is a vector, use \code{NA}
     for a final value which is not available.
     
+    If \code{yend} has a  \code{names} attribute, and \code{yini} does not,
+    the names will be available within the functions and 
+    used to label the output matrix.
+
     If \code{yend = NULL}, then the boundary conditions must be specified
-    via function \code{bound}.
+    via function \code{bound}; 
+    if not \code{NULL} then \code{yini} should also be not \code{NULL}.
   }
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
   }
   \item{guess }{guess for the value(s) of the unknown \emph{initial} conditions;
-    i.e. one value for each \code{NA} in \code{yini}.
+    i.e. one value for each \code{NA} in \code{yini}. Ignored if \code{xguess}
+    and \code{yguess} are given.
     
-    The length of \code{guess} should thus equal the number of \code{NA}s
+    The length of \code{guess} should equal the number of \code{NA}s
     in \code{yini}. If not provided, a value = 0 is assumed for each
     \code{NA} in \code{yini} and a warning printed.
+
+    if \code{guess} has a names attributes, the names will be 
+    available within the functions and used to label the output matrix.
   }
   \item{xguess }{Initial grid \code{x}, a vector. \code{bvptwp} requires the length
     of \code{xguess} to be at least equal to the length of \code{x}. If this
@@ -90,6 +102,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{yguess }{First guess values of \code{y}, corresponding to initial grid
     \code{xguess}; a matrix with number of rows equal to the number of
     equations, and whose number of columns equals the length of \code{xguess}.
+    
+    if the rows of \code{guess} have a names attribute, the names will be 
+    available within the functions and used to label the output matrix.
   }
   \item{jacfunc }{jacobian (optional) - either an \R-function that evaluates the
     jacobian of \code{func} at point \code{x}, or a string with the name of a
@@ -135,7 +150,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{islin }{set to \code{TRUE} if the problem is linear - this will
     speed up the simulation.
   }
-  \item{nmax }{maximal number of subintervals.
+  \item{nmax }{maximal number of subintervals during the calculation.
   }
   \item{colp }{number of points per subinterval.
   }
@@ -205,7 +220,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 
   If \code{yini} has a names attribute, it will be used to label the columns
   of the output value. If \code{yini} is not named, the solver will try to find
-  the names in \code{yend} and ultimately \code{yguess}.
+  the names in \code{yend}, \code{yguess} and ultimately \code{guess}.
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>

@@ -21,6 +21,7 @@ require(bvpSolve)
 
 # Declare global problem dependent parameters.
 eps     <- 0.01
+x       <- seq(0,1,0.01)
 
 fsub <- function (t,Y,pars,eps)
 { return(list(c(f1 = Y[2],
@@ -32,7 +33,7 @@ fsub <- function (t,Y,pars,eps)
 }
 
 # Solve the model. Simple call
-#shooting does not work
+# shooting does not work with eps this small.
 
 # bvptwp does...
 print(system.time(Sol <- bvptwp(atol=1e-5,x=x,func=fsub,guess= c(2,0,0),

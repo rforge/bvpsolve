@@ -9,6 +9,7 @@
 ## The initial condition y'(0) is a function of y(0)
 ## Can be solved with bvpshoot
 ## =============================================================================
+require(bvpSolve)
 
 # Not so simple to solve with bvpshoot
 Reactor<-function(x,y,parms)
@@ -27,7 +28,7 @@ sol<-bvpshoot(func=Reactor, yend=c(y=NA,dy=0), yini=yini,
 plot(sol)
 
 
-# Easier with bvptwp
+# Easier with boundary function...
 
 bound <- function(i,y,p) {
   if (i ==1) return(y[2]-Pe*(y[1]-1))
@@ -38,3 +39,6 @@ Sol<-bvptwp(func=Reactor,x=seq(0,1,by=0.01),leftbc=1,
             bound=bound,guess=c(y=1,dy=1))
 plot(Sol)
 
+Sol2<-bvpshoot(func=Reactor,x=seq(0,1,by=0.01),leftbc=1,
+            bound=bound,guess=c(y=1,dy=1))
+plot(Sol2)

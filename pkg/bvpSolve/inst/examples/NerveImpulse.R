@@ -124,10 +124,17 @@ yguess[2,] <- cos(2*pi*xguess)
 
 Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-        func=nerve3,leftbc=3, xguess=xguess, yguess=yguess)
+        func=nerve3,
+        leftbc=3, xguess=xguess, yguess=yguess)
 plot(Sol)
 
 Sol2  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-        func=nerve3,jacfunc=dnerve3, leftbc=3, xguess=xguess, yguess=yguess)
+        func=nerve3,jacfunc=dnerve3, 
+        leftbc=3, xguess=xguess, yguess=yguess)
 plot(Sol2)
+
+Sol3  <- bvpshoot(bound=bound, x=seq(0,1,by=0.01), 
+        guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
+        func=nerve3,jacfunc=dnerve3, leftbc=3)
+plot(Sol3)

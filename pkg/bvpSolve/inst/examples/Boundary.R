@@ -85,5 +85,9 @@ boundjac <- function (i,y,pars)
 
 
 print(system.time(Sol <- as.data.frame(bvptwp(x=x,leftbc=1,func=fun, guess=1,
-        bound=boundfun,jacbound=boundjac,jacfunc=jacfun), verbose=TRUE)))
+        bound=boundfun,jacbound=boundjac,jacfunc=jacfun, verbose=TRUE))))
 lines(Sol[,1],Sol[,2],type="l",col="blue")
+
+print(system.time(Sol2 <- as.data.frame(bvpshoot(x=x,leftbc=1,func=fun, ncomp=2,
+        bound=boundfun,jacbound=boundjac,jacfunc=jacfun), verbose=TRUE)))
+lines(Sol2[,1],Sol2[,2],type="l",col="blue")

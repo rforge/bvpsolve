@@ -89,3 +89,8 @@ Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
               guess=1,atol=1e-10)
 ))
 
+# same using bvpshoot - not so quick
+print(system.time(
+Sol2 <- bvpshoot(yini= NULL, x=x, func=musn, bound=bound,
+       leftbc = 4,  guess=c(u=1,v=1,w=1,z=-10,y=0),atol=1e-10)
+)) 
