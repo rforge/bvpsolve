@@ -87,3 +87,15 @@ Soltwp4 <- bvptwp(func=fluid, x=times, parms=NULL, R=R,
 ))
                     
 lines(Soltwp4[,"x"], Soltwp4[,"f1"], col="darkgreen", lwd =2)
+
+R      <- 50000
+P      <- 0.7*R
+times  <- seq(0,1,by=0.01)
+yini   <- c(f=0,f1=0,f2=NA,h=0,h1=NA,O=0,O1=NA,A=NA)
+yend   <- c(1,0,NA,0,NA,1,NA,NA)
+
+print(system.time(
+Soltwp5 <- bvptwp(func=fluid, x=times, parms=NULL, R=R,
+                 yini=c(f=0,f1=0,f2=NA,h=0,h1=NA,O=0,O1=NA,A=NA),
+                 cond=TRUE,   yend=c(1,0,NA,0,NA,1,NA,NA))
+))

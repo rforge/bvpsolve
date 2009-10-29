@@ -84,6 +84,12 @@ sol  <- bvptwp(yini=init,yend=c(NA,0, NA),x=x,
 
 plot(sol, type="l",lwd=2)
 
+
+Sol <- bvptwp (yini= init, yend = c(NA,0,NA),
+        x=x, func=mathieu2, xguess = xguess,
+        yguess = matrix(nr=3,rep(15,9)) )
+plot(Sol, type="l",lwd=2)
+
 print(system.time(
 sol2 <- bvpshoot(yini=init,yend=c(NA,0, NA),x=x,
         func=mathieu2, jacfunc =jac, guess=c(15))
