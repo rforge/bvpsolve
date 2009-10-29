@@ -1,26 +1,27 @@
 #include <time.h>
 #include <string.h>
-#include "twpbvp.h"
+#include "twpbvpc.h"
 
 /* definition of the calls to the fortran functions -
       subroutine twpbvp(ncomp, nlbc, aleft, aright,
      *       nfxpnt, fixpnt, ntol, ltol, tol,
      *       linear, givmsh, giveu, nmsh,
-     *       xx, nudim, u, nmax,
-     *       lwrkfl, wrk, lwrkin, iwrk,
+     *       nxxdim, xx, nudim, u, nmax,
+     *       lwrkfl, wrk, lwrkin, iwrk,  precis,
      *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp,full)
 */
 
-void F77_NAME(twpbvp)(int*, int*, double *, double *,
+void F77_NAME(twpbvpc)(int*, int*, double *, double *,
          int *, double *, int *, int *, double *,
-         int *, int *, int *, int *,
+         int *, int *, int *, int *, int *,
          double *, int *, double *, int *,
          int *, double *, int*, int*, double *,
          void (*)(int *, double *, double *, double *, double *, int *), /* fsub(n,x,u,f,rp,ip)   */
 		     void (*)(int *, double *, double *, double *, double *, int *), /* dfsub(n,x,u,df,rp,ip) */
 			   void (*)(int *, int *, double *, double *, double *, int *),    /* gsub(i,n,u,g,rp,ip)   */
 		     void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
-         double *, int *, int *, int *);
+         double *, double *, double *, double *, double *, 
+         double *, int *, int *, int *, int *, int *, int *, int *);
 
 /* interface between fortran function calls and R functions
    Fortran code calls twp_derivs(m, x, y, ydot)
@@ -105,7 +106,7 @@ mesh points, initial value of continuation parameter */
 SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 		SEXP Tol, SEXP Linear, SEXP Full, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
 		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
-    SEXP Rpar, SEXP Ipar, SEXP func, SEXP jacfunc, SEXP boundfunc,
+    SEXP Rpar, SEXP Ipar, SEXP UseC, SEXP func, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP Initfunc, SEXP Parms, SEXP flist, SEXP rho)
 
 {
@@ -118,8 +119,10 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis;
+  double ckappa1, gamma1, sigma, ckappa, ckappa2; 
+  int  liseries, *iseries, indnms, nxdim;
   int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
-  int full;
+  int full, useC;
   
   deriv_func    *derivs;
   jac_func      *jac;
@@ -132,7 +135,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
 /*                      #### initialisation ####                              */    
   init_N_Protect();
-
+  useC   = INTEGER(UseC)[0];     /* conditioning or not */
   ncomp  = INTEGER(Ncomp)[0];    /* number of equations */
   nlbc   = INTEGER(Nlbc)[0];     /* number of left boundary conditions */
   nmax   = INTEGER(Nmax)[0];     /* max number of mesh points */
@@ -164,7 +167,8 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   nfixpnt =  LENGTH(Fixpnt);
   fixpnt   =(double *) R_alloc(nfixpnt, sizeof(double));
    for (j = 0; j < nfixpnt;j++) fixpnt[j] = REAL(Fixpnt)[j];
-
+// check this:
+  nxdim = nmax;
   xx   =(double *) R_alloc(nmax, sizeof(double));
    for (j = 0; j < nmesh; j++) xx[j] = REAL(Xguess)[j];
    for (j = nmesh; j < nmax; j++) xx[j] = 0;
@@ -175,7 +179,10 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
    for (j = nmesh*ncomp; j < nmax*ncomp; j++) u[j] = 0;
 
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
+     for (j = 0; j < lwrkfl; j++) wrk[j] = 0.;
+
   iwrk= (int *)    R_alloc(lwrkin, sizeof(int));
+     for (j = 0; j < lwrkin; j++) iwrk[j] = 0;
 
   precis = (double *) R_alloc(3,sizeof(double));
   precis[0] = DBL_MIN;
@@ -230,17 +237,31 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     }
 
 /* Call the fortran function -
-      subroutine twpbvp(ncomp, nlbc, aleft, aright,
+      subroutine twpbvpc(ncomp, nlbc, aleft, aright,
      *       nfxpnt, fixpnt, ntol, ltol, tol,
      *       linear, givmsh, giveu, nmsh,
-     *       xx, nudim, u, nmax,
-     *       lwrkfl, wrk, lwrkin, iwrk,
-     *       fsub, dfsub, gsub, dgsub, iflbvp,verbose)
+     *       nxxdim, xx, nudim, u, nmax,
+     *       lwrkfl, wrk, lwrkin, iwrk, precis,
+     *       fsub, dfsub, gsub, dgsub,
+     *       ckappa1,gamma1,sigma,ckappa,
+     *       ckappa2,rpar,ipar,iflbvp,liseries,iseries,indnms,
+     *       full)
+
 */
-	  F77_CALL(twpbvp) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
-        &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, xx, &ncomp,
-        u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
-        derivs,jac,bound,jacbound, rpar, ipar,&iflag,&full);
+// CHECK THIS!
+    liseries = nmax;
+    iseries = (int *)    R_alloc(liseries, sizeof(int));
+    
+	  F77_CALL(twpbvpc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
+        &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, &nxdim, xx,
+        &ncomp, u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
+        derivs, jac, bound, jacbound, 
+        &ckappa1, &gamma1, &sigma, &ckappa, &ckappa2, 
+        rpar, ipar,
+        &iflag, &liseries, iseries, &indnms, &full, &useC);
+
+//     error("Till here.\n");
+
 /*
 C....   iflag - The Mode Of Return From twpbvp
 C....         =  0  For Normal Return
@@ -248,7 +269,7 @@ C....         =  1  If The Expected No. Of Subintervals Exceeds Storage
 C....               Specifications.
 C....         = -1  If There Is An Input Data Error.
 */
-	  if (iflag == -1)
+	  if (iflag == 4)
      {
 	   unprotect_all();
      error("One of the input parameters is invalid.\n");
@@ -256,7 +277,18 @@ C....         = -1  If There Is An Input Data Error.
     else if (iflag == 1)
 	{
 	  unprotect_all();
-	  error("The Expected No. Of Subintervals Exceeds Storage Specifications.\n");
+	  error("The Expected No. Of mesh points Exceeds Storage Specifications.\n");
+	}
+
+    else if (iflag == 2)
+	{
+	  unprotect_all();
+	  error("The Expected No. Of meshes Exceeds Storage Specifications. Increase liseries\n");
+	}
+    else if (iflag == 3)
+	{
+	  unprotect_all();
+	  error("Terminated: ill conditioned problem.\n");
 	}
 
   else

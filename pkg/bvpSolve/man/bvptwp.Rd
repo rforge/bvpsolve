@@ -8,16 +8,17 @@
 \description{
   Solves a boundary value problem of a system of ordinary differential
   equations. This is an implementation of the fortran
-  code twpbvp, based on mono-implicit Runge-Kutta formulae
-  of orders 4, 6 and 8 in a deferred correction framework
+  code twpbvpc, based on mono-implicit Runge-Kutta formulae
+  of orders 4, 6 and 8 in a deferred correction framework and 
+  that uses conditioning in the mesh selection.
 
-  written by J.R. Cash and M.H. Wright.
+  written by J.R. Cash, F. Mazzia and M.H. Wright.
 }
 
 \usage{
 bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
-  leftbc=NULL, islin=FALSE, nmax=1000, colp= NULL, atol=1e-8,
+  leftbc=NULL, islin=FALSE, nmax=1000, atol=1e-8, cond = FALSE,
   allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
   forcings=NULL, initforc = NULL, fcontrol=NULL, verbose=FALSE, ...)
 }
@@ -152,9 +153,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   }
   \item{nmax }{maximal number of subintervals during the calculation.
   }
-  \item{colp }{number of points per subinterval.
-  }
   \item{atol }{error tolerance, a scalar.
+  }
+  \item{cond }{if \code{TRUE}, uses conditioning in the mesh selection
   }
   \item{allpoints }{sometimes the solver estimates the solution in a number
     of extra points, and by default the solutions at these extra points will
@@ -226,10 +227,12 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
   
   Jeff Cash <j.cash@imperial.ac.uk>
+  
+  Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \details{
-  This is an implementation of the method \emph{twpbvp}, written by
-  Cash and Wright, to solve two-point boundary value problems of
+  This is an implementation of the method \emph{twpbvpC}, written by
+  Cash, Mazzia and Wright, to solve two-point boundary value problems of
   ordinary differential equations.
 
   A boundary value problem does not have all initial values of
@@ -314,6 +317,10 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   J.R. Cash and M.H. Wright, A deferred correction method for nonlinear
   two-point boundary value problems: implementation and numerical evaluation,
   SIAM J. Sci. Stat. Comput., 12 (1991) 971 989.
+
+  Cash, J. R. and F. Mazzia, A new mesh selection algorithm, based on 
+   conditioning, for two-point boundary value codes. J. Comput. Appl. Math. 184  
+   (2005), no. 2, 362--381.
 
   \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }

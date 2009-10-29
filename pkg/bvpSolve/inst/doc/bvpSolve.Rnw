@@ -30,18 +30,22 @@
 
 
 \author{Karline Soetaert\\
-  Centre for Estuarine and Marine Ecology\\
+  CEME\\
   Netherlands Institute of Ecology\\
   The Netherlands
   \And
   Jeff Cash\\
+  Department of mathematics\\
   Imperial College London\\
-  South Kensington Campus\\
-  London SW7 2AZ\\
   U.K.
+  \And
+  Francesca Mazzia\\
+  Dipartimento di Matematica \\
+  Universita' di Bari \\
+  Italy   
 }
 
-\Plainauthor{Karline Soetaert and Jeff Cash}
+\Plainauthor{Karline Soetaert, Jeff Cash and Francesca Mazzia}
 
 \Abstract{\R package \bvp \citep{bvpSolve} is designed for the numerical
   solution of boundary value problems (BVP) for ordinary differential
@@ -54,12 +58,21 @@
       packages \pkg{deSolve} \citep{deSolve} and the root-finding solver
       from package \pkg{rootSolve} \citep{rootSolve}.
     \item function \code{bvptwp}, the mono-implicit Runge-Kutta (MIRK)
-      method with deferred corrections, code TWPBVP
-      \citep{Cash91}, for solving two-point  boundary value problems
+      method with deferred corrections, using conditioning in the mesh 
+      selection,  based on FORTRAN code TWPBVPC
+      \citep{Cash91, CashMazz}, for solving two-point  boundary value problems
   \end{itemize}
 
   The \R functions have an interface which is similar to the interface of
-  the solvers in package \ds
+  the solvers in package \ds      \\
+  
+  The default input to the solvers is very simple, requiring specification 
+  of only one function, that calculates the derivatives. 
+
+  However, in order to speed-up the simulations, and to increase the number of 
+  problems that can be solved, it is also possible to specify the
+  boundary conditions by means of a function and provide analytical solutions 
+  for the derivative and boundary gradients.
 }
 
 %% The address of (at least) one author should be given
@@ -68,16 +81,25 @@
   Karline Soetaert\\
   Centre for Estuarine and Marine Ecology (CEME)\\
   Netherlands Institute of Ecology (NIOO)\\
-  4401 NT Yerseke, Netherlands\\
+  4401 NT Yerseke, Netherlands \\
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
   URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
- \\
+   \\
   Jeff Cash\\
   Imperial College London\\
   South Kensington Campus\\
   London SW7 2AZ, U.K.\\
   E-mail: \email{j.cash@imperial.ac.uk}\\
-  URL: \url{http://www.ma.ic.ac.uk/\~jcash}
+  URL: \url{http://www.ma.ic.ac.uk/\~jcash}\\
+  \\
+  Francesca Mazzia
+  Dipartimento di Matematica \\
+  Universita' di Bari        \\
+  Via Orabona 4,             \\
+  70125 BARI                 \\
+  Italy 
+  E-mail: \email{mazzia@dm.uniba.it}\\
+  URL: \url{http://pitagora.dm.uniba.it/\~mazzia}\\
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
@@ -100,6 +122,7 @@ options(width=70)
 
 \section{Introduction}
 
+\subsection{Boundary value problems}
   \pkg{bvpSolve} numerically solves boundary value problems (BVP) of
   ordinary differential equations (ODE), which for one (second-order) ODE
   can be written as:
@@ -118,6 +141,7 @@ options(width=70)
   defined at the end of the interval over which the ODE is specified (i.e.
   at \code{a} and/or \code{b}).
 
+\subsection{package bvpSolve}
   \bvp can only solve sets of first-order ODEs.
   Thus, higher-order ODEs need to be rewritten as a set of first-order systems.
 
@@ -139,33 +163,39 @@ options(width=70)
       of nonlinear algebraic equations; it makes use of solvers from
       packages \ds, and \rs.
     \item \code{bvptwp}, the mono-implicit Runge-Kutta (MIRK)
-      method with deferred corrections, based on the FORTRAN code TWPBVP
-      \citep{Cash91}.
+      method with deferred corrections, using conditioning in the mesh 
+      selection, based on FORTRAN code TWPBVPC
+      \citep{Cash91, CashMazz}.
   \end{itemize}
   
   An S3 method for plotting is included. This will plot all variables in 
-  separate figures
+  separate figures.
 
+\subsection{Simple and more complex input}
+  When using \code{bvptwp}, the problem can be specified in several ways. 
+  
+  \begin{itemize}
+  \item
+  By default, the partial derivatives of the differential equations and of 
+  the boundary conditions are approximated using \emph{finite differences} by the
+  solver. Then, the user need not be concerned with supplying functions
+  that estimate these analytical partial derivatives. 
+  This makes the definition of the problem very simple; only one
+  function, estimating the derivatives needs to be specified.
+  However, many problems cannot be specified this way; it is also the slowest
+  way.
+  \item
   The \code{bvptwp} function is much more efficient if
   \emph{analytical} partial derivatives of the differential 
-  equations and of boundary conditions are given.  However, input
-  is much simpler if these are approximated by \emph{finite differences} by the
-  solver. Then, the user need not be concerned with supplying functions
-  that estimate these analytical partial derivatives.
-
-  Therefore, by default \bvp function \code{bvptwp} numerically
-  approximates the jacobians, and requires a simple input of the boundary
-  conditions. This makes the definition of the problem very simple; only one
-  function, estimating the derivatives needs to be specified.
-
-  However, in order to speed-up the simulations, it is possible to provide 
-  analytical functions.
-
+  equations and of boundary conditions are given.  
+  \item
   Even more simulation time will be gained if the problem is specified in
-  compiled code (\proglang{FORTRAN, C}). In this case, \R is used to trigger
+  \emph{compiled code} (\proglang{FORTRAN, C}). In this case, \R is used to trigger
   the solver \code{bvptwp}, and for post-processing (graphics), while
   solving the BVP itself entirely takes place in compiled code.
+  \end {itemize}
 
+\subsection{Examples in this vignette}
   In this package vignette it is shown how to formulate and solve BVPs. We
   use well-known test cases as examples.
   \begin{itemize}
@@ -226,8 +256,7 @@ options(width=70)
   \end{eqnarray*}
   This is implemented as:
 <<>>=
-fun<- function(x,y,pars)
-{
+fun<- function(x,y,pars) {
  list(c(y[2],
    1/ks*(-x*y[2]+y[1]-(1+ks*pi*pi)*cos(pi*x)-pi*x*sin(pi*x)))
      )
@@ -281,19 +310,20 @@ legend("topright",c("bvptwp", "bvpshoot"),
 For very small values of the parameter  $\xi$, \code{bvpshoot} cannot solve 
 the problem anymore, due to the presence of a zone of rapid change near x=0.
 
-However, it can still easily be solved with the MIRK method:
+However, it can still be solved with the MIRK method, provided that good 
+initial guesses are provided:
 <<>>=
-ks <-0.0001
+ks <-0.0005
 
 print(system.time(
-sol2  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=seq(-1,1,by=0.01),
-           func=fun, guess=0)
+sol3  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=seq(-1,1,by=0.01),
+           func=fun, xguess=sol2[,1], yguess=t(sol2[,-1]))
 ))
 @
 Here we produce the output with the S3 plot method, which depicts both 
 dependent variables:
 <<label=pr7b,include=FALSE>>=
-plot(sol2,type="l", lwd=2)
+plot(sol3,type="l", lwd=2,col="red")
 
 @
 
@@ -338,8 +368,8 @@ plot(sol2,type="l", lwd=2)
 
   Its implementation in R is:
 <<>>=
-fsub <- function (t,Y,pars)
-{ return(list(c(f1 = Y[2],
+fsub <- function (t,Y,pars)  { 
+  return(list(c(f1 = Y[2],
                 f2 = (Y[1]*Y[4] - Y[3]*Y[2])/eps,
                 f3 = Y[4],
                 f4 = Y[5],
@@ -360,7 +390,7 @@ Soltwp <- bvptwp(x=x,func=fsub,guess= c(2,0,0),
 @
 where the reported system time is in seconds
 
-A pairs plot produces a pretty picture.
+A \code{pairs} plot produces a pretty picture.
 <<label=swirl,include=FALSE>>=
 pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 @
@@ -379,17 +409,21 @@ pairs(Soltwp, main="swirling flow III, eps=0.01", col="blue")
 
 Using the same input as above, the problem cannot be solved with too 
 small values of eps (but see next section):
-<<>>=
-eps <- 1e-9
-Soltwp2 <- NA
-Soltwp2 <- try(bvptwp(x=x,func=fsub,guess= c(2,0,0),
-                      yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
-                      yend=c(1,NA,0,0,NA,NA)),
-    silent = TRUE)
-
-cat(Soltwp2)
-
-@
+\begin{Schunk}
+\begin{Sinput}
+> eps <- 1e-9
+> Soltwp2 <- NA
+> Soltwp2 <- try(bvptwp(x=x,func=fsub,guess= c(2,0,0),
++                       yini=c(y1=-1,y2=NA,y3=0,y4=0,y5=NA,y6=NA),
++                       yend=c(1,NA,0,0,NA,NA)),
++     silent = TRUE)
+> cat(Soltwp2)
+\end{Sinput}
+\begin{Soutput}
+Error in bvptwp(x = x, func = fsub, guess = c(2, 0, 0), yini = c(y1 = -1,  : 
+  The Expected No. Of mesh points Exceeds Storage Specifications.
+\end{Soutput}
+\end{Schunk}
 
 \clearpage
 \section{Solving a boundary value problem using continuation}
@@ -456,16 +490,14 @@ of \code{y}.
 
 Implementation of the ODE function is simple:
 <<>>=
-musn <- function(x,Y,pars)
-{
-  with (as.list(Y),
-  {
-   du=0.5*u*(w-u)/v
-   dv=-0.5*(w-u)
-   dw=(0.9-1000*(w-y)-0.5*w*(w-u))/z
-   dz=0.5*(w-u)
-   dy=-100*(y-w)
-   return(list(c(du,dv,dw,dz,dy)))
+musn <- function(x,Y,pars) {
+  with (as.list(Y),  {
+    du=0.5*u*(w-u)/v
+    dv=-0.5*(w-u)
+    dw=(0.9-1000*(w-y)-0.5*w*(w-u))/z
+    dz=0.5*(w-u)
+    dy=-100*(y-w)
+    return(list(c(du,dv,dw,dz,dy)))
   })
 }
 @
@@ -757,7 +789,7 @@ Sol  <- bvptwp(func=nerve3, bound=bound, x=seq(0,1,by=0.01),
         leftbc=3, xguess=xguess, yguess=yguess)
 @
 <<label=nerve,include=FALSE>>=
-plot(Sol, type="l", lwd=2)
+plot(Sol, type="l", lwd=2, col="darkblue")
 @
 \setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}

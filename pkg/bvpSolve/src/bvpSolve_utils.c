@@ -2,7 +2,7 @@
 /* Patterned on code odesolve_utils.c from package odesolve */
 #include <R.h>
 #include <Rdefines.h>
-#include "twpbvp.h"
+#include "twpbvpc.h"
 
 /* some functions for keeping track of how many SEXPs 
  * 	are PROTECTed, and UNPROTECTing them in the case of a fortran stop.

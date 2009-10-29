@@ -29,18 +29,22 @@
 
 
 \author{Karline Soetaert\\
-  Centre for Estuarine and Marine Ecology\\
+  CEME\\
   Netherlands Institute of Ecology\\
   The Netherlands
   \And
   Jeff Cash\\
+  Department of mathematics\\
   Imperial College London\\
-  South Kensington Campus\\
-  London SW7 2AZ\\
   U.K.
+  \And
+  Francesca Mazzia\\
+  Dipartimento di Matematica \\
+  Universita' di Bari \\
+  Italy   
 }
 
-\Plainauthor{Karline Soetaert and Jeff Cash}
+\Plainauthor{Karline Soetaert, Jeff Cash and Francesca Mazzia}
 
 \Abstract{
   This document implements several testproblems
@@ -57,13 +61,22 @@
   4401 NT Yerseke, Netherlands \\
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
   URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
- \\
+   \\
   Jeff Cash\\
   Imperial College London\\
   South Kensington Campus\\
   London SW7 2AZ, U.K.\\
   E-mail: \email{j.cash@imperial.ac.uk}\\
-  URL: \url{http://www.ma.ic.ac.uk/\~jcash}
+  URL: \url{http://www.ma.ic.ac.uk/\~jcash}\\
+  \\
+  Francesca Mazzia
+  Dipartimento di Matematica \\
+  Universita' di Bari        \\
+  Via Orabona 4,             \\
+  70125 Bari                 \\
+  Italy 
+  E-mail: \email{mazzia@dm.uniba.it}\\
+  URL: \url{http://pitagora.dm.uniba.it/\~mazzia}\\
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
@@ -86,8 +99,8 @@ options(width=70)
 \section{introduction}
 
   \pkg{bvpSolve} numerically solves boundary value problems (BVP) of
-  first-order ordinary differential equations (ODE), which for one ODE
-  can be written as:
+  first-order ordinary differential equations (ODE), which for one 
+  (second-order) ODE can be written as:
 
   \begin{eqnarray*}
     \frac{d^2y}{dx^2}=f(x,y,\frac{dy}{dx}) \\
@@ -462,9 +475,11 @@ twp  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7, guess=0)
 xi <- 0.001
 twp2  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7, guess=0)
 @
+For even smaller $\xi$, we need to provide good initial guesses:
 <<>>=
-xi <- 0.0001
-twp3  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7, guess=0)
+xi <- 0.0005
+twp3  <- bvptwp(yini=c(-1,NA),yend=c(1,NA),x=x,func=prob7,xguess=twp2[,1],
+  yguess = t(twp2[,-1]))
 
 @
 <<label=prob7,include=FALSE>>=

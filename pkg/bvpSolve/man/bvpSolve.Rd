@@ -10,7 +10,7 @@
   ordinary differential equations (ODE)
 
   The functions provide (1) an interface to the FORTRAN code
-  twpbvp written by J.R. Cash and M.H. Wright,
+  twpbvpC written by J.R. Cash, F. Mazzia and M.H. Wright,
   and (2) also implements a shooting method.
 }
 \details{
@@ -44,16 +44,24 @@
   Karline Soetaert (Maintainer)
   
   Jeff Cash
+  
+  Francesca Mazzia
 }
 \references{
   J.R. Cash and M.H. Wright, (1991) A deferred correction method for nonlinear
   two-point boundary value problems: implementation and numerical evaluation,
   SIAM J. Sci. Stat. Comput. 12,  971-989.
+
+  Cash, J. R. and F. Mazzia, (2005) A new mesh selection algorithm, based on 
+   conditioning, for two-point boundary value codes. J. Comput. Appl. Math. 184  
+   no. 2, 362--381.
+
+  \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
 \seealso{
   \code{\link{bvptwp}}, a deferred correction method based on mono-
-    implicit Runge-Kutta formulas and adaptive mesh refinement, to solve
-    two-point boundary value problems  (Cash and Wright, 1991).
+    implicit Runge-Kutta formulas and adaptive mesh refinement, based on 
+    conditioning to solve two-point boundary value problems (Cash and Mazzia, 2005).
     
   \code{\link{bvpshoot}}, a shooting method, using solvers from packages
     deSolve and rootSolve.

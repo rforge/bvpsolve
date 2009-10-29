@@ -6,7 +6,7 @@
 
 bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
      xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
-     leftbc=NULL, islin=FALSE, nmax=1000, colp=NULL, atol=1e-8,
+     leftbc=NULL, islin=FALSE, nmax=1000, atol=1e-8, cond = FALSE,
      allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
      forcings=NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE, ...)   {
 
@@ -52,6 +52,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 ##---------------------
 
   if (! is.null(yini))  {    # yini is specified
+    ncomp  <- length(yini) 
     y       <- yini
     Y       <- y
     inix    <- which (is.na(y))
@@ -59,7 +60,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     leftbc  <- length(which (!is.na(y)))   # NA when initial condition not known
 
     if (is.null(guess)&& ! is.null(yguess))
-      guess <- yguess[1,inix]
+      guess <- yguess[inix,1]
 
     if (nas > 0 & is.null(guess))  {
       warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
@@ -161,10 +162,14 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       }
 
 ## function evaluation
+    if (is.null(y) & ! is.null(ncomp)) y<-runif(ncomp) 
     tmp <- eval(Func(x[1], y), rho)
     if (!is.list(tmp))
       stop("Model function must return a list\n")
-    ncomp  <- length(tmp[[1]])    # number of differential equations
+   if (! is.null(ncomp)  )  {
+    if (length(tmp[[1]])!= length(y))
+      stop (" 'func' should return ",paste(ncomp)," elements")
+  } else ncomp  <- length(tmp[[1]])    # number of differential equations
 
 ## in case jacobian function is not defined...
     if ( is.null(jacfunc)) {
@@ -257,9 +262,9 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     } else  Yguess <- yguess # ncomp,nmesh
     if (length(Yguess) != nmesh*ncomp) stop ("xguess and yguess not compatible")
   }
-
-  lwrkfl <- nmax *(4*ncomp*ncomp+12*ncomp+3) + 5 *(ncomp*ncomp)-2*ncomp-9*ncomp
-  lwrkin <- nmax*(ncomp+2)+ncomp
+  ntol <- ncomp
+  lwrkfl <- nmax *(6*ncomp*ncomp+22*ncomp+3) + 6 *(ncomp*ncomp)+22*ncomp+2*ntol
+  lwrkin <- nmax*(2*ncomp+3)+2*ncomp
   if (length(atol) ==1)
     atol <- rep(atol,len=ncomp)
   else  if (length(atol) != ncomp)
@@ -278,7 +283,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
             as.integer(givmesh),as.integer(givu),as.integer(nmesh),
             as.integer(nmax),as.integer(lwrkfl),as.integer(lwrkin),
             as.double(Xguess), as.double(Yguess),
-            as.double(Rpar), as.integer(Ipar),
+            as.double(Rpar), as.integer(Ipar), as.integer(cond),
             Func, JacFunc, Bound, JacBound, ModelInit, initpar,
             flist, rho, PACKAGE="bvpSolve")
   nn <- attr(out,"istate")
