@@ -29,21 +29,27 @@ parms <- c(
 
 yini <- c(y=NA, dy=0)
 yend <- c(y=1, dy=NA)
+x    <- seq(0,1,by=0.05)
 
-# three solutions, found with different initial guesses
+## =============================================================================
+## three solutions, found with different initial guesses
+## =============================================================================
 xguess <- c(0,1)
 yguess <- matrix(data=1, nr=2,nc=2)
 
-Sol <- bvptwp(func=catalyst, x=seq(0,1,by=0.05),
-    yini=yini, yend=yend, parms = parms, xguess=xguess, yguess=yguess)
+Sol <- bvptwp(func=catalyst, x=x,
+              yini=yini, yend=yend, 
+              parms = parms, xguess=xguess, yguess=yguess)
 plot(Sol, which="y", type="l", ylim = c(0,1))
 
 yguess <- matrix(data=0.5, nr=2,nc=2)
-Sol2 <- bvptwp(func=catalyst, x=seq(0,1,by=0.05),
-    yini=yini, yend=yend, parms = parms, xguess=xguess, yguess=yguess)
+Sol2 <- bvptwp(func=catalyst, x=x,
+               yini=yini, yend=yend, 
+               parms = parms, xguess=xguess, yguess=yguess)
 lines(Sol2[,c("x","y")])
 
 yguess <- matrix(data=0.0, nr=2,nc=2)
-Sol3 <- bvptwp(func=catalyst, x=seq(0,1,by=0.05),
-    yini=yini, yend=yend, parms = parms, xguess=xguess, yguess=yguess)
+Sol3 <- bvptwp(func=catalyst, x=x,
+               yini=yini, yend=yend, 
+               parms = parms, xguess=xguess, yguess=yguess)
 lines(Sol3[,c("x","y")])

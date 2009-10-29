@@ -20,8 +20,10 @@
 require(bvpSolve)
 
 # Declare global problem dependent parameters.
-eps     <- 0.01
 x       <- seq(0,1,0.01)
+yini <- c(-1,NA,0,0,NA,NA)
+yend <- c(1 ,NA,0,0,NA,NA)
+
 
 fsub <- function (t,Y,pars,eps)
 { return(list(c(f1 = Y[2],
@@ -36,36 +38,32 @@ fsub <- function (t,Y,pars,eps)
 # shooting does not work with eps this small.
 
 # bvptwp does...
-print(system.time(Sol <- bvptwp(atol=1e-5,x=x,func=fsub,guess= c(2,0,0),
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+print(system.time(Sol <- bvptwp(x=x, func=fsub, guess= c(2,0,0),
+                  yini = yini, yend = yend, eps=0.01)))
 
 pairs(Sol,col="blue",lty=2)
 
 # For successively smaller values of eps:
-eps     <- 0.001
-print(system.time(Sol2 <- bvptwp(atol=1e-5,
-                  xguess=Sol[,1],yguess=t(Sol[,2:7]),x=x,func=fsub,
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+print(system.time(Sol2 <- bvptwp(x=x, func=fsub, 
+                  xguess=Sol[,1], yguess=t(Sol[,-1]),
+                  yini = yini, yend = yend, eps=0.001)))
 pairs(Sol2,col="red",lty=2)
 
 # For successively smaller values of eps:
-eps     <- 0.0001
-print(system.time(Sol3 <- bvptwp(atol=1e-5,
-                  xguess=Sol2[,1],yguess=t(Sol2[,2:7]),x=x,func=fsub,
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+print(system.time(Sol3 <- bvptwp(x=x, func=fsub, 
+                  xguess=Sol2[,1], yguess=t(Sol2[,-1]),
+                  yini = yini, yend = yend, eps=0.0001)))
 pairs(Sol3,col="darkgreen",lty=2)
 
 
 # For successively smaller values of eps:
-eps     <- 5e-5
-print(system.time(Sol4 <- bvptwp(atol=1e-5,
-                  xguess=Sol3[,1],yguess=t(Sol3[,2:7]),x=x,func=fsub,
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
+print(system.time(Sol4 <- bvptwp(x=x, func=fsub, 
+                  xguess=Sol3[,1],yguess=t(Sol3[,-1]),
+                  yini = yini, yend = yend, eps=5e-5)))
 pairs(Sol4,col="orange",lty=2)
 
-
-
-eps     <- 1e-6
-print(system.time(Sol4 <- bvptwp(atol=1e-5, cond=TRUE, x=x,func=fsub,
-                  yini=c(-1,NA,0,0,NA,NA), yend=c(1,NA,0,0,NA,NA),eps=eps)))
-pairs(Sol4,col="orange",lty=2)
+# This one cannot be solved with conditioning, but it can without!
+print(system.time(Sol5 <- bvptwp(atol=1e-5, x=x, func=fsub,  #cond=TRUE, 
+                  xguess=Sol4[,1], yguess=t(Sol4[,-1]),
+                  yini = yini, yend = yend, eps=1e-6 )))
+pairs(Sol5,col="yellow2",lty=2)

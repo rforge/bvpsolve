@@ -12,8 +12,7 @@
 require(bvpSolve)
 
 # Not so simple to solve with bvpshoot
-Reactor<-function(x,y,parms)
-{
+Reactor<-function(x,y,parms)  {
   list(c(y[2],Pe*(y[2]+R*(y[1]^n))))
 }
 

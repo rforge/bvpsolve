@@ -6,14 +6,13 @@
 ## Englewood Cliffs, NJ, USA, 1988.
 ## =============================================================================
 
-###### freezes R when using bvptwp ######
-
 require(bvpSolve)
 
+## =============================================================================
 ## Simple implementation, solved with bvpshoot
+## =============================================================================
 
-measel2<-function(t,y,pars,vv)
-{
+measel2<-function(t,y,pars,vv)   {
   bet<- 1575*(1+cos(2*pi*t))
   dy1<- mu-bet*y[1]*y[3]
   dy2<- bet*y[1]*y[3]-y[2]/lam
@@ -34,11 +33,11 @@ Sol <- bvpshoot(fun=measel2, yini=c(y1=NA,y2=NA,y3=NA), yend=res,
 
 plot(Sol)
 
+## =============================================================================
+## Complex implementation
+## =============================================================================
 
-###### Complex implementation
-
-measel<-function(t,y,pars,vv)
-{
+measel<-function(t,y,pars,vv)  {
   bet<- 1575*(1+cos(2*pi*t))
   dy1<- mu-bet*y[1]*y[3]
   dy2<- bet*y[1]*y[3]-y[2]/lam
@@ -84,11 +83,11 @@ dbound <- function(i, y, pars,vv) {
   if ( i == 3 | i == 6) return(c(0,0,1,0,0,-1))
   }
 
-#Sol <- bvptwp(fun=measel, bound=bound, guess=guess,x=(0:100)/100,leftbc=3,vv=v)
 print(system.time(
 sola <- bvpshoot(fun=measel, bound=bound, 
     x=(0:100)/100,leftbc=3,vv=v, ncomp=6)
 ))
+
 sol <- bvptwp(fun=measel, bound=bound, xguess=sola[,1], yguess=t(sola[,-1]),
     x=(0:100)/100,leftbc=3,vv=v, ncomp=6, nmax=100000, atol=1e-4)
 

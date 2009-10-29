@@ -22,6 +22,10 @@
 
 require(bvpSolve)
 
+## =============================================================================
+## First solution: using shooting
+## =============================================================================
+
 nerve <- function (t,y,T)
   list(c( 3*T*(y[1] + y[2] - 1/3*(y[1]^3) - 1.3),
         (-1/3)*T*(y[1] - 0.7 + 0.8*y[2]) ))
@@ -33,8 +37,9 @@ res<- function (Y,yini,T)
     T*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1)
   
 init <- c(y1=NA,y2=NA)
-sol  <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
-        func=nerve, guess=c(0.5,0.5), yend=res, extra=2*pi)
+sol  <- bvpshoot(func=nerve, yini=init, yend=res,
+        x=seq(0,1,by=0.01),
+        guess=c(0.5,0.5), extra=2*pi)
 attributes(sol)$root
 plot(sol,type="l",lwd=2)
 
@@ -53,8 +58,9 @@ res2<- function (Y,yini,T)
     Y[3]*(-1/3)*(yini[1] - 0.7 + 0.8*yini[2]) - 1)
 
 init <- c(y1=NA,y2=NA,T=NA)
-sol2 <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
-        func=nerve2, guess=c(0.5,0.5,2*pi), yend=res2)
+sol2 <- bvpshoot(func=nerve2, yini=init, yend=res,
+        x=seq(0,1,by=0.01),
+        guess=c(0.5,0.5,2*pi)2)
         
 attributes(sol)$root
 plot(sol,type="l",lwd=2)
@@ -62,7 +68,7 @@ plot(sol,type="l",lwd=2)
 yini <- NULL
 
 ## =============================================================================
-## Third solution: augment two more for boundaries and solve with bvpshoot 
+## Third solution: augment with two more for boundaries and solve with bvpshoot 
 ## =============================================================================
 
 nerve3 <- function (t,y,p)
@@ -80,8 +86,9 @@ res3<- function (Y,yini,T)
     Y[2]-Y[5]
     )
 init <- c(y1=NA,y2=NA,T=NA,yi1=NA,yi2=NA)
-sol3 <- bvpshoot(yini=init,x=seq(0,1,by=0.01),
-        func=nerve3, guess=c(0.5,0.5,2*pi,0.5,0.5), yend=res3)
+sol3 <- bvpshoot(func=nerve3, yini=init, yend=res3, 
+        x=seq(0,1,by=0.01),
+        guess=c(0.5,0.5,2*pi,0.5,0.5))
 
 ## =============================================================================
 ## Fourth solution: use augmented equation with bvptwp... 
@@ -96,6 +103,7 @@ nerve3 <- function (t,y,p)
         0)
   )
 
+# derivate function
 dnerve3 <- function (t,y,p)  {
   df <- matrix(nr=5,nc=5,data=0)
   
@@ -107,7 +115,7 @@ dnerve3 <- function (t,y,p)  {
   df[2,3] =(-1.0/3)*(y[1] - 0.7 + 0.8*y[2]) 
   return(df)
 }
-
+# boundary function
 bound <- function(i,y,p) {
  if (i ==1) return(y[3]*(-1/3)*(y[1] - 0.7 + 0.8*y[2]) - 1)
  if (i ==2) return(y[1]-y[4])
@@ -122,19 +130,20 @@ yguess = matrix(nr=5,nc=length(xguess),5.)
 yguess[1,] <- sin(2*pi*xguess)
 yguess[2,] <- cos(2*pi*xguess)
 
-Sol  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
+Sol  <- bvptwp(func=nerve3, bound=bound, 
+        x=seq(0,1,by=0.01), 
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-        func=nerve3,
         leftbc=3, xguess=xguess, yguess=yguess)
 plot(Sol)
 
-Sol2  <- bvptwp(bound=bound, x=seq(0,1,by=0.01), 
+Sol2  <- bvptwp(func=nerve3, bound=bound, jacfunc=dnerve3, 
+        x=seq(0,1,by=0.01), 
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-        func=nerve3,jacfunc=dnerve3, 
         leftbc=3, xguess=xguess, yguess=yguess)
 plot(Sol2)
 
-Sol3  <- bvpshoot(bound=bound, x=seq(0,1,by=0.01), 
+Sol3  <- bvpshoot(func=nerve3, bound=bound, jacfunc=dnerve3, 
+        x=seq(0,1,by=0.01), 
         guess=c(y=0.5,dy=0.5,T=2*pi,yi=0.5,yj=0.5),
-        func=nerve3,jacfunc=dnerve3, leftbc=3)
+        leftbc=3)
 plot(Sol3)

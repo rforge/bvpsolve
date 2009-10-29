@@ -17,7 +17,7 @@
 ## Solved using shooting and bvptwp
 ## =============================================================================
 
- require(bvpSolve)
+require(bvpSolve)
 
 #--------------------------------
 # Derivative function
@@ -37,31 +37,28 @@ init <- c(-0.1/sqrt(p+0.01), NA)
 end  <- c(0.1/sqrt(p+0.01), NA)
 x    <- seq(-0.1,0.1,by=0.001)
 
-#---------------------
-# Solution method 1
-#  **  shooting  **
-#---------------------
+## =============================================================================
+## Solution method 1 **  shooting  **
+## =============================================================================
 
-print(system.time(sol  <- as.data.frame(bvpshoot(yini=init,x=x,
-       func=fun, yend=end, guess=1, atol=1e-10))))
-plot(sol$x,sol[,2],type="l")
+print(system.time(sol  <- bvpshoot(yini=init,x=x,
+       func=fun, yend=end, guess=1, atol=1e-10)))
+plot(sol, which = 1, type="l")
 
 # add analytical solution
 curve(x/sqrt(p+x*x),add=TRUE,type="p")
 
-#---------------------
-# Solution method 2
-# bvptwp method -simple input
-#---------------------
+## =============================================================================
+## Solution method 2, bvptwp method -simple input
+## =============================================================================
 
-print(system.time(Sol2<- as.data.frame(bvptwp(yini=init,x=x,
-      func=fun, yend=end, guess=1,atol=1e-10))))
+print(system.time(Sol2<- bvptwp(yini=init,x=x,
+      func=fun, yend=end, guess=1,atol=1e-10)))
 lines(Sol2[,1],Sol2[,2],type="l",col="red")
 
-#-------------------------------
-# Solution method 3
-#  ** bvptwp -full input **
-#--------------------------------
+## =============================================================================
+## Solution method 3, bvptwp -full input **
+## =============================================================================
 
 # the jacobian
 jacfun <- function(t,y,pars) {
@@ -84,10 +81,11 @@ boundjac <- function (i,y,pars)
   return(c(1,0))
 
 
-print(system.time(Sol <- as.data.frame(bvptwp(x=x,leftbc=1,func=fun, guess=1,
-        bound=boundfun,jacbound=boundjac,jacfunc=jacfun, verbose=TRUE))))
+print(system.time(Sol <- bvptwp(x=x,leftbc=1,func=fun, guess=1,
+        bound=boundfun,jacbound=boundjac,jacfunc=jacfun, verbose=TRUE)))
 lines(Sol[,1],Sol[,2],type="l",col="blue")
 
-print(system.time(Sol2 <- as.data.frame(bvpshoot(x=x,leftbc=1,func=fun, ncomp=2,
-        bound=boundfun,jacbound=boundjac,jacfunc=jacfun), verbose=TRUE)))
+# here verbose prints the output from the ode solver...
+print(system.time(Sol2 <- bvpshoot(x=x,leftbc=1,func=fun, ncomp=2,
+        bound=boundfun,jacbound=boundjac,jacfunc=jacfun, verbose=TRUE)))
 lines(Sol2[,1],Sol2[,2],type="l",col="blue")

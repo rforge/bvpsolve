@@ -19,11 +19,13 @@
 
 require(bvpSolve)
 
-#--------------------------------
+## =============================================================================
+## First method: shooting
+## =============================================================================
+
 # Derivatives
-#--------------------------------
-musn <- function(t,Y,pars)
-{
+
+musn <- function(t,Y,pars)  {
   with (as.list(Y),
   {
    du=0.5*u*(w-u)/v
@@ -36,37 +38,32 @@ musn <- function(t,Y,pars)
 }
 
 x<- seq(0,1,by=0.05)
-#----------------------
-# Solution method 1
-#  ** shooting **
-#----------------------
 
 # Residual function for yend...
 res  <- function (Y,yini,pars)  with (as.list(Y), w-y)
 
 # Initial values; NA= not available
-init <- c(u=1,v=1,w=1,z=-10,y=NA)
+init <- c(u=1, v=1, w=1, z=-10, y=NA)
 
 print(system.time(
-sol   <-bvpshoot(yini= init, x=x,func=musn,
-           yend=res,guess=1,atol=1e-10,rtol=0)
+sol   <-bvpshoot(func=musn, yini= init, yend=res, x=x, 
+           guess=1,atol=1e-10,rtol=0)
 ))
 
 # second solution...
-sol2  <-bvpshoot(yini= init, x=x,func=musn,
-           yend=res,guess=0.9,atol=1e-10,rtol=0)
+sol2  <-bvpshoot(func=musn, yini= init, yend=res, x=x,
+           guess=0.9,atol=1e-10,rtol=0)
 
 pairs(sol)
 
 # check the solution by simple integration...
 yini <- sol[1,-1]
-out <- as.data.frame(ode(fun=musn,y=yini,parms=0,times=x,atol=1e-10,rtol=0))
+out  <- as.data.frame(ode(fun=musn,y=yini,parms=0,times=x,atol=1e-10,rtol=0))
 out$w[nrow(out)]-out$y[nrow(out)]
 
-#----------------------
-# Solution method 2
-#  ** bvptwp **
-#----------------------
+## =============================================================================
+## Solution method 2 : bvptwp 
+## =============================================================================
 # Does not work unless good initial conditions are used
 
 bound <- function(i,y,pars) {
@@ -88,6 +85,8 @@ Sol <- bvptwp(yini= NULL, x=x, func=musn, bound=bound,
               xguess=xguess, yguess=yguess, leftbc = 4,
               guess=1,atol=1e-10)
 ))
+plot(Sol)
+
 
 # same using bvpshoot - not so quick
 print(system.time(

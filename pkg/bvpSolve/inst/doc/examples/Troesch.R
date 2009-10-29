@@ -4,10 +4,7 @@
 require(bvpSolve)
 
 Troesch <- function (t, y, pars) {
-
-  list(c(y[2],
-                mu*sinh(mu*y[1]))
-       )
+  list( c(y[2],  mu*sinh(mu*y[1])) )
 }
 
 mu <- 5

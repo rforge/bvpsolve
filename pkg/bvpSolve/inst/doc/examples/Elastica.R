@@ -4,6 +4,8 @@
 ## http://www.ma.ic.ac.uk/~jcash/BVP_software
 ## =============================================================================
 
+require(bvpSolve)
+
 Elastica <- function (t, y, pars) {
 
   list( c(cos(y[3]),
@@ -12,21 +14,25 @@ Elastica <- function (t, y, pars) {
           y[5]*cos(y[3]),
           0))
 }
+yini <- c(x=0, y=0, p=NA,   k=0, F=NA)
+yend <- c(x=NA,y=0, p=-pi/2,k=NA,F=NA)
 
-require(bvpSolve)
+## =============================================================================
+## simple call
+## =============================================================================
 
-# simple call
 print(system.time(
 Sol <- bvptwp(func=Elastica,
-              yini = c(x=0, y=0, p=NA,   k=0, F=NA),
-              yend = c(x=NA,y=0, p=-pi/2,k=NA,F=NA),
+              yini = yini, yend = yend,
               x = seq(0,0.5,len=16),
               guess=c(0,0) )
 ))
 Sol
 plot(Sol)
 
-# using jacfunc
+## =============================================================================
+## using jacfunc
+## =============================================================================
 jacfunc <- function (x, y, pars) {
       Jac <- matrix(nr=5,nc=5,0)
       Jac[3,4]=1.0
@@ -40,11 +46,14 @@ jacfunc <- function (x, y, pars) {
 
 print(system.time(
 Sol2 <- bvptwp(func=Elastica, jacfunc=jacfunc,
-              yini = c(x=0, y=0, p=NA,   k=0, F=NA),
-              yend = c(x=NA,y=0, p=-pi/2,k=NA,F=NA),
+              yini = yini, yend = yend,
               x = seq(0,0.5,len=16),
               guess=c(0,0) )
 ))
+
+## =============================================================================
+## .. and boundary function
+## =============================================================================
 
 bound <- function (i, y, pars)  {
     if (i <=2) return(y[i])
@@ -53,10 +62,10 @@ bound <- function (i, y, pars)  {
     else if (i == 5) return(y[3]+pi/2)
 }
 print(system.time(
-Sol3 <- bvptwp(leftbc = 3,
-              func=Elastica, jacfunc=jacfunc, bound = bound,
+Sol3 <- bvptwp(func=Elastica, jacfunc=jacfunc, 
+              bound = bound,
               x = seq(0,0.5,len=16),
-              guess=c(0,0) )
+              leftbc = 3, guess=c(0,0) )
 ))
 
 jacbound <- function(i, y, pars)  {
@@ -68,9 +77,8 @@ jacbound <- function(i, y, pars)  {
     JJ
 }
 print(system.time(
-Sol4 <- bvptwp(leftbc = 3,
-              func=Elastica, jacfunc = jacfunc,
+Sol4 <- bvptwp(func=Elastica, jacfunc = jacfunc,
               bound = bound, jacbound = jacbound,
               x = seq(0,0.5,len=16),
-              guess=c(0,0) )
+              leftbc = 3, guess=c(0,0) )
 ))
