@@ -1,3 +1,9 @@
+      subroutine rprint(msg)
+      character (len=*) msg
+      
+            call dblepr(msg, 100, 0, 0)
+      end subroutine 
+
 c karline: added this!
       subroutine initu(ncomp, nmsh, xx, nudim, u, rpar, ipar)
       implicit double precision (a-h,o-z)
@@ -15,7 +21,7 @@ c karline: added this!
 
       if (iprint .ne. -1) then 
         write(msg,99) uval0
-        call rwarn(msg)
+        call Rprint(msg)
       endif
    99 format('initu, uval0',1pd15.5)
       call mtload(ncomp, nmsh, uval0, nudim, u)
@@ -101,7 +107,7 @@ c karline: added this!
 *
 
 c Karline Soetaerts changes to port to R:
-c     1. write(6,...) -> write(msg,...) call rwarn(msg)
+c     1. write(6,...) -> write(msg,...) call Rprint(msg)
 
       implicit double precision (a-h,o-z)
       dimension rpar(*),ipar(*), precis(3)
@@ -121,7 +127,8 @@ c     1. write(6,...) -> write(msg,...) call rwarn(msg)
 
       parameter ( zero = 0.0d+0 )
       use_c = useC
-      COMP_C = useC
+c Karline: set this = 1 => always computed...      
+      COMP_C =  .TRUE.  
       if (full) then
         iprint = 0
       else
@@ -182,7 +189,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       if (iprint .ge. 0) THEN
 	      write(msg,901) nmax
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
       ENDIF
   901 format(1h ,'nmax from workspace =',i8)
 
@@ -312,7 +319,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       if (iprint .eq. 1) THEN
 	      write(msg,903) ilast
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
       ENDIF
 
  903   format(1h ,'ilast',i10)
@@ -446,7 +453,7 @@ c         epsmch = d1mach(3)
          epsmch = precis(3)
          if (pdebug) THEN
     	     write(msg,901) epsmch
-	         CALL rwarn(msg)
+	         CALL Rprint(msg)
          ENDIF
 
          mchset = .false.
@@ -510,7 +517,7 @@ c karline: removed this to here
             maxmsh = .true.
             if (iprint .eq. 1) THEN
 		    write(msg,*)'Initial mesh greater then nmax'
-  	        CALL rwarn(msg)
+  	        CALL Rprint(msg)
             ENDIF
 
             goto 900
@@ -523,7 +530,7 @@ c karline: was originally here...
             maxmsh = .true.
             if (iprint .eq. 1) THEN
 		    write(msg,*)'Initial mesh greater then nmax'
- 	        CALL rwarn(msg)
+ 	        CALL Rprint(msg)
             ENDIF
 
             goto 900
@@ -531,7 +538,7 @@ c karline: was originally here...
 
       if (pdebug) then
          write(msg,902)
-  	     CALL rwarn(msg)
+  	     CALL Rprint(msg)
          call sprt(nmsh, xx)
       endif
 
@@ -547,7 +554,7 @@ c karline: was originally here...
   400 continue
       if (iprint .eq. 1) THEN
 	  write(msg,903) nmsh
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -559,7 +566,7 @@ c karline: was originally here...
 
        if (indnms .ge. liseries) then
           write(msg,1008) nmsh
- 	        CALL rwarn(msg)
+ 	        CALL Rprint(msg)
           goto 1900
        end if
 
@@ -631,15 +638,15 @@ c
 
           if (iprint .ge. 0) then
             write(msg,1001) sigma
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1002) gamma1
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1003) ckappa1
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1004) ckappa
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1008) ckappa2
- 	      CALL rwarn(msg)
+ 	      CALL Rprint(msg)
           end if
 
           stab_kappa = abs(ckappaold-ckappa)/(ckappa).lt.5d-2
@@ -658,15 +665,15 @@ c
 
            if (iprint .eq. 1) then
              write(msg,*) 'stab_kappa = ', stab_kappa
-	       CALL rwarn(msg)
+	       CALL Rprint(msg)
              write(msg,*) 'stab_kappa1 = ', stab_kappa1
-	       CALL rwarn(msg)
+	       CALL Rprint(msg)
              write(msg,*) 'stab_gamma = ', stab_gamma
-	       CALL rwarn(msg)
+	       CALL Rprint(msg)
              write(msg,*) 'stiff_cond = ', stiff_cond
-	       CALL rwarn(msg)
+	       CALL Rprint(msg)
              write(msg,*) 'ill_cond   = ', ill_cond
-	       CALL rwarn(msg)
+	       CALL Rprint(msg)
            end if
            if (ill_cond .and. use_c) goto 2000
 
@@ -686,7 +693,7 @@ c endif if (comp_c)
 
         if (pdebug .and. .not. onto6) THEN
 	    write (msg,904)
-	    CALL rwarn(msg)
+	    CALL Rprint(msg)
         ENDIF
 
 
@@ -706,15 +713,15 @@ c endif if (comp_c)
 
          if (iprint .ge. 0) then
             write(msg,1001) sigma
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1002) gamma1
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1003) ckappa1
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1004) ckappa
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
             write(msg,1008) ckappa2
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
          end if
 
           stab_kappa = abs(ckappaold-ckappa)/(ckappa).lt.5d-2
@@ -734,15 +741,15 @@ c endif if (comp_c)
          if (ill_cond .and. use_c) goto 2000
          if (iprint .eq. 1) then
            write(msg,*) 'stab_kappa = ', stab_kappa
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
            write(msg,*) 'stab_kappa1 = ', stab_kappa1
- 	     CALL rwarn(msg)
+ 	     CALL Rprint(msg)
            write(msg,*) 'stab_gamma = ', stab_gamma
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
            write(msg,*) 'stiff_cond = ', stiff_cond
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
            write(msg,*) 'ill_cond   = ', ill_cond
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          end if
          end if
        end if
@@ -767,7 +774,7 @@ c end if if(comp_c)
           if (iprint .ne. -1 .and. comp_c .and. use_c) then
             if ( ill_cond) THEN
 		    write(msg,1005)
-	        CALL rwarn(msg)
+	        CALL Rprint(msg)
             ENDIF
 
           end if
@@ -778,7 +785,7 @@ c end if if(comp_c)
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
 			    write(msg,1010)
- 	            CALL rwarn(msg)
+ 	            CALL Rprint(msg)
                 ENDIF
 
              end if
@@ -798,7 +805,7 @@ c end if if(comp_c)
 
       if (iprint .eq. 1) then 
 	  write(msg,905)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -876,7 +883,7 @@ c end if if(comp_c)
          if (iprint .ne. -1 .and. comp_c .and. use_c) then
            if (  ill_cond ) THEN
 		   write(msg,1005)
-  	       CALL rwarn(msg)
+  	       CALL Rprint(msg)
            ENDIF
 
          end if
@@ -887,7 +894,7 @@ c end if if(comp_c)
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
 			    write(msg,1010)
-	            CALL rwarn(msg)
+	            CALL Rprint(msg)
                 ENDIF
 
              end if
@@ -905,7 +912,7 @@ c end if if(comp_c)
 
       if (iprint .eq. 1) THEN
 	  write(msg,906)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -1017,7 +1024,7 @@ c      write(*,*) 'succes after conv8', succes
       if (iprint .ne. -1 .and. comp_c .and. use_c) then
         if ( ill_cond) THEN 
 	    write(msg,1005)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       end if
@@ -1027,7 +1034,7 @@ c      write(*,*) 'succes after conv8', succes
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
 			    write(msg,1010)
-	            CALL rwarn(msg)
+	            CALL Rprint(msg)
                 ENDIF
              end if
        end if
@@ -1042,14 +1049,14 @@ c      write(*,*) 'succes after conv8', succes
 
       iflbvp = 2
       write(msg,1009) indnms
-      CALL rwarn(msg)
+      CALL Rprint(msg)
       if (linear .and. ill_cond) THEN
 	  write(msg,1006)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
       if (.not.linear .and. ill_cond) THEN
 	  write(msg,1007)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
       return
  2000 continue
@@ -1057,10 +1064,10 @@ c      write(*,*) 'succes after conv8', succes
          iflbvp = 3
          if (linear) then
             write(msg,1006)
-  	      CALL rwarn(msg)
+  	      CALL Rprint(msg)
          else
             write(msg,1007)
- 	      CALL rwarn(msg)
+ 	      CALL Rprint(msg)
          end if
          return
   900 continue
@@ -1069,17 +1076,19 @@ c      write(*,*) 'succes after conv8', succes
 
       iflbvp = 1
       write(msg,*) 'Terminated, too many mesh points'
-      CALL rwarn(msg)
+      CALL Rprint(msg)
+      write(msg,*) 'Order was', iorder
+      CALL Rprint(msg)
 
       if (iprint .ne. -1 .and. comp_c ) then
         if (linear .and. ill_cond) THEN
             write(msg,1006)
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
         ENDIF
 
         if (.not.linear .and.ill_cond) THEN
             write(msg,1007)
-	      CALL rwarn(msg)
+	      CALL Rprint(msg)
         ENDIF
 
       end if
@@ -1572,7 +1581,7 @@ c
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -1605,12 +1614,12 @@ c
       if ( smooth .or. reaft6) then
          if (smooth .and. pdebug) THEN
 	     write(msg,902)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
 
          if (reaft6 .and. pdebug) THEN
 	     write(msg,903)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
 
          onto6 = .true.
@@ -1651,34 +1660,34 @@ c
       if (pdebug) then
          if (smooth) THEN
 	     write(msg,904)
- 	     CALL rwarn(msg)
+ 	     CALL Rprint(msg)
          ENDIF
          if (callrt) THEN
 	     write(msg,905)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          if (oscchk) THEN
 	     write(msg,906)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          if (strctr) THEN
 	     write(msg,907)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          if (reposs) THEN
 	     write(msg,908)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          if (savedu) THEN
 	     write(msg,909)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          if (onto6) THEN
 	     write(msg,910)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
          write(msg,911) rat1, oldrt1
-	   CALL rwarn(msg)
+	   CALL Rprint(msg)
       endif
       oldrt1 = rat1
       dfold = dfexmx
@@ -1744,7 +1753,7 @@ c
 
       if (pdebug .and. reposs .and. .not. onto6) THEN
 	 write(msg,912)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -1787,13 +1796,13 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
 
             if (pdebug) THEN
 		    write(msg,913) drat, u(incmp,inmsh), tol(intol)
-	        CALL rwarn(msg)
+	        CALL Rprint(msg)
             ENDIF
 
             numadd = drat**power
             if (pdebug) THEN
 		    write(msg,*) 'numadd ', numadd
-	        CALL rwarn(msg)
+	        CALL Rprint(msg)
             ENDIF
 
          if ((use_c) .AND. (stiff_cond)) then
@@ -1863,7 +1872,7 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -1933,7 +1942,7 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -1998,7 +2007,7 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       succes = .false.
@@ -2014,22 +2023,22 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
 
       if (reaft6 .and. iprint .ge. 0) THEN
 	  write(msg,9999)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
  9999 format(1h ,'in fail6, reaft6is true')
       if (.not.reaft6 .and. iprint .ge. 0) THEN
 	  write(msg,9998)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
  9998 format(1h ,'in fail6, not reaft6')
       if (ddouble.and. iprint .ge. 0) THEN
 	  write(msg,9997)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
  9997 format(1h ,'in fail6, ddouble  is true')
       if (.not.ddouble.and. iprint.ge.0 ) THEN
 	  write(msg,9996)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
  9996 format(1h ,'in fail6, not double')
@@ -2083,13 +2092,13 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
      *          rerr, remax, itlmx, adjrer )
          if (iprint.eq.1) THEN
 	     write(msg,9994)
- 	     CALL rwarn(msg)
+ 	     CALL Rprint(msg)
          ENDIF
 
  9994    format(1h ,'***in fail6')
          if (iprint.eq.1) THEN
 	     write(msg,9993) remax, eight*tol(itlmx)
-	     CALL rwarn(msg)
+	     CALL Rprint(msg)
          ENDIF
 
  9993    format(1h ,'remax',1pe14.4,5x,'8*tol',1pe14.4)
@@ -2229,7 +2238,7 @@ cf of the old mesh we take the values using incx = 2
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -2274,7 +2283,7 @@ c      write(*,*) 'etest8', etest8(1),etest8(2), errok
 *  satisfy the test for termination.
       if (pdebug) THEN
 	  write(msg,902) err6, err8, er6old, er8old
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -2417,7 +2426,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug .and. .not.succes) THEN
 	  write(msg,903)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       return
@@ -2452,7 +2461,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,901)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 
@@ -2532,9 +2541,9 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) then
          write(msg,901)
- 	   CALL rwarn(msg)
+ 	   CALL Rprint(msg)
          write(msg,902) dfexmx, incmp, inmsh, intol
-	   CALL rwarn(msg)
+	   CALL Rprint(msg)
       endif
 
 *  Find derivm (maximum-magnitude element of fval(incmp,*))
@@ -2544,7 +2553,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       derivm = abs(fval(incmp, idmx))
       if (pdebug) THEN
 	  write(msg,903) derivm
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
 *  For component incmp, go through the mesh intervals to calculate
@@ -2593,7 +2602,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,905) rat1, rat2, dfimmx
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -2644,12 +2653,12 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,901)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       if (pdebug) THEN
 	  write(msg,902) tolval, rtst
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -2673,7 +2682,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       thttol = thrtwo*tolval
       if (pdebug) THEN
 	  write(msg,903) thttol
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -2987,7 +2996,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,901)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       allsum = zero
@@ -3014,7 +3023,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
          if (pdebug) THEN
 	     write(msg,902) im, ratdc(im), abdef, frac2*dfexmx
-  	     CALL rwarn(msg)
+  	     CALL Rprint(msg)
          ENDIF
 
 
@@ -3039,7 +3048,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,903) rmax, jsndif
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3051,7 +3060,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (pdebug) THEN
 	  write(msg,904) ave, avsm, avbg
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3265,7 +3274,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       ninter = nmsh - 1
@@ -3298,7 +3307,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
      *      (iorder.eq. 8 .and. rnsq.gt.xlarge)) then
          if (iprint .eq. 1) THEN
 	     write (msg,902) rnsq
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          iflag = -2
@@ -3314,7 +3323,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (iprint .eq. 1) THEN
 	  write(msg,903) iter, rnsq
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       if (rnsq .le. 1.0d2*epsmch) then
@@ -3376,7 +3385,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
          endif
          if (iprint .eq. 1) THEN
 	     write(msg,904) iflag
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          return
@@ -3396,7 +3405,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       if (iprint .ge. 0) THEN
 	  write(msg,905) iter, rnsq
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3603,7 +3612,7 @@ c
 
       if (iprint .eq. 1) THEN
 	  write(msg,901)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3634,7 +3643,7 @@ c
       rnbest = flmax
       if (.not. pdebug .and. iprint .ge. 0) THEN
 	  write (msg,902)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3650,7 +3659,7 @@ c
 
       if (iprint .eq. 1) THEN 
 	  write(msg,910) iter
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3659,7 +3668,7 @@ c
       if (iter .ge. lmtnwt) then
          if (iprint .ge. 0) THEN
 	     write(msg,903)
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          iflag = -2
@@ -3681,7 +3690,7 @@ c
       if (iflwat .ne. 0) then
          if (iprint .ge. 0) THEN
 	     write(msg,904) iter
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
          iflag = -3
          return
@@ -3701,7 +3710,7 @@ c
       if (rnsq .le. epsmch) then
          if (iprint .ge. 0) THEN
 	     write(msg,906) iter, rnsq
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          iflag = 0
@@ -3728,7 +3737,7 @@ c
 
       if (iprint .ge. 0 .and. iflag.ne.0) THEN
 	  write(msg,905) iter
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       if (iflag .ne. 0) return
@@ -3758,7 +3767,7 @@ c  at the initial point of the line search.
       alfa = zero
       if (iprint .eq. 1) THEN
 	  write (msg,908) alfa, fmtry, rnsq
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3809,7 +3818,7 @@ c  at the initial point of the line search.
 
       if (pdebug) THEN
 	  write(msg,907) inform, alfa
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3866,7 +3875,7 @@ c  at the initial point of the line search.
          end if
          if (iprint .eq. 1) THEN
 	     write (msg,908) alfa, fmtry, rnsqtr
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          go to 150
@@ -3883,7 +3892,7 @@ c  at the initial point of the line search.
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
       if (iprint .ge. 0) THEN
 	  write(msg,909) iter, alfa, fmtry, rnsq
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -3902,7 +3911,7 @@ c  at the initial point of the line search.
 
       if (iprint .ge. 0) THEN
 	  write(msg, 906) iter+1, rnsq
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       iflag = 0
@@ -4287,11 +4296,11 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       if (pdebug) then
          write (msg,902) rnsq
-         CALL rwarn(msg)
+         CALL Rprint(msg)
          write(msg,903)
-         CALL rwarn(msg)
+         CALL Rprint(msg)
          write(msg,904) (rhs(i), i=1,ncomp*nmsh)
-         CALL rwarn(msg)
+         CALL Rprint(msg)
       endif
       return
 
@@ -4339,7 +4348,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       if(nmnew .ge. nmax) then
          if (iprint .ge. 0) THEN
 	     write(msg,901) nmnew
-  	     CALL rwarn(msg)
+  	     CALL Rprint(msg)
          ENDIF
 
          nmsh = nmold
@@ -4363,7 +4372,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmsh = nmnew
       if(iprint .ge. 0) THEN
 	  write(msg,902) nmsh
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       return
@@ -4414,7 +4423,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       if (pdebug) THEN
 	  write(msg,901) nmsh, ipow
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -4458,7 +4467,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
       if (pdebug) THEN
 	  write(msg,903) errmax
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -4661,7 +4670,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       maxmsh = .false.
       if (iprint .ge. 0) THEN
 	  write(msg,905) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -4696,7 +4705,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 c         nmsh = 2*nmsh - 1
          nmsh = nmold
          call dcopy(nmold, xxold, 1, xx, 1)
-         maxmsh = .true.
+         maxmsh = .true.                       
       endif
       return
 
@@ -4731,7 +4740,7 @@ c       selmsh
 
       if (pdebug) THEN
 	  write(msg,901)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -4747,7 +4756,7 @@ c       selmsh
       endif
       if (pdebug) THEN
 	  write (msg,902) nmsh, intref, numadd
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -4760,7 +4769,7 @@ c       selmsh
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
 		    write(msg,903) nmnew
-              CALL rwarn(msg)
+              CALL Rprint(msg)
             ENDIF
             maxmsh = .true.
             return
@@ -4785,7 +4794,7 @@ c       selmsh
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
 		     write(msg,903) nmnew
-               CALL rwarn(msg)
+               CALL Rprint(msg)
             ENDIF
 
             maxmsh = .true.
@@ -4809,7 +4818,7 @@ c       selmsh
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
 		    write(msg,903) nmnew
-              CALL rwarn(msg)
+              CALL Rprint(msg)
             ENDIF
             maxmsh = .true.
             return
@@ -4852,7 +4861,7 @@ c       selmsh
 
       if(iprint .ge. 0) THEN
 	  write(msg,904) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -4897,7 +4906,7 @@ c       selmsh
 
       if (iprint .ge. 0) THEN
 	  write(msg,901) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -5061,7 +5070,7 @@ c
 
       if (pdebug) THEN
 	  write(msg,901) nummed, numbig
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -5117,7 +5126,7 @@ c     *   .and. (use_c))
          tstval = bigfac*(sumrhs-rbigst)/ninter
          if (pdebug) THEN
 	     write(msg,902) ic, tstval, rbigst, rsecnd
-           CALL rwarn(msg)
+           CALL Rprint(msg)
          ENDIF
 
          if (rbigst .ge. small .and. rbigst .ge. tstval) go to 100
@@ -5131,7 +5140,7 @@ c     *   .and. (use_c))
       ddouble = .true.
       if (pdebug) THEN
 	  write(msg,903)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 cf the mesh if not doubled if the problem is stiff and the order is 4
@@ -5178,7 +5187,7 @@ c      call dblmsh(nmsh, nmax, xx, nmold, xxold, maxmsh)
 *  Refine the mesh.
       if (pdebug) THEN 
 	  write(msg,904) numbig, nummed
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -5223,7 +5232,7 @@ cf
       endif
       if (ddouble  .and. pdebug) THEN
 	  write(msg,905)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -5269,7 +5278,7 @@ cf
 
       if (pdebug) THEN
 	  write(msg,900)
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       errsum = zero
@@ -5283,7 +5292,7 @@ cf
          errel = abs(er/(tol(it)*denom))
          if (pdebug) THEN
 	      write(msg,901) im, it, errel, etest(it)
-            CALL rwarn(msg)
+            CALL Rprint(msg)
          ENDIF
 
          errsum = errsum + errel
@@ -5292,7 +5301,7 @@ cf
 
       if (pdebug) THEN
 	  write(msg,902) errsum
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -5569,7 +5578,7 @@ c
 c     if (debug) THEN
 c  write (msg, 1000) alfmax, oldf, oldg, tolabs,
 c    *   alfuzz, epsaf, epsag, tolrel, crampd
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       go to 800
@@ -5600,7 +5609,7 @@ c
 c
 c     if (debug) THEN
 c  write (msg, 1100) alfa, ftry, ctry
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       if (.not. imprvd) go to 130
@@ -5717,7 +5726,7 @@ c    *   extrap, alfbst, fbest, cbest, alfaw, fw
       if (vset) alfav  = alfbst + xv
 c     if (debug  .and.  vset) THEN
 c     write (msg, 1300) alfav, fv
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       if (convrg  .and.  moved) go to 910
@@ -5771,7 +5780,7 @@ c
       q = two*(oldg - gw)
 c     if (debug) THEN
 c  write (msg, 2100)
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       go to 600
@@ -5783,7 +5792,7 @@ c
       q  = two*(gv - gw)
 c     if (debug) THEN
 c  write (msg, 2200)
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
 c
@@ -5818,7 +5827,7 @@ c
       xtry   = xw/ten
 c     if (debug) THEN
 c  write (msg, 2400) xtry
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       go to 700
@@ -5865,7 +5874,7 @@ c
       if (endpnt .lt. zero) xtry = - xtry
 c     if (debug) THEN
 c  write (msg, 2500) xtry, daux, dtry
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
 c
@@ -5892,7 +5901,7 @@ c
       if (abs( s*xw ) .ge. q*tol) xtry = (s/q)*xw
 c     if (debug) THEN
 c  write (msg, 2600) xtry
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
 c
@@ -5972,7 +5981,7 @@ c
   990 continue 
 c 990 if (debug) THEN
 c       write (msg, 3000)
-c       CALL rwarn(msg)
+c       CALL Rprint(msg)
 c     ENDIF
 
       return
@@ -6022,7 +6031,7 @@ c  end of getptq
 
       if (pdebug) THEN
 	  write(msg,900)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -6225,7 +6234,7 @@ c#
 
       if (pdebug) THEN
 	  write(msg,901) nmsh, ipow
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -6264,7 +6273,7 @@ c          end do
 c            .and. ermeas(jcomp,im) .ge. thres)
             if (pdebug ) THEN
              write(msg,902) im,jcomp,ems,ermeas(jcomp,im), u(jcomp,im)
-                CALL rwarn(msg)
+                CALL Rprint(msg)
             ENDIF
             err = ermeas(jcomp, im)
             if (err .ge. ermx(im)) then
@@ -6294,7 +6303,7 @@ cf   the conditioning and the error
 
       if (pdebug) THEN
 	  write(msg,903) errmax
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -6342,7 +6351,7 @@ cf   the conditioning and the error
             irefin(im) = int(ermx(im)**frcpow) + 1
             if (pdebug ) THEN
                 write(msg,*) im,ermx(im), frcpow, irefin(im),decii
-                CALL rwarn(msg)
+                CALL Rprint(msg)
             ENDIF
             nmest = nmest + irefin(im) - 1
          else
@@ -6384,7 +6393,7 @@ c        end if
 
       if (pdebug) THEN
 	  write(msg,904) nmest, (irefin(i), i=1,ninter)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       if (nmest .gt. nmax) then
@@ -6493,11 +6502,18 @@ c        end if
 
          jtkout = 0
          new = new + 1
+CKS:::
+          if (new .gt. nmax) go to 360 
+
+        
+
          xx(new) = xxold(im)
          if (irefin(im) .gt. 1) then
             dx = rlen/irefin(im)
             do 300 j = 2, irefin(im)
               new = new + 1
+CKS:::
+          if (new .gt. nmax) go to 360 
               xx(new) = xxold(im) + (j-1)*dx
   300       continue
          endif
@@ -6531,12 +6547,14 @@ c        end if
 *  mesh.  The last mesh point remains unchanged.
 
       new = new + 1
+CKS:::
+          if (new .gt. nmax) go to 360 
       xx(new) = xxold(nmsh)
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
 	  write(msg,905) nmsh
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       return
@@ -6571,7 +6589,7 @@ c        end if
 c         nmsh = 2*nmsh - 1
          nmsh = nmold
          call dcopy(nmsh, xxold, 1, xx, 1)
-         maxmsh = .true.
+         maxmsh = .true.       
       endif
 
       end if
@@ -6626,7 +6644,7 @@ c   endif use the conditioning and the error
 
       if (pdebug) THEN
 	  write(msg,901) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       ddouble = .false.
@@ -6822,14 +6840,14 @@ c   endif use the conditioning and the error
 *  and have neither exceeded the specified maximum nor
 *  exceeded three times the number of intervals in the old
 *  mesh.  The last mesh point remains unchanged.
-
+      
       new = new + 1
       xx(new) = xxold(nmsh)
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
 	  write(msg,905) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -6898,7 +6916,7 @@ c   endif use the conditioning and the error
 
       if (pdebug) THEN
 	  write(msg,901) nmsh
-	  CALL rwarn(msg)
+	  CALL Rprint(msg)
       ENDIF
 
       ddouble = .false.
@@ -6979,7 +6997,7 @@ c   endif use the conditioning and the error
 
       if (pdebug) THEN
 	  write(msg,904) nmest, (irefin(i), i=1,ninter)
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -7101,7 +7119,7 @@ c   endif use the conditioning and the error
 *  Try doubling the mesh if possible.
             if (iprint .eq. 1) THEN
 		    write(msg,*) 'smpselcondmsh'
-              CALL rwarn(msg)
+              CALL Rprint(msg)
             ENDIF
 
             nmsh = nmold
@@ -7127,7 +7145,7 @@ c   endif use the conditioning and the error
       maxmsh = .false.
       if (iprint .ge. 0) THEN
 	  write(msg,905) nmsh
-        CALL rwarn(msg)
+        CALL Rprint(msg)
       ENDIF
 
       return
@@ -7238,7 +7256,7 @@ c vecchio 0.5 nuovo 0.65
 
        if (iprint .eq. 1) THEN
 	   write(msg,901)r1,r3,fatt_r1r3,nptcond,nptm,nptr
-         CALL rwarn(msg)
+         CALL Rprint(msg)
        ENDIF
 
 
@@ -8004,12 +8022,12 @@ C  ***  ISSUE STOP 779 IF ALL DATA STATEMENTS ARE COMMENTED...
                   LOG10(2) = 10000000*LOG10(2) + 5232940
                ELSE
                   WRITE(msg,9000)
-                  CALL rwarn(msg)
+                  CALL Rprint(msg)
                   STOP 779
                   END IF
             ELSE
                WRITE(msg,9000)
-               CALL rwarn(msg)
+               CALL Rprint(msg)
                STOP 779
                END IF
             END IF

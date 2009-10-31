@@ -46,10 +46,25 @@ times  = seq(0,1,by=0.1)      # -> fixpnt
 yini   = c(f=0,f1=0,f2=NA,h=0,h1=NA,O=0,O1=NA,A=NA)
 yend   = c(f=1,f1=0,f2=NA,h=0,h1=NA,O=1,O1=NA,A=NA)
 
-# Solving the model, using twpbvpC + very large value of R + conditioning
-Soltwp = bvptwp(func=fluid, x=times, parms=NULL, R=50000, 
-                nmax=100000, cond=TRUE,
+# Solving the model, using twpbvpC this works
+Soltwp = bvptwp(func=fluid, x=times, parms=NULL, R=200, 
+                nmax=195, cond=TRUE, #verbose=TRUE,  
                 yini=yini, yend=yend)
+diagnose(Soltwp)
+
+
+
+
+# Solving the model, using twpbvpC + very large value of R + conditioning
+Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000, 
+                nmax=1100, cond=TRUE, verbose=TRUE,    #
+                yini=yini, yend=yend)
+diagnose(Soltwp2)
 
 # plot the results
-plot(Soltwp)
+plot(Soltwp2, type="l", lwd=2)
+
+
+Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000, 
+                nmax=1000, cond=TRUE, verbose=TRUE,    #
+                yini=yini, yend=yend)

@@ -115,7 +115,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 /******************************************************************************/
 
 /* These R-structures will be allocated and returned to R*/
-  SEXP yout=NULL, ISTATE;
+  SEXP yout=NULL, ISTATE, RSTATE;
 
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double aleft, aright, *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis;
@@ -177,7 +177,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   u   =(double *) R_alloc(ii, sizeof(double));
    for (j = 0; j < nmesh*ncomp; j++) u[j] = REAL(Yguess)[j];
    for (j = nmesh*ncomp; j < nmax*ncomp; j++) u[j] = 0;
-
+      
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
      for (j = 0; j < lwrkfl; j++) wrk[j] = 0.;
 
@@ -299,12 +299,22 @@ C....         = -1  If There Is An Input Data Error.
 	  for (j = 0; j < nx; j++)       REAL(yout)[j]    = xx[j];
     for (j = 0; j < ncomp*nx; j++) REAL(yout)[nx+j] =  u[j];
    }
-  PROTECT(ISTATE = allocVector(INTSXP, 3));incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, 5));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
   INTEGER(ISTATE)[1] = nmax;
   INTEGER(ISTATE)[2] = nmesh;
+  INTEGER(ISTATE)[3] = lwrkfl;
+  INTEGER(ISTATE)[4] = lwrkin;
   setAttrib(yout, install("istate"), ISTATE);
 
+  PROTECT(RSTATE = allocVector(REALSXP, 5));incr_N_Protect();
+  REAL(RSTATE)[0] = ckappa1;
+  REAL(RSTATE)[1] = gamma1; 
+  REAL(RSTATE)[2] = sigma; 
+  REAL(RSTATE)[3] = ckappa;
+  REAL(RSTATE)[4] = ckappa2;
+  setAttrib(yout, install("rstate"), RSTATE);
+  
 /*               ####   termination   ####                            */
   unprotect_all();
   return(yout);

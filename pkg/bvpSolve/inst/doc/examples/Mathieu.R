@@ -147,8 +147,8 @@ plot(sol1,which="y", mfrow=NULL,type="l",lwd=2)
 plot(sol2,which="y", mfrow=NULL,type="l",lwd=2)
 plot(sol3,which="y", mfrow=NULL,type="l",lwd=2)
 plot(sol1b,which="y", mfrow=NULL,type="l",lwd=2)
-plot(sol2b,which="y", mfrow=NULL,type="l",lwd=2)
-plot(sol3b,which="y", mfrow=NULL,type="l",lwd=2)
+plot(sol2b,which=1, mfrow=NULL,type="l",lwd=2)
+plot(sol3b,which=1, mfrow=NULL,type="l",lwd=2)
 par(mfrow=c(1,1))
 
 

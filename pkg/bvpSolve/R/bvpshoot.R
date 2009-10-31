@@ -162,5 +162,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
                                    f.root=sol$f.root, iter=sol$iter)
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   colnames(out)[1] <- "x"
+  attr(out,"name") <- "bvpshoot"
+
   out
 }

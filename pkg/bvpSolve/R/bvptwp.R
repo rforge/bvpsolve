@@ -287,6 +287,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
             Func, JacFunc, Bound, JacBound, ModelInit, initpar,
             flist, rho, PACKAGE="bvpSolve")
   nn <- attr(out,"istate")
+  rn <- attr(out,"rstate")
   mesh <- nn[3]
   attr(out,"istate") <- NULL
 
@@ -302,5 +303,65 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       out <- out [which(out[,1]%in% x),]
   dimnames(out) <- list(NULL,nm)
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
+  names(nn) <- c("flag","nmax","nmesh","nrwork","niwork")
+  attr(out,"istate") <- nn 
+  names(rn) <- c("ckappa1","gamma1","sigma","ckappa","ckappa2")
+  attr(out,"rstate") <- rn 
+  attr(out,"name") <- "bvptwp"
   out
 }
+
+
+diagnose <- function(obj) {
+    if (!"bvpSolve" %in% class(obj)) return(NULL)
+    Attr <- attributes(obj)
+    istate <- Attr$istate
+    rstate <- Attr$rstate
+
+    if (is.null(istate) || is.null (rstate)) return(NULL)
+    if (! Attr$name == "bvptwp") return(NULL)
+    
+    cat("\n--------------------\n")
+    cat(paste( "return code"))
+    cat("\n--------------------\n")
+
+    idid <- istate[1]
+    if (idid ==0)  cat("  Integration was successful.\n") else
+       cat("  Integration was NOT successful\n") 
+
+    df <- c( "The return code                    :",   #1
+             "The maximal number of mesh points  :",   #2
+             "The actual number of mesh points   :",
+             "The size of the real work array    :",
+             "The size of the integer work array :")
+             
+
+    printmessage(df, istate)
+
+    cat("\n--------------------\n")
+    cat(paste( "conditioning pars"))
+    cat("\n--------------------\n")
+
+    df <- c( "ckappa1  :",
+             "gamma1   :",
+             "sigma    :",
+             "ckappa   :",
+             "ckappa2  :")
+    printmessage(df, rstate)
+
+}
+
+## internal helper functions for printing solver return code messages
+## these functions are not exported
+
+printmessage <-function(message1, state, message2 = NULL, Nr = 1:length(message1)) {
+  if (is.null(message2)) {
+    cat("\n", paste(formatC(Nr, "##", width = 2), message1,
+              signif(state, digits = getOption("digits")), "\n"), "\n")
+  } else {
+    cat("\n", paste(formatC(Nr, "##", width = 2), message1,
+              signif(state, digits = getOption("digits")), message2, "\n"), "\n")
+  
+  }
+}
+

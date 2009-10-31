@@ -69,7 +69,7 @@
   E-mail: \email{j.cash@imperial.ac.uk}\\
   URL: \url{http://www.ma.ic.ac.uk/\~jcash}\\
   \\
-  Francesca Mazzia
+  Francesca Mazzia           \\
   Dipartimento di Matematica \\
   Universita' di Bari        \\
   Via Orabona 4,             \\
@@ -109,8 +109,8 @@ options(width=70)
     g_2(y) |_b = 0
   \end{eqnarray*}
   where \code{y} is the dependent, \code{x} the independent variable,
-  function \code{f} is the differential equation, $g_a$ and $g_b$ the
-  boundary conditions at the end points a and b.
+  function \code{f} is the differential equation, $g_1(y) |_a $ and 
+  $g_2(y) |_b$ the boundary conditions at the end points a and b.
 
   The problem must be specified as a first-order system. Thus, higher-order
   ODEs need to be rewritten as a set of first-order systems. For instance:
@@ -140,8 +140,9 @@ options(width=70)
   provided at the initial boundary point only.
 
   Package \rs \citep{rootSolve} has functions to solve certain
-  boundary value problems, using the method of lines approach.
-  This is usually more efficient than the boundary value solvers from \bvp
+  boundary value problems, using the method of lines (MOL) approach.
+  This is usually more efficient (but less precise) than the boundary value 
+  solvers from \bvp, but many problems cannot be solved using the MOL.
 
 \section{Linear problems}
 \subsection{problem 1}
