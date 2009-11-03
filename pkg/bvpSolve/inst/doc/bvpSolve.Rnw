@@ -655,7 +655,7 @@ variable, whose derivative = 0 (it is a parameter, and by definition
 does not change over the integration interval). This is, the equations are:
   \begin{eqnarray*}
     \frac{dy}{dt}&=& y_2\\
-    \frac{dy_2}{dt}&=& -(\lambda-10 \cos(2t)) \cdot y
+    \frac{dy_2}{dt}&=& -(\lambda-10 \cos(2t)) \cdot y \\
     \frac{d\lambda}{dt}&=& 0
   \end{eqnarray*}
 for dependent variables \code{y, y_2} and $\lambda$

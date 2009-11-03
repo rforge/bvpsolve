@@ -1,4 +1,5 @@
 useDynLib(bvpSolve)
-export(bvpshoot,bvptwp,diagnose)
+export(bvpshoot,bvptwp, diagnose)
 
 S3method("plot", "bvpSolve")
+
