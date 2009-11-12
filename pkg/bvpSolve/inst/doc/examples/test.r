@@ -2,7 +2,7 @@
 ## fluid injection problem
 ## Original definition:
 ## f'''- R[(f')^2 -f*f''] + A = 0
-## h'' + R*f*h' + 1 = 0 
+## h'' + R*f*h' + 1 = 0
 ## O'' + P*f*O' = 0
 ## A is unknown, P = 0.7*R
 ##
@@ -26,15 +26,15 @@ require(bvpSolve)
 fluid<-function(t, y, parms, R) {
  P    = 0.7*R
  with(as.list(y),  {
-   df = f1                    
-   df1= f2                    
-   df2= R*(f1^2-f*f2)-A       
+   df = f1
+   df1= f2
+   df2= R*(f1^2-f*f2)-A
    dh = h1
    dh1= -R*f*h1-1
    dO = O1
-   dO1= -P*f*O1              
+   dO1= -P*f*O1
    dA = 0
-  
+
    return(list( c(df,df1,df2,dh,dh1,dO,dO1,dA)) )
  })
 }
@@ -47,24 +47,24 @@ yini   = c(f=0,f1=0,f2=NA,h=0,h1=NA,O=0,O1=NA,A=NA)
 yend   = c(f=1,f1=0,f2=NA,h=0,h1=NA,O=1,O1=NA,A=NA)
 
 # Solving the model, using twpbvpC this works
-Soltwp = bvptwp(func=fluid, x=times, parms=NULL, R=200, 
-                nmax=195, cond=TRUE, #verbose=TRUE,  
+Soltwp = bvptwp(func=fluid, x=times, parms=NULL, R=200,
+                nmax=195, cond=TRUE, #verbose=TRUE,
                 yini=yini, yend=yend)
-diagnose(Soltwp)
+diagnostics(Soltwp)
 
 
 
 
 # Solving the model, using twpbvpC + very large value of R + conditioning
-Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000, 
+Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000,
                 nmax=1100, cond=TRUE, verbose=TRUE,    #
                 yini=yini, yend=yend)
-diagnose(Soltwp2)
+diagnostics(Soltwp2)
 
 # plot the results
 plot(Soltwp2, type="l", lwd=2)
 
 
-Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000, 
+Soltwp2 = bvptwp(func=fluid, x=times, parms=NULL, R=50000,
                 nmax=1000, cond=TRUE, verbose=TRUE,    #
                 yini=yini, yend=yend)
