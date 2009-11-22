@@ -29,13 +29,12 @@ double yguess;
 
 /* Globals : the R-functions, R-environment, R-parameters */
 
-SEXP twp_deriv_func;
-SEXP twp_jac_func;
-SEXP twp_bound_func;
-SEXP twp_jacbound_func;
+SEXP R_bvpderiv_func;
+SEXP R_bvpjac_func;
+SEXP R_bvpbound_func;
+SEXP R_bvpjacbound_func;
 
-SEXP bvp_envir;
-SEXP bvpcolmod_envir;
+SEXP R_envir;
 SEXP bvp_gparms;
 
 /*==================================================

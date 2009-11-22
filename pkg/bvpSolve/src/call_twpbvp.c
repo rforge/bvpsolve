@@ -2,13 +2,7 @@
 #include <string.h>
 #include "twpbvpc.h"
 
-/* definition of the calls to the fortran functions -
-      subroutine twpbvp(ncomp, nlbc, aleft, aright,
-     *       nfxpnt, fixpnt, ntol, ltol, tol,
-     *       linear, givmsh, giveu, nmsh,
-     *       nxxdim, xx, nudim, u, nmax,
-     *       lwrkfl, wrk, lwrkin, iwrk,  precis,
-     *       fsub, dfsub, gsub, dgsub, rpar, ipar, iflbvp,full)
+/* definition of the calls to the fortran functions - in file twpbvpc.f
 */
 
 void F77_NAME(twpbvpc)(int*, int*, double *, double *,
@@ -23,12 +17,9 @@ void F77_NAME(twpbvpc)(int*, int*, double *, double *,
          double *, double *, double *, double *, double *, 
          double *, int *, int *, int *, int *, int *, int *, int *);
 
-/* interface between fortran function calls and R functions
-   Fortran code calls twp_derivs(m, x, y, ydot)
-   R code called as twp_deriv_func(x, y) and returns ydot
-   Note: passing of parameter values and "..." is done in R-function bvpcol*/
+/* interface between fortran function calls and R functions */
 
-static void twp_derivs (int *n,  double *x, double *y, double *ydot,
+static void C_bvpderiv_func (int *n,  double *x, double *y, double *ydot,
   double * rpar, int * ipar)
 {
   int i;
@@ -36,14 +27,17 @@ static void twp_derivs (int *n,  double *x, double *y, double *ydot,
                              REAL(X)[0]   = *x;
   for (i = 0; i < *n ; i++)  REAL(Y)[i]   = y[i];
 
-  PROTECT(R_fcall = lang3(twp_deriv_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, bvp_envir));      incr_N_Protect();
+  PROTECT(R_fcall = lang3(R_bvpderiv_func,X,Y)); incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));      incr_N_Protect();
 
   for (i = 0; i < *n ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
                                                 my_unprotect(2);
 }
 
-static void forc_twp (int *neq, double *x, double *y,
+/* wrapper above the derivate function that first estimates the
+values of the forcing functions */
+
+static void C_bvpderiv_func_forc (int *neq, double *x, double *y,
                          double *ydot, double *rpar, int *ipar)
 {
   updatedeforc(x);
@@ -51,7 +45,7 @@ static void forc_twp (int *neq, double *x, double *y,
 }
 
 /* interface between fortran call to jacobian and R function */
-static void twp_jac (int *n,  double *x, double *y, double *pd,
+static void C_bvpjac_func (int *n,  double *x, double *y, double *pd,
   double * rpar, int * ipar)
 {
   int i;
@@ -59,8 +53,8 @@ static void twp_jac (int *n,  double *x, double *y, double *pd,
                            REAL(X)[0]   = *x;
   for (i = 0; i < *n; i++) REAL(Y)[i]   = y[i];
 
-  PROTECT(R_fcall = lang3(twp_jac_func,X,Y));   incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, bvp_envir));      incr_N_Protect();
+  PROTECT(R_fcall = lang3(R_bvpjac_func,X,Y));   incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));      incr_N_Protect();
 
   for (i = 0; i < *n * *n; i++)  pd[i] = REAL(ans)[i];
                                                 my_unprotect(2);
@@ -68,7 +62,7 @@ static void twp_jac (int *n,  double *x, double *y, double *pd,
 
 /* interface between fortran call to boundary condition and corresponding R function */
 
-static void twp_bound (int *ii, int *n, double *y, double *gout,
+static void C_bvpbound_func (int *ii, int *n, double *y, double *gout,
   double * rpar, int * ipar)
 {
   int i;
@@ -76,15 +70,15 @@ static void twp_bound (int *ii, int *n, double *y, double *gout,
                              INTEGER(J)[0] = *ii;
   for (i = 0; i < *n ; i++)  REAL(Y)[i] = y[i];
 
-  PROTECT(R_fcall = lang3(twp_bound_func,J,Y));   incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, bvp_envir));        incr_N_Protect();
+  PROTECT(R_fcall = lang3(R_bvpbound_func,J,Y));   incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));        incr_N_Protect();
   /* only one element returned... */
   gout[0] = REAL(ans)[0];
                                                   my_unprotect(2);
 }
 /*interface between fortran call to jacobian of boundary and corresponding R function */
 
-static void twp_jacbound (int *ii, int *n, double *y, double *dg,
+static void C_bvpjacbound_func (int *ii, int *n, double *y, double *dg,
   double * rpar, int * ipar)
 {
   int i;
@@ -92,21 +86,19 @@ static void twp_jacbound (int *ii, int *n, double *y, double *dg,
                            INTEGER(J)[0] = *ii;
   for (i = 0; i < *n; i++) REAL(Y)[i] = y[i];
 
-  PROTECT(R_fcall = lang3(twp_jacbound_func,J,Y));  incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, bvp_envir));          incr_N_Protect();
+  PROTECT(R_fcall = lang3(R_bvpjacbound_func,J,Y));  incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
 
   for (i = 0; i < *n ; i++)  dg[i] = REAL(ans)[i];
                                                     my_unprotect(2);
 }
 
-/* number of eqs, order of eqs, summed order of eqns, from, to,
-boundary points, settings, number of tolerances, tolerances,
-mesh points, initial value of continuation parameter */
+/* MAIN C-FUNCTION, CALLED FROM R-code */
 
 SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 		SEXP Tol, SEXP Linear, SEXP Full, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
 		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
-    SEXP Rpar, SEXP Ipar, SEXP UseC, SEXP func, SEXP jacfunc, SEXP boundfunc,
+    SEXP Rpar, SEXP Ipar, SEXP UseC, SEXP derivfunc, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP Initfunc, SEXP Parms, SEXP flist, SEXP rho)
 
 {
@@ -124,10 +116,11 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
   int full, useC;
   
-  deriv_func    *derivs;
-  jac_func      *jac;
-  jacbound_func *jacbound;
-  bound_func    *bound;
+  /* pointers to functions passed to FORTRAN */
+  deriv_func_type    *deriv_func;
+  jac_func_type      *jac_func;
+  jacbound_func_type *jacbound_func;
+  bound_func_type    *bound_func;
 
 /******************************************************************************/
 /******                         STATEMENTS                               ******/
@@ -150,13 +143,14 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   aleft  =REAL(Aleft)[0];
   aright =REAL(Aright)[0];
 
-/* is function a dll ?*/
-  if (inherits(func, "NativeSymbol")) {
+  /* is function a dll ?*/
+  if (inherits(derivfunc, "NativeSymbol")) {
    isDll = 1;
   } else {
    isDll = 0;
   }
 
+  /* copies of variables that will be changed in the FORTRAN subroutine */
   ntol = LENGTH(Tol);
   tol   =(double *) R_alloc(ntol, sizeof(double));
     for (j = 0; j < ntol;j++) tol[j] = REAL(Tol)[j];
@@ -167,7 +161,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   nfixpnt =  LENGTH(Fixpnt);
   fixpnt   =(double *) R_alloc(nfixpnt, sizeof(double));
    for (j = 0; j < nfixpnt;j++) fixpnt[j] = REAL(Fixpnt)[j];
-// check this:
+  // check this - Francesca/Jeff:
   nxdim = nmax;
   xx   =(double *) R_alloc(nmax, sizeof(double));
    for (j = 0; j < nmesh; j++) xx[j] = REAL(Xguess)[j];
@@ -197,108 +191,83 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Nlbc, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   rpar = (double *) R_alloc(ii, sizeof(double));
      for (j=0; j<ii; j++) rpar[j] = REAL(Rpar)[j];
 
-/* initialise global R-variables... */
+  /* initialise global R-variables... */
   if (isDll == 0) {
     PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
     PROTECT(J = NEW_INTEGER(1));                incr_N_Protect();
     PROTECT(Y = allocVector(REALSXP,ncomp));    incr_N_Protect();
   }
 
-  
+  /* Initialization of Parameters and Forcings (DLL functions)  */
   isForcing = initForcings(flist);
   initParms(Initfunc, Parms);
 
-   bvp_envir = rho;
+  R_envir = rho;
 
+  /* pointers to functions passed to FORTRAN */
   if (isDll) {   /* DLL addresses passed to fortran */
-      derivs = (deriv_func *) R_ExternalPtrAddr(func);
-      jac = (jac_func *) R_ExternalPtrAddr(jacfunc);
-      bound = (bound_func *) R_ExternalPtrAddr(boundfunc);
-      jacbound = (jacbound_func *) R_ExternalPtrAddr(jacboundfunc);
+      deriv_func = (deriv_func_type *) R_ExternalPtrAddr(derivfunc);
+      jac_func = (jac_func_type *) R_ExternalPtrAddr(jacfunc);
+      bound_func = (bound_func_type *) R_ExternalPtrAddr(boundfunc);
+      jacbound_func = (jacbound_func_type *) R_ExternalPtrAddr(jacboundfunc);
 
-	  /* here overruling derivs if forcing */
+	  /* here overruling deriv_func if forcing */
       if (isForcing) {
-        derfun = (deriv_func *) R_ExternalPtrAddr(func);
-        derivs = (deriv_func *) forc_twp;
+        derfun = (deriv_func_type *) R_ExternalPtrAddr(derivfunc);
+        deriv_func = (deriv_func_type *) C_bvpderiv_func_forc;
       }
 
   } else {      /* interface functions between fortran and R */
-      derivs = (deriv_func *) twp_derivs;
-      twp_deriv_func = func;
+      deriv_func = (deriv_func_type *) C_bvpderiv_func;
+      R_bvpderiv_func = derivfunc;
 
-      jac = twp_jac;
-      twp_jac_func = jacfunc;
+      jac_func = C_bvpjac_func;
+      R_bvpjac_func = jacfunc;
 
-      bound = twp_bound;
-      twp_bound_func = boundfunc;
+      bound_func = C_bvpbound_func;
+      R_bvpbound_func = boundfunc;
 
-      jacbound = twp_jacbound;
-      twp_jacbound_func = jacboundfunc;
+      jacbound_func = C_bvpjacbound_func;
+      R_bvpjacbound_func = jacboundfunc;
     }
 
-/* Call the fortran function -
-      subroutine twpbvpc(ncomp, nlbc, aleft, aright,
-     *       nfxpnt, fixpnt, ntol, ltol, tol,
-     *       linear, givmsh, giveu, nmsh,
-     *       nxxdim, xx, nudim, u, nmax,
-     *       lwrkfl, wrk, lwrkin, iwrk, precis,
-     *       fsub, dfsub, gsub, dgsub,
-     *       ckappa1,gamma1,sigma,ckappa,
-     *       ckappa2,rpar,ipar,iflbvp,liseries,iseries,indnms,
-     *       full)
+/* Call the fortran function twpbvpc
+// CHECK liseries with jeff/francesca!
 
 */
-// CHECK THIS!
-    liseries = nmax;
-    iseries = (int *)    R_alloc(liseries, sizeof(int));
+  liseries = nmax;
+  iseries = (int *)    R_alloc(liseries, sizeof(int));
     
-	  F77_CALL(twpbvpc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
+	F77_CALL(twpbvpc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
         &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, &nxdim, xx,
         &ncomp, u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
-        derivs, jac, bound, jacbound, 
+        deriv_func, jac_func, bound_func, jacbound_func, 
         &ckappa1, &gamma1, &sigma, &ckappa, &ckappa2, 
         rpar, ipar,
         &iflag, &liseries, iseries, &indnms, &full, &useC);
 
-//     error("Till here.\n");
-
-/*
-C....   iflag - The Mode Of Return From twpbvp
-C....         =  0  For Normal Return
-C....         =  1  If The Expected No. Of Subintervals Exceeds Storage
-C....               Specifications.
-C....         = -1  If There Is An Input Data Error.
-*/
-	  if (iflag == 4)
-     {
+/*  iflag - The Mode Of Return From twpbvp  */
+	if (iflag == 4)      {
 	   unprotect_all();
      error("One of the input parameters is invalid.\n");
-     }
-    else if (iflag == 1)
-	{
+  }  else if (iflag == 1) 	{
 	  unprotect_all();
 	  error("The Expected No. Of mesh points Exceeds Storage Specifications.\n");
-	}
-
-    else if (iflag == 2)
-	{
+	}     else if (iflag == 2) 	{
 	  unprotect_all();
 	  error("The Expected No. Of meshes Exceeds Storage Specifications. Increase liseries\n");
-	}
-    else if (iflag == 3)
-	{
+	}     else if (iflag == 3)  	{
 	  unprotect_all();
 	  error("Terminated: ill conditioned problem.\n");
-	}
-
-  else
-	{
-   nx = nmesh;
+	}   else	{
+  /*                   ####   returning output   ####                           */    
+    nx = nmesh;
 
     PROTECT(yout = allocVector(REALSXP,(ncomp+1)*(nx)));incr_N_Protect();
 	  for (j = 0; j < nx; j++)       REAL(yout)[j]    = xx[j];
     for (j = 0; j < ncomp*nx; j++) REAL(yout)[nx+j] =  u[j];
-   }
+  }
+ 
   PROTECT(ISTATE = allocVector(INTSXP, 5));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
   INTEGER(ISTATE)[1] = nmax;
