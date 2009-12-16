@@ -32,10 +32,10 @@
     \item All test problems from the website of J.R. Cash
       \url{http://www.ma.ic.ac.uk/~jcash/BVP_software/PROBLEMS.PDF} are
       implemented in package vignette "bvpTests"
-    \item Other test problems, in \R code are in the packages \url{example}
+    \item Other test problems, in \R code are in the packages \url{doc/example}
       subdirectory.
     \item Test problems implemented in compiled code can be found in the
-      packages \url{dynload} subdirectory.
+      packages \url{doc/dynload} subdirectory.
     \item Still more examples, both in R and compiled code are in the package
       vignetter "bvpSolve".
   }
@@ -74,10 +74,10 @@ example(bvptwp)
 example(bvpshoot)
 
 ## open the directory with R- examples
-browseURL(paste(system.file(package = "bvpSolve"), "/examples", sep = ""))
+browseURL(paste(system.file(package = "bvpSolve"), "doc/examples", sep = ""))
 
 ## open the directory with examples in compiled code
-browseURL(paste(system.file(package = "bvpSolve"), "/dynload", sep = ""))
+browseURL(paste(system.file(package = "bvpSolve"), "doc/dynload", sep = ""))
 
 ## show package vignette with how to use bvpSolve
 ## + source code of the vignette
