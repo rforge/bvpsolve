@@ -1,2 +1,0 @@
-useDynLib(colmod)
-export(bvpcolmod)
