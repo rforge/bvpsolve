@@ -4,6 +4,7 @@
 ## h'' + R*f*h' + 1 = 0 
 ## O'' + P*f*O' = 0
 ## A is unknown
+## Example 1.4 from Asher et al., 1995.
 ##
 ## rewritten as:
 ## df=f1                   #f

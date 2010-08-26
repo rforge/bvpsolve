@@ -78,16 +78,16 @@ diagnostics.bvpSolve<- function(obj, ...) {
     idid <- istate[1]
     if (idid ==0)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
+    if(Attr$name == "bvptwp") {
 
-    df <- c( "The return code                    :",   #1
-             "The maximal number of mesh points  :",   #2
-             "The actual number of mesh points   :",
-             "The size of the real work array    :",
-             "The size of the integer work array :")
+      df <- c( "The return code                    :",   #1
+               "The maximal number of mesh points  :",   #2
+               "The actual number of mesh points   :",
+               "The number of function evaluations :",
+               "The size of the integer work array :")
 
 
     printmessage(df, istate)
-
     cat("\n--------------------\n")
     cat(paste( "conditioning pars"))
     cat("\n--------------------\n")
@@ -98,6 +98,13 @@ diagnostics.bvpSolve<- function(obj, ...) {
              "ckappa   :",
              "ckappa2  :")
     printmessage(df, rstate)
+   }  else {
+      df <- c( "The return code                    :",   #1
+               "The actual number of mesh points   :")
+
+
+    printmessage(df, istate[1:2])
+   }
 
 }
 

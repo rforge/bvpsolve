@@ -60,7 +60,7 @@ res2<- function (Y,yini,T)
 init <- c(y1=NA,y2=NA,T=NA)
 sol2 <- bvpshoot(func=nerve2, yini=init, yend=res,
         x=seq(0,1,by=0.01),
-        guess=c(0.5,0.5,2*pi)2)
+        guess=c(0.5,0.5,2*pi))
         
 attributes(sol)$root
 plot(sol,type="l",lwd=2)

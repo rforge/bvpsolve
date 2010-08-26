@@ -9,15 +9,18 @@
   Functions that solve boundary value problems of a system of stiff
   ordinary differential equations (ODE)
 
-  The functions provide (1) an interface to the FORTRAN code
+  The functions provide an interface to (1) the FORTRAN code
   twpbvpC written by J.R. Cash, F. Mazzia and M.H. Wright,
-  and (2) also implements a shooting method.
+  
+  (2) to the FORTRAN code colnew by Ascher, Christiansen and Russell
+  
+  and also implement a shooting method.
 }
 \details{
   \tabular{ll}{
     Package: \tab bvpSolve\cr
     Type:    \tab Package\cr
-    Version: \tab 1.1\cr
+    Version: \tab 1.2\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
@@ -56,6 +59,10 @@
    conditioning, for two-point boundary value codes. J. Comput. Appl. Math. 184  
    no. 2, 362--381.
 
+  U. Ascher, J. Christiansen and R. D. Russell,  (1981)
+  collocation software for boundary-value odes,
+  acm trans. math software 7, 209-222.
+
   \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
 \seealso{
@@ -63,6 +70,10 @@
     implicit Runge-Kutta formulas and adaptive mesh refinement, based on 
     conditioning to solve two-point boundary value problems (Cash and Mazzia, 2005).
     
+  \code{\link{bvpcol}}, a collocation methodCollocation method  to 
+  solve multi-point boundary value problems of ordinary
+  differential equations. (Asher et al., 1981).
+
   \code{\link{bvpshoot}}, a shooting method, using solvers from packages
     deSolve and rootSolve.
 }

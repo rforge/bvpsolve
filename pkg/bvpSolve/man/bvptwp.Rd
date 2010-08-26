@@ -308,7 +308,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
    one forcing function data set.
 }
 \seealso{
-  \code{\link{bvpshoot}} for the shooting method
+  \code{\link{bvpshoot}} for a shooting method
+  
+  \code{\link{bvpcol}} for a collocation method  
 }
 
 \keyword{math}

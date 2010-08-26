@@ -37,6 +37,8 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     stop("`bound' must be a function or character vector")
   if (!is.null(jacbound) && !(is.function(jacbound) || is.character(jacbound)))
     stop("`jacbound' must be a function or character vector")
+  if (length(x) > nmax)
+        stop ("length of 'x' (", length(x), "), should not be > nmax (", nmax, ")")
 
   if (is.character(func)) {
       if (!is.character(jacfunc))
@@ -63,7 +65,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       guess <- yguess[inix,1]
 
     if (nas > 0 & is.null(guess))  {
-      warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
+      if (verbose) warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
       guess <- rep(0,nas)
     }
 
@@ -71,6 +73,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       stop("length of 'guess' should be equal to number of NAs in y")
     if (nas > 0)
       y[inix] <- guess
+
     inix   <- which (!is.na(yini))
     finalx <- which (!is.na(yend))
     if (leftbc==length(y))
@@ -80,14 +83,14 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       stop("leftbc should be inputted if bound is given")
       
     if (! is.null(yguess))
-      guess <- yguess[,1]  #KS: or [,1]
+      guess <- yguess[,1]   
     Y <- y <- guess  # trick
   }
   if (length(y) == 0 && is.null(ncomp))
     stop ("don't know the number of state variables - provide 'ncomp' or 'guess', a initial guess")
   Ynames <- attr(y,"names")
   if (is.null(Ynames) & ! is.null(yend))   Ynames <- names(yend)
-  if (is.null(Ynames) & is.matrix(yguess)) Ynames <- colnames(yguess)
+  if (is.null(Ynames) & is.matrix(yguess)) Ynames <- rownames(yguess)
   if (is.null(Ynames) & is.vector(yguess)) Ynames <- names(yguess)
   flist     <- list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
   ModelInit <- NULL
@@ -136,9 +139,10 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       flist <- checkforcings(forcings,x,dllname,initforc,FALSE,fcontrol)
 
   } else {      # The functions are R-code
-  
+    ifunc <- 0
     Func    <- function(x,state)  {
       attr(state,"names") <- Ynames
+      ifunc <- ifunc +1
       func   (x,state,parms,...)[1]
     }
     Func2   <- function(x,state)  {
@@ -245,21 +249,32 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   if (! is.null (xguess))  {
     givmesh <- TRUE
     nmesh   <- length(xguess)
-    if (nmesh<length(x)) {
+    
+    if (nmesh < length(x)) {
       warning ("expanding xguess; must be provided in as many mesh points as x")
       Xguess <- x
-    } else Xguess <- xguess
+    } else {
+      rr <- range(Xguess) - range(x)
+      if (rr[1] <0)
+        stop ("minimum of 'xguess' (",Xguess[1], "), should be <= minimum of 'x' (", x[1], ")")
+      if (rr[2] <0)
+        stop ("maximum of 'xguess' (",Xguess[nmesh], "), should be >= maximum of 'x' (", x[nmesh], ")")
+      # expand Xguess with elements in x and not in xguess
+      if (length(ii <- which(!x %in% xguess)) >0)
+        Xguess <- sort(c(x[ii],xguess))
+    }  
+  
   }
   if (! is.null(yguess))  {
     if (is.null(xguess))
       stop ("xguess must be provided if yguess is")
     givu <- TRUE
-    if (nmesh<length(x))  { # expand yguess
+    if (nmesh < length(x) || length(ii)>0)  { # expand yguess
       Yguess <- NULL
       nmesh <- length(Xguess)
       for (i in 1:ncomp)
         Yguess <- rbind(Yguess,approx(xguess,yguess[i,],Xguess)$y)
-    } else  Yguess <- yguess # ncomp,nmesh
+    } else Yguess <- yguess # ncomp,nmesh
     if (length(Yguess) != nmesh*ncomp) stop ("xguess and yguess not compatible")
   }
   ntol <- ncomp
@@ -276,7 +291,6 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     else
       initpar <- as.double(parms)
   if(verbose) ow <- options("warn"=1)   # print as warnings are generated
-      
   out <- .Call("call_bvptwp",as.integer(ncomp),as.integer(leftbc),
             as.double(fixpt),as.double(aleft),as.double(aright),
             as.double(atol),as.integer(linear), as.integer(verbose),
@@ -303,8 +317,9 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
       out <- out [which(out[,1]%in% x),]
   dimnames(out) <- list(NULL,nm)
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
-  names(nn) <- c("flag","nmax","nmesh","nrwork","niwork")
+  names(nn) <- c("flag","nmax","nmesh","funceval","niwork")
   attr(out,"istate") <- nn 
+  istate[4] <- ifunc
   names(rn) <- c("ckappa1","gamma1","sigma","ckappa","ckappa2")
   attr(out,"rstate") <- rn 
   attr(out,"name") <- "bvptwp"

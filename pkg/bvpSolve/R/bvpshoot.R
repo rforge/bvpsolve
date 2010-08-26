@@ -106,7 +106,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     Ynames <- names(yend)
   if (is.null(y)) {
     y <- rep(0,ncomp)
-    warning("estimates for initial conditions not given ('guess'); assuming 0's")
+    if (verbose) warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
   }  
   if (is.null(y)) 
     stop ("either provide 'guess' for initial conditions or 'ncomp', number of compartments")

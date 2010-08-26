@@ -1,13 +1,15 @@
 ## =============================================================================
+##
 ## "Swirling Flow III", a test problem in Ascher, Mattheij,
 ## and Russell, Numerical Solution of Boundary Value Problems
 ## for Ordinary Differential Equations", Classics in Applied
 ## Mathematics Series, SIAM, Philadelphia, 1995].
+##
 ## g'' = (g f' - f g')/eps
 ## f'''' = (-ff'''-gg')/eps
 ## g(0)=-1,f(0)=0,f'(0)=0, g(1)=1,f(1)=0,f'(1)=0
 ##
-## 1st order system (y1=g, y3=f)
+## written as a 1st order system (y1=g, y3=f)
 ## y1' = y2
 ## y2' = (y1*y4 -y3*y2)/eps
 ## y3'=y4
@@ -15,6 +17,7 @@
 ## y5'=y6
 ## y6'=(-y3y6-y1y2)/eps
 ## y1(0)=-1,y3(0)=0,y4(0)=0, y1(1)=1,y3(1)=0,y4(1)=0
+##
 ## =============================================================================
 
 require(bvpSolve)

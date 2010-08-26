@@ -246,7 +246,9 @@ bvpshoot(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 }
 
 \seealso{
-  \code{\link{bvptwp}} for the MIRK method
+  \code{\link{bvptwp}} for a MIRK method
+
+  \code{\link{bvpcol}} for a collocation method  
 
   \code{\link[deSolve]{lsoda}}, \code{\link[deSolve]{lsode}},
     \code{\link[deSolve]{lsodes}}, \code{\link[deSolve]{vode}},
