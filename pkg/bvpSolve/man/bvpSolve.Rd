@@ -6,15 +6,15 @@
   Solvers for Boundary Value Problems (BVP) of Ordinary Differential Equations
 }
 \description{
-  Functions that solve boundary value problems of a system of stiff
+  Functions that solve boundary value problems of a system of 
   ordinary differential equations (ODE)
 
   The functions provide an interface to (1) the FORTRAN code
   twpbvpC written by J.R. Cash, F. Mazzia and M.H. Wright,
   
-  (2) to the FORTRAN code colnew by Ascher, Christiansen and Russell
+  (2) to the FORTRAN code colnew by Bader and Ascher
   
-  and also implement a shooting method.
+  and (3) also implement a shooting method.
 }
 \details{
   \tabular{ll}{
@@ -40,7 +40,7 @@
     \item Test problems implemented in compiled code can be found in the
       packages \url{doc/dynload} subdirectory.
     \item Still more examples, both in R and compiled code are in the package
-      vignetter "bvpSolve".
+      vignette "bvpSolve".
   }
 }
 \author{
@@ -59,6 +59,11 @@
    conditioning, for two-point boundary value codes. J. Comput. Appl. Math. 184  
    no. 2, 362--381.
 
+  G. Bader and U. Ascher, (1987)
+  a new basis implementation for a mixed order
+  boundary value ode solver,
+  siam j. scient. stat. comput. 8, 487-483.
+
   U. Ascher, J. Christiansen and R. D. Russell,  (1981)
   collocation software for boundary-value odes,
   acm trans. math software 7, 209-222.
@@ -70,12 +75,17 @@
     implicit Runge-Kutta formulas and adaptive mesh refinement, based on 
     conditioning to solve two-point boundary value problems (Cash and Mazzia, 2005).
     
-  \code{\link{bvpcol}}, a collocation methodCollocation method  to 
+  \code{\link{bvpcol}}, a collocation method to 
   solve multi-point boundary value problems of ordinary
-  differential equations. (Asher et al., 1981).
+  differential equations. (AsCher et al., 1981).
 
   \code{\link{bvpshoot}}, a shooting method, using solvers from packages
     deSolve and rootSolve.
+
+  \code{\link{diagnostics.bvpSolve}}, for a description of diagnostic messages.
+
+  \code{\link{plot.bvpSolve}}, for a description of plotting the output of the 
+  BVP solvers.
 }
 
 \examples{
@@ -83,6 +93,7 @@
 ## show examples (see respective help pages for details)
 example(bvptwp)
 example(bvpshoot)
+example(bvpCOL)
 
 ## open the directory with R- examples
 browseURL(paste(system.file(package = "bvpSolve"), "doc/examples", sep = ""))

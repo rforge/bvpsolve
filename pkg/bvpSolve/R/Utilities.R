@@ -2,6 +2,46 @@
 ### S3 methods
 ### ============================================================================
 
+## An approximation function for bvpSolve objects that were solved with \
+## bvpcol
+approx <- function (x, ...) UseMethod("approx")
+
+approx.default <- function (x, ...) {
+if ("bvpSolve" %in% class (x))
+  approx.bvpSolve(x,...)
+else  
+  stats::approx(x,...)
+#nextmethod()  
+}
+
+approx.bvpSolve <- function(x, xout=NULL, ...){
+ 
+  Attr <- attributes(x)
+  if (Attr$name != "bvpcol")
+    stop("can only use 'approx.bvpSolve' if problem was solved with 'bvpcol'")
+  istate <- Attr$istate[-1]
+  rstate <- Attr$rstate
+  il <- length(xout)
+  if (il <= 0)
+    stop ("'approx' requires at least one value to approximate")   
+
+  z <- rep(1, istate[4])
+  appone <- function(x)
+    .Fortran("appsln", as.double(x), 
+            result = as.double(z), as.double(rstate), as.integer(istate))$result
+  Out <- NULL
+  for (i in 1:il)
+    Out <- rbind(Out,c(xout[i],appone(xout[i])))
+  colnames(Out) <- colnames(x)
+  class (Out) <- c( "bvpSolve", "matrix" ) 
+  attr(Out, "name") <-  "approx"
+  dimnames(Out) <- dimnames(x)
+  Out
+}
+
+
+print.bvpSolve <- function(x, ...)
+   print(as.data.frame(x), ... )
 
 plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
     t <- 1     # column with "times"
@@ -42,7 +82,7 @@ plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
     ## interactively wait if there are remaining figures
     if (ask) {
         oask <- devAskNewPage(TRUE)
-	on.exit(devAskNewPage(oask))
+	      on.exit(devAskNewPage(oask))
     }
 
     Main <- is.null(dots$main)
@@ -69,25 +109,31 @@ diagnostics.bvpSolve<- function(obj, ...) {
     rstate <- Attr$rstate
 
     if (is.null(istate) || is.null (rstate)) return(NULL)
-    if (! Attr$name == "bvptwp") return(NULL)
+    cat("\n--------------------\n")
+    cat(paste( "solved with ",Attr$name))
+    cat("\n--------------------\n")
 
+    if (Attr$name == "bvpshoot") {
     cat("\n--------------------\n")
-    cat(paste( "return code"))
+    cat("diagnostics of the IVP solver ")
     cat("\n--------------------\n")
+      diagnostics.deSolve(obj)
+    }  
 
     idid <- istate[1]
+
+    if (Attr$name == "bvptwp") {
     if (idid ==0)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
-    if(Attr$name == "bvptwp") {
-
-      df <- c( "The return code                    :",   #1
-               "The maximal number of mesh points  :",   #2
-               "The actual number of mesh points   :",
-               "The number of function evaluations :",
-               "The size of the integer work array :")
+    df <- c( "The return code                    :",   #1
+             "The maximal number of mesh points  :",   #2
+             "The actual number of mesh points   :",
+             "The size of the real work array    :",
+             "The size of the integer work array :")
 
 
     printmessage(df, istate)
+
     cat("\n--------------------\n")
     cat(paste( "conditioning pars"))
     cat("\n--------------------\n")
@@ -98,13 +144,20 @@ diagnostics.bvpSolve<- function(obj, ...) {
              "ckappa   :",
              "ckappa2  :")
     printmessage(df, rstate)
-   }  else {
-      df <- c( "The return code                    :",   #1
-               "The actual number of mesh points   :")
+    } else if (Attr$name == "bvpcol") {
+    if (idid ==1)  cat("  Integration was successful.\n") else
+       cat("  Integration was NOT successful\n")
+    df <- c( "The return code                                   :",   #1
+             "The actual number of mesh points                  :",
+             "The number of collocation points per subinterval  :",
+             "The number of equations                           :",
+             "The number of components (variables)              :",
+             rep(
+             "The order of each equation                        :",istate[4]))
 
 
-    printmessage(df, istate[1:2])
-   }
+    printmessage(df, istate[-c(6:8)])
+    }    
 
 }
 

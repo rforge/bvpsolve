@@ -10,13 +10,16 @@
   equations using the shooting method. This combines the integration routines
   from package \code{deSolve} with root-finding methods from package
   \code{rootSolve}.
+  
+  Preferentially \code{bvptwp} or \code{bvpcol} should be used rather than
+  \code{bvpshoot}, as they give mor precise output.
 }
 
 \usage{
-bvpshoot(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
-    extra=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL, 
-    leftbc=NULL, ncomp = NULL, atol=1e-8, rtol=1e-8,
-    maxiter=100, positive = FALSE, method="lsoda",...)
+bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
+    extra = NULL, jacfunc = NULL, bound = NULL, jacbound = NULL, 
+    leftbc = NULL, ncomp = NULL, atol = 1e-8, rtol = 1e-8,
+    maxiter = 100, positive = FALSE, method = "lsoda",...)
 }
 
 \arguments{
@@ -246,9 +249,7 @@ bvpshoot(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 }
 
 \seealso{
-  \code{\link{bvptwp}} for a MIRK method
-
-  \code{\link{bvpcol}} for a collocation method  
+  \code{\link{bvptwp}} for the MIRK method
 
   \code{\link[deSolve]{lsoda}}, \code{\link[deSolve]{lsode}},
     \code{\link[deSolve]{lsodes}}, \code{\link[deSolve]{vode}},
@@ -257,6 +258,11 @@ bvpshoot(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     for details about the integration method
     
   \code{\link[rootSolve]{multiroot}}, the root-solving method used
+
+  \code{\link{diagnostics.bvpSolve}}, for a description of diagnostic messages
+  
+  \code{\link{plot.bvpSolve}}, for a description of plotting the output of the 
+  BVP solvers.
 }
 \keyword{math}
 
@@ -279,27 +285,28 @@ bvpshoot(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 #--------------------------------
 # Derivative function
 #--------------------------------
-fun <- function(t,y,pars)
-{ dy1 <-y[2]
-  dy2 <- - 3*p*y[1]/(p+t*t)^2
+fun <- function(t, y, pars)
+{ dy1 <- y[2]
+  dy2 <- - 3*p*y[1] / (p+t*t)^2
   return(list(c(dy1,
-             dy2))) }
+               dy2))) }
 
 
 # parameter value
-p    <-1e-5
+p    <- 1e-5
 
 # initial and final condition; second conditions unknown
-init <- c(y=-0.1/sqrt(p+0.01), dy=NA)
-end  <- c(0.1/sqrt(p+0.01), NA)
+init <- c(y = -0.1 / sqrt(p+0.01), dy = NA)
+end  <- c(     0.1 / sqrt(p+0.01), NA)
 
 # Solve bvp
-sol  <- as.data.frame(bvpshoot(yini=init, x=seq(-0.1,0.1,by=0.001),
-        func=fun, yend=end, guess=1))
-plot(sol$x,sol$y,type="l")
+sol  <- bvpshoot(yini = init, x = seq(-0.1, 0.1, by = 0.001),
+          func = fun, yend = end, guess = 1)
+          
+plot(sol, which = "y", type = "l")
 
 # add analytical solution
-curve(x/sqrt(p+x*x),add=TRUE,type="p")
+curve(x/sqrt(p+x*x), add = TRUE, type = "p")
 
 ## =============================================================================
 ## Example 1b: simple
@@ -312,24 +319,25 @@ curve(x/sqrt(p+x*x),add=TRUE,type="p")
 ## dy2/dx  = - 1/x*dy/dx - (1-1/(4x^2)y + sqrt(x)*cos(x)
 ## =============================================================================
 
-f2 <- function(x,y,parms)
+f2 <- function(x, y, parms)
 {
  dy  <- y[2]
- dy2 <- -1/x*y[2]-(1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
- list(c(dy,dy2))
+ dy2 <- -1/x*y[2] - (1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
+ list(c(dy, dy2))
 }
 
-x    <- seq(1,6,0.1)
-sol  <- bvpshoot(yini=c(y=1,dy=NA), yend=c(-0.5,NA), x=x, func=f2, guess=1)
+x    <- seq(1, 6, 0.1)
+sol  <- bvpshoot(yini = c(y = 1, dy = NA), yend = c(-0.5, NA), 
+          x = x, func = f2, guess = 1)
 
 # plot both state variables
-plot(sol, type = "l", lwd=2)
+plot(sol, type = "l", lwd = 2)
 
 # plot only y and add the analytic solution
-plot(sol, which="y")
+plot(sol, which = "y")
 
 curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
-      1/4*x^(3/2)*sin(x),add=TRUE,type="l")
+      1/4*x^(3/2)*sin(x), add = TRUE, type = "l")
 
 
 ## =============================================================================
@@ -343,49 +351,50 @@ curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 ## dy2=Pe(dy-Ry^n)
 ## =============================================================================
 
-Reactor<-function(x,y,parms)
+Reactor<-function(x, y, parms)
 {
   list(c(y[2],
-         Pe*(y[2]+R*(y[1]^n))))
+         Pe * (y[2]+R*(y[1]^n))))
 }
 
 Pe <- 1
 R  <- 2
 n  <- 2
-x  <- seq(0,1,by=0.01)
+x  <- seq(0, 1, by = 0.01)
 
 # 1. yini is a function here
-yini <- function (x,parms) c(x,Pe*(x-1))
+yini <- function (x, parms) c(x, Pe*(x-1))
 
 system.time(
-sol <- bvpshoot(func=Reactor, yend=c(y=NA,dy=0), y=yini, x=x, extra=1)
+  sol <- bvpshoot(func = Reactor, yend = c(y = NA, dy = 0), 
+          y = yini, x = x, extra = 1)
 )
-plot(sol, which="y" ,main="Reactor", type="l", lwd=2)
+plot(sol, which = "y", main = "Reactor", type = "l", lwd = 2)
 attributes(sol)$roots
 
 # 2. using boundary function rather than yini...
-bound <- function(i,y,p) {
-  if (i ==1) return(y[2]-Pe*(y[1]-1))
-  if (i ==2) return(y[2])
+bound <- function(i, y, p) {
+  if (i == 1) return(y[2] - Pe*(y[1]-1))
+  if (i == 2) return(y[2])
 }
 
 # need to give number of left boundary conditions + guess of all initial 
 # conditions (+ names)
 system.time(
-Sol2<- bvpshoot(func=Reactor, x=x, leftbc=1,
-            bound=bound, guess=c(y=1,dy=1) )
+Sol2<- bvpshoot(func = Reactor, x = x, leftbc = 1,
+            bound = bound, guess = c(y = 1, dy = 1) )
 )
 attributes(Sol2)$roots
 
 
 # 3. boundary function with jacobian of boundary function
-jacbound <- function(i,y,p) {
-  if (i ==1) return(c(-Pe*y[1],1))
-  if (i ==2) return(c(0,1))
+jacbound <- function(i, y, p) {
+  if (i == 1) return(c(-Pe*y[1], 1))
+  if (i == 2) return(c(0, 1))
 }
 system.time(
-Sol3<-bvpshoot(func=Reactor, x=x, leftbc=1,
-            bound=bound, jacbound=jacbound, guess=c(y=1,dy=1) )
+Sol3<-bvpshoot(func = Reactor, x = x, leftbc = 1, bound = bound, 
+           jacbound = jacbound, guess = c(y = 1, dy = 1) )
 )
 attributes(Sol3)$roots
 
@@ -405,32 +414,32 @@ attributes(Sol3)$roots
 ##      u(0) = v(0) = w(0) = 1,  z(0) = -10,  w(1) = y(1)
 ## =============================================================================
 
-musn <- function(t,Y,pars)
+musn <- function(t, Y, pars)
 {
   with (as.list(Y),
   {
-   du=0.5*u*(w-u)/v
-   dv=-0.5*(w-u)
-   dw=(0.9-1000*(w-y)-0.5*w*(w-u))/z
-   dz=0.5*(w-u)
-   dy=-100*(y-w)
-   return(list(c(du,dv,dw,dy,dz)))
+   du <- 0.5 * u * (w-u)/v
+   dv <- -0.5 * (w-u)
+   dw <- (0.9 - 1000 * (w-y) - 0.5 * w * (w-u))/z
+   dz <- 0.5 * (w-u)
+   dy <- -100 * (y-w)
+   return(list(c(du, dv, dw, dy, dz)))
   })
 }
 
 #--------------------------------
-# Residuals
+# Residuals of end conditions
 #--------------------------------
-res  <- function (Y,yini,pars)  with (as.list(Y), w-y)
+res  <- function (Y, yini, pars)  with (as.list(Y), w-y)
 
 #--------------------------------
 # Initial values; y= NA= not available
 #--------------------------------
 
-init <- c(u=1,v=1,w=1,y=NA,z=-10)
-sol  <-bvpshoot(y= init, x=seq(0,1,by=0.05), func=musn,
-           yend=res, guess=1, atol=1e-10, rtol=0)
-pairs(sol, main="MUSN")
+init <- c(u = 1, v = 1, w = 1, y = NA, z = -10)
+sol  <-bvpshoot(y = init, x = seq(0, 1, by = 0.05), func = musn,
+           yend = res, guess = 1, atol = 1e-10, rtol = 0)
+pairs(sol, main = "MUSN")
 
 ## =============================================================================
 ## Example 4 - solve also for unknown parameter
@@ -442,18 +451,18 @@ pairs(sol, main="MUSN")
 ## dy2= -(lam-10cos(2t))*y
 ## =============================================================================
 
-mathieu<- function(t,y,lam)
+mathieu<- function(t, y, lam)
 {
- list(c(y[2],-(lam-10*cos(2*t))*y[1]))
+ list(c(y[2], -(lam - 10 * cos(2*t)) * y[1]))
 }
 
-yini <- c(1,0)   # initial condition(y1=1,dy=y2=0)
-yend <- c(NA,0)  # final condition at pi (y1=NA, dy=0)
+yini <- c(1, 0)   # initial condition(y1=1,dy=y2=0)
+yend <- c(NA, 0)  # final condition at pi (y1=NA, dy=0)
 
 # there is one extra parameter to be fitted: "lam"; its initial guess = 15
-Sol  <- bvpshoot(yini=yini, yend=yend, x=seq(0,pi,by=0.01),
-        func=mathieu, guess=NULL, extra=15)
+Sol  <- bvpshoot(yini = yini, yend = yend, x = seq(0, pi, by = 0.01),
+          func = mathieu, guess = NULL, extra = 15)
 plot(Sol)
-attr(Sol,"roots")  # root gives the value of "lam" (17.10684)
+attr(Sol, "roots")  # root gives the value of "lam" (17.10684)
 }
 

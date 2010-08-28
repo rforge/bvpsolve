@@ -26,6 +26,7 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
     dllname = NULL, initfunc = dllname, 
     rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
     initforc = NULL, fcontrol = NULL, verbose = FALSE, ...) 
+
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -298,7 +299,14 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
 \seealso{
 \code{\link{bvpshoot}} for the shooting method
 
-\code{bvptwp} for a MIRK formula
+\link{bvptwp} for a MIRK formula
+
+\code{\link{diagnostics.bvpSolve}}, for a description of diagnostic messages
+  
+\code{\link{approx.bvpSolve}}, for approximating solution in new values
+  
+\code{\link{plot.bvpSolve}}, for a description of plotting the output of the 
+  BVP solvers.
 }
 
 \references{
@@ -321,7 +329,7 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
 \keyword{math}
 
 \examples{
-#################################################################
+################################################################################
 # Example 1: simple standard problem
 # solve the BVP ODE:
 # d2y/dt^2=-3py/(p+t^2)^2
@@ -361,6 +369,11 @@ plot(sol, type = "l", which = 1)
 # add analytical solution
 curve(x/sqrt(p+x*x), add = TRUE, type = "p")
 
+diagnostics(sol)
+
+zoom <- approx(sol, xout = seq(-0.005, 0.005, by  = 0.0001))
+plot(zoom, which = 1, main = "zoom in on [-0.0005,0.0005]")
+
 
 ################################################################################
 # Example 1b: 
@@ -374,7 +387,7 @@ fun2 <- function(t, y, pars)
 sol2  <- bvpcol(yini = init, yend = end, order = 2, 
                 x = seq(-0.1, 0.1, by = 0.001), func = fun2)
 
-#################################################################
+################################################################################
 # Example 2: simple
 # solve d2y/dx2 + 1/x*dy/dx + (1-1/(4x^2)y = sqrt(x)*cos(x),
 # on the interval [1,6] and with boundary conditions:
@@ -383,7 +396,7 @@ sol2  <- bvpcol(yini = init, yend = end, order = 2,
 # Write as set of 2 odes
 # dy/dx = y2
 # dy2/dx  = - 1/x*dy/dx - (1-1/(4x^2)y + sqrt(x)*cos(x)
-#################################################################
+################################################################################
 
 f2 <- function(x, y, parms)
 {
@@ -402,7 +415,7 @@ curve(0.0588713*cos(x)/sqrt(x) + 1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
       1/4*x^(3/2)*sin(x), add = TRUE, type = "l")
 
 
-#################################################################
+################################################################################
 # Example 3  - solved with specification of boundary, and jacobians
 # d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
 # y(0)=y'(0)=0
@@ -412,7 +425,7 @@ curve(0.0588713*cos(x)/sqrt(x) + 1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 # dy2/dx = y3    (=d2y/dx2)
 # dy3/dx = y4    (=d3y/dx3)
 # dy4/dx = R*(y2*y3 -y*y4)
-#################################################################
+################################################################################
 
 # derivative function: 4 first-order derivatives
 f1st<- function(x, y, parms, R)
@@ -461,7 +474,7 @@ sol  <- bvpcol(x = seq(0, 1, by = 0.01),
 
 plot(sol)
 
-#################################################################
+################################################################################
 # Example 3b - solved with specification of boundary, and jacobians
 # and as a higher-order derivative
 # d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
@@ -472,7 +485,7 @@ plot(sol)
 # dy2/dx = y3    (=d2y/dx2)
 # dy3/dx = y4    (=d3y/dx3)
 # dy4/dx = R*(y2*y3 -y*y4)
-#################################################################
+################################################################################
 
 # derivative function: one fourth-order derivative
 f4th <- function(x, y, parms, R)
@@ -509,13 +522,13 @@ sol2  <- bvpcol(x = seq(0,1,by=0.01), ynames = c("y","dy","d2y","d3y"),
 
 plot(sol2)
 
-#################################################################
+################################################################################
 # Example 4  - a multipoint bvp
 # dy1 = (y2 - 1)/2
 # dy2 = (y1*y2 - x)/mu
 # over interval [0,1]
 # y1(1) = 0; y2(0.5) = 1
-#################################################################
+################################################################################
 
 multip <- function (x, y, p) {
   list(c((y[2] - 1)/2, 

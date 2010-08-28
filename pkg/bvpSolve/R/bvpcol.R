@@ -287,6 +287,8 @@ bvpcol<- function(yini=NULL, x, func, yend=NULL, parms=NULL, ynames = NULL,
   GuessFunc <- function(x) y     # dummy function
   if (Restart) {   # previous solution used - same mesh 
     ATT <- attributes(yguess)
+    if (ATT$name != "bvpcol")
+       stop ("can only continuate solution if previous solution in 'yguess' was obtained with 'bvpcol', not with ", ATT$name)
     rwork <- ATT$rstate
     if ( length (rwork) == 0)
        stop ("attributes(yguess)$rstate should be present, if continuation is requested")

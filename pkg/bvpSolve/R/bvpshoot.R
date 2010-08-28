@@ -106,7 +106,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     Ynames <- names(yend)
   if (is.null(y)) {
     y <- rep(0,ncomp)
-    if (verbose) warning("estimates for unknown initial conditions not given ('guess'); assuming 0's")
+    warning("estimates for initial conditions not given ('guess'); assuming 0's")
   }  
   if (is.null(y)) 
     stop ("either provide 'guess' for initial conditions or 'ncomp', number of compartments")
@@ -156,11 +156,9 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   out <- ode (t=x, fun=func, y=Y, parms=Parms, method=method, jacfunc=jacfunc, 
               atol=atol, rtol=rtol, ...)
               
-  attr(out,"istate") <- NULL  # similar attributes of deSolve solvers
-  attr(out,"rstate") <- NULL
   attr(out,"roots")  <- data.frame(root=sol$root,
                                    f.root=sol$f.root, iter=sol$iter)
-  class(out) <- c("bvpSolve","matrix")  # a boundary value problem
+  class(out) <- c("bvpSolve","matrix","deSolve")  # a boundary value problem
   colnames(out)[1] <- "x"
   attr(out,"name") <- "bvpshoot"
 

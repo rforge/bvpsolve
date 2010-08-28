@@ -1,7 +1,7 @@
 \name{bvptwp}
 \alias{bvptwp}
 \title{
-  Solver for two-point boundary value problems of ordinary differential
+  Solves two-point boundary value problems of ordinary differential
   equations, using a mono-implicit Runge-Kutta formula
 }
 
@@ -16,21 +16,23 @@
 }
 
 \usage{
-bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
-  xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, jacbound=NULL,
-  leftbc=NULL, islin=FALSE, nmax=1000, atol=1e-8, cond = FALSE,
-  allpoints=TRUE, dllname=NULL, initfunc=dllname, ncomp=NULL,
-  forcings=NULL, initforc = NULL, fcontrol=NULL, verbose=FALSE, ...)
+bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, ynames = NULL,
+  xguess = NULL, yguess = NULL, jacfunc=NULL, bound = NULL, 
+  jacbound = NULL, leftbc = NULL, islin = FALSE, nmax = 1000, 
+  atol = 1e-8, cond = FALSE, allpoints = TRUE, ncomp = NULL, 
+  dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
+  forcings = NULL, initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
     the ODE system, or \code{NULL}.
 
     If \code{yini} is a vector, use \code{NA} for an
-    initial value which is not available. 
+    initial value which is not specified. 
     
     If \code{yini} has a
-    \code{names} attribute, the names will be used to label the output matrix.
+    \code{names} attribute, the names will be available within \code{func} and
+    used to label the output matrix.
     
     If \code{yini = NULL}, then the boundary conditions must be specified
     via function \code{bound};
@@ -67,7 +69,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     ODE system, or \code{NULL};
 
     if \code{yend} is a vector, use \code{NA}
-    for a final value which is not available.
+    for a final value which is not specified.
     
     If \code{yend} has a  \code{names} attribute, and \code{yini} does not,
     the names will be available within the functions and 
@@ -80,17 +82,12 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
   }
-  \item{guess }{guess for the value(s) of the unknown \emph{initial} conditions;
-    i.e. one value for each \code{NA} in \code{yini}. Ignored if \code{xguess}
-    and \code{yguess} are given.
+  \item{ynames }{The names of the variables; used to label the output, and 
+    avaliable within the functions.
     
-    The length of \code{guess} should equal the number of \code{NA}s
-    in \code{yini}. If not provided, a value = 0 is assumed for each
-    \code{NA} in \code{yini} and a warning printed.
-
-    if \code{guess} has a names attributes, the names will be 
-    available within the functions and used to label the output matrix.
-  }
+    If \code{ynames} is \code{NULL}, names can also be passed via \code{yini},  
+    \code{yend} or \code{yguess}.
+      }
   \item{xguess }{Initial grid \code{x}, a vector. \code{bvptwp} requires the length
     of \code{xguess} to be at least equal to the length of \code{x}. If this
     is not the case, then \code{xguess} and \code{yguess} will be interpolated
@@ -104,7 +101,7 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     \code{xguess}; a matrix with number of rows equal to the number of
     equations, and whose number of columns equals the length of \code{xguess}.
     
-    if the rows of \code{guess} have a names attribute, the names will be 
+    if the rows of \code{yguess} have a names attribute, the names will be 
     available within the functions and used to label the output matrix.
   }
   \item{jacfunc }{jacobian (optional) - either an \R-function that evaluates the
@@ -177,15 +174,34 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
     (which initialises values of parameters), as provided in
     \file{dllname}. See package vignette \code{"bvpSolve"}.
   }
-  \item{ncomp }{only used if the model is specified by compiled code, the number of
+  \item{rpar }{only when \file{dllname} is specified: a vector with
+    double precision values passed to the dll-functions whose names are
+    specified by \code{func} and \code{jacfunc}.
+  }
+  \item{ipar }{only when \file{dllname} is specified: a vector with
+    integer values passed to the dll-functions whose names are specified
+    by \code{func} and \code{jacfunc}.
+  }
+  \item{nout }{only used if \code{dllname} is specified and the model is
+    defined in compiled code: the number of output variables calculated
+    in the compiled function \code{func}, present in the shared
+    library. Note: it is not automatically checked whether this is
+    indeed the number of output variables calculated in the dll - you have
+    to perform this check in the code. See deSolve's package vignette
+    \code{"compiledCode"}.
+  }
+  \item{ncomp }{used if the model is specified by compiled code, the number of
     components (or equations). See package vignette \code{"bvpSolve"}.
+    
+    Also to be used if the boundary conditions are specified by \code{bound}, and 
+    there is no \code{yguess}
   }
   \item{forcings }{only used if \file{dllname} is specified: a list with
     the forcing function data sets, each present as a two-columned matrix,
     with (time,value); interpolation outside the interval
     [min(\code{times}), max(\code{times})] is done by taking the value at
     the closest data extreme. This feature is included for consistency with
-    the intial value problem solvers from packatge \code{deSolve}.
+    the initial value problem solvers from package \code{deSolve}.
 
     See package vignette \code{"compiledCode"} from package \code{deSolve}.
   }
@@ -208,7 +224,8 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 }
 
 \value{
-  A matrix with up to as many rows as elements in \code{x} and as many columns
+  A matrix of class \code{bvpSolve}, with up to as many rows as elements 
+  in \code{x} and as many columns
   as elements in \code{yini} or \code{ncomp} plus the number of "global"
   values returned from \code{func}, plus an additional
   column (the first) for the \code{x}-value.
@@ -219,9 +236,9 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
   if the number of points as in \code{x} was not sufficient. In order to
   not return these extra points, set \code{allpoints} equal to \code{FALSE}.
 
-  If \code{yini} has a names attribute, it will be used to label the columns
-  of the output value. If \code{yini} is not named, the solver will try to find
-  the names in \code{yend}, \code{yguess} and ultimately \code{guess}.
+  If \code{ynames} is given, or \code{yini}, \code{yend} has a names attribute, 
+  or \code{yguess} has named rows, the names will be used to label the
+  columns of the output value.
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
@@ -306,11 +323,20 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 
    Note that only ONE specification is allowed, even if there is more than
    one forcing function data set.
+   
+   This -advanced- feature is explained in \code{deSolve}'s package 
+   vignette "compiledCode".
 }
 \seealso{
-  \code{\link{bvpshoot}} for a shooting method
+  \code{\link{bvpshoot}} for the shooting method
+
+  \code{\link{bvpcol}} for the collocation method
+
+  \code{\link{diagnostics.bvpSolve}}, for a description of diagnostic messages
   
-  \code{\link{bvpcol}} for a collocation method  
+  \code{\link{plot.bvpSolve}}, for a description of plotting the output of the 
+  BVP solvers.
+
 }
 
 \keyword{math}
@@ -346,27 +372,27 @@ bvptwp(yini=NULL, x, func, yend=NULL, parms=NULL, guess=NULL,
 #--------------------------------
 # Derivative function
 #--------------------------------
-fun <- function(t,y,pars)
-{ dy1 <-y[2]
-  dy2 <- - 3*p*y[1]/(p+t*t)^2
+fun <- function(t, y, pars)
+{ dy1 <- y[2]
+  dy2 <- - 3*p*y[1] / (p+t*t)^2
   return(list(c(dy1,
-             dy2))) }
+                dy2))) }
 
 
 # parameter value
-p    <-1e-5
+p    <- 1e-5
 
 # initial and final condition; second conditions unknown
-init <- c(y=-0.1/sqrt(p+0.01), dy=NA)
-end  <- c(0.1/sqrt(p+0.01), NA)
+init <- c(y = -0.1 / sqrt(p+0.01), dy=NA)
+end  <- c(     0.1 / sqrt(p+0.01), NA)
 
 # Solve bvp
-sol  <- as.data.frame(bvptwp(yini=init,x=seq(-0.1,0.1,by=0.001),
-        func=fun, yend=end, guess=1))
-plot(sol$x,sol$y,type="l")
+sol  <- as.data.frame(bvptwp(yini = init, x = seq(-0.1, 0.1, by = 0.001),
+        func = fun, yend = end))
+plot(sol$x, sol$y, type = "l")
 
 # add analytical solution
-curve(x/sqrt(p+x*x),add=TRUE,type="p")
+curve(x/sqrt(p+x*x), add = TRUE, type = "p")
 
 ## =============================================================================
 ## Example 1b: simple
@@ -379,20 +405,21 @@ curve(x/sqrt(p+x*x),add=TRUE,type="p")
 ## dy2/dx  = - 1/x*dy/dx - (1-1/(4x^2)y + sqrt(x)*cos(x)
 ## =============================================================================
 
-f2 <- function(x,y,parms)
+f2 <- function(x, y, parms)
 {
  dy  <- y[2]
- dy2 <- -1/x*y[2]-(1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
- list(c(dy,dy2))
+ dy2 <- -1/x*y[2] - (1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
+ list(c(dy, dy2))
 }
 
-x    <- seq(1,6,0.1)
-sol  <- bvptwp(yini=c(y=1,dy=NA),yend=c(-0.5,NA),x=x,func=f2,guess=1)
-plot(sol,which="y")
+x    <- seq(1, 6, 0.1)
+sol  <- bvptwp(yini = c(y = 1, dy = NA),
+               yend = c(-0.5, NA), x = x, func = f2)
+plot(sol, which = "y")
 
 # add the analytic solution
 curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
-      1/4*x^(3/2)*sin(x),add=TRUE,type="l")
+      1/4*x^(3/2)*sin(x), add = TRUE, type = "l")
 
 ## =============================================================================
 ## Example 2  - using continuation
@@ -410,29 +437,30 @@ Prob24 <- function(x, y, pars, xi) {
        (AA/A)*(1-(ga-1)*y[1]^2/2))/(xi*A*y[1])  ))
 }
 
-ini <- c(0.9129,NA)
-end <- c(0.375,NA)
+ini <- c(0.9129, NA)
+end <- c(0.375, NA)
 
 # This problem needs an initial guess for y; (as it divides by y,
 # the default, 0, does not work)
 
 # guess of y; set equal to 1
-xguess <- c(0,1)
-yguess <- matrix(nrow=2,ncol=2,data=1)
+xguess <- c(0, 1)
+yguess <- matrix(nrow = 2, ncol = 2, data = 1)
 
 # start with relatively large value of xi
-xi <-0.01
+xi <- 0.01
 print(system.time(
-mod1  <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
-        func=Prob24,xi=xi, xguess=xguess,yguess=yguess)
+mod1  <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+          func = Prob24, xi = xi, xguess = xguess, yguess = yguess)
 ))        
-plot(mod1[,1:2], ylim = c(0.4,1.4), type="l", lwd=2)
+plot(mod1[,1:2], ylim = c(0.4,1.4), type = "l", lwd = 2)
 
 # use previous solution to initialise solver for smaller xi
-xi <-0.005
-mod1b  <- bvptwp(yini=ini,yend=end,x=seq(0,1,by=0.01),
-        func=Prob24,xi=xi, xguess=mod1[,1],yguess=t(mod1[,2:3]))
-lines(mod1b, lwd=2, col="red")
+xi <- 0.005
+mod1b  <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+        func = Prob24, xi = xi, xguess = mod1[,1], 
+        yguess = t(mod1[,2:3]))
+lines(mod1b, lwd = 2, col = "red")
 
 
 ## =============================================================================
@@ -447,50 +475,50 @@ lines(mod1b, lwd=2, col="red")
 ## dy4/dx = R*(y2*y3 -y*y4)
 ## =============================================================================
 
-f2<- function(x,y,parms,R)
+f2<- function(x, y, parms, R)
 {
-  list(c(y[2],y[3],y[4],R*(y[2]*y[3]-y[1]*y[4]) ))
+  list(c(y[2], y[3], y[4], R*(y[2]*y[3] - y[1]*y[4]) ))
 }
 
-df2 <- function(x,y,parms,R)
+df2 <- function(x, y, parms, R)
 {
- df <- matrix(nr=4,nc=4,byrow=TRUE,data=c(
-             0,1,0,0,
-             0,0,1,0,
-             0,0,0,1,
+ df <- matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
+             0,        1,     0,     0,
+             0,        0,     1,     0,
+             0,        0,     0,     1,
              -1*R*y[4],R*y[3],R*y[2],-R*y[1]))
 }
 
-g2 <- function(i,y,parms,R)
+g2 <- function(i, y, parms, R)
 {
-  if ( i ==1) return(y[1])
-  if ( i ==2) return(y[2])
-  if ( i ==3) return(y[1]-1)
-  if ( i ==4) return(y[2])
+  if (i == 1) return(y[1])
+  if (i == 2) return(y[2])
+  if (i == 3) return(y[1]-1)
+  if (i == 4) return(y[2])
 }
 
-dg2 <- function(i,y,parms,R)
+dg2 <- function(i, y, parms, R)
 {
-  if ( i ==1) return(c(1,0,0,0))
-  if ( i ==2) return(c(0,1,0,0))
-  if ( i ==3) return(c(1,0,0,0))
-  if ( i ==4) return(c(0,1,0,0))
+  if (i == 1) return(c(1, 0, 0, 0))
+  if (i == 2) return(c(0, 1, 0, 0))
+  if (i == 3) return(c(1, 0, 0, 0))
+  if (i == 4) return(c(0, 1, 0, 0))
 }
 
 require(bvpSolve)
-init <- c(1,NA)
+init <- c(1, NA)
 R    <- 0.01
-sol  <- bvptwp(x=seq(0,1,by=0.01), leftbc=2,
-        func=f2, guess=1,R=R,
-        bound=g2, jacfunc=df2, jacbound=dg2)
+sol  <- bvptwp(x = seq(0, 1, by = 0.01), leftbc = 2,
+          func = f2, R = R, ncomp = 4,
+          bound = g2, jacfunc = df2, jacbound = dg2)
 plot(sol[,1:2])  # columns do not have names
 
 mf <- par ("mfrow")
-sol  <- bvptwp(x=seq(0,1,by=0.01), leftbc=2,
-        func=f2, guess=c(y=1,dy=1,dy2=1,dy3=1),R=R,
-        bound=g2, jacfunc=df2, jacbound=dg2)
+sol  <- bvptwp(x = seq(0, 1, by = 0.01), leftbc = 2,
+          func = f2, ynames = c("y", "dy", "d2y", "d3y"), R=R,
+          bound = g2, jacfunc = df2, jacbound = dg2)
 plot(sol)        # here they do
-par(mfrow=mf)
+par(mfrow = mf)
 
 }
 
