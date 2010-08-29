@@ -16,12 +16,14 @@
 }
 
 \usage{
-bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, ynames = NULL,
-  xguess = NULL, yguess = NULL, jacfunc=NULL, bound = NULL, 
-  jacbound = NULL, leftbc = NULL, islin = FALSE, nmax = 1000, 
-  atol = 1e-8, cond = FALSE, allpoints = TRUE, ncomp = NULL, 
-  dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
-  forcings = NULL, initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
+bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, 
+  order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
+  jacfunc=NULL, bound = NULL, jacbound = NULL, 
+  leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
+  ncomp = NULL, atol = 1e-8, cond = FALSE, allpoints = TRUE, 
+  dllname = NULL, initfunc = dllname, 
+  rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
+  initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -142,13 +144,36 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, ynames = NULL,
     If \code{jacbound} is \code{NULL}, then a numerical approximation using
     differences is used. This is the default.
   }
-  \item{leftbc }{only if \code{yini} and \code{yend} are not available: the
-    number of left boundary conditions.
+  \item{leftbc }{only if \code{yini} and \code{yend} are not available and
+    \code{posbound} is not specified: the number of left boundary conditions.
+  }
+  \item{posbound }{only used if \code{bound} is given: a vector with the position 
+    (in the mesh) of the boundary conditions - only the boundary points are 
+    allowed. Note that it is simpler to use \code{leftbc}. 
   }
   \item{islin }{set to \code{TRUE} if the problem is linear - this will
     speed up the simulation.
   }
   \item{nmax }{maximal number of subintervals during the calculation.
+  }
+  \item{order }{the order of each derivative in \code{func}. The default is that
+    all derivatives are 1-st order, in which case \code{order} can be set = 
+    \code{NULL}.
+    
+    If \code{order} is not \code{NULL}, the number of equations in \code{func} 
+    must equal the length of \code{order}; the summed values of \code{order}
+    must equal the number of variables (ncomp). 
+    The jacobian as specified in \code{jacfunc}
+    must have number of rows = number of equations and number of columns = number 
+    of variables.                            
+    \code{bound} and \code{jacbound} remain defined in the number of variables.
+    See example 4 and 4b. 
+  }   
+  \item{ncomp }{used if the model is specified by compiled code, the number of
+    components. See package vignette \code{"bvpSolve"}.
+    
+    Also to be used if the boundary conditions are specified by \code{bound}, and 
+    there is no \code{yguess}
   }
   \item{atol }{error tolerance, a scalar.
   }
@@ -189,12 +214,6 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, ynames = NULL,
     indeed the number of output variables calculated in the dll - you have
     to perform this check in the code. See deSolve's package vignette
     \code{"compiledCode"}.
-  }
-  \item{ncomp }{used if the model is specified by compiled code, the number of
-    components (or equations). See package vignette \code{"bvpSolve"}.
-    
-    Also to be used if the boundary conditions are specified by \code{bound}, and 
-    there is no \code{yguess}
   }
   \item{forcings }{only used if \file{dllname} is specified: a list with
     the forcing function data sets, each present as a two-columned matrix,
@@ -338,6 +357,29 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, ynames = NULL,
   BVP solvers.
 
 }
+\note{
+ When \code{order} is not \code{NULL}, then it should contain the order of all
+ \emph{equations} in \code{func}. If the order of some equations > 1, then 
+ there will be less equations than variables. The number of equations should
+ be equal to the length of \code{order}, while the number of variables will be
+ the sum of order.
+
+ For instance, if \code{order = c(1,2,3,4)}, then the first equation will be
+ of order 1, the second one of order 2, ...and the last of order 4. 
+
+ There will be 1+2+3+4 = 10 variables. For instance, if the derivative 
+ function defines (A', B'', C''', D'''') respectively, then the variable vector 
+ will contain values for A, B, B', C, C', C'', D, D', D'', D'''; in that 
+ order. This is also the order in which the initial and end conditions of 
+ all variables must be specified.
+
+ If neq are the number of equations, and ncomp the number of variables, then 
+ the Jacobian of the derivative function as specified in \code{jacfunc}
+ must be of dimension (neq, ncomp).
+ 
+ The jacobian of the boundaries, as specified in \code{jacbound} should return
+ a vector of length = ncomp
+}
 
 \keyword{math}
 
@@ -394,8 +436,21 @@ plot(sol$x, sol$y, type = "l")
 # add analytical solution
 curve(x/sqrt(p+x*x), add = TRUE, type = "p")
 
+
 ## =============================================================================
-## Example 1b: simple
+## Example 1b: 
+## Same problem, now solved as a second-order equation.
+## =============================================================================
+
+fun2 <- function(t, y, pars)
+{ dy <- - 3 * p * y[1] / (p+t*t)^2
+  list(dy)
+}
+sol2  <- bvptwp(yini = init, yend = end, order = 2, 
+                x = seq(-0.1, 0.1, by = 0.001), func = fun2)
+
+## =============================================================================
+## Example 2: simple
 ## solve d2y/dx2 + 1/x*dy/dx + (1-1/(4x^2)y = sqrt(x)*cos(x),
 ## on the interval [1,6] and with boundary conditions:
 ## y(1)=1, y(6)=-0.5
@@ -422,7 +477,7 @@ curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
       1/4*x^(3/2)*sin(x), add = TRUE, type = "l")
 
 ## =============================================================================
-## Example 2  - using continuation
+## Example 3  - using continuation
 ## Problem nr 24 from http://www.ma.ic.ac.uk/~jcash/BVP_software/PROBLEMS.PDF
 ## xi*A*y*y'' -((1+ga)/2-xi*A'*y*y'+y'/y+(A'/A*(1-(ga-1)/2*y^2)=0
 ## where A = 1 + x2, y(x=0) = 0:9129, y(x=1) = 0:375
@@ -464,7 +519,7 @@ lines(mod1b, lwd = 2, col = "red")
 
 
 ## =============================================================================
-## Example 3  - solved with specification of boundary, and jacobians
+## Example 4  - solved with specification of boundary, and jacobians
 ## d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
 ## y(0)=y'(0)=0
 ## y(1)=1, y'(1)=0
@@ -507,7 +562,7 @@ dg2 <- function(i, y, parms, R)
 
 require(bvpSolve)
 init <- c(1, NA)
-R    <- 0.01
+R    <- 100
 sol  <- bvptwp(x = seq(0, 1, by = 0.01), leftbc = 2,
           func = f2, R = R, ncomp = 4,
           bound = g2, jacfunc = df2, jacbound = dg2)
@@ -520,5 +575,35 @@ sol  <- bvptwp(x = seq(0, 1, by = 0.01), leftbc = 2,
 plot(sol)        # here they do
 par(mfrow = mf)
 
+## =============================================================================
+## Example 4b - solved with specification of boundary, and jacobians
+## and as a higher-order derivative
+## d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
+## y(0)=y'(0)=0
+## y(1)=1, y'(1)=0
+## =============================================================================
+
+# derivative function: one fourth-order derivative
+f4th <- function(x, y, parms, R) {
+  list(R * (y[2]*y[3] - y[1]*y[4]))
 }
 
+# jacobian of derivative function
+df4th <- function(x, y, parms, R)  {
+ df <- matrix(nrow = 1, ncol = 4, byrow = TRUE, data = c(
+             -1*R*y[4], R*y[3], R*y[2], -R*y[1]))
+}
+
+# boundary function - same as previous example
+
+# jacobian of boundary - same as previous
+
+# order = 4 specifies the equation to be 4th order
+sol2 <- bvptwp(x = seq(0, 1, by = 0.01), 
+          ynames = c("y", "dy", "d2y", "d3y"),
+          posbound = c(0, 0, 1, 1), func = f4th, R = R, order = 4, 
+          bound = g2, jacfunc = df4th, jacbound = dg2)
+
+max(abs(sol2-sol))
+
+}

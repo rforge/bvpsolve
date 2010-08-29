@@ -101,7 +101,8 @@ static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
 /* MAIN C-FUNCTION, CALLED FROM R-code */
 
 SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
-		SEXP Nlbc, SEXP Tol, SEXP Linear, SEXP Full, SEXP Givmesh, SEXP Givu, SEXP Nmesh,
+		SEXP Nlbc, SEXP Tol, SEXP Linear, SEXP Full, 
+    SEXP Givmesh, SEXP Givu, SEXP Nmesh,
 		SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
     SEXP Rpar, SEXP Ipar, SEXP UseC, 
     SEXP derivfunc, SEXP jacfunc, SEXP boundfunc,

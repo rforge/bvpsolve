@@ -2,23 +2,25 @@
 \alias{bvpshoot}
 \title{
   Solver for two-point boundary value problems of ordinary differential
-  equations, using the shooting method
+  equations, using the single shooting method
 }
 
 \description{
   Solves a boundary value problem of a system of ordinary differential
-  equations using the shooting method. This combines the integration routines
-  from package \code{deSolve} with root-finding methods from package
-  \code{rootSolve}.
+  equations using the single shooting method. 
+  This combines the integration routines from package 
+  \code{deSolve} with root-finding methods from package \code{rootSolve}.
   
   Preferentially \code{bvptwp} or \code{bvpcol} should be used rather than
-  \code{bvpshoot}, as they give mor precise output.
+  \code{bvpshoot}, as they give more precise output.
 }
 
 \usage{
-bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
-    extra = NULL, jacfunc = NULL, bound = NULL, jacbound = NULL, 
-    leftbc = NULL, ncomp = NULL, atol = 1e-8, rtol = 1e-8,
+bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, 
+    order = NULL, guess = NULL,
+    jacfunc = NULL, bound = NULL, jacbound = NULL, 
+    leftbc = NULL, posbound = NULL, ncomp = NULL, 
+    atol = 1e-8, rtol = 1e-8, extra = NULL, 
     maxiter = 100, positive = FALSE, method = "lsoda",...)
 }
 
@@ -84,6 +86,19 @@ bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
   }
+  \item{order }{the order of each derivative in \code{func}. The default is that
+    all derivatives are 1-st order, in which case \code{order} can be set = 
+    \code{NULL}.
+    
+    If \code{order} is not \code{NULL}, the number of equations in \code{func} 
+    must equal the length of \code{order}; the summed values of \code{order}
+    must equal the number of variables (ncomp). 
+    The jacobian as specified in \code{jacfunc}
+    must have number of rows = number of equations and number of columns = number 
+    of variables.                            
+    \code{bound} and \code{jacbound} remain defined in the number of variables.
+    See examples. 
+  }   
   \item{guess }{guess for the value(s) of the unknown \emph{initial} conditions;
     
     if initial and final conditions are specified by \code{yini} and 
@@ -103,11 +118,6 @@ bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
     If \code{guess} is not provided, then \code{ncomp} should specify the 
     total number of variables, a value = 0 will be assumed for the initial
     conditions and a warning printed.
-  }
-  \item{extra }{if too many boundary conditions are given, then it is assumed
-    that an extra parameter has to be estimated.
-
-    \code{extra} should contain the initial guess of this extra parameter.
   }
   \item{jacfunc }{jacobian (optional) - an \R-function that evaluates the
     jacobian of \code{func} at point \code{x}.
@@ -147,9 +157,14 @@ bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
   \item{leftbc }{only if \code{yini} and \code{yend} are not available: the
     number of left boundary conditions.
   }
+  \item{posbound }{only used if \code{bound} is given: a vector with the position 
+    (in the mesh) of the boundary conditions - only points that are in \code{x}
+    are allowed. Note that, if the boundary conditions are at the ends of the 
+    integration interval, it is simpler to use \code{leftbc}. 
+  }
   \item{ncomp }{only used if the boundaries are specified via the boundary 
     function \code{bound} and \code{guess} is not specified. 
-    The number of components (or equations).  
+    The number of components.  
   }
   \item{atol }{absolute error tolerance, either a scalar or a vector, one
     value for each unknown element - passed to function
@@ -158,6 +173,11 @@ bvpshoot(yini = NULL, x, func, yend = NULL, parms = NULL, guess = NULL,
   \item{rtol }{relative error tolerance, either a scalar or a vector, one
     value for each unknown element - passed to function
     \link[rootSolve]{multiroot} - see help of this function.
+  }
+  \item{extra }{if too many boundary conditions are given, then it is assumed
+    that an extra parameter has to be estimated.
+
+    \code{extra} should contain the initial guess of this extra parameter.
   }
   \item{maxiter }{the maximal number of iterations allowed in the root solver.
   }
@@ -367,7 +387,7 @@ yini <- function (x, parms) c(x, Pe*(x-1))
 
 system.time(
   sol <- bvpshoot(func = Reactor, yend = c(y = NA, dy = 0), 
-          y = yini, x = x, extra = 1)
+          yini = yini, x = x, extra = 1)
 )
 plot(sol, which = "y", main = "Reactor", type = "l", lwd = 2)
 attributes(sol)$roots
@@ -397,6 +417,31 @@ Sol3<-bvpshoot(func = Reactor, x = x, leftbc = 1, bound = bound,
            jacbound = jacbound, guess = c(y = 1, dy = 1) )
 )
 attributes(Sol3)$roots
+
+## =============================================================================
+## Example 2b - same as 2 but written as higher-order equation
+## y''=Pe(y'+Ry^n) Pe=1,R=2,n=2
+## on the interval [0,1] and with initial conditions:
+## y'0=Pe(y(0)-1), y'(1)=0
+## =============================================================================
+
+Reactor2<-function(x, y, parms) 
+  list (Pe * (y[2]+R*(y[1]^n)))
+
+Pe <- 1
+R  <- 2
+n  <- 2
+x  <- seq(0, 1, by = 0.01)
+
+# 1. yini is a function here
+yini <- function (x, parms) c(x, Pe*(x-1))
+
+# need to specify that order = 2
+system.time(
+  sol2 <- bvpshoot(func = Reactor2, yend = c(y = NA, dy = 0), order=2,
+          yini = yini, x = x, extra = 1)
+)
+max(abs(sol2-sol))
 
 ## =============================================================================
 ## Example 3 - final condition is a residual function
@@ -463,6 +508,24 @@ yend <- c(NA, 0)  # final condition at pi (y1=NA, dy=0)
 Sol  <- bvpshoot(yini = yini, yend = yend, x = seq(0, pi, by = 0.01),
           func = mathieu, guess = NULL, extra = 15)
 plot(Sol)
-attr(Sol, "roots")  # root gives the value of "lam" (17.10684)
+attr(Sol, "roots")  # root gives the value of "lam" (17.1068)
+}
+\note{
+ When \code{order} is not \code{NULL}, then it should contain the order of all
+ \emph{equations} in \code{func}. If the order of some equations > 1, then 
+ there will be less equations than variables. The number of equations should
+ be equal to the length of \code{order}, while the number of variables will be
+ the sum of order.
+
+ For instance, if \code{order = c(1,2,3,4)}, then the first equation will be
+ of order 1, the second one of order 2, ...and the last of order 4. 
+
+ There will be 1+2+3+4 = 10 variables. For instance, if the derivative 
+ function defines (A', B'', C''', D'''') respectively, then the variable vector 
+ will contain values for A, B, B', C, C', C'', D, D', D'', D'''; in that 
+ order. This is also the order in which the initial and end conditions of 
+ all variables must be specified.
+
+ Do not specify the jacobian if the maximal order>1.
 }
 

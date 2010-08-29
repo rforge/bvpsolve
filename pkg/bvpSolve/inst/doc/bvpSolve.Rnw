@@ -121,7 +121,8 @@
 
 <<preliminaries,echo=FALSE,results=hide>>=
 library("bvpSolve")
-options(prompt = "> ")
+options(prompt = " ")
+options(continue = "  ")
 options(width=70)
 @ 
 
@@ -165,9 +166,13 @@ options(width=70)
   An S3 method for plotting is included. This will plot all variables in 
   separate figures.
 
-  Functions \code{bvpshoot} and \code{bvptwp} can only solve sets of 
-  \emph{first-order} ODEs.
-  Thus, higher-order ODEs need to be rewritten as a set of first-order ODEs.
+  All functions can solve higher-order ODEs without writing them as a set
+  of first-order ODEs, but this makes the interface a bit more difficult.
+  
+  Only \code{bvpcol} is more efficient if the higher-order input is used.
+  
+  For functions \code{bvpshoot} and \code{bvptwp} it is slightly more 
+  efficient to write them as \emph{first-order} ODEs.
   
   For instance:
   \begin{eqnarray*}
@@ -180,11 +185,6 @@ options(width=70)
   \end{eqnarray*}
   where \code{y} and \code{z} are now the two dependent variables. 
 
-
-  \code{bvpcol} can also solve higher-order ODEs without writing them as a set
-  of first-order ODEs, but this makes the 
-  interface a bit more difficult.
- 
   In \code{bvptwp} and \code{bvpshoot}, the boundary conditions must be
   defined at the end of the interval over which the ODE is specified (i.e.
   at \code{a} and/or \code{b}). In contrast, \code{bvpcol} can also have 
@@ -237,6 +237,7 @@ options(width=70)
       periodic boundary conditions. 
     \item The ''fluid injection'' problem \citep{Asher95}, is a set of 
       higher-order ODEs, which is best solved using \code{bvpcol}.
+    \item A simple multipoint examplis is solved using \code{bvpcol}.
     \item The ''elastica'' problem (Jeff Cash's website) is used to demonstrate how
       to specify the analytic jacobians, and how to implement
       problems in \proglang{FORTRAN} or \proglang{C}.
@@ -474,8 +475,11 @@ Error in bvptwp(x = x, func = fsub, yini = c(y1 = -1,  :
 \end{Schunk}
 
 \subsection{Solving the Problem in Higher Order Form}
-Function \code{bvpcol} can also solve the same problem without rewriting it
+All functions can also solve the same problem without rewriting it
 in $1^{st}$ order form.
+
+However, only for function \code{bvpcol} will this lead to a significant
+improvement of performance.
 
 Thus, the derivative function becomes:
 <<>>=
@@ -500,6 +504,22 @@ Whereas both ways of solving the system produce almost the same output
 <<>>=
 max(abs(Solcol2-Solcol))
 @
+
+This is not case when we use \code{bvptwp}, where the higher-order 
+specification is usually a bit slower than the first-order model:
+<<>>=
+print(system.time(
+Soltwp2 <- bvptwp(x = x, func = fsubhigh, order = c(2, 4),
+           yini = c(y1 = -1, y2 = NA, y3 = 0, y4 = 0, y5 = NA, y6 = NA),
+           yend = c(1, NA, 0, 0, NA, NA))
+))
+@
+Here the output for the first-order and higher-order specification is exactly
+the same:
+<<>>=
+max(abs(Soltwp2- Soltwp))
+@
+This problem is much too difficult to be solved with \code{bvpshoot}
 \clearpage
 \section{Solving a Boundary Value Problem using Continuation}
 The previous -swirl- problem can be solved for small values of \code{eps}
@@ -1009,6 +1029,64 @@ plot(Solcol1, main="Fluid injection problem",
 \label{fig:fluid}
 \end{figure}
 
+\clearpage
+\section{A Multipoint Problem}
+Function \code{bvptwp} can only solve problems whose boundary conditions 
+are located at the start and/or end of the integration interval.
+
+Function \code{bvpcol} (and also \code{bvpshoot}) can also solve problems 
+where the extra conditions are somewhere within the integration interval.
+
+Consider the following problem:
+\begin{eqnarray*}
+   y_1' &=& (y_2-1)/2\\
+   y_2' &=& (y_1 y_2 - x)/\mu
+\end{eqnarray*}
+defined in the interval [0,1]
+and with extra conditions:
+\begin{eqnarray*}
+   y_1(1) = 0\\
+   y_2(0.5) = 1
+\end{eqnarray*}
+As the second condition is specified within the integration interval, this is 
+a multipoint problem.
+
+Mulipoint problems can only be specified in R using a boundary 
+function \code{bound}; as the boundary for $y_2$ is specified before $y_1$, 
+it is treated first in the boundary function 
+(because \code{posbound} has to be sorted).
+<<>>=
+multip <- function (x, y, p) {
+  list(c((y[2] - 1)/2, 
+         (y[1]*y[2] - x)/mu))
+}
+
+bound <- function (i, y, p) {
+  if (i == 1) y[2] -1         # at x=0.5: y2=1
+  else y[1]                   # at x=  1: y1=0
+}
+
+mu  <- 0.1
+sol <- bvpcol(func = multip, bound = bound, 
+              x = seq(0, 1, 0.01), posbound = c(0.5, 1))
+@
+We check the boundary values:
+<<>>=
+sol[sol[,1] %in% c(0.5,1),]
+@
+<<label=multipoint,include=FALSE>>=
+plot(sol)
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=multipoint,fig=TRUE,echo=FALSE>>=
+<<multipoint>>
+@
+\end{center}
+\caption{Solution of a multipoint problem - see text for R-code}
+\label{fig:multipoint}
+\end{figure}
 \clearpage
 \section{Specifying the Analytic Jacobians}
 By default, the Jacobians of the derivative function and of the boundary
