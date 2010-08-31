@@ -123,7 +123,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
             stop("'posbound' should have a length = number of variables ")
          } else ncomp <- length(posbound)
             
-         iipos <- which (times %in% posbound)
+         iipos <- which (x %in% posbound)
          if (length(iipos) != ncomp)
            stop("all elements in 'posbound' should also be in 'x' ")
          
@@ -134,6 +134,8 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
     rootfun <- function(X,...)  {  
       if (! posspecified) 
          times <- c(x[1], x[length(x)])
+      else
+         times <- x   
       out   <- ode(y=X, times=times, fun=Func, jacfunc=jacfunc, 
                    parms=parms, method=method,
                    atol=atol, rtol=rtol, ...)
