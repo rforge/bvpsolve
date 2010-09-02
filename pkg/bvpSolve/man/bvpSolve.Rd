@@ -77,7 +77,7 @@
     
   \code{\link{bvpcol}}, a collocation method to 
   solve multi-point boundary value problems of ordinary
-  differential equations. (AsCher et al., 1981).
+  differential equations. (Ascher et al., 1981).
 
   \code{\link{bvpshoot}}, a shooting method, using solvers from packages
     deSolve and rootSolve.
@@ -93,7 +93,7 @@
 ## show examples (see respective help pages for details)
 example(bvptwp)
 example(bvpshoot)
-example(bvpCOL)
+example(bvpcol)
 
 ## open the directory with R- examples
 browseURL(paste(system.file(package = "bvpSolve"), "doc/examples", sep = ""))

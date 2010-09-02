@@ -19,7 +19,7 @@ approx.bvpSolve <- function(x, xout=NULL, ...){
   Attr <- attributes(x)
   if (Attr$name != "bvpcol")
     stop("can only use 'approx.bvpSolve' if problem was solved with 'bvpcol'")
-  istate <- Attr$istate[-1]
+  istate <- Attr$istate[-(1:6)]   # first 6 elements have nothing to do with continuation
   rstate <- Attr$rstate
   il <- length(xout)
   if (il <= 0)
@@ -125,11 +125,18 @@ diagnostics.bvpSolve<- function(obj, ...) {
     if (Attr$name == "bvptwp") {
     if (idid ==0)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
-    df <- c( "The return code                    :",   #1
-             "The maximal number of mesh points  :",   #2
-             "The actual number of mesh points   :",
-             "The size of the real work array    :",
-             "The size of the integer work array :")
+    df <- c( "The return code                             :",   #1
+             "The number of function evaluations          :", 
+             "The number of jacobian evaluations          :",	
+             "The number of steps                         :", 
+             "The number of boundary evaluations          :", 
+             "The number of boundary jacobian evaluations :", 
+             "The number of mesh resets                   :",
+             "The maximal number of mesh points           :",   #2
+             "The actual number of mesh points            :",
+             "The size of the real work array             :",
+             "The size of the integer work array          :"
+             )
 
 
     printmessage(df, istate)
@@ -148,15 +155,20 @@ diagnostics.bvpSolve<- function(obj, ...) {
     if (idid ==1)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
     df <- c( "The return code                                   :",   #1
+             "The number of function evaluations                :", 
+             "The number of jacobian evaluations                :",	
+             "The number of steps                               :", 
+             "The number of boundary evaluations                :", 
+             "The number of boundary jacobian evaluations       :", 
              "The actual number of mesh points                  :",
              "The number of collocation points per subinterval  :",
              "The number of equations                           :",
              "The number of components (variables)              :",
              rep(
-             "The order of each equation                        :",istate[4]))
+             "The order of each equation                        :",istate[4+5]))
 
 
-    printmessage(df, istate[-c(6:8)])
+    printmessage(df, istate[-c(11:13)])
     }    
 
 }

@@ -16,7 +16,7 @@ void F77_NAME(twpbvpc)(int*, int*, double *, double *,
 		   void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
        double *, double *, double *, double *, double *, 
        double *, int *, int *, int *, int *, int *, int *, int *,
-       double *, double *);
+       double *, double *, int*);
 
 /* interface between fortran function calls and R functions */
 
@@ -29,7 +29,7 @@ static void C_bvp_deriv_func (int *n,  double *x, double *y, double *ydot,
   for (i = 0; i < *n ; i++)  REAL(Y)[i]   = y[i];
 
   PROTECT(R_fcall = lang3(R_bvp_deriv_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));         incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
 
   for (i = 0; i < *n ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
   
@@ -56,7 +56,7 @@ static void C_bvp_jac_func (int *n,  double *x, double *y, double *pd,
   for (i = 0; i < *n; i++) REAL(Y)[i]   = y[i];
 
   PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));       incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));        incr_N_Protect();
 
   for (i = 0; i < *n * *n; i++)  pd[i] = REAL(ans)[i];
   
@@ -74,7 +74,7 @@ static void C_bvp_bound_func (int *ii, int *n, double *y, double *gout,
   for (i = 0; i < *n ; i++)  REAL(Y)[i] = y[i];
 
   PROTECT(R_fcall = lang3(R_bvp_bound_func,J,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));         incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
   
   gout[0] = REAL(ans)[0];       /* only one element returned... */
   
@@ -91,7 +91,7 @@ static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
   for (i = 0; i < *n; i++) REAL(Y)[i] = y[i];
 
   PROTECT(R_fcall = lang3(R_bvp_jacbound_func,J,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));             incr_N_Protect();
 
   for (i = 0; i < *n ; i++)  dg[i] = REAL(ans)[i];
   
@@ -121,7 +121,8 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   double *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis, *xguess, *yguess;
   double aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2; 
   int  liseries, *iseries, indnms, nxdim, type;
-  int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh, givu, nmesh, isDll;
+  int *ltol, *iwrk, *iset, ntol, iflag, nfixpnt, linear, givmesh, 
+      givu, nmesh, isDll;
   int full, useC;
   
   /* pointers to functions passed to FORTRAN */
@@ -203,9 +204,12 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
      for (j = 0; j < lwrkfl; j++) wrk[j] = 0.;
 
-  iwrk= (int *)    R_alloc(lwrkin, sizeof(int));
+  iwrk = (int *)   R_alloc(lwrkin, sizeof(int));
      for (j = 0; j < lwrkin; j++) iwrk[j] = 0;
 
+  iset = (int*)    R_alloc(6, sizeof(int));
+     for (j = 0; j < 6; j++) iset[j] = 0;
+  
   precis = (double *) R_alloc(3,sizeof(double));
   precis[0] = DBL_MIN;
   precis[1] = DBL_MAX;
@@ -271,7 +275,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
         deriv_func, jac_func, bound_func, jacbound_func, 
         &ckappa1, &gamma1, &sigma, &ckappa, &ckappa2, 
         rpar, ipar, &iflag, &liseries, iseries, &indnms, 
-        &full, &useC, xguess, yguess);
+        &full, &useC, xguess, yguess, iset);
 
 /*  iflag - The Mode Of Return From twpbvp  */
 	if (iflag == 4)      {
@@ -295,12 +299,15 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     for (j = 0; j < ncomp*nx; j++) REAL(yout)[nx+j] =  u[j];
   }
  
-  PROTECT(ISTATE = allocVector(INTSXP, 5));incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, 11));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
-  INTEGER(ISTATE)[1] = nmax;
-  INTEGER(ISTATE)[2] = nmesh;
-  INTEGER(ISTATE)[3] = lwrkfl;
-  INTEGER(ISTATE)[4] = lwrkin;
+  for (j = 0; j < 6; j++)
+    INTEGER(ISTATE)[1+j] = iset[j];
+  INTEGER(ISTATE)[7] = nmax;
+  INTEGER(ISTATE)[8] = nmesh;
+  INTEGER(ISTATE)[9] = lwrkfl;
+  INTEGER(ISTATE)[10] = lwrkin;
+    
   setAttrib(yout, install("istate"), ISTATE);
 
   PROTECT(RSTATE = allocVector(REALSXP, 5));incr_N_Protect();

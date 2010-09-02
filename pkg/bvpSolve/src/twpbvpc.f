@@ -1,10 +1,19 @@
-* KS: to make this code compatible with R:
-* 1. change all rwarn -> rprint; remove definition of rexit
+c ===================================================================================
+* karline: to make this code compatible with R:
+* 1. change all write(6,...) -> rprint
 * 2. add initu
-* 3. pass precisions, in 3-valued vector "precis" after iwrk - do not use d1mach
-* 4. add argument useC
+* 3. pass precisions, in 3-valued vector "precis", as passed form C calling routine
+*         - do not use d1mach of original FORTRAN code
+* 4. add argument useC for conditioning or not
+* 5. add arguments xguess and yguess (used if givu=TRUE)
+* 6. got rid of "pdebug"
+* 7. added iset, to contain several 'counters'
+c ===================================================================================
+
  
-c karline: added this!
+c ===================================================================================
+c print R-messages
+c ===================================================================================
 
       subroutine rprint(msg)
       character (len=100) msg
@@ -12,9 +21,12 @@ c karline: added this!
             call dblepr(msg, 100, 0, 0)
       end subroutine 
 
-c karline: added this!
-c interpolates between (Xguess,Yguess), if these are inputted 
+c ===================================================================================
+c initu resets u after re-meshing for linear problems or for nonlinear problems
+c when interpolation of the old solution is not used.
+c it interpolates between (Xguess,Yguess), if these are inputted 
 c otherwise sets to constant value...
+c ===================================================================================
 
       subroutine initu(ncomp, nmsh, xx, nudim, u, xguess, yguess)
       implicit double precision (a-h,o-z)
@@ -22,35 +34,33 @@ c otherwise sets to constant value...
 
       character(len=100) msg
 
-      logical pdebug, use_c, comp_c, giv_u
-	integer nmguess 
-      common/algprs/nminit, pdebug, iprint, idum, uval0, use_c, comp_c
-	common/gu/ nmguess, giv_u
+      logical use_c, comp_c, giv_u
+      integer nmguess, ureset 
+      common/algprs/nminit, iprint, idum, use_c, comp_c
+      common/gu/ nmguess, giv_u, ureset
 
-*  This routine must be provided to reset u after re-meshing 
-*  for linear problems or for nonlinear problems
-*  when interpolation of the old solution is not used.
- 
+      ureset = ureset + 1
       if (iprint .ne. -1) then 
-        write(msg,99) uval0
+        write(msg,99) 0.d0
         call Rprint(msg)
       endif
-   99 format('initu, uval0',1pd15.5)
+   99 format('initu',1pd15.5)
 
-	IF (giv_u) THEN
-	  call interp(nudim, nmsh, xx, nudim, u,
+      IF (giv_u) THEN
+        call interp(nudim, nmsh, xx, nudim, u,
      *                    nmguess, xguess, yguess)
       ELSE
-        call mtload(ncomp, nmsh, uval0, nudim, u)
-	ENDIF
+        call mtload(ncomp, nmsh, 0.d0, nudim, u)
+      ENDIF
 
-	return
+      return
       end
 
 
-
-
-c ks: added "precis", "useC"
+c ===================================================================================
+c main driver for twpbvpc, written by Jeff Cash and Francesca Mazzia
+c with small adaptations to make it work with R by Karline Soetaert
+c ===================================================================================
 
       subroutine twpbvpc(ncomp, nlbc, aleft, aright,
      *       nfxpnt, fixpnt, ntol, ltol, tol,
@@ -60,9 +70,8 @@ c ks: added "precis", "useC"
      *       fsub, dfsub, gsub, dgsub,
      *       ckappa1,gamma1,sigma,ckappa,
      *       ckappa2,rpar,ipar,iflbvp,liseries,iseries,indnms,
-     *       full, useC, xguess, yguess)
-C karline: added xguess, yguess, in case  giveu=TRUE
-
+     *       full, useC, xguess, yguess, iset)
+C
 *     OUTPUT
 *
 *     IFLBVP = 0   SUCCESFULL TERMINATION
@@ -124,19 +133,14 @@ C karline: added xguess, yguess, in case  giveu=TRUE
 *           abdnrm
 *
 *     The common block algprs contains two more variable
-*     logical pdebug, use_c, comp_c
-*     common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+*     logical use_c, comp_c
+*     common/algprs/ nminit, iprint, idum, use_c, comp_c
 *
 * The starting subroutine is twpbvp by J.R. Cash and M.H. Wright
 *
 
-c Karline Soetaerts changes to port to R:
-c     1. write(6,...) -> write(msg,...) call rprint(msg)
-c ksks: addeded definition of precis(3) and useC
-c xguess and yguess added; for initu!
-
       implicit double precision (a-h,o-z)
-      dimension rpar(*),ipar(*), precis(3)
+      dimension rpar(*),ipar(*), iset(*), precis(3)
       dimension fixpnt(*), ltol(*), tol(*)
       dimension xx(*), u(nudim,*), xguess(*), yguess(ncomp,*)
       dimension wrk(lwrkfl), iwrk(lwrkin)
@@ -146,21 +150,32 @@ c xguess and yguess added; for initu!
       character(len=100) msg
 
 
-      logical pdebug, use_c, comp_c, giv_u
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
-	integer nmguess
-	common/gu/ nmguess, giv_u
+      logical use_c, comp_c, giv_u
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      integer nmguess, ureset
+      common/gu/ nmguess, giv_u, ureset
 
+c Karline: diagnostic properties
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
       intrinsic abs, min
 
       parameter ( zero = 0.0d+0 )
 
       use_c = useC
-c ksks Karline: set this = 1 => always computed...      
+
+c Karline: set this = 1 => always computed...      
       COMP_C =  .TRUE.  
-c ksks: giove_u
       giv_u = giveu  
       nmguess = nmsh
+
+c initialise counters
+      ureset = 0
+      nfunc = 0
+      njac = 0
+      nstep = 0
+      nbound = 0
+      njacbound = 0
 
       if (full) then
         iprint = 1
@@ -222,8 +237,8 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 * nmax from size of u and xx
 
       if (iprint .ge. 0) THEN
-	  write(msg,901) nmax
-	  CALL rprint(msg)
+        write(msg,901) nmax
+        CALL rprint(msg)
       ENDIF
   901 format(1h ,'nmax from workspace =',i8)
 
@@ -352,8 +367,8 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
 
       if (iprint .eq. 1) THEN
-	  write(msg,903) ilast
-	  CALL rprint(msg)
+        write(msg,903) ilast
+        CALL rprint(msg)
       ENDIF
 
  903   format(1h ,'ilast',i10)
@@ -397,6 +412,14 @@ c ksks: add precis as argument: machine precision...
      *   ckappa1,gamma1,ckappa,
      *   ckappa2, sigma,rpar, ipar,liseries,iseries,indnms,precis,
      *   xguess, yguess )
+
+      iset(1) = nfunc
+      iset(2) = njac
+      iset(3) = nstep
+      iset(4) = nbound
+      iset(5) = njacbound
+      iset(6) = ureset
+
       return
       end
 
@@ -448,8 +471,8 @@ c ksks: add precis as argument: machine precision...
 
       common/mchprs/flmin, flmax, epsmch
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       intrinsic max
 
@@ -472,9 +495,6 @@ c      save frscal
       parameter (quan6 = 0.1d+0 )
       parameter (itcondmax = 10)
 
-*  blas: dload
-*  double precision d1mach
-
       data mchset/.true./
       data fxfct/10.0d+0/
       data maxmsh/.false./
@@ -483,18 +503,11 @@ c      save frscal
 
       frscal = .true.
       if (mchset) then
-cKSKS: use precis instead-set in C-code.      
-c         flmin = d1mach(1)
-c         flmax = d1mach(2)
-c         epsmch = d1mach(3)
+c Karline: use precis instead of d1mach
+
          flmin = precis(1)
          flmax = precis(2)
          epsmch = precis(3)
-         if (pdebug) THEN
-  	     write(msg,901) epsmch
-	     CALL rprint(msg)
-         ENDIF
-
          mchset = .false.
       endif
 
@@ -554,8 +567,8 @@ c         epsmch = d1mach(3)
          if (nmsh .ge. nmax ) then
             maxmsh = .true.
             if (iprint .eq. 1) THEN
-		    write(msg,*)'Initial mesh greater then nmax'
-  	        CALL rprint(msg)
+              write(msg,*)'Initial mesh greater then nmax'
+              CALL rprint(msg)
             ENDIF
 
             goto 900
@@ -567,18 +580,12 @@ c         epsmch = d1mach(3)
          if (nmsh .ge. nmax ) then
             maxmsh = .true.
             if (iprint .eq. 1) THEN
-		    write(msg,*)'Initial mesh greater then nmax'
- 	        CALL rprint(msg)
+              write(msg,*)'Initial mesh greater then nmax'
+              CALL rprint(msg)
             ENDIF
 
             goto 900
          end if
-
-      if (pdebug) then
-         write(msg,902)
-  	   CALL rprint(msg)
-         call sprt(nmsh, xx)
-      endif
 
       if (.not. giveu) call initu(ncomp, nmsh, xx, nudim, u,
      *     xguess, yguess)
@@ -591,8 +598,8 @@ cf       number of failure of Newton iteration
 
   400 continue
       if (iprint .eq. 1) THEN
-	  write(msg,903) nmsh
-	  CALL rprint(msg)
+        write(msg,903) nmsh
+        CALL rprint(msg)
       ENDIF
 
 
@@ -604,7 +611,7 @@ cf       number of failure of Newton iteration
 
        if (indnms .ge. liseries) then
           write(msg,1008) nmsh
- 	    CALL rprint(msg)
+          CALL rprint(msg)
           goto 1900
        end if
 
@@ -676,15 +683,15 @@ c
 
           if (iprint .ge. 0) then
             write(msg,1001) sigma
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1002) gamma1
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1003) ckappa1
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1004) ckappa
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1008) ckappa2
- 	      CALL rprint(msg)
+            CALL rprint(msg)
           end if
 
           stab_kappa = abs(ckappaold-ckappa)/(ckappa).lt.5d-2
@@ -703,15 +710,15 @@ c
 
            if (iprint .eq. 1) then
              write(msg,*) 'stab_kappa = ', stab_kappa
-	       CALL rprint(msg)
+             CALL rprint(msg)
              write(msg,*) 'stab_kappa1 = ', stab_kappa1
-	       CALL rprint(msg)
+             CALL rprint(msg)
              write(msg,*) 'stab_gamma = ', stab_gamma
-	       CALL rprint(msg)
+             CALL rprint(msg)
              write(msg,*) 'stiff_cond = ', stiff_cond
-	       CALL rprint(msg)
+             CALL rprint(msg)
              write(msg,*) 'ill_cond   = ', ill_cond
-	       CALL rprint(msg)
+             CALL rprint(msg)
            end if
            if (ill_cond .and. use_c) goto 2000
 
@@ -727,12 +734,6 @@ c endif if (comp_c)
      *           fsub, maxmsh, succes, first4,
      *           amg,stab_cond,ckappa,stiff_cond,wrkrhs,
      *           nfxpnt, fixpnt, irefin, rpar, ipar, xguess, yguess)
-
-
-        if (pdebug .and. .not. onto6) THEN
-	    write (msg,904)
-	    CALL rprint(msg)
-        ENDIF
 
 
       else
@@ -751,15 +752,15 @@ c endif if (comp_c)
 
          if (iprint .ge. 0) then
             write(msg,1001) sigma
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1002) gamma1
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1003) ckappa1
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1004) ckappa
-	      CALL rprint(msg)
+            CALL rprint(msg)
             write(msg,1008) ckappa2
-	      CALL rprint(msg)
+            CALL rprint(msg)
          end if
 
           stab_kappa = abs(ckappaold-ckappa)/(ckappa).lt.5d-2
@@ -779,15 +780,15 @@ c endif if (comp_c)
          if (ill_cond .and. use_c) goto 2000
          if (iprint .eq. 1) then
            write(msg,*) 'stab_kappa = ', stab_kappa
-	     CALL rprint(msg)
+           CALL rprint(msg)
            write(msg,*) 'stab_kappa1 = ', stab_kappa1
- 	     CALL rprint(msg)
+           CALL rprint(msg)
            write(msg,*) 'stab_gamma = ', stab_gamma
-	     CALL rprint(msg)
+           CALL rprint(msg)
            write(msg,*) 'stiff_cond = ', stiff_cond
-	     CALL rprint(msg)
+           CALL rprint(msg)
            write(msg,*) 'ill_cond   = ', ill_cond
-	     CALL rprint(msg)
+           CALL rprint(msg)
          end if
          end if
        end if
@@ -811,8 +812,8 @@ c end if if(comp_c)
       if (succes) then
           if (iprint .ne. -1 .and. comp_c .and. use_c) then
             if ( ill_cond) THEN
-		    write(msg,1005)
-	        CALL rprint(msg)
+              write(msg,1005)
+              CALL rprint(msg)
             ENDIF
 
           end if
@@ -822,8 +823,8 @@ c end if if(comp_c)
             if (.not. stab_kappa .and. indnms .gt. 1) then
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
-			    write(msg,1010)
- 	            CALL rprint(msg)
+                  write(msg,1010)
+                  CALL rprint(msg)
                 ENDIF
 
              end if
@@ -842,8 +843,8 @@ c end if if(comp_c)
 **** logic for 6th order ****
 
       if (iprint .eq. 1) then
-	  write(msg,905)
-	  CALL rprint(msg)
+        write(msg,905)
+        CALL rprint(msg)
       ENDIF
 
 
@@ -921,8 +922,8 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
 
          if (iprint .ne. -1 .and. comp_c .and. use_c) then
            if (  ill_cond ) THEN
-		   write(msg,1005)
-  	       CALL rprint(msg)
+             write(msg,1005)
+             CALL rprint(msg)
            ENDIF
 
          end if
@@ -932,8 +933,8 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
             if (.not. stab_kappa .and. indnms .gt. 1) then
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
-			    write(msg,1010)
-	            CALL rprint(msg)
+                  write(msg,1010)
+                  CALL rprint(msg)
                 ENDIF
 
              end if
@@ -950,8 +951,8 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
 ***** logic for trying to calculate 8th order solution *****
 
       if (iprint .eq. 1) THEN
-	  write(msg,906)
-	  CALL rprint(msg)
+        write(msg,906)
+        CALL rprint(msg)
       ENDIF
 
 
@@ -1063,8 +1064,8 @@ c      write(*,*) 'succes after conv8', succes
 
       if (iprint .ne. -1 .and. comp_c .and. use_c) then
         if ( ill_cond) THEN
-	    write(msg,1005)
-	  CALL rprint(msg)
+          write(msg,1005)
+        CALL rprint(msg)
       ENDIF
 
       end if
@@ -1073,8 +1074,8 @@ c      write(*,*) 'succes after conv8', succes
             if (.not. stab_kappa .and. indnms .gt. 1) then
                 iflbvp = -1
                 if  (iprint .ne. -1) THEN
-			    write(msg,1010)
-	            CALL rprint(msg)
+                  write(msg,1010)
+                  CALL rprint(msg)
                 ENDIF
              end if
        end if
@@ -1091,12 +1092,12 @@ c      write(*,*) 'succes after conv8', succes
       write(msg,1009) indnms
       CALL rprint(msg)
       if (linear .and. ill_cond) THEN
-	  write(msg,1006)
+        write(msg,1006)
         CALL rprint(msg)
       ENDIF
       if (.not.linear .and. ill_cond) THEN
-	  write(msg,1007)
-	  CALL rprint(msg)
+        write(msg,1007)
+        CALL rprint(msg)
       ENDIF
       return
  2000 continue
@@ -1104,10 +1105,10 @@ c      write(*,*) 'succes after conv8', succes
          iflbvp = 3
          if (linear) then
             write(msg,1006)
-  	      CALL rprint(msg)
+            CALL rprint(msg)
          else
             write(msg,1007)
- 	      CALL rprint(msg)
+            CALL rprint(msg)
          end if
          return
   900 continue
@@ -1121,21 +1122,18 @@ c      write(*,*) 'succes after conv8', succes
       if (iprint .ne. -1 .and. comp_c ) then
         if (linear .and. ill_cond) THEN
             write(msg,1006)
-	      CALL rprint(msg)
+            CALL rprint(msg)
         ENDIF
 
         if (.not.linear .and.ill_cond) THEN
             write(msg,1007)
-	      CALL rprint(msg)
+            CALL rprint(msg)
         ENDIF
 
       end if
       return
 
-  901 format(1h ,'epsmch',1pe10.3)
-  902 format(1h ,'initial mesh')
   903 format(1h ,'start 4th order, nmsh',i5)
-  904 format(1h ,'do not go on to 6th')
   905 format(1h ,'start 6th order')
   906 format(1h ,'start 8th order')
  1001 format(1h ,'stiffness = ',1pe11.3)
@@ -1161,18 +1159,13 @@ c      write(*,*) 'succes after conv8', succes
       block data
 
 *  This block data routine initializes nminit (the initial number
-*  of mesh points), pdebug (a logical variable indicating whether
-*  debug printout is desired), and uval0 (the initial value for the trial
-*  solution) to their default values.
+*  of mesh points), the mesh conditioning,...
 
-      double precision uval0
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       data nminit/9/
-      data pdebug/.false./
       data iprint/-1/
-      data uval0 /0.0d+0/
       data use_c /.true./
       data comp_c/.true./
       end
@@ -1600,8 +1593,8 @@ c
 
       logical callrt, oscchk, reposs, savedu
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       common/mchprs/flmin, flmax, epsmch
 
       parameter (hundth = 1.0d+5, rerfct = 1.5d+0)
@@ -1618,8 +1611,8 @@ c
 *  The Newton iteration converged for a 4th order solution.
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
-	  CALL rprint(msg)
+        write(msg,901)
+        CALL rprint(msg)
       ENDIF
 
 
@@ -1650,16 +1643,6 @@ c
 *  bother to calculate implicit deferred corrections).
 
       if ( smooth .or. reaft6) then
-         if (smooth .and. pdebug) THEN
-	     write(msg,902)
-	     CALL rprint(msg)
-         ENDIF
-
-         if (reaft6 .and. pdebug) THEN
-	     write(msg,903)
-	     CALL rprint(msg)
-         ENDIF
-
          onto6 = .true.
          return
       endif
@@ -1695,38 +1678,6 @@ c
      *     onto6, smooth, callrt, strctr, oscchk, ddouble , reposs)
 
 
-      if (pdebug) then
-         if (smooth) THEN
-	     write(msg,904)
- 	     CALL rprint(msg)
-         ENDIF
-         if (callrt) THEN
-	     write(msg,905)
-	     CALL rprint(msg)
-         ENDIF
-         if (oscchk) THEN
-	     write(msg,906)
-	     CALL rprint(msg)
-         ENDIF
-         if (strctr) THEN
-	     write(msg,907)
-	     CALL rprint(msg)
-         ENDIF
-         if (reposs) THEN
-	     write(msg,908)
-	     CALL rprint(msg)
-         ENDIF
-         if (savedu) THEN
-	     write(msg,909)
-	     CALL rprint(msg)
-         ENDIF
-         if (onto6) THEN
-	     write(msg,910)
-	     CALL rprint(msg)
-         ENDIF
-         write(msg,911) rat1, oldrt1
-	   CALL rprint(msg)
-      endif
       oldrt1 = rat1
       dfold = dfexmx
       if (callrt) then
@@ -1789,12 +1740,6 @@ c
 *     end of logic for linear
       endif
 
-      if (pdebug .and. reposs .and. .not. onto6) THEN
-	 write(msg,912)
-	  CALL rprint(msg)
-      ENDIF
-
-
 c      if (stiff_cond .and. stab_cond) onto6 = .true.
 
       if (.not. onto6) then
@@ -1832,16 +1777,7 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
              drat = dfexmx/
      *               (max(one, abs(u(incmp,inmsh)))*tol(intol))
 
-            if (pdebug) THEN
-		    write(msg,913) drat, u(incmp,inmsh), tol(intol)
-	        CALL rprint(msg)
-            ENDIF
-
             numadd = drat**power
-            if (pdebug) THEN
-		    write(msg,*) 'numadd ', numadd
-	        CALL rprint(msg)
-            ENDIF
 
          if ((use_c) .AND. (stiff_cond)) then
 
@@ -1867,18 +1803,6 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
       return
 
   901 format(1h ,'conv4')
-  902 format(1h ,'smooth')
-  903 format(1h ,'reaft6')
-  904 format(1h ,'smooth')
-  905 format(1h ,'callrt')
-  906 format(1h ,'oscchk')
-  907 format(1h ,'strctr')
-  908 format(1h ,'reposs')
-  909 format(1h ,'savedu')
-  910 format(1h ,'onto6 after decid4')
-  911 format(1h ,'rat1,oldrt1',2(1pe11.3))
-  912 format(1h ,'reposs and not onto6')
-  913 format(1h ,'drat,u,tol',3(1pe11.3))
 
       end
 
@@ -1902,15 +1826,15 @@ C KS: ADDED nfail4 TO DEFINITION
       logical linear, ddouble , maxmsh
       logical stab_cond,stiff_cond
       dimension amg(*),r4(*), fixpnt(*), irefin(*)
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       character(len=100) msg
 
 *  The Newton procedure failed to obtain a 4th order solution.
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
-	  CALL Rprint(msg)
+        write(msg,901)
+        CALL Rprint(msg)
       ENDIF
 
 
@@ -1940,7 +1864,7 @@ C KS: ADDED nfail4 TO DEFINITION
 c .or.
 c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
                 call initu(ncomp, nmsh, xx, nudim, u, xguess, yguess)
-	    nfail4=0
+          nfail4=0
               else
 *  Interpolate the partially converged solution.
                call matcop(nudim, ncomp, ncomp, nmold, u, uold)
@@ -1971,8 +1895,8 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
       dimension uold(ncomp,*), etest6(*)
       logical trst6, onto8, reaft6, succes
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       logical errok
       character(len=100) msg
@@ -1980,8 +1904,8 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
 *  The Newton iteration converged for a 6th-order solution.
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
-	  CALL rprint(msg)
+        write(msg,901)
+        CALL rprint(msg)
       ENDIF
 
 
@@ -2030,8 +1954,8 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
       logical stab_cond, stiff_cond
       dimension amg(*), r4(*)
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 *  blas: dcopy
 
@@ -2046,8 +1970,8 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
 *  Non-convergence of 6th order.
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
-	  CALL rprint(msg)
+        write(msg,901)
+        CALL rprint(msg)
       ENDIF
 
       succes = .false.
@@ -2062,23 +1986,23 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
       call matcop(ncomp, nudim, ncomp, nmold, uold, u)
 
       if (reaft6 .and. iprint .ge. 0) THEN
-	  write(msg,9999)
-	  CALL rprint(msg)
+        write(msg,9999)
+        CALL rprint(msg)
       ENDIF
  9999 format(1h ,'in fail6, reaft6is true')
       if (.not.reaft6 .and. iprint .ge. 0) THEN
-	  write(msg,9998)
-	  CALL rprint(msg)
+        write(msg,9998)
+        CALL rprint(msg)
       ENDIF
  9998 format(1h ,'in fail6, not reaft6')
       if (ddouble.and. iprint .ge. 0) THEN
-	  write(msg,9997)
-	  CALL rprint(msg)
+        write(msg,9997)
+        CALL rprint(msg)
       ENDIF
  9997 format(1h ,'in fail6, ddouble  is true')
       if (.not.ddouble.and. iprint.ge.0 ) THEN
-	  write(msg,9996)
-	  CALL rprint(msg)
+        write(msg,9996)
+        CALL rprint(msg)
       ENDIF
 
  9996 format(1h ,'in fail6, not double')
@@ -2131,14 +2055,14 @@ c     *                            (itnwt.le.2 .and. iflnwt.ne.0)) then
          call rerrvl( ncomp, nmsh, nudim, u, usave, ntol, ltol,
      *          rerr, remax, itlmx, adjrer )
          if (iprint.eq.1) THEN
-	     write(msg,9994)
- 	     CALL rprint(msg)
+           write(msg,9994)
+           CALL rprint(msg)
          ENDIF
 
  9994    format(1h ,'***in fail6')
          if (iprint.eq.1) THEN
-	     write(msg,9993) remax, eight*tol(itlmx)
-	     CALL rprint(msg)
+           write(msg,9993) remax, eight*tol(itlmx)
+           CALL rprint(msg)
          ENDIF
 
  9993    format(1h ,'remax',1pe14.4,5x,'8*tol',1pe14.4)
@@ -2257,8 +2181,8 @@ cf of the old mesh we take the values using incx = 2
       logical linear, strctr, ddouble , maxmsh, succes, first8
       logical stab_cond, stiff_cond
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       intrinsic max
 
@@ -2277,8 +2201,8 @@ cf of the old mesh we take the values using incx = 2
 
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
-	  CALL rprint(msg)
+        write(msg,901)
+        CALL rprint(msg)
       ENDIF
 
 
@@ -2321,11 +2245,6 @@ c      write(*,*) 'etest8', etest8(1),etest8(2), errok
 
 *  At this point, the 8th order solution converged, but did not
 *  satisfy the test for termination.
-      if (pdebug) THEN
-	  write(msg,902) err6, err8, er6old, er8old
-	  CALL rprint(msg)
-      ENDIF
-
 
       if (nmsh .lt. nmold. and.
      *         err6 .gt. efact*er6old .and.
@@ -2464,16 +2383,9 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *     end of logic for err8 greater than err6
       endif
 
-      if (pdebug .and. .not.succes) THEN
-	  write(msg,903)
-	  CALL rprint(msg)
-      ENDIF
-
       return
 
   901 format(1h ,'conv8')
-  902 format(1h ,'err6, err8, er6old, er8old',4(1pe11.3))
-  903 format(1h ,'8th order fails error tests.')
       end
 
 
@@ -2493,15 +2405,9 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       logical ddouble , maxmsh
       logical stiff_cond, stab_cond
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       character(len=100) msg
-
-      if (pdebug) THEN
-	  write(msg,901)
-	  CALL rprint(msg)
-      ENDIF
-
 
 *  8th order solution did not converge (the problem must be nonlinear)
 
@@ -2533,7 +2439,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       endif
 
       return
-  901 format(1h ,'fail8')
       end
 
       subroutine dccal( ncomp, nmsh, ntol, ltol,
@@ -2547,8 +2452,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension  defexp(ncomp,nmsh-1), defimp(ncomp,nmsh-1)
       dimension  fval(ncomp,nmsh), ratdc(nmsh-1)
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter ( zero = 0.0d+0, one = 1.0d+0 )
       parameter ( rtst = 50.0d+0, tstrat = 0.1d+0 )
@@ -2577,22 +2482,11 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
          endif
    10 continue
 
-      if (pdebug) then
-         write(msg,901)
- 	   CALL rprint(msg)
-         write(msg,902) dfexmx, incmp, inmsh, intol
-	   CALL rprint(msg)
-      endif
-
 *  Find derivm (maximum-magnitude element of fval(incmp,*))
 *  for all mesh points.
 
       idmx = idamax(nmsh, fval(incmp, 1), ncomp)
       derivm = abs(fval(incmp, idmx))
-      if (pdebug) THEN
-	  write(msg,903) derivm
-	  CALL rprint(msg)
-      ENDIF
 
 *  For component incmp, go through the mesh intervals to calculate
 *  (1) dfimmx, the maximum implicit deferred correction;
@@ -2635,21 +2529,10 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
             if (abs(texp) .ge. smtest
      *                .and. abrat .ge. rat1)  rat1 = abrat
          endif
-*         if (pdebug) write(6,904) im, texp, timp, ratdc(im), dfctol
   100 continue
-
-      if (pdebug) THEN
-	  write(msg,905) rat1, rat2, dfimmx
-        CALL rprint(msg)
-      ENDIF
 
       return
 
-  901 format(1h ,'dccal')
-  902 format(1h ,'dfexmx, incmp, inmsh, intol',1pe11.3,3i5)
-  903 format(1h ,'derivm',1pe11.3)
-  904 format(1h ,'im, texp, timp, ratdc, dfctol',i5,4(1pe11.3))
-  905 format(1h ,'rat1, rat2, dfimmx', 3(1pe11.3))
       end
 
 
@@ -2663,8 +2546,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       logical linear, onto6, smooth, callrt, strctr,
      *     oscchk, ddouble , reposs
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       logical stest
 
@@ -2689,16 +2572,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
 *  rat2 is always greater than or equal to rat1.
 
-      if (pdebug) THEN
-	  write(msg,901)
-        CALL rprint(msg)
-      ENDIF
-
-      if (pdebug) THEN
-	  write(msg,902) tolval, rtst
-        CALL rprint(msg)
-      ENDIF
-
 
       stest = .true.
       if (linear) stest = dfexmx .lt. tenth*dfold
@@ -2718,11 +2591,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  We know now that rat2 .ge. rtst.
 
       thttol = thrtwo*tolval
-      if (pdebug) THEN
-	  write(msg,903) thttol
-        CALL rprint(msg)
-      ENDIF
-
 
       if (rat1 .lt. rtst .and. dfexmx .lt. thttol) then
           if (stest) then
@@ -2790,9 +2658,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       if (linear) reposs = .true.
       return
 
-  901 format(1h ,'decid4')
-  902 format(1h ,'tolval, rtst',2(1pe11.3))
-  903 format(1h ,'thttol',1pe11.3)
       end
 
 
@@ -2806,8 +2671,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension  defexp(ncomp,nmsh-1), tmp(ncomp,4)
       external fsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter ( half = 0.5d+0, fourth = 0.25d+0, thfrth= 0.75d+0 )
 
@@ -2815,6 +2680,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
      *    a1, b1, c1, d1, e2, f2, c2, d2, b2, a2,
      *    p3, q3, e3, f3, c3, d3, a3, b3, a4, p4, x4, e4, c4,
      *    a5, b5, c5, d5, e5, f5, a6, b6, c6
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
 
       character(len=100) msg
 
@@ -2856,6 +2723,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
    30    continue
 
    50 continue
+      nfunc = nfunc + (nmsh-1)*3
+      nstep = nstep + 1
       return
       end
 
@@ -2875,8 +2744,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension def8(ncomp, nmsh-1),  tmp(ncomp,8)
       external fsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter ( half = 0.5d+0, two = 2.0d+0 )
       parameter ( fc1 = 0.625d+0, fc2= 0.375d+0 )
@@ -2885,6 +2754,9 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
      *    a1, b1, c1, d1, e2, f2, c2, d2, b2, a2,
      *    p3, q3, e3, f3, c3, d3, a3, b3, a4, p4, x4, e4, c4,
      *    a5, b5, c5, d5, e5, f5, a6, b6, c6
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
+
       character(len=100) msg
 
       do 100 im = 1, nmsh-1
@@ -2949,6 +2821,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
    50    continue
 
   100 continue
+      nstep = nstep + 1
+      nfunc = nfunc + (nmsh-1)*7
       return
       end
 
@@ -2960,8 +2834,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension dsq(ncomp, ncomp), dexr(ncomp)
       dimension ipivot(ncomp), defimp(ncomp, nmsh-1)
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 *  blas: dcopy
 
@@ -2997,8 +2871,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       logical ddouble , onto6, trst6, smooth
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       intrinsic abs
 
@@ -3032,11 +2906,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       ninter = nmsh - 1
 
-      if (pdebug) THEN
-	  write(msg,901)
-        CALL rprint(msg)
-      ENDIF
-
       allsum = zero
       smlsum = zero
       bigsum = zero
@@ -3059,12 +2928,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  sign) and (2) the explicit deferred correction is not too small
 *  relative to the maximum.
 
-         if (pdebug) THEN
-	     write(msg,902) im, ratdc(im), abdef, frac2*dfexmx
-  	     CALL rprint(msg)
-         ENDIF
-
-
          if (ratdc(im).lt.zero .and. abdef.ge.frac2*dfexmx) then
             jsndif = jsndif + 1
 
@@ -3084,23 +2947,11 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
          endif
    30 continue
 
-      if (pdebug) THEN
-	  write(msg,903) rmax, jsndif
-        CALL rprint(msg)
-      ENDIF
-
-
       avsm = zero
       if (ism.gt.0) avsm = smlsum/ism
       avbg = zero
       if (ibig.gt.0) avbg = bigsum/ibig
       ave = allsum/ninter
-
-      if (pdebug) THEN
-	  write(msg,904) ave, avsm, avbg
-        CALL rprint(msg)
-      ENDIF
-
 
       if (avsm.gt.frac1*avbg .or. ave.gt.half*avbg) then
 
@@ -3125,10 +2976,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
           trst6 = .false.
       endif
       return
-  901 format(1h ,'osc')
-  902 format(1h ,'im, ratdc, abdef, val',i5,3(1pe11.3))
-  903 format(1h ,'rmax, jsndif', 1pe11.3,i5)
-  904 format(1h ,'ave, avsm, avbg', 3(1pe11.3))
       end
 
 
@@ -3290,8 +3137,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       external   fsub, gsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       common/mchprs/flmin, flmax, epsmch
 
       intrinsic  abs, max
@@ -3311,7 +3158,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  their calculation.
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
+        write(msg,901)
         CALL rprint(msg)
       ENDIF
 
@@ -3344,7 +3191,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       if (rnsq.gt.huge .or.
      *      (iorder.eq. 8 .and. rnsq.gt.xlarge)) then
          if (iprint .eq. 1) THEN
-	     write (msg,902) rnsq
+           write (msg,902) rnsq
            CALL rprint(msg)
          ENDIF
 
@@ -3360,7 +3207,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  If rnsq is sufficiently small, terminate immediately.
 
       if (iprint .eq. 1) THEN
-	  write(msg,903) iter, rnsq
+        write(msg,903) iter, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -3423,7 +3270,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
             iflag = -2
          endif
          if (iprint .eq. 1) THEN
-	     write(msg,904) iflag
+           write(msg,904) iflag
            CALL rprint(msg)
          ENDIF
 
@@ -3443,7 +3290,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  been passed.
 
       if (iprint .ge. 0) THEN
-	  write(msg,905) iter, rnsq
+        write(msg,905) iter, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -3486,8 +3333,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       logical    ludone
       external   fsub, dfsub, gsub, dgsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 *  blas: dcopy, dload
 
@@ -3607,8 +3454,8 @@ c      iflag = 0
       parameter ( two = 2.0d+0, half = 0.5d+0, fourth = 0.25d+0 )
       parameter ( tenth = 0.1d+0, ten = 10.0d+0, hund = 100.0d+0 )
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       common/mchprs/flmin, flmax, epsmch
 
       logical gtpdeb, imprvd, braktd, crampd, extrap, vset, wset
@@ -3650,7 +3497,7 @@ c
       ninter = nmsh - 1
 
       if (iprint .eq. 1) THEN
-	  write(msg,901)
+        write(msg,901)
         CALL rprint(msg)
       ENDIF
 
@@ -3680,8 +3527,8 @@ c
 
       rnprev = flmax
       rnbest = flmax
-      if (.not. pdebug .and. iprint .ge. 0) THEN
-	  write (msg,902)
+      if (iprint .ge. 0) THEN
+        write (msg,902)
         CALL rprint(msg)
       ENDIF
 
@@ -3697,7 +3544,7 @@ c
       iter = iter + 1
 
       if (iprint .eq. 1) THEN
-	  write(msg,910) iter
+        write(msg,910) iter
         CALL rprint(msg)
       ENDIF
 
@@ -3706,7 +3553,7 @@ c
 
       if (iter .ge. lmtnwt) then
          if (iprint .ge. 0) THEN
-	     write(msg,903)
+           write(msg,903)
            CALL rprint(msg)
          ENDIF
 
@@ -3728,7 +3575,7 @@ c
 
       if (iflwat .ne. 0) then
          if (iprint .ge. 0) THEN
-	     write(msg,904) iter
+           write(msg,904) iter
            CALL rprint(msg)
          ENDIF
          iflag = -3
@@ -3748,7 +3595,7 @@ c
 
       if (rnsq .le. epsmch .and. .not. comp_c ) then
          if (iprint .ge. 0) THEN
-	     write(msg,906) iter, rnsq
+           write(msg,906) iter, rnsq
            CALL rprint(msg)
          ENDIF
 
@@ -3775,7 +3622,7 @@ c
      +   ninter,botblk,ncomp-nlbc,ipivot,delu,iflag,job)
 
       if (iprint .ge. 0 .and. iflag.ne.0) THEN
-	  write(msg,905) iter
+        write(msg,905) iter
         CALL rprint(msg)
       ENDIF
 
@@ -3809,7 +3656,7 @@ c  at the initial point of the line search.
       oldg = -two*fa
       alfa = zero
       if (iprint .eq. 1) THEN
-	  write (msg,908) alfa, fmtry, rnsq
+        write (msg,908) alfa, fmtry, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -3858,12 +3705,6 @@ c  at the initial point of the line search.
 *  inform = 7 means that the gradient at alfa=0 (oldg) is positive
 *  (this cannot happen here, since oldg=-two*fa, and fa is a non-negative
 *  number)
-
-      if (pdebug) THEN
-	  write(msg,907) inform, alfa
-        CALL rprint(msg)
-      ENDIF
-
 
       if (inform .eq. 5) then
           iflag = -5
@@ -3917,7 +3758,7 @@ c  at the initial point of the line search.
             fmtry = rnsqtr
          end if
          if (iprint .eq. 1) THEN
-	     write (msg,908) alfa, fmtry, rnsqtr
+           write (msg,908) alfa, fmtry, rnsqtr
            CALL rprint(msg)
          ENDIF
 
@@ -3934,7 +3775,7 @@ c  at the initial point of the line search.
       call matcop (ncomp, nudim, ncomp, nmsh, utrial, u)
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
       if (iprint .ge. 0) THEN
-	  write(msg,909) iter, alfa, fmtry, rnsq
+        write(msg,909) iter, alfa, fmtry, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -3953,7 +3794,7 @@ c  at the initial point of the line search.
 
 
       if (iprint .ge. 0) THEN
-	  write(msg, 906) iter+1, rnsq
+        write(msg, 906) iter+1, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -3974,7 +3815,6 @@ c  at the initial point of the line search.
   904 format(1h ,'Watchdog tests fail, iter =', i5)
   905 format(1h ,'Singular Jacobian, iter=',i5)
   906 format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
-  907 format(1h ,'inform, alfa after getptq',i5,3x, 1pe11.3)
   908 format(1h ,'alfa, merit, rnsq',3(1pe11.3))
   909 format(1h ,i5,3(1pe11.3))
   910 format(1h ,'Newton iteration',i5)
@@ -4058,6 +3898,9 @@ c  at the initial point of the line search.
       implicit double precision (a-h,o-z)
       dimension rpar(*),ipar(*)
       dimension xx(nmsh), u(nudim,nmsh), fval(ncomp,nmsh)
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
+
       external fsub
 
 *  fneval evaluates the function values (from fsub) for
@@ -4071,6 +3914,9 @@ c  at the initial point of the line search.
          call fsub (ncomp, xx(im+1), u(1,im+1), fval(1,im+1), 
      *     rpar, ipar)
    50 continue
+      nstep = nstep + 1
+      nfunc = nfunc + nmsh
+
       return
       end
 
@@ -4094,8 +3940,10 @@ c  at the initial point of the line search.
 
       external  dfsub, dgsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
 
 *  blas: dcopy, ddot
 
@@ -4105,15 +3953,11 @@ c  at the initial point of the line search.
       character(len=100) msg
 
 
-*      if (pdebug) write(6,901)
-
       ninter = nmsh - 1
 
-*      if (pdebug) write(6,902)
       do 110 i = 1, nlbc
          call dgsub (i, ncomp, u(1,1), dgtm,rpar,ipar)
          call dcopy(ncomp, dgtm(1), 1, topblk(i,1), nlbc)
-*         if (pdebug) write(6,903) i, (topblk(i,j),j=1,ncomp)
   110 continue
 
       call dfsub (ncomp, xx(1), u(1,1), dftm1(1,1), rpar, ipar)
@@ -4122,8 +3966,6 @@ c  at the initial point of the line search.
 *  at (xx(im), u(ic,im)), ic=1,...,ncomp and im = 1,...,nmsh,
 *  calculated by a preceding call of rhscal with the same xx and u
 *  arrays.
-
-*      if (pdebug) write(6,904)
 
       do 200 im = 1, ninter
 
@@ -4143,8 +3985,6 @@ c  at the initial point of the line search.
      *             + dftm2(ic,jc)/three + hmsh*dsq/twelve)
   130       continue
             ajac(ic,ic,im) = ajac(ic,ic,im) - one
-*            if (pdebug) write(6,905) im, ic,
-*     *            (ajac(ic,jc,im), jc=1,ncomp)
   140    continue
 
          call dfsub (ncomp, xx(im+1), u(1,im+1), dftm1(1,1), rpar, ipar)
@@ -4161,43 +4001,22 @@ c  at the initial point of the line search.
      *                   bhold(ic,1,im), ncomp)
             ajac(ic,ic+ncomp,im) = ajac(ic,ic+ncomp,im) + one
             chold(ic,ic,im) = ajac(ic,ic+ncomp,im)
-*            if (pdebug) write(6,905) im, ic,
-*     *                    (ajac(ic,jc+ncomp,im),jc=1,ncomp)
   170    continue
 
 
   200 continue
-*      if (pdebug) write(6,906)
+      
+      njac = njac + 1 + ninter*2
+
       do 220 i = nlbc+1, ncomp
          call dgsub (i, ncomp, u(1, nmsh), dgtm,rpar,ipar)
          call dcopy(ncomp, dgtm(1), 1, botblk(i-nlbc,1), ncomp-nlbc)
-*         if (pdebug) write(6,903) i,(botblk(i-nlbc,j), j=1,ncomp)
   220 continue
-c      write(6,991)
-c991   format(1x,'topblk')
-c      write(6,992) topblk(1,1),topblk(1,2)
-c992   format(1x,2g22.10)
-c      write(6,993)
-c993   format(1x,'main jacobian')
-c      do 994 iu=1,ninter
-c      do 994 iv=1,ncomp
-c      write(6,996) ajac(iv,1,iu),ajac(iv,2,iu),ajac(iv,3,iu),
-c     +ajac(iv,4,iu)
-c996   format(1x,4f12.7)
-c994   continue
-c      write(6,995)
-c995   format(1x,'botblk')
-c      write(6,992) botblk(1,1),botblk(1,2)
 
+      njacbound = njacbound + ncomp
 
       return
 
-  901 format(1h ,'jaccal')
-  902 format(1h ,'topblk')
-  903 format(1h ,i5,6(1pe11.3))
-  904 format(1h ,'ajac')
-  905 format(1h ,2i5,5(1pe11.3))
-  906 format(1h ,'botblk')
       end
 
 
@@ -4219,6 +4038,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       parameter ( one = 1.0d+0, four = 4.0d+0, six = 6.0d+0 )
 
       common/mchprs/flmin, flmax, epsmch
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
       intrinsic abs
       character(len=100) msg
 
@@ -4252,6 +4073,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
      *            (fval(ic,im) + fval(ic,im+1) + four*ftmp(ic))/six
    40    continue
    50 continue
+      
+      nfunc = nfunc + ninter
 
       nrhs = ninter*ncomp
       do 60 ii = nlbc+1, ncomp
@@ -4262,6 +4085,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       call dssq  ( nmsh*ncomp, rhs, 1, scale, sumsq )
       rnsq = (scale**2)*sumsq
 
+      nbound = nbound + ncomp
       return
       end
 
@@ -4283,18 +4107,18 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       dimension  ftmp(ncomp), uint(ncomp)
       external   fsub, gsub
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       common/mchprs/flmin, flmax, epsmch
       intrinsic abs
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/diagnost/nfunc, njac, nstep, nbound, njacbound
 
 *  blas: dssq
 
       parameter ( zero = 0.0d+0, half = 0.5d+0, eighth = 0.125d+0 )
       parameter ( one = 1.0d+0, four = 4.0d+0, six = 6.0d+0 )
       character(len=100) msg
-
-*      if (pdebug) write(6,901)
 
 *  ninter is the number of intervals in the mesh (one less than the
 *  number of mesh points)
@@ -4328,6 +4152,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 
    40    continue
    50 continue
+      nfunc = nfunc + ninter
 
       nrhs = ninter*ncomp
       do 60 ii = nlbc+1, ncomp
@@ -4335,24 +4160,12 @@ c      write(6,992) botblk(1,1),botblk(1,2)
          rhs(nrhs+ii) = -wg
    60 continue
 
+      nbound = nbound + ncomp
 
       call dssq  ( nmsh*ncomp, rhs, 1, scale, sumsq )
       rnsq = (scale**2)*sumsq
 
-      if (pdebug) then
-         write (msg,902) rnsq
-         CALL rprint(msg)
-         write(msg,903)
-         CALL rprint(msg)
-         write(msg,904) (rhs(i), i=1,ncomp*nmsh)
-         CALL rprint(msg)
-      endif
       return
-
-  901 format(1h ,'rhscal')
-  902 format(1h ,'rnsq',1pe11.3)
-  903 format(1h ,'rhs vector')
-  904 format(1h ,(7(1pe11.3)))
       end
 
       subroutine dblmsh (nmsh, nmax, xx, nmold, xxold, maxmsh)
@@ -4360,8 +4173,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       dimension xx(*), xxold(*)
       logical maxmsh
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 *  blas: dcopy
 
@@ -4392,8 +4205,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmnew = ninnew + 1
       if(nmnew .ge. nmax) then
          if (iprint .ge. 0) THEN
-	     write(msg,901) nmnew
-  	     CALL rprint(msg)
+           write(msg,901) nmnew
+           CALL rprint(msg)
          ENDIF
 
          nmsh = nmold
@@ -4416,8 +4229,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       xx(2) = half*(xx(3) + xx(1))
       nmsh = nmnew
       if(iprint .ge. 0) THEN
-	  write(msg,902) nmsh
-	  CALL rprint(msg)
+        write(msg,902) nmsh
+        CALL rprint(msg)
       ENDIF
 
       return
@@ -4445,8 +4258,8 @@ c      write(6,992) botblk(1,1),botblk(1,2)
 *  blas: dcopy
 *  double precision dlog
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter  ( zero = 0.0d+0, one = 1.0d+0, onep1 = 1.1d+0 )
       parameter  ( erdcid = 5.0d+0 )
@@ -4465,12 +4278,6 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       endif
 
       maxmsh = .false.
-
-      if (pdebug) THEN
-	  write(msg,901) nmsh, ipow
-        CALL rprint(msg)
-      ENDIF
-
 
       frcpow = one/ipow
       ddouble = .false.
@@ -4498,8 +4305,6 @@ c      write(6,992) botblk(1,1),botblk(1,2)
             denom = tol(it)*max(one, abs(u(jcomp,im)))
             ems = ermeas(jcomp,im)
             ermeas(jcomp,im) = abs(ems)/denom
-*            if (pdebug .and. ermeas(jcomp,im) .ge. thres)
-*     *             write(6,902) im,jcomp,ems,ermeas(jcomp,im)
             err = ermeas(jcomp, im)
             if (err .ge. ermx(im)) then
                 ermx(im) = err
@@ -4508,12 +4313,6 @@ c      write(6,992) botblk(1,1),botblk(1,2)
   110    continue
          errmax = max(ermx(im), errmax)
   120 continue
-
-
-      if (pdebug) THEN
-	  write(msg,903) errmax
-        CALL rprint(msg)
-      ENDIF
 
 
       if (errmax .gt. zero .and. errmax .le. erdcid) then
@@ -4563,7 +4362,6 @@ c      write(6,992) botblk(1,1),botblk(1,2)
             nmest = nmest - 1
          endif
   220 continue
-*      if (pdebug) write(6,904) nmest, (irefin(i), i=1,ninter)
 
       if (nmest .gt. nmax) then
 
@@ -4715,7 +4513,7 @@ c      write(6,992) botblk(1,1),botblk(1,2)
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
-	  write(msg,905) nmsh
+        write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
 
@@ -4755,10 +4553,8 @@ c         nmsh = 2*nmsh - 1
       endif
       return
 
-  901 format(1h ,'selmsh.  nmsh, ipow =',2i5)
   902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
   903 format(1h ,'errmax',1pe11.3)
-  904 format(1h ,'nmest, irefin',(10i5))
   905 format(1h ,'selmsh.  new nmsh =',i8)
   910 format(1h ,'ihcomp',(10i5))
       end
@@ -4772,8 +4568,8 @@ c       selmsh
       logical maxmsh
       dimension xx(*), xxold(*)
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       character(len=100) msg
 
 *  blas: dcopy
@@ -4783,12 +4579,6 @@ c       selmsh
 *  by the integer intref.
 *  numadd gives the trial number of points to be added in each
 *  interval.
-
-      if (pdebug) THEN
-	  write(msg,901)
-        CALL rprint(msg)
-      ENDIF
-
 
       nmold = nmsh
       call dcopy(nmold, xx, 1, xxold, 1)
@@ -4800,10 +4590,6 @@ c       selmsh
       elseif (numadd .lt. 4) then
          numadd = 4
       endif
-      if (pdebug) THEN
-	  write (msg,902) nmsh, intref, numadd
-        CALL rprint(msg)
-      ENDIF
 
 
       maxmsh = .false.
@@ -4814,7 +4600,7 @@ c       selmsh
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
-		    write(msg,903) nmnew
+              write(msg,903) nmnew
               CALL rprint(msg)
             ENDIF
             maxmsh = .true.
@@ -4839,7 +4625,7 @@ c       selmsh
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
-		     write(msg,903) nmnew
+               write(msg,903) nmnew
                CALL rprint(msg)
             ENDIF
 
@@ -4863,7 +4649,7 @@ c       selmsh
          nmnew = nmsh + 3*numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
-		    write(msg,903) nmnew
+              write(msg,903) nmnew
               CALL rprint(msg)
             ENDIF
             maxmsh = .true.
@@ -4906,13 +4692,11 @@ c       selmsh
       nmsh = nmnew
 
       if(iprint .ge. 0) THEN
-	  write(msg,904) nmsh
+        write(msg,904) nmsh
         CALL rprint(msg)
       ENDIF
 
       return
-  901 format(1h , ' smpmsh')
-  902 format(1h ,'nmsh, intref, numadd',3i6)
   903 format(1h , ' smpmsh.  maximum points exceeded, nmnew =',i6)
   904 format(1h ,'smpmsh, new nmsh =',i7)
       end
@@ -4924,8 +4708,8 @@ c       selmsh
       integer  nmsh, nfxpnt
       dimension fixpnt(*), xx(nmsh)
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       intrinsic max
       character(len=100) msg
@@ -4951,7 +4735,7 @@ c       selmsh
 *  The array xx (of dimension nmsh) contains the mesh points.
 
       if (iprint .ge. 0) THEN
-	  write(msg,901) nmsh
+        write(msg,901) nmsh
         CALL rprint(msg)
       ENDIF
 
@@ -5073,8 +4857,8 @@ c
       logical    ddouble , maxmsh
       dimension  amg(*)
       logical stab_cond, stiff_cond, forcedouble
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 *  blas: dcopy
       logical nodouble
@@ -5113,12 +4897,6 @@ c
 *  If iorder .gt. 4, signalling that we were trying Newton
 *  iterations for order 6 or 8, check only elements of rhs
 *  corresponding to components for which a tolerance is specified.
-
-      if (pdebug) THEN
-	  write(msg,901) nummed, numbig
-        CALL rprint(msg)
-      ENDIF
-
 
       nodouble = ((iorder.eq.4) .and.
      *       (stiff_cond .and. .not. stab_cond) .and. (use_c))
@@ -5170,11 +4948,6 @@ c     *   .and. (use_c))
          call stats(ninter, tmwork, rbigst, rsecnd,
      *                 sumrhs, intref)
          tstval = bigfac*(sumrhs-rbigst)/ninter
-         if (pdebug) THEN
-	     write(msg,902) ic, tstval, rbigst, rsecnd
-           CALL rprint(msg)
-         ENDIF
-
          if (rbigst .ge. small .and. rbigst .ge. tstval) go to 100
    50 continue
 
@@ -5184,10 +4957,6 @@ c     *   .and. (use_c))
       numbig = 0
       nummed = 0
       ddouble = .true.
-      if (pdebug) THEN
-	  write(msg,903)
-        CALL rprint(msg)
-      ENDIF
 
 cf the mesh if not doubled if the problem is stiff and the order is 4
        if (nodouble .and. .not. forcedouble) then
@@ -5231,13 +5000,6 @@ c      call dblmsh(nmsh, nmax, xx, nmold, xxold, maxmsh)
       endif
 
 *  Refine the mesh.
-      if (pdebug) THEN
-	  write(msg,904) numbig, nummed
-        CALL rprint(msg)
-      ENDIF
-
-
-
       if (ddouble) then
 cf the mesh if not doubled if the problem is stiff
          if  (nodouble .and. .not. forcedouble)  then
@@ -5276,18 +5038,8 @@ cf
         endif
 
       endif
-      if (ddouble  .and. pdebug) THEN
-	  write(msg,905)
-        CALL rprint(msg)
-      ENDIF
 
       return
-
-  901 format(1h ,'mshref. nummed, numbig =',2i5)
-  902 format(1h ,'ic, tst, bigst, second',i5, 3(1pe11.3))
-  903 format(1h ,'No significantly large value')
-  904 format(1h ,'numbig, nummed =',2i5)
-  905 format(1h ,'double the mesh')
       end
 
       subroutine errest (ncomp, nmsh, ntol, ltol, tol,
@@ -5298,8 +5050,8 @@ cf
      *              uold(ncomp,nmsh), etest(ntol)
       logical errok
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
       intrinsic abs, max
 
       parameter ( one = 1.0d+0, zero = 0.0d+0 )
@@ -5322,11 +5074,6 @@ cf
 *   -- is .true. if all error measures are less than the
 *      corresponding values of etest.
 
-      if (pdebug) THEN
-	  write(msg,900)
-	  CALL rprint(msg)
-      ENDIF
-
 cf      errsum = zero
       errmax = zero
       errok = .true.
@@ -5337,25 +5084,12 @@ cf      errsum = zero
          er = u(icmp,im) - uold(icmp,im)
          denom = max(one, abs(uold(icmp,im)))
          errel = abs(er/(tol(it)*denom))
-         if (pdebug) THEN
-	      write(msg,901) im, it, errel, etest(it)
-            CALL rprint(msg)
-         ENDIF
          errmax = max(errmax,  errel)
 cf         errsum = errsum + errel
          if (errel .gt. etest(it)) errok = .false.
    10 continue
 
-C KS: TOGGLED OFF:ERRSUM NOT KNOWN
-C      if (pdebug) THEN
-C	  write(msg,902) errsum
-C        CALL rprint(msg)
-C     ENDIF
-
       return
-  900 format(1h ,'errest')
-  901 format(1h ,2i5,2(1pe11.3))
-  902 format(1h ,'errsum',1pe11.3)
       end
 
 
@@ -6061,8 +5795,8 @@ c  end of getptq
 
       implicit double precision (a-h, o-z)
       dimension xx(*), u(nudim,*), xxold(*), uold(ncomp,*)
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical  use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
 * blas: dcopy
 
@@ -6076,12 +5810,6 @@ c  end of getptq
 *  more points than the old, nor that the new and old mesh
 *  points are related in a specific way (except that their first
 *  and last points are identical).
-
-      if (pdebug) THEN
-	  write(msg,900)
-        CALL rprint(msg)
-      ENDIF
-
 
 *  By construction, xx(1) = xxold(1).  Copy the first ncomp
 *  components of uold into those of u.
@@ -6122,7 +5850,6 @@ c  end of getptq
   100 continue
       call dcopy(ncomp, uold(1,nmold), 1, u(1,nmsh), 1)
       return
-  900 format(1h ,'interp')
       end
 
 
@@ -6257,8 +5984,8 @@ c#
 *  blas: dcopy
 *  double precision dlog
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter  ( zero = 0.0d+0, one = 1.0d+0, onep1 = 1.1d+0 )
       parameter  ( erdcid = 5.0d+0 )
@@ -6279,12 +6006,6 @@ c#
       endif
 
       maxmsh = .false.
-
-      if (pdebug) THEN
-	  write(msg,901) nmsh, ipow
-        CALL rprint(msg)
-      ENDIF
-
 
       frcpow = one/ipow
       ddouble = .false.
@@ -6319,10 +6040,6 @@ c          end do
             ems = ermeas(jcomp,im)
             ermeas(jcomp,im) = abs(ems)/denom
 c            .and. ermeas(jcomp,im) .ge. thres)
-            if (pdebug ) THEN
-             write(msg,902) im,jcomp,ems,ermeas(jcomp,im), u(jcomp,im)
-                CALL rprint(msg)
-            ENDIF
             err = ermeas(jcomp, im)
             if (err .ge. ermx(im)) then
                 ermx(im) = err
@@ -6347,13 +6064,6 @@ cf
      *         nmold, xxold, ddouble , maxmsh,r4,amg)
       else
 cf   the conditioning and the error
-
-
-      if (pdebug) THEN
-	  write(msg,903) errmax
-        CALL rprint(msg)
-      ENDIF
-
 
       if (errmax .gt. zero .and. errmax .le. erdcid) then
 
@@ -6397,10 +6107,6 @@ cf   the conditioning and the error
       do 220 im = 1, ninter
          if (ermx(im).ge.thres) then
             irefin(im) = int(ermx(im)**frcpow) + 1
-            if (pdebug ) THEN
-                write(msg,*) im,ermx(im), frcpow, irefin(im),decii
-                CALL rprint(msg)
-            ENDIF
             nmest = nmest + irefin(im) - 1
          else
             irefin(im) = 1
@@ -6438,11 +6144,6 @@ cc              nmest = nmest - 1
 c         endif
 c 221     continue
 c        end if
-
-      if (pdebug) THEN
-	  write(msg,904) nmest, (irefin(i), i=1,ninter)
-        CALL rprint(msg)
-      ENDIF
 
       if (nmest .gt. nmax) then
 
@@ -6596,8 +6297,8 @@ c        end if
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
-	  write(msg,905) nmsh
-	  CALL rprint(msg)
+        write(msg,905) nmsh
+        CALL rprint(msg)
       ENDIF
 
       return
@@ -6639,10 +6340,6 @@ c         nmsh = 2*nmsh - 1
 c   endif use the conditioning and the error
       return
 
-  901 format(1h ,'selconderrmsh.  nmsh, ipow =',2i5)
-  902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
-  903 format(1h ,'errmax',1pe11.3)
-  904 format(1h ,'nmest, irefin',(10i5))
   905 format(1h ,'selconderrmsh.  new nmsh =',i8)
   910 format(1h ,'ihcomp',(10i5))
       end
@@ -6668,8 +6365,8 @@ c   endif use the conditioning and the error
 *  blas: dcopy
 *  double precision dlog
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter  ( zero = 0.0d+0, one = 1.0d+0, onep1 = 1.1d+0 )
       parameter  ( erdcid = 5.0d+0 )
@@ -6683,13 +6380,6 @@ c   endif use the conditioning and the error
 
 
       maxmsh = .false.
-
-
-      if (pdebug) THEN
-	  write(msg,901) nmsh
-        CALL rprint(msg)
-      ENDIF
-
       ddouble = .false.
       nmold = nmsh
       ninter = nmsh - 1
@@ -6902,7 +6592,7 @@ c  220 continue
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
-	  write(msg,905) nmsh
+        write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
 
@@ -6922,7 +6612,6 @@ c  220 continue
 
 
 
-  901 format(1h ,'selcondmsh.  nmsh, ipow =',2i5)
   902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
   903 format(1h ,'errmax',1pe11.3)
   904 format(1h ,'nmest, irefin',(10i5))
@@ -6949,8 +6638,8 @@ c  220 continue
 *  blas: dcopy
 *  double precision dlog
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter  ( zero = 0.0d+0, one = 1.0d+0,onep1 = 1.1d+0)
       parameter  ( erdcid = 5.0d+0 )
@@ -6968,12 +6657,6 @@ c  220 continue
 
 
       maxmsh = .false.
-
-
-      if (pdebug) THEN
-	  write(msg,901) nmsh
-	  CALL rprint(msg)
-      ENDIF
 
       ddouble = .false.
       nmold = nmsh
@@ -7051,11 +6734,6 @@ c  220 continue
          go to 360
 
       endif
-
-      if (pdebug) THEN
-	  write(msg,904) nmest, (irefin(i), i=1,ninter)
-        CALL rprint(msg)
-      ENDIF
 
 
 *  It appears that we can perform the desired selective mesh
@@ -7178,7 +6856,7 @@ c  220 continue
 *  but has more than 3 times as many intervals as the old mesh.
 *  Try doubling the mesh if possible.
             if (iprint .eq. 1) THEN
-		    write(msg,*) 'smpselcondmsh'
+              write(msg,*) 'smpselcondmsh'
               CALL rprint(msg)
             ENDIF
 
@@ -7205,7 +6883,7 @@ c  220 continue
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
-	  write(msg,905) nmsh
+        write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
 
@@ -7225,10 +6903,6 @@ c  220 continue
 
 
 
-  901 format(1h ,'smpselcondmsh.  nmsh, ipow =',2i5)
-  902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
-  903 format(1h ,'errmax',1pe11.3)
-  904 format(1h ,'nmest, irefin',(10i5))
   905 format(1h ,'smpselcondmsh.  new nmsh =',i8)
   910 format(1h ,'ihcomp',(10i5))
       end
@@ -7250,8 +6924,8 @@ c  220 continue
 *  blas: dcopy
 *  double precision dlog
 
-      logical pdebug, use_c, comp_c
-      common/algprs/ nminit, pdebug, iprint, idum, uval0, use_c, comp_c
+      logical use_c, comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
 
       parameter  ( zero = 0.0d+0, one = 1.0d+0 )
       character(len=100) msg
@@ -7316,7 +6990,7 @@ c vecchio 0.5 nuovo 0.65
 
 
        if (iprint .eq. 1) THEN
-	   write(msg,901)r1,r3,fatt_r1r3,nptcond,nptm,nptr
+         write(msg,901)r1,r3,fatt_r1r3,nptcond,nptm,nptr
          CALL rprint(msg)
        ENDIF
 
@@ -7592,578 +7266,6 @@ C
       RETURN
 C
       END
-
-c This is the code that has gone into netlib as a replacement.
-
-      DOUBLE PRECISION FUNCTION D1MACH(I)
-      character(len=100) msg
-      INTEGER I
-C
-C  DOUBLE-PRECISION MACHINE CONSTANTS
-C
-C  D1MACH( 1) = B**(EMIN-1), THE SMALLEST POSITIVE MAGNITUDE.
-C
-C  D1MACH( 2) = B**EMAX*(1 - B**(-T)), THE LARGEST MAGNITUDE.
-C
-C  D1MACH( 3) = B**(-T), THE SMALLEST RELATIVE SPACING.
-C
-C  D1MACH( 4) = B**(1-T), THE LARGEST RELATIVE SPACING.
-C
-C  D1MACH( 5) = LOG10(B)
-C
-C  TO ALTER THIS FUNCTION FOR A PARTICULAR ENVIRONMENT,
-C  THE DESIRED SET OF DATA STATEMENTS SHOULD BE ACTIVATED BY
-C  REMOVING THE C FROM COLUMN 1.
-C  ON RARE MACHINES A STATIC STATEMENT MAY NEED TO BE ADDED.
-C  (BUT PROBABLY MORE SYSTEMS PROHIBIT IT THAN REQUIRE IT.)
-C
-C  FOR IEEE-ARITHMETIC MACHINES (BINARY STANDARD), ONE OF THE FIRST
-C  TWO SETS OF CONSTANTS BELOW SHOULD BE APPROPRIATE.  IF YOU DO NOT
-C  KNOW WHICH SET TO USE, TRY BOTH AND SEE WHICH GIVES PLAUSIBLE
-C  VALUES.
-C
-C  WHERE POSSIBLE, DECIMAL, OCTAL OR HEXADECIMAL CONSTANTS ARE USED
-C  TO SPECIFY THE CONSTANTS EXACTLY.  SOMETIMES THIS REQUIRES USING
-C  EQUIVALENT INTEGER ARRAYS.  IF YOUR COMPILER USES HALF-WORD
-C  INTEGERS BY DEFAULT (SOMETIMES CALLED INTEGER*2), YOU MAY NEED TO
-C  CHANGE INTEGER TO INTEGER*4 OR OTHERWISE INSTRUCT YOUR COMPILER
-C  TO USE FULL-WORD INTEGERS IN THE NEXT 5 DECLARATIONS.
-C
-C  COMMENTS JUST BEFORE THE END STATEMENT (LINES STARTING WITH *)
-C  GIVE C SOURCE FOR D1MACH.
-C
-      INTEGER SMALL(2)
-      INTEGER LARGE(2)
-      INTEGER RIGHT(2)
-      INTEGER DIVER(2)
-      INTEGER LOG10(2)
-      INTEGER SC, CRAY1(38), J
-      COMMON /D9MACH/ CRAY1
-C/6S
-C/7S
-      SAVE SMALL, LARGE, RIGHT, DIVER, LOG10, SC
-C/
-      DOUBLE PRECISION DMACH(5)
-C
-      EQUIVALENCE (DMACH(1),SMALL(1))
-      EQUIVALENCE (DMACH(2),LARGE(1))
-      EQUIVALENCE (DMACH(3),RIGHT(1))
-      EQUIVALENCE (DMACH(4),DIVER(1))
-      EQUIVALENCE (DMACH(5),LOG10(1))
-C
-C     MACHINE CONSTANTS FOR BIG-ENDIAN IEEE ARITHMETIC (BINARY FORMAT)
-C     MACHINES IN WHICH THE MOST SIGNIFICANT BYTE IS STORED FIRST,
-C     SUCH AS THE AT&T 3B SERIES, MOTOROLA 68000 BASED MACHINES (E.G.
-C     SUN 3), AND MACHINES THAT USE SPARC, HP, OR IBM RISC CHIPS.
-C
-C      DATA SMALL(1),SMALL(2) /    1048576,          0 /
-C      DATA LARGE(1),LARGE(2) / 2146435071,         -1 /
-C      DATA RIGHT(1),RIGHT(2) / 1017118720,          0 /
-C      DATA DIVER(1),DIVER(2) / 1018167296,          0 /
-C      DATA LOG10(1),LOG10(2) / 1070810131, 1352628735 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR LITTLE-ENDIAN (BINARY) IEEE ARITHMETIC
-C     MACHINES IN WHICH THE LEAST SIGNIFICANT BYTE IS STORED FIRST,
-C     E.G. IBM PCS AND OTHER MACHINES THAT USE INTEL 80X87 OR DEC
-C     ALPHA CHIPS.
-C
-      DATA SMALL(1),SMALL(2) /          0,    1048576 /
-      DATA LARGE(1),LARGE(2) /         -1, 2146435071 /
-      DATA RIGHT(1),RIGHT(2) /          0, 1017118720 /
-      DATA DIVER(1),DIVER(2) /          0, 1018167296 /
-      DATA LOG10(1),LOG10(2) / 1352628735, 1070810131 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR AMDAHL MACHINES.
-C
-C      DATA SMALL(1),SMALL(2) /    1048576,          0 /
-C      DATA LARGE(1),LARGE(2) / 2147483647,         -1 /
-C      DATA RIGHT(1),RIGHT(2) /  856686592,          0 /
-C      DATA DIVER(1),DIVER(2) /  873463808,          0 /
-C      DATA LOG10(1),LOG10(2) / 1091781651, 1352628735 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE BURROUGHS 1700 SYSTEM.
-C
-C      DATA SMALL(1) / ZC00800000 /
-C      DATA SMALL(2) / Z000000000 /
-C
-C      DATA LARGE(1) / ZDFFFFFFFF /
-C      DATA LARGE(2) / ZFFFFFFFFF /
-C
-C      DATA RIGHT(1) / ZCC5800000 /
-C      DATA RIGHT(2) / Z000000000 /
-C
-C      DATA DIVER(1) / ZCC6800000 /
-C      DATA DIVER(2) / Z000000000 /
-C
-C      DATA LOG10(1) / ZD00E730E7 /
-C      DATA LOG10(2) / ZC77800DC0 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE BURROUGHS 5700 SYSTEM.
-C
-C      DATA SMALL(1) / O1771000000000000 /
-C      DATA SMALL(2) / O0000000000000000 /
-C
-C      DATA LARGE(1) / O0777777777777777 /
-C      DATA LARGE(2) / O0007777777777777 /
-C
-C      DATA RIGHT(1) / O1461000000000000 /
-C      DATA RIGHT(2) / O0000000000000000 /
-C
-C      DATA DIVER(1) / O1451000000000000 /
-C      DATA DIVER(2) / O0000000000000000 /
-C
-C      DATA LOG10(1) / O1157163034761674 /
-C      DATA LOG10(2) / O0006677466732724 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE BURROUGHS 6700/7700 SYSTEMS.
-C
-C      DATA SMALL(1) / O1771000000000000 /
-C      DATA SMALL(2) / O7770000000000000 /
-C
-C      DATA LARGE(1) / O0777777777777777 /
-C      DATA LARGE(2) / O7777777777777777 /
-C
-C      DATA RIGHT(1) / O1461000000000000 /
-C      DATA RIGHT(2) / O0000000000000000 /
-C
-C      DATA DIVER(1) / O1451000000000000 /
-C      DATA DIVER(2) / O0000000000000000 /
-C
-C      DATA LOG10(1) / O1157163034761674 /
-C      DATA LOG10(2) / O0006677466732724 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR FTN4 ON THE CDC 6000/7000 SERIES.
-C
-C      DATA SMALL(1) / 00564000000000000000B /
-C      DATA SMALL(2) / 00000000000000000000B /
-C
-C      DATA LARGE(1) / 37757777777777777777B /
-C      DATA LARGE(2) / 37157777777777777774B /
-C
-C      DATA RIGHT(1) / 15624000000000000000B /
-C      DATA RIGHT(2) / 00000000000000000000B /
-C
-C      DATA DIVER(1) / 15634000000000000000B /
-C      DATA DIVER(2) / 00000000000000000000B /
-C
-C      DATA LOG10(1) / 17164642023241175717B /
-C      DATA LOG10(2) / 16367571421742254654B /, SC/987/
-C
-C     MACHINE CONSTANTS FOR FTN5 ON THE CDC 6000/7000 SERIES.
-C
-C      DATA SMALL(1) / O"00564000000000000000" /
-C      DATA SMALL(2) / O"00000000000000000000" /
-C
-C      DATA LARGE(1) / O"37757777777777777777" /
-C      DATA LARGE(2) / O"37157777777777777774" /
-C
-C      DATA RIGHT(1) / O"15624000000000000000" /
-C      DATA RIGHT(2) / O"00000000000000000000" /
-C
-C      DATA DIVER(1) / O"15634000000000000000" /
-C      DATA DIVER(2) / O"00000000000000000000" /
-C
-C      DATA LOG10(1) / O"17164642023241175717" /
-C      DATA LOG10(2) / O"16367571421742254654" /, SC/987/
-C
-C     MACHINE CONSTANTS FOR CONVEX C-1
-C
-C      DATA SMALL(1),SMALL(2) / '00100000'X, '00000000'X /
-C      DATA LARGE(1),LARGE(2) / '7FFFFFFF'X, 'FFFFFFFF'X /
-C      DATA RIGHT(1),RIGHT(2) / '3CC00000'X, '00000000'X /
-C      DATA DIVER(1),DIVER(2) / '3CD00000'X, '00000000'X /
-C      DATA LOG10(1),LOG10(2) / '3FF34413'X, '509F79FF'X /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE CRAY 1, XMP, 2, AND 3.
-C
-C      DATA SMALL(1) / 201354000000000000000B /
-C      DATA SMALL(2) / 000000000000000000000B /
-C
-C      DATA LARGE(1) / 577767777777777777777B /
-C      DATA LARGE(2) / 000007777777777777776B /
-C
-C      DATA RIGHT(1) / 376434000000000000000B /
-C      DATA RIGHT(2) / 000000000000000000000B /
-C
-C      DATA DIVER(1) / 376444000000000000000B /
-C      DATA DIVER(2) / 000000000000000000000B /
-C
-C      DATA LOG10(1) / 377774642023241175717B /
-C      DATA LOG10(2) / 000007571421742254654B /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE DATA GENERAL ECLIPSE S/200
-C
-C     SMALL, LARGE, RIGHT, DIVER, LOG10 SHOULD BE DECLARED
-C     INTEGER SMALL(4), LARGE(4), RIGHT(4), DIVER(4), LOG10(4)
-C
-C     NOTE - IT MAY BE APPROPRIATE TO INCLUDE THE FOLLOWING LINE -
-C     STATIC DMACH(5)
-C
-C      DATA SMALL/20K,3*0/,LARGE/77777K,3*177777K/
-C      DATA RIGHT/31420K,3*0/,DIVER/32020K,3*0/
-C      DATA LOG10/40423K,42023K,50237K,74776K/, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE HARRIS SLASH 6 AND SLASH 7
-C
-C      DATA SMALL(1),SMALL(2) / '20000000, '00000201 /
-C      DATA LARGE(1),LARGE(2) / '37777777, '37777577 /
-C      DATA RIGHT(1),RIGHT(2) / '20000000, '00000333 /
-C      DATA DIVER(1),DIVER(2) / '20000000, '00000334 /
-C      DATA LOG10(1),LOG10(2) / '23210115, '10237777 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE HONEYWELL DPS 8/70 SERIES.
-C
-C      DATA SMALL(1),SMALL(2) / O402400000000, O000000000000 /
-C      DATA LARGE(1),LARGE(2) / O376777777777, O777777777777 /
-C      DATA RIGHT(1),RIGHT(2) / O604400000000, O000000000000 /
-C      DATA DIVER(1),DIVER(2) / O606400000000, O000000000000 /
-C      DATA LOG10(1),LOG10(2) / O776464202324, O117571775714 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE IBM 360/370 SERIES,
-C     THE XEROX SIGMA 5/7/9 AND THE SEL SYSTEMS 85/86.
-C
-C      DATA SMALL(1),SMALL(2) / Z00100000, Z00000000 /
-C      DATA LARGE(1),LARGE(2) / Z7FFFFFFF, ZFFFFFFFF /
-C      DATA RIGHT(1),RIGHT(2) / Z33100000, Z00000000 /
-C      DATA DIVER(1),DIVER(2) / Z34100000, Z00000000 /
-C      DATA LOG10(1),LOG10(2) / Z41134413, Z509F79FF /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE INTERDATA 8/32
-C     WITH THE UNIX SYSTEM FORTRAN 77 COMPILER.
-C
-C     FOR THE INTERDATA FORTRAN VII COMPILER REPLACE
-C     THE Z'S SPECIFYING HEX CONSTANTS WITH Y'S.
-C
-C      DATA SMALL(1),SMALL(2) / Z'00100000', Z'00000000' /
-C      DATA LARGE(1),LARGE(2) / Z'7EFFFFFF', Z'FFFFFFFF' /
-C      DATA RIGHT(1),RIGHT(2) / Z'33100000', Z'00000000' /
-C      DATA DIVER(1),DIVER(2) / Z'34100000', Z'00000000' /
-C      DATA LOG10(1),LOG10(2) / Z'41134413', Z'509F79FF' /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE PDP-10 (KA PROCESSOR).
-C
-C      DATA SMALL(1),SMALL(2) / "033400000000, "000000000000 /
-C      DATA LARGE(1),LARGE(2) / "377777777777, "344777777777 /
-C      DATA RIGHT(1),RIGHT(2) / "113400000000, "000000000000 /
-C      DATA DIVER(1),DIVER(2) / "114400000000, "000000000000 /
-C      DATA LOG10(1),LOG10(2) / "177464202324, "144117571776 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE PDP-10 (KI PROCESSOR).
-C
-C      DATA SMALL(1),SMALL(2) / "000400000000, "000000000000 /
-C      DATA LARGE(1),LARGE(2) / "377777777777, "377777777777 /
-C      DATA RIGHT(1),RIGHT(2) / "103400000000, "000000000000 /
-C      DATA DIVER(1),DIVER(2) / "104400000000, "000000000000 /
-C      DATA LOG10(1),LOG10(2) / "177464202324, "047674776746 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR PDP-11 FORTRANS SUPPORTING
-C     32-BIT INTEGERS (EXPRESSED IN INTEGER AND OCTAL).
-C
-C      DATA SMALL(1),SMALL(2) /    8388608,           0 /
-C      DATA LARGE(1),LARGE(2) / 2147483647,          -1 /
-C      DATA RIGHT(1),RIGHT(2) /  612368384,           0 /
-C      DATA DIVER(1),DIVER(2) /  620756992,           0 /
-C      DATA LOG10(1),LOG10(2) / 1067065498, -2063872008 /, SC/987/
-C
-C      DATA SMALL(1),SMALL(2) / O00040000000, O00000000000 /
-C      DATA LARGE(1),LARGE(2) / O17777777777, O37777777777 /
-C      DATA RIGHT(1),RIGHT(2) / O04440000000, O00000000000 /
-C      DATA DIVER(1),DIVER(2) / O04500000000, O00000000000 /
-C      DATA LOG10(1),LOG10(2) / O07746420232, O20476747770 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR PDP-11 FORTRANS SUPPORTING
-C     16-BIT INTEGERS (EXPRESSED IN INTEGER AND OCTAL).
-C
-C     SMALL, LARGE, RIGHT, DIVER, LOG10 SHOULD BE DECLARED
-C     INTEGER SMALL(4), LARGE(4), RIGHT(4), DIVER(4), LOG10(4)
-C
-C      DATA SMALL(1),SMALL(2) /    128,      0 /
-C      DATA SMALL(3),SMALL(4) /      0,      0 /
-C
-C      DATA LARGE(1),LARGE(2) /  32767,     -1 /
-C      DATA LARGE(3),LARGE(4) /     -1,     -1 /
-C
-C      DATA RIGHT(1),RIGHT(2) /   9344,      0 /
-C      DATA RIGHT(3),RIGHT(4) /      0,      0 /
-C
-C      DATA DIVER(1),DIVER(2) /   9472,      0 /
-C      DATA DIVER(3),DIVER(4) /      0,      0 /
-C
-C      DATA LOG10(1),LOG10(2) /  16282,   8346 /
-C      DATA LOG10(3),LOG10(4) / -31493, -12296 /, SC/987/
-C
-C      DATA SMALL(1),SMALL(2) / O000200, O000000 /
-C      DATA SMALL(3),SMALL(4) / O000000, O000000 /
-C
-C      DATA LARGE(1),LARGE(2) / O077777, O177777 /
-C      DATA LARGE(3),LARGE(4) / O177777, O177777 /
-C
-C      DATA RIGHT(1),RIGHT(2) / O022200, O000000 /
-C      DATA RIGHT(3),RIGHT(4) / O000000, O000000 /
-C
-C      DATA DIVER(1),DIVER(2) / O022400, O000000 /
-C      DATA DIVER(3),DIVER(4) / O000000, O000000 /
-C
-C      DATA LOG10(1),LOG10(2) / O037632, O020232 /
-C      DATA LOG10(3),LOG10(4) / O102373, O147770 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE PRIME 50 SERIES SYSTEMS
-C     WITH 32-BIT INTEGERS AND 64V MODE INSTRUCTIONS,
-C     SUPPLIED BY IGOR BRAY.
-C
-C      DATA SMALL(1),SMALL(2) / :10000000000, :00000100001 /
-C      DATA LARGE(1),LARGE(2) / :17777777777, :37777677775 /
-C      DATA RIGHT(1),RIGHT(2) / :10000000000, :00000000122 /
-C      DATA DIVER(1),DIVER(2) / :10000000000, :00000000123 /
-C      DATA LOG10(1),LOG10(2) / :11504046501, :07674600177 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE SEQUENT BALANCE 8000
-C
-C      DATA SMALL(1),SMALL(2) / $00000000,  $00100000 /
-C      DATA LARGE(1),LARGE(2) / $FFFFFFFF,  $7FEFFFFF /
-C      DATA RIGHT(1),RIGHT(2) / $00000000,  $3CA00000 /
-C      DATA DIVER(1),DIVER(2) / $00000000,  $3CB00000 /
-C      DATA LOG10(1),LOG10(2) / $509F79FF,  $3FD34413 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE UNIVAC 1100 SERIES.
-C
-C      DATA SMALL(1),SMALL(2) / O000040000000, O000000000000 /
-C      DATA LARGE(1),LARGE(2) / O377777777777, O777777777777 /
-C      DATA RIGHT(1),RIGHT(2) / O170540000000, O000000000000 /
-C      DATA DIVER(1),DIVER(2) / O170640000000, O000000000000 /
-C      DATA LOG10(1),LOG10(2) / O177746420232, O411757177572 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE VAX UNIX F77 COMPILER
-C
-C      DATA SMALL(1),SMALL(2) /        128,           0 /
-C      DATA LARGE(1),LARGE(2) /     -32769,          -1 /
-C      DATA RIGHT(1),RIGHT(2) /       9344,           0 /
-C      DATA DIVER(1),DIVER(2) /       9472,           0 /
-C      DATA LOG10(1),LOG10(2) /  546979738,  -805796613 /, SC/987/
-C
-C     MACHINE CONSTANTS FOR THE VAX-11 WITH
-C     FORTRAN IV-PLUS COMPILER
-C
-C      DATA SMALL(1),SMALL(2) / Z00000080, Z00000000 /
-C      DATA LARGE(1),LARGE(2) / ZFFFF7FFF, ZFFFFFFFF /
-C      DATA RIGHT(1),RIGHT(2) / Z00002480, Z00000000 /
-C      DATA DIVER(1),DIVER(2) / Z00002500, Z00000000 /
-C      DATA LOG10(1),LOG10(2) / Z209A3F9A, ZCFF884FB /, SC/987/
-C
-C     MACHINE CONSTANTS FOR VAX/VMS VERSION 2.2
-C
-C      DATA SMALL(1),SMALL(2) /       '80'X,        '0'X /
-C      DATA LARGE(1),LARGE(2) / 'FFFF7FFF'X, 'FFFFFFFF'X /
-C      DATA RIGHT(1),RIGHT(2) /     '2480'X,        '0'X /
-C      DATA DIVER(1),DIVER(2) /     '2500'X,        '0'X /
-C      DATA LOG10(1),LOG10(2) / '209A3F9A'X, 'CFF884FB'X /, SC/987/
-C
-C  ***  ISSUE STOP 779 IF ALL DATA STATEMENTS ARE COMMENTED...
-      IF (SC .NE. 987) THEN
-         DMACH(1) = 1.D13
-         IF (      SMALL(1) .EQ. 1117925532
-     *       .AND. SMALL(2) .EQ. -448790528) THEN
-*           *** IEEE BIG ENDIAN ***
-            SMALL(1) = 1048576
-            SMALL(2) = 0
-            LARGE(1) = 2146435071
-            LARGE(2) = -1
-            RIGHT(1) = 1017118720
-            RIGHT(2) = 0
-            DIVER(1) = 1018167296
-            DIVER(2) = 0
-            LOG10(1) = 1070810131
-            LOG10(2) = 1352628735
-         ELSE IF ( SMALL(2) .EQ. 1117925532
-     *       .AND. SMALL(1) .EQ. -448790528) THEN
-*           *** IEEE LITTLE ENDIAN ***
-            SMALL(2) = 1048576
-            SMALL(1) = 0
-            LARGE(2) = 2146435071
-            LARGE(1) = -1
-            RIGHT(2) = 1017118720
-            RIGHT(1) = 0
-            DIVER(2) = 1018167296
-            DIVER(1) = 0
-            LOG10(2) = 1070810131
-            LOG10(1) = 1352628735
-         ELSE IF ( SMALL(1) .EQ. -2065213935
-     *       .AND. SMALL(2) .EQ. 10752) THEN
-*               *** VAX WITH D_FLOATING ***
-            SMALL(1) = 128
-            SMALL(2) = 0
-            LARGE(1) = -32769
-            LARGE(2) = -1
-            RIGHT(1) = 9344
-            RIGHT(2) = 0
-            DIVER(1) = 9472
-            DIVER(2) = 0
-            LOG10(1) = 546979738
-            LOG10(2) = -805796613
-         ELSE IF ( SMALL(1) .EQ. 1267827943
-     *       .AND. SMALL(2) .EQ. 704643072) THEN
-*               *** IBM MAINFRAME ***
-            SMALL(1) = 1048576
-            SMALL(2) = 0
-            LARGE(1) = 2147483647
-            LARGE(2) = -1
-            RIGHT(1) = 856686592
-            RIGHT(2) = 0
-            DIVER(1) = 873463808
-            DIVER(2) = 0
-            LOG10(1) = 1091781651
-            LOG10(2) = 1352628735
-         ELSE IF ( SMALL(1) .EQ. 1120022684
-     *       .AND. SMALL(2) .EQ. -448790528) THEN
-*           *** CONVEX C-1 ***
-            SMALL(1) = 1048576
-            SMALL(2) = 0
-            LARGE(1) = 2147483647
-            LARGE(2) = -1
-            RIGHT(1) = 1019215872
-            RIGHT(2) = 0
-            DIVER(1) = 1020264448
-            DIVER(2) = 0
-            LOG10(1) = 1072907283
-            LOG10(2) = 1352628735
-         ELSE IF ( SMALL(1) .EQ. 815547074
-     *       .AND. SMALL(2) .EQ. 58688) THEN
-*           *** VAX G-FLOATING ***
-            SMALL(1) = 16
-            SMALL(2) = 0
-            LARGE(1) = -32769
-            LARGE(2) = -1
-            RIGHT(1) = 15552
-            RIGHT(2) = 0
-            DIVER(1) = 15568
-            DIVER(2) = 0
-            LOG10(1) = 1142112243
-            LOG10(2) = 2046775455
-         ELSE
-            DMACH(2) = 1.D27 + 1
-            DMACH(3) = 1.D27
-            LARGE(2) = LARGE(2) - RIGHT(2)
-            IF (LARGE(2) .EQ. 64 .AND. SMALL(2) .EQ. 0) THEN
-               CRAY1(1) = 67291416
-               DO 10 J = 1, 20
- 10               CRAY1(J+1) = CRAY1(J) + CRAY1(J)
-               CRAY1(22) = CRAY1(21) + 321322
-               DO 20 J = 22, 37
- 20               CRAY1(J+1) = CRAY1(J) + CRAY1(J)
-               IF (CRAY1(38) .EQ. SMALL(1)) THEN
-*                  *** CRAY ***
-*                 SMALL(1) = 2332160919536140288
-                  SMALL(1) = 2332160
-                  SMALL(1) = 1000000*SMALL(1) + 919536
-                  SMALL(1) = 1000000*SMALL(1) + 140288
-                  SMALL(2) = 0
-*                 LARGE(1) = 6917247552664371199
-                  LARGE(1) = 6917247
-                  LARGE(1) = 1000000*LARGE(1) + 552664
-                  LARGE(1) = 1000000*LARGE(1) + 371199
-*                 LARGE(2) = 281474976710654
-                  LARGE(2) = 28147497
-                  LARGE(2) = 10000000*LARGE(2) + 6710654
-*                 RIGHT(1) = 4585649583081652224
-                  RIGHT(1) = 4585649
-                  RIGHT(1) = 1000000*RIGHT(1) + 583081
-                  RIGHT(1) = 1000000*RIGHT(1) + 652224
-                  RIGHT(2) = 0
-*                 DIVER(1) = 4585931058058362880
-                  DIVER(1) = 4585931
-                  DIVER(1) = 1000000*DIVER(1) + 058058
-                  DIVER(1) = 1000000*DIVER(1) + 362880
-                  DIVER(2) = 0
-*                 LOG10(1) = 4611574008272714703
-                  LOG10(1) = 4611574
-                  LOG10(1) = 1000000*LOG10(1) +   8272
-                  LOG10(1) = 1000000*LOG10(1) + 714703
-*                 LOG10(2) = 272234615232940
-                  LOG10(2) = 27223461
-                  LOG10(2) = 10000000*LOG10(2) + 5232940
-               ELSE
-                  WRITE(msg,9000)
-                  CALL rprint(msg)
-                  STOP 779
-                  END IF
-            ELSE
-               WRITE(msg,9000)
-               CALL rprint(msg)
-               STOP 779
-               END IF
-            END IF
-         SC = 987
-         END IF
-C
-C  ***  ISSUE STOP 778 IF ALL DATA STATEMENTS ARE OBVIOUSLY WRONG...
-      IF (DMACH(4) .GE. 1.0D0) STOP 778
-*C/6S
-*C     IF (I .LT. 1  .OR.  I .GT. 5)
-*C    1   CALL SETERR(24HD1MACH - I OUT OF BOUNDS,24,1,2)
-*C/7S
-*      IF (I .LT. 1  .OR.  I .GT. 5)
-*     1   CALL SETERR('D1MACH - I OUT OF BOUNDS',24,1,2)
-*C/
-      IF (I .LT. 1 .OR. I .GT. 5) THEN
-         WRITE(msg,*) 'D1MACH(I): I =',I,' is out of bounds.'
-         CALL rexit(msg)
-c         STOP
-         END IF
-      D1MACH = DMACH(I)
-      RETURN
-C/6S
-C9000 FORMAT(/46H Adjust D1MACH by uncommenting data statements/
-C    *30H appropriate for your machine.)
-C/7S
- 9000 FORMAT(/' Adjust D1MACH by uncommenting data statements'/
-     *' appropriate for your machine.')
-C/
-C
-* /* C source for D1MACH -- remove the * in column 1 */
-*#include <stdio.h>
-*#include <float.h>
-*#include <math.h>
-*
-*double d1mach_(long *i)
-*{
-*     switch(*i){
-*       case 1: return DBL_MIN;
-*       case 2: return DBL_MAX;
-*       case 3: return DBL_EPSILON/FLT_RADIX;
-*       case 4: return DBL_EPSILON;
-*       case 5: return log10(FLT_RADIX);
-*       }
-*
-*     fprintf(stderr, "invalid argument: d1mach(%ld)\n", *i);
-*     exit(1);
-*     return 0; /* for compilers that complain of missing return values */
-*     }
-      END
-
-c KSKSKS: removed that - too long array - too dangerous in R
-      subroutine sprt(n, array)
-* sprt prints an array.
-      implicit double precision (a-h,o-z)
-      dimension array(n)
-      character(len=100) msg
-
-c      write(6,900) (array(i), i=1,n)
-c  900 format(1h ,(7(1pe11.3)))
-c      return
-      end
-
-      subroutine mprt(nrowd, nrow, ncol, array)
-* mprt prints a matrix.
-      implicit double precision (a-h,o-z)
-      dimension array(nrowd, ncol)
-      character(len=100) msg
-
-c      do 400 i = 1, nrow
-c         write(6,900) i,(array(i,j), j=1,ncol)
-c  400 continue
-c  900 format(1h ,i5,(6(1pe11.3)))
-      return
-      end
 
 
 C

@@ -1,3 +1,10 @@
+c ===================================================================================
+* karline: to make this code compatible with R:
+* 1. change all write statements into rprint statements
+* 2. changed all ( ,1) declarations into (,*)
+* 3. changed interface to fsub, gsub to make it compatible with TWPBVPC
+* 4. added counters
+c ===================================================================================
 
 C**********************************************************************
 C  this package solves boundary value problems for
@@ -9,11 +16,7 @@ C  representation replacing b-splines, and improvements for
 C  the linear and nonlinear algebraic equation solvers.
 C  the package can be referenced as either COLNEW or COLSYS.
 C
-C Karline:
-C Karline: (,1) -> (,*)
-C     CODE MADE COMPATIBLE WITH R: WRITE STATEMENTS REWRITTEN/REMOVED
-C     used rprint rather than rwarn...
-C     changed interface fsub, gsub - compatible with bvptwp
+C small changes by Karline Soetaert to make it compatible with R
 C**********************************************************************
 C----------------------------------------------------------------------
 C                            p a r t  1
@@ -22,7 +25,8 @@ C----------------------------------------------------------------------
 C
       SUBROUTINE COLNEW (NCOMP, M, ALEFT, ARIGHT, ZETA, ISET, LTOL,
      1                   TOL, FIXPNT, ISPACE, FSPACE, IFLAG,
-     2                   FSUB, DFSUB, GSUB, DGSUB, GUESS, RPAR, IPAR)
+     2                   FSUB, DFSUB, GSUB, DGSUB, GUESS, RPAR, IPAR,
+     3                   ICOUNT)
 C
 C
 C**********************************************************************
@@ -469,7 +473,7 @@ C
 C----------------------------------------------------------------------
       IMPLICIT REAL*8 (A-H,O-Z)
       DIMENSION M(*), ZETA(*), ISET(*), LTOL(*), TOL(*), DUMMY(1),
-     1          FIXPNT(*), ISPACE(*), FSPACE(*), ipar(*), rpar(*)
+     1  FIXPNT(*), ISPACE(*), FSPACE(*), ipar(*), rpar(*), icount(*)
 C
       COMMON /COLOUT/ PRECIS, IOUT, IPRINT
       COMMON /COLLOC/ RHO(7), COEF(49)
@@ -488,6 +492,10 @@ C     Karline: removed this...
 c      ENTRY      COLSYS (NCOMP, M, ALEFT, ARIGHT, ZETA, ISET, LTOL,
 c     1                   TOL, FIXPNT, ISPACE, FSPACE, IFLAG,
 c     2                   FSUB, DFSUB, GSUB, DGSUB, GUESS)
+
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
+
       CHARACTER(len=100) msg
 
 C
@@ -502,14 +510,19 @@ C     and to break the work areas fspace and ispace up into the
 C     arrays needed by the program.
 C
 C**********************************************************************
+
+C     intialise counters
+      nfunc = 0
+      njac = 0
+      nstep = 0
+      nbound = 0
+      njacbound = 0
+ 
 C
 C...  specify machine dependent output unit  iout  and compute machine
 C...  dependent constant  precis = 100 * machine unit roundoff
 C
 
-c      IF ( ISET(7) .LE. 0 )  WRITE(6,99)
-c  99  FORMAT(,33H VERSION *COLNEW* OF COLSYS .    )
-C
       IOUT = 6
       PRECIS = 1.D0
    10 PRECIS = PRECIS / 2.D0
@@ -739,6 +752,14 @@ C
       IC = IDMZ + NDMZ
       DO 258 I = 1, K2
   258 FSPACE( IC+I ) = COEF(I)
+
+
+  259 icount(1) = nfunc
+      icount(2) = njac
+      icount(3) = nstep
+      icount(4) = nbound
+      icount(5) = njacbound
+ 
       RETURN
 C----------------------------------------------------------------------
   260 FORMAT(37H THE NUMBER OF (LINEAR) DIFF EQNS IS , I3, 1X,
@@ -1461,7 +1482,7 @@ C
       COMMON /COLBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /COLEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-	CHARACTER (len = 100) msg 
+      CHARACTER (len = 100) msg 
 C
       NFXP1 = NFXPNT +1
       GO TO (180, 100, 50, 20, 10), MODE
@@ -1955,7 +1976,7 @@ C
       COMMON /COLBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /COLEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-	CHARACTER (len = 100) msg 
+      CHARACTER (len = 100) msg 
 
 C
 C...  error estimates are to be generated and tested
@@ -2106,6 +2127,8 @@ C
 C
       EXTERNAL DFSUB, DGSUB
       CHARACTER(len=100) msg
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
 
 C
       M1 = MODE + 1
@@ -2158,6 +2181,8 @@ C
 C...  the do loop 290 sets up the linear system of equations.
 C
   90  CONTINUE
+C karline
+      nstep = nstep + 1
       DO 290 I=1, N
 C
 C...       construct a block of  a  and a corresponding piece of  rhs.
@@ -2195,6 +2220,9 @@ C
 C...       find  rhs  boundary value.
 C
   110      CALL GSUB (IZETA, MSTAR, ZVAL, GVAL, RPAR, IPAR)
+C karline
+           nbound = nbound + 1
+
            RHS(NDMZ+IZETA) = -GVAL
            RNORM = RNORM + GVAL**2
            IF ( MODE .EQ. 2 )                       GO TO 130
@@ -2230,6 +2258,8 @@ C
      1            Z, DMZ, K, NCOMP, MMAX, M, MSTAR, 2, DMZO(IRHS), 1)
 C
   170        CALL FSUB (MSTAR, XCOL, ZVAL, F, RPAR, IPAR)
+c karline: added           
+             nfunc = nfunc  + 1
              DO 180 JJ = 1, NCOMP
                VALUE = DMZO(IRHS) - F(JJ)
                RHS(IRHS) = - VALUE
@@ -2247,6 +2277,7 @@ C
 C...         fill in  rhs  values (and accumulate its norm).
 C
              CALL FSUB (MSTAR, XCOL, ZVAL, F, RPAR, IPAR)
+             nfunc = nfunc  + 1
              DO 195 JJ = 1, NCOMP
                VALUE = DMZ(IRHS) - F(JJ)
                RHS(IRHS) = - VALUE
@@ -2258,6 +2289,7 @@ C
 C...         the linear case
 C
   200        CALL FSUB (MSTAR, XCOL, ZVAL, RHS(IRHS), RPAR, IPAR)
+             nfunc = nfunc  + 1
              IRHS = IRHS + NCOMP
 C
 C...         fill in ncomp rows of  w and v
@@ -2267,6 +2299,8 @@ C
      2       MSING, RPAR, IPAR)
              IF ( MSING .NE. 0 )                    RETURN
   220      CONTINUE
+
+
 C
 C...       build global bvp matrix  g
 C
@@ -2300,6 +2334,8 @@ C
 C...       find  rhs  boundary value.
 C
   250      CALL GSUB (IZETA, MSTAR, ZVAL, GVAL, RPAR, IPAR)
+C karline
+           nbound = nbound + 1
            RHS(NDMZ+IZETA) = - GVAL
            RNORM = RNORM + GVAL**2
            IF ( MODE .EQ. 2 )                       GO TO 270
@@ -2319,6 +2355,7 @@ C
            IDMZ = IDMZ + KD
            IF ( MODE .EQ. 1 )  IDMZO = IDMZO + KD
   290 CONTINUE
+
 C
 C...       assembly process completed
 C
@@ -2441,6 +2478,9 @@ C
       COMMON /COLORD/ KDUM, NDUM, MSTAR, KD, MMAX, M(20)
       COMMON /COLSID/ ZETA(40), ALEFT, ARIGHT, IZETA, IDUM
       COMMON /COLNLN/ NONLIN, ITER, LIMIT, ICARE, IGUESS
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
+
 C
 C...  zero jacobian dg
 C
@@ -2450,6 +2490,7 @@ C
 C...  evaluate jacobian dg
 C
       CALL DGSUB (IZETA, MSTAR, ZVAL, DG, RPAR, IPAR)
+      njacbound = njacbound + 1
 C
 C...  evaluate  dgz = dg * zval  once for a new mesh
 C
@@ -2512,6 +2553,8 @@ C**********************************************************************
 C
       COMMON /COLORD/ K, NCDUM, MSTAR, KDUM, MMAX, M(20)
       COMMON /COLNLN/ NONLIN, ITER, LIMIT, ICARE, IGUESS
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
 C
 C...  if jj = 1 initialize  wi .
 C
@@ -2544,6 +2587,7 @@ C...   id
 C...  for id = 1 to ncomp.
 C
       CALL DFSUB (mstar, XCOL, ZVAL, DF, RPAR, IPAR)
+      njac = njac + 1
       I0 = (JJ-1) * NCOMP
       I1 = I0 + 1
       I2 = I0 + NCOMP
@@ -2772,7 +2816,7 @@ C
       DIMENSION Z(*), DMZ(*), BM(4), COEF(*)
 C
       COMMON /COLOUT/ PRECIS, IOUT, IPRINT
-	CHARACTER (len = 100) msg 
+      CHARACTER (len = 100) msg 
 
 C
       GO TO (10, 30, 80, 90), MODE

@@ -31,8 +31,15 @@
   In case the problem was solved with \code{bvpshoot}, the diagnostics
   of the initial value problem solver will be written to screen.
   
+  The diagnostics of both \code{bvptwp} and \code{bvpcol} include the 
+  number of function evaluations, the number of jacobian evaluations, 
+  the number of steps, the number of boundary evaluations and the number
+  of boundary jacobian evaluations.
+  Note that the number of function evaluations are *without* the extra 
+  calls performed to generate the ordinary output variables (if present). 
+
   In case the method used was
-  \code{bvpcol}, will also return the \emph{conditioning parameters}. They are:
+  \code{bvptwp}, will also return the \emph{conditioning parameters}. They are:
   ckappa, ckappa1, ckappa2, sigma and gamma.
   
   See \url{http://pitagora.dm.uniba.it/~mazzia/bvp/tom/lucidinorvegiad.pdf}
@@ -43,7 +50,6 @@
   If ckappa is large and gamma is small, the problem is ill-conditioned in the 
   maximum and well conditioned in the 1-norm. This is typical for problems that
   involve different time scales ("stiff" problems).
-  
 
   S3 method \code{approx} calculates an approximate solution vector at points
   inbetween the original \code{x}-values. If beyond the integration interval,

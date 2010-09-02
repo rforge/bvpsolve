@@ -224,6 +224,8 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
 ##------------------------------------------------------------------------------
   flist     <- list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
   ModelInit <- NULL
+  jacPresent      <- TRUE
+  jacboundPresent <- TRUE
   # The functions are in a DLL
   if (is.character(func)) {
     if (sum(duplicated (c(func,initfunc,jacfunc))) >0)
@@ -271,6 +273,8 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
 ## Functions in R-code
 ##------------------------------------------------------------------------------
   } else {      # The functions are R-code
+  jacPresent      <- ! is.null(jacfunc)
+  jacboundPresent <- ! is.null(jacbound)
     
     if (type == 1 & max(order)>1 ){ 
 
@@ -430,9 +434,13 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
 ##------------------------------------------------------------------------------
 
   if (type == 1) {
+
+
 ## =============================================
 ## bvptwp
 ## =============================================
+
+
   storage.mode(y) <- storage.mode(x) <- "double"
   givmesh <- givu <-FALSE
   nmesh  <- 0
@@ -501,7 +509,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
             flist, type = as.integer(1), rho, PACKAGE="bvpSolve")
   nn <- attr(out,"istate")
   rn <- attr(out,"rstate")
-  mesh <- nn[3]
+  mesh <- nn[9]
   attr(out,"istate") <- NULL
 
 #(  if(verbose) print(names(baseenv()$last.warning))  # dangerous...
@@ -531,16 +539,27 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   } 
   dimnames(out) <- list(NULL,nm)
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
-  names(nn) <- c("flag","nmax","nmesh","nrwork","niwork")
+
+  nn[2] <- nn[2] + 1  # add test function evaluation
+  if (!jacPresent) 
+       nn[2] <- nn[2] + nn[3] * (mstar+1) 
+
+  names(nn) <- c("flag",	"nfunc", "njac",	"nstep", "nbound", "njacbound", 
+    "ureset","nmax","nmesh","nrwork","niwork")
   attr(out,"istate") <- nn 
   names(rn) <- c("ckappa1","gamma1","sigma","ckappa","ckappa2")
   attr(out,"rstate") <- rn 
   attr(out,"name") <- "bvptwp"
   out
+
+
   
 ## =============================================
 ## bvpcol
 ## =============================================
+
+
+
   } else if (type == 2) {   
 ## legal values
   if (is.null(colp))
@@ -567,7 +586,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
     rwork <- ATT$rstate
     if ( length (rwork) == 0)
        stop ("attributes(yguess)$rstate should be present, if continuation is requested")
-    iwork <- ATT$istate[-1]   
+    iwork <- ATT$istate[-(1:6)]  # first 6 elements nothing to do with continuation 
     if ( length (iwork) == 0)
        stop ("attributes(yguess)$istate should be present, if continuation is requested")
              
@@ -647,6 +666,12 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
             as.double(fixpnt), as.double (rpar), as.integer (ipar), 
             Func, JacFunc, Bound, JacBound, GuessFunc, ModelInit, initpar,
             flist, type = as.integer(2), rho,  PACKAGE="bvpSolve")
+  nn <- attributes(out)$istate
+  rn <- attributes(out)$rstate
+  nn[2] <- nn[2] + 1  # add test function evaluation
+  if (!jacPresent) 
+       nn[2] <- nn[2] + nn[3] * (mstar+1) 
+
      nm <- c("x",
           if (!is.null(Ynames)) Ynames else as.character(1:mstar))
 # if there are other variables...
@@ -667,6 +692,11 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   attr(out,"name") <- "bvpcol"
   dimnames(out) <- list(nm,NULL)
+ 
+  names(nn)[1:10] <- c("flag","nfunc", "njac",	
+  	 "nstep", "nbound", "njacbound","nmesh","ncoll","neqs","ncomps")
+  attributes(out)$istate <- nn
+  attributes(out)$rstate <- rn
   t(out)
   } # type
 }

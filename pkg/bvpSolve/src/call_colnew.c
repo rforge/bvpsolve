@@ -29,7 +29,7 @@ void F77_NAME(colnew)(int*, int*, double *, double *, double *, int *, int *,
 			   void (*)(int *, int *, double *, double *, double *, int *),      /* gsub  */
 		     void (*)(int *, int *, double *, double *, double *, int *),      /* dgsub */
          void (*)(double *, double *, double *),                           /* guess_func */
-         double *, int *) ;
+         double *, int *, int*) ;
 void F77_NAME(appsln)(double *, double *, double *, int *);
 
 /* initialisation function */
@@ -165,7 +165,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   int  j, ii, ncomp, k, nx, ntol, nfixpnt, isForcing, type;
   double aleft, aright, *zeta, *fspace, *tol, *fixpnt, *z, *rpar;
   double xout;
-  int *m, *ispace, *iset, *ltol, *ipar, iflag, isDll, FullOut;
+  int *m, *ispace, *iset, *icount, *ltol, *ipar, iflag, isDll, FullOut;
 
   C_deriv_func_type    *deriv_func;
   C_jac_func_type      *jac_func;
@@ -208,6 +208,9 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   iset  = (int *)    R_alloc(ii, sizeof(int));
   for (j = 0; j < ii; j++) iset[j] = INTEGER(Iset)[j];
 
+  icount  = (int *)    R_alloc(5, sizeof(int));
+  for (j = 0; j<5; j++) icount[j] = 0;
+  
   FullOut = INTEGER(Iset)[ii];
   
   ntol = LENGTH(Tol);
@@ -292,7 +295,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 	  F77_CALL(colnew) (&ncomp, m, &aleft, &aright, zeta, iset, ltol,
         tol, fixpnt, ispace, fspace, &iflag, 
         deriv_func, jac_func, bound_func, jacbound_func, 
-        guess_func, rpar, ipar);
+        guess_func, rpar, ipar, icount);
 
 /*             Call Appsln(Xx,Z,Fspace,Ispace)
 C....   Iflag - The Mode Of Return From colnew.
@@ -340,9 +343,10 @@ C....         = -3  If There Is An Input Data Error.
                  for (j=0;j<mstar;j++) REAL(yout)[k*(mstar+1) + j+1] = z[ j];
       }  /* end main x loop */
   ii = ncomp+7;
-  PROTECT(ISTATE = allocVector(INTSXP, ii+1));incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, ii+6));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
-  for (k = 0;k<ii;k++) INTEGER(ISTATE)[k+1] = ispace[k];
+  for (k = 0; k < 5; k++)  INTEGER(ISTATE)[k+1] = icount[k];
+  for (k = 0; k < ii; k++) INTEGER(ISTATE)[k+6] = ispace[k];
   if (FullOut) 
     ii = ispace[6]; 
   else 

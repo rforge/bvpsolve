@@ -47,7 +47,8 @@
 
 \Plainauthor{Karline Soetaert, Jeff Cash and Francesca Mazzia}
 
-\Abstract{\R package \bvp \citep{bvpSolve} is designed for the numerical
+\Abstract{package \bvp \citep{bvpSolve}, in the open-source software \R,
+  \citep{R2010} is designed for the numerical
   solution of boundary value problems (BVP) for ordinary differential
   equations (ODE).
 
@@ -79,7 +80,8 @@
   boundary conditions by means of a function and provide analytical solutions 
   for the derivative and boundary gradients.
   
- This is a vignette of package \rs.
+  This is one of two vignette of package \rs.
+ 
 }
 
 %% The address of (at least) one author should be given
@@ -439,6 +441,15 @@ Solcol <- bvpcol(x = x, func = fsub,
 @
 where the reported system time is in seconds
 
+The diagnostics of the output solved with \code{bvptwp} shows that the 
+problem is quite stiff (high values of the conditioning parameters).
+
+Both solvers require almost the same amount of steps:
+<<>>=
+diagnostics(Soltwp)
+diagnostics(Solcol)
+@
+
 A \code{pairs} plot produces a pretty picture.
 <<label=swirl,include=FALSE>>=
 pairs(Soltwp, main = "swirling flow III, eps=0.01", col = "blue")
@@ -500,9 +511,11 @@ Solcol2 <- bvpcol(x = x, func = fsubhigh, order = c(2, 4),
 ))
 @
 Whereas both ways of solving the system produce almost the same output
-(but not quite), the second way is significantly faster.
+(but not quite), the second way is significantly faster. It indeed solves the 
+problem in less steps:
 <<>>=
 max(abs(Solcol2-Solcol))
+diagnostics(Solcol2)
 @
 
 This is not case when we use \code{bvptwp}, where the higher-order 
