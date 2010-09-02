@@ -34,6 +34,8 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
 ## ---------------------------
   Func <- func
   testit <- FALSE
+  attrib <- rep(0,4) # number of steps, number of fn evaluations, # jacobians ,nr ivp
+
   if (! is.null(order)) {
     mstar <- sum(order)
     neq   <- length(order)
@@ -96,6 +98,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
       out   <- ode(y=Y, times=times, fun=Func, jacfunc=jacfunc, 
                  parms=Parms, method=method,
                  atol=atol, rtol=rtol, ...)
+      attrib <<- attrib + c(attributes(out)$istate[c(2,3,14)],1)
     # deviation with yend should be =0             
       if (is.function(yend) )
         Res   <- yend(out[nrow(out),2:(ly+1)], Y, Parms,...)
@@ -139,6 +142,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
       out   <- ode(y=X, times=times, fun=Func, jacfunc=jacfunc, 
                    parms=parms, method=method,
                    atol=atol, rtol=rtol, ...)
+      attrib <<- attrib + c(attributes(out)$istate[c(2,3,14)],1)
       Res <- vector(len=ly)
       if (! posspecified) {
         Yend <- out[nrow(out),2:(ly+1)]             
@@ -234,12 +238,17 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
     
   out <- ode (t=x, fun=Func, y=Y, parms=Parms, method=method, jacfunc=jacfunc, 
               atol=atol, rtol=rtol, ...)
+  attrib <- attrib + c(attributes(out)$istate[c(2,3,14)],1)
+
+  attrib[2] <- attrib[2] +attrib[4] +1 # correct for one more per ivp solution
               
   attr(out,"roots")  <- data.frame(root=sol$root,
                                    f.root=sol$f.root, iter=sol$iter)
   class(out) <- c("bvpSolve","matrix","deSolve")  # a boundary value problem
   colnames(out)[1] <- "x"
   attr(out,"name") <- "bvpshoot"
+  attr(out,"istate2") <- attrib[c(2,3,1,4)]
+  names (attr(out,"istate2")) <- c("nfunc", "njac", "nstep", "nivp")
 
   out
 }

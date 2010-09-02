@@ -14,6 +14,8 @@ else
 #nextmethod()  
 }
 
+### ============================================================================
+
 approx.bvpSolve <- function(x, xout=NULL, ...){
  
   Attr <- attributes(x)
@@ -39,9 +41,12 @@ approx.bvpSolve <- function(x, xout=NULL, ...){
   Out
 }
 
+### ============================================================================
 
 print.bvpSolve <- function(x, ...)
    print(as.data.frame(x), ... )
+
+### ============================================================================
 
 plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
     t <- 1     # column with "times"
@@ -102,27 +107,37 @@ plot.bvpSolve <- function (x, which = 1:(ncol(x)-1), ask = NULL, ...) {
     }
 }
 
+### ============================================================================
+
 diagnostics.bvpSolve<- function(obj, ...) {
-    if (!"bvpSolve" %in% class(obj)) return(NULL)
-    Attr <- attributes(obj)
-    istate <- Attr$istate
-    rstate <- Attr$rstate
+  if (!"bvpSolve" %in% class(obj)) return(NULL)
+  Attr <- attributes(obj)
+  istate <- Attr$istate
+  rstate <- Attr$rstate
+  idid <- istate[1]
 
-    if (is.null(istate) || is.null (rstate)) return(NULL)
-    cat("\n--------------------\n")
-    cat(paste( "solved with ",Attr$name))
-    cat("\n--------------------\n")
+  if (is.null(istate) || is.null (rstate)) return(NULL)
+  cat("\n--------------------\n")
+  cat(paste( "solved with ",Attr$name))
+  cat("\n--------------------\n")
 
-    if (Attr$name == "bvpshoot") {
-    cat("\n--------------------\n")
-    cat("diagnostics of the IVP solver ")
-    cat("\n--------------------\n")
+  if (Attr$name == "bvpshoot") {
+    cat("\n---------------------------------------------\n")
+    cat("diagnostics of BVP solver ")
+    cat("\n---------------------------------------------\n")
+    df <- c( "The number of function evaluations              :", 
+             "The number of jacobian evaluations +LU decomp   :",	
+             "The number of steps                             :",
+             "The number of calls to the ivp solver           :")
+    printmessage(df, Attr$istate2)
+
+    cat("\n---------------------------------------------\n")
+    cat("diagnostics of the last run of the IVP solver ")
+    cat("\n---------------------------------------------\n")
       diagnostics.deSolve(obj)
-    }  
-
-    idid <- istate[1]
-
-    if (Attr$name == "bvptwp") {
+    
+  } else if (Attr$name == "bvptwp") {
+  
     if (idid ==0)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
     df <- c( "The return code                             :",   #1
@@ -151,7 +166,9 @@ diagnostics.bvpSolve<- function(obj, ...) {
              "ckappa   :",
              "ckappa2  :")
     printmessage(df, rstate)
-    } else if (Attr$name == "bvpcol") {
+    
+    
+  } else if (Attr$name == "bvpcol") {
     if (idid ==1)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
     df <- c( "The return code                                   :",   #1
@@ -173,6 +190,7 @@ diagnostics.bvpSolve<- function(obj, ...) {
 
 }
 
+### ============================================================================
 ## internal helper functions for printing solver return code messages
 ## these functions are not exported
 

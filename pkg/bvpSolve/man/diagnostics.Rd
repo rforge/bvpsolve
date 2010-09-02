@@ -29,14 +29,18 @@
   It will depend on the solution method.
   
   In case the problem was solved with \code{bvpshoot}, the diagnostics
-  of the initial value problem solver will be written to screen.
+  of the initial value problem solver will also be written to screen.
   
-  The diagnostics of both \code{bvptwp} and \code{bvpcol} include the 
-  number of function evaluations, the number of jacobian evaluations, 
-  the number of steps, the number of boundary evaluations and the number
-  of boundary jacobian evaluations.
+  The diagnostics of all solvers include the 
+  number of function evaluations, the number of jacobian evaluations, and
+  the number of steps
+  
   Note that the number of function evaluations are *without* the extra 
   calls performed to generate the ordinary output variables (if present). 
+
+  The diagnostics of both \code{bvptwp} and \code{bvpcol} also include the 
+  the number of boundary evaluations and the number of boundary jacobian 
+  evaluations.
 
   In case the method used was
   \code{bvptwp}, will also return the \emph{conditioning parameters}. They are:
