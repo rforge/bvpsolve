@@ -32,6 +32,7 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
 ## ---------------------------
 ## The order of the equations
 ## ---------------------------
+  JacFunc <- jacfunc # save jacfunc for further passing it to ode()
   Func <- func
   testit <- FALSE
   attrib <- rep(0,4) # number of steps, number of fn evaluations, # jacobians ,nr ivp
@@ -90,12 +91,12 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
     else
       y <- yini
       
-    # root function to solve for  
-    rootfun <- function(X,...)  {  
+    # root function to solve for  - note jacfunc = NULL to avoid error in devel R 2.12
+    rootfun <- function(X, jacfunc=NULL, ...)  {  
       times <- c(x[1], x[length(x)])
       Parms <- initparms(X)
       Y     <- inity(X,Parms)
-      out   <- ode(y=Y, times=times, fun=Func, jacfunc=jacfunc, 
+      out   <- ode(y=Y, times=times, fun=Func, jacfunc=JacFunc, 
                  parms=Parms, method=method,
                  atol=atol, rtol=rtol, ...)
       attrib <<- attrib + c(attributes(out)$istate[c(2,3,14)],1)
@@ -134,12 +135,12 @@ bvpshoot<- function(yini=NULL, x, func, yend=NULL, parms=NULL,
     }   
     y <- guess  
   
-    rootfun <- function(X,...)  {  
+    rootfun <- function(X, jacfunc = NULL, ...)  {  
       if (! posspecified) 
          times <- c(x[1], x[length(x)])
       else
          times <- x   
-      out   <- ode(y=X, times=times, fun=Func, jacfunc=jacfunc, 
+      out   <- ode(y=X, times=times, fun=Func, jacfunc=JacFunc, 
                    parms=parms, method=method,
                    atol=atol, rtol=rtol, ...)
       attrib <<- attrib + c(attributes(out)$istate[c(2,3,14)],1)
