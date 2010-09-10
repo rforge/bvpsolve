@@ -547,12 +547,10 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   names(nn) <- c("flag",	"nfunc", "njac",	"nstep", "nbound", "njacbound", 
     "ureset","nmax","nmesh","nrwork","niwork")
   attr(out,"istate") <- nn 
-  names(rn) <- c("ckappa1","gamma1","sigma","ckappa","ckappa2")
+  names(rn) <- c("kappa1","gamma1","sigma","kappa","kappa2")
   attr(out,"rstate") <- rn 
   attr(out,"name") <- "bvptwp"
   out
-
-
   
 ## =============================================
 ## bvpcol

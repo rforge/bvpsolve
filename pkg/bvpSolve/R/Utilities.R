@@ -160,11 +160,11 @@ diagnostics.bvpSolve<- function(obj, ...) {
     cat(paste( "conditioning pars"))
     cat("\n--------------------\n")
 
-    df <- c( "ckappa1  :",
-             "gamma1   :",
-             "sigma    :",
-             "ckappa   :",
-             "ckappa2  :")
+    df <- c( "kappa1  :",
+             "gamma1  :",
+             "sigma   :",
+             "kappa   :",
+             "kappa2  :")
     printmessage(df, rstate)
     
     
