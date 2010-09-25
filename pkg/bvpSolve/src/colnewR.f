@@ -4,6 +4,7 @@ c ==============================================================================
 * 2. changed all ( ,1) declarations into (,*)
 * 3. changed interface to fsub, gsub to make it compatible with TWPBVPC
 * 4. added counters
+* 5. renamed ipar -> iset and solutn -> guess
 c ===================================================================================
 
 C**********************************************************************
@@ -277,13 +278,13 @@ C     the following subroutines must be declared external in the
 C     main program which calls colnew.
 C
 C
+C    karline: changed from FSUB (x , z , f)
 C     FSUB  - name of subroutine for evaluating f(x,z(u(x))) =
 C                            t
 C             (f ,...,f     )  at a point x in (aleft,aright).  it
 C               1      ncomp
 C             should have the heading
-C    karline: changed from FSUB (x , z , f)
-C             to  subroutine FSUB (mstar, x , z , f, rpar, ipar)
+c                  subroutine FSUB (mstar, x , z , f, rpar, ipar)
 C
 C             where f is the vector containing the value of fi(x,z(u))
 C             in the i-th component and                            t
@@ -291,11 +292,11 @@ C                                       z(u(x))=(z(1),...,z(mstar))
 C             is defined as above under  purpose .
 C
 C
+C     karline: changed from subroutine dFSUB (x , z , df)
 C     DFSUB - name of subroutine for evaluating the jacobian of
 C             f(x,z(u)) at a point x.  it should have the heading
-C
-C    karline: changedd from s ubroutine dFSUB (x , z , df)
-C             to dfsub (mstar, x , z , df,rpar, ipar)
+C                dfsub (mstar, x , z , df,rpar, ipar)
+C              
 C             where z(u(x)) is defined as for FSUB and the (ncomp) by
 C             (mstar) array df should be filled by the partial deriv-
 C             atives of f, viz, for a particular call one calculates
@@ -303,13 +304,13 @@ C                                df(i,j) = dfi / dzj, i=1,...,ncomp
 C                                                     j=1,...,mstar.
 C
 C
+C     karline: changed from subroutine GSUB (i , z , g)
 C     GSUB  - name of subroutine for evaluating the i-th component of
 C             g(x,z(u(x))) = g (zeta(i),z(u(zeta(i)))) at a point x =
 C                             i
 C             zeta(i) where 1.le.i.le.mstar. it should have the heading
 C
-C     karline: chnaged from subroutine GSUB (i , z , g)
-C                      to   subroutine GSUB (i , mstar,  z , g, rpar, ipar)
+C                      subroutine GSUB (i , mstar,  z , g, rpar, ipar)
 C
 C             where z(u) is as for FSUB, and i and g=g  are as above.
 C                                                     i
@@ -317,11 +318,11 @@ C             note that in contrast to f in  FSUB , here
 C             only one value per call is returned in g.
 C
 C
+C     karline: changed from subroutine dGSUB (i , z , dg)
 C     dGSUB - name of subroutine for evaluating the i-th row of
 C             the jacobian of g(x,u(x)).  it should have the heading
 C
-C     karline: changed from subroutine dGSUB (i , z , dg)
-C                      to subroutine dGSUB(i, mstar, z, dg, rpar, ipar)
+C                      subroutine dGSUB(i, mstar, z, dg, rpar, ipar)
 C
 C             where z(u) is as for FSUB, i as for GSUB and the mstar-
 C             vector dg should be filled with the partial derivatives

@@ -28,9 +28,15 @@ approx.bvpSolve <- function(x, xout=NULL, ...){
     stop ("'approx' requires at least one value to approximate")   
 
   z <- rep(1, istate[4])
+  if (! Attr$bspline)
   appone <- function(x)
     .Fortran("appsln", as.double(x), 
             result = as.double(z), as.double(rstate), as.integer(istate))$result
+  else 
+    appone <- function(x)
+      .Fortran("sysappsln", as.double(x), 
+            result = as.double(z), as.double(rstate), as.integer(istate))$result
+  
   Out <- NULL
   for (i in 1:il)
     Out <- rbind(Out,c(xout[i],appone(xout[i])))

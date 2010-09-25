@@ -19,18 +19,18 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      islin, nmax, ncomp, atol, 
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     cond, allpoints, NULL, TRUE, ... )
+     cond, allpoints, NULL, TRUE, TRUE, ... )
 }
 
 ##==============================================================================
 ## Solving boundary value problems of ordinary differential equations
-## using collocation method "colnew"
+## using collocation method "colnew"  or "colsys"
 ##==============================================================================
 
 bvpcol<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL, 
      ynames=NULL, xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, 
      jacbound=NULL, leftbc=NULL, posbound=NULL, islin=FALSE, nmax=1000, 
-     ncomp=NULL, atol=1e-8, colp=NULL, fullOut = TRUE, 
+     ncomp=NULL, atol=1e-8, colp=NULL, bspline = FALSE, fullOut = TRUE, 
     dllname=NULL, initfunc=dllname, rpar = NULL, ipar = NULL, nout = 0,
     forcings=NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,...)   {
 
@@ -42,13 +42,13 @@ bvpcol<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      islin, nmax, ncomp, atol, 
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     FALSE, TRUE, colp, fullOut, ... )
+     FALSE, TRUE, colp, fullOut, bspline, ... )
 }
 
 
 ##==============================================================================
 ## Solving boundary value problems of ordinary differential equations
-## wrapper around collocation method "colnew" and "twpbvp"
+## wrapper around collocation method "colnew/colsys" and "twpbvp"
 ##==============================================================================
 
 bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
@@ -59,7 +59,8 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
      islin=FALSE, nmax=1000, ncomp=NULL, atol=1e-8, 
      dllname=NULL, initfunc=dllname, rpar = NULL, ipar = NULL, nout = 0,
      forcings=NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
-     cond = FALSE, allpoints = TRUE, colp = NULL, fullOut = TRUE, ...)   {
+     cond = FALSE, allpoints = TRUE, colp = NULL, fullOut = TRUE, 
+     bspline = TRUE, ...)   {
 
   rho <- environment(func)
 
@@ -638,7 +639,12 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   iset[6] <- nmax*(kdm + 3)  # length of ispace
 
   nrec    <- 0 # should be number of right hand side boundary conditions...
-  nsizef <- 4 + 3*mstar+ (5+kd)*kdm+(2*mstar-nrec)*2*mstar
+
+  if (!bspline)  # colnew
+    nsizef <- 4 + 3*mstar+ (5+kd)*kdm+(2*mstar-nrec)*2*mstar
+  else           # colsys
+    nsizef <- 4 + neq + 2 *kd + (4+2*neq)*mstar+ (kdm-nrec)*(kdm+1)
+    
   iset[5] <- nmax*nsizef     # length of fspace
   iset[5] = max(iset[5], length(rwork))     # length of fspace
 
@@ -663,7 +669,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
             as.double(tol),
             as.double(fixpnt), as.double (rpar), as.integer (ipar), 
             Func, JacFunc, Bound, JacBound, GuessFunc, ModelInit, initpar,
-            flist, type = as.integer(2), rho,  PACKAGE="bvpSolve")
+            flist, type = as.integer(bspline), rho,  PACKAGE="bvpSolve")
   nn <- attributes(out)$istate
   rn <- attributes(out)$rstate
   nn[2] <- nn[2] + 1  # add test function evaluation
@@ -689,6 +695,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   } 
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   attr(out,"name") <- "bvpcol"
+  attr(out,"bspline") <- bspline
   dimnames(out) <- list(nm,NULL)
  
   names(nn)[1:10] <- c("flag","nfunc", "njac",	

@@ -63,8 +63,8 @@
       selection,  based on FORTRAN code TWPBVPC
       \citep{Cash91, CashMazz}, for solving two-point  boundary value problems
     \item function \code{bvpcol}, the collocation method 
-       based on FORTRAN code COLNEW
-      \citep{Bader87}, for solving Multi-point  boundary value problems of
+       based on FORTRAN codes COLNEW \citep{Bader87}, and COLSYS \citep{ascher79}
+      for solving Multi-point  boundary value problems of
       mixed order
   \end{itemize}
 
@@ -160,8 +160,8 @@ options(width=70)
       selection, based on FORTRAN code TWPBVPC
       \citep{Cash91, CashMazz}.
     \item \code{bvpcol}, a collocation method 
-       based on FORTRAN code COLNEW
-      \citep{Bader87}, for solving Multi-point boundary value problems of
+       based on FORTRAN codes COLNEW \citep{Bader87}, and COLSYS \citep{ascher79} 
+       for solving Multi-point boundary value problems of
       mixed order.
   \end{itemize}
   

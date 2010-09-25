@@ -30,7 +30,18 @@ void F77_NAME(colnew)(int*, int*, double *, double *, double *, int *, int *,
 		     void (*)(int *, int *, double *, double *, double *, int *),      /* dgsub */
          void (*)(double *, double *, double *),                           /* guess_func */
          double *, int *, int*) ;
+
+void F77_NAME(colsys)(int*, int*, double *, double *, double *, int *, int *,
+         double *, double *, int *, double *, int *, 
+         void (*)(int *, double *, double *, double *, double *, int *),   /* fsub  */
+		     void (*)(int *, double *, double *, double *, double *, int *),   /* dfsub */
+			   void (*)(int *, int *, double *, double *, double *, int *),      /* gsub  */
+		     void (*)(int *, int *, double *, double *, double *, int *),      /* dgsub */
+         void (*)(double *, double *, double *),                           /* guess_func */
+         double *, int *, int*) ;
+
 void F77_NAME(appsln)(double *, double *, double *, int *);
+void F77_NAME(sysappsln)(double *, double *, double *, int *);
 
 /* initialisation function */
 static void C_bvp_guess_func (double *x, double *y,  double *ydot)
@@ -139,7 +150,7 @@ static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
 
 /* MAIN C-FUNCTION, CALLED FROM R-code
 
-      Subroutine colnew(Ncomp, M, Aleft, Aright, Zeta, Iset, Ltol,
+      Subroutine colnew/colsys(Ncomp, M, Aleft, Aright, Zeta, Iset, Ltol,
      +     Tol, Fixpnt, Ispace, Fspace, Iflag, 
      +     Fsub, Dfsub, Gsub, Dgsub, guess_func)             */
 
@@ -292,13 +303,19 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
       Subroutine colnew(Ncomp, M, Aleft, Aright, Zeta, Iset, Ltol,
      +     Tol, Fixpnt, Ispace, Fspace, Iflag, 
      +     Fsub, Dfsub, Gsub, Dgsub, guess_func)             */
+   if (type == 0) 
 	  F77_CALL(colnew) (&ncomp, m, &aleft, &aright, zeta, iset, ltol,
+        tol, fixpnt, ispace, fspace, &iflag, 
+        deriv_func, jac_func, bound_func, jacbound_func, 
+        guess_func, rpar, ipar, icount);
+   else
+	  F77_CALL(colsys) (&ncomp, m, &aleft, &aright, zeta, iset, ltol,
         tol, fixpnt, ispace, fspace, &iflag, 
         deriv_func, jac_func, bound_func, jacbound_func, 
         guess_func, rpar, ipar, icount);
 
 /*             Call Appsln(Xx,Z,Fspace,Ispace)
-C....   Iflag - The Mode Of Return From colnew.
+C....   Iflag - The Mode Of Return From colnew/colsys.
 C....         =  1  For Normal Return
 C....         =  0  If The Collocation Matrix Is Singular For The Final
 C....               Continuation Problem.
@@ -328,7 +345,7 @@ C....         = -3  If There Is An Input Data Error.
   else  if (iflag == -3)
 	{
 	  unprotect_all();
-	  error("Illegal input to colnew\n");
+	  error("Illegal input to bvpcol\n");
 	}
   else
 	{
@@ -336,12 +353,21 @@ C....         = -3  If There Is An Input Data Error.
     z  =(double *) R_alloc(mstar, sizeof(double));
 
     PROTECT(yout = allocMatrix(REALSXP,mstar+1,nx));incr_N_Protect();
+   if (type == 0) 
 	  for (k = 0; k < nx; k++)
       {          xout = REAL(Xout)[k];
                  REAL(yout)[k*(mstar+1)] = xout;
                  F77_CALL(appsln)(&xout,z,fspace,ispace);
                  for (j=0;j<mstar;j++) REAL(yout)[k*(mstar+1) + j+1] = z[ j];
       }  /* end main x loop */
+    else
+	   for (k = 0; k < nx; k++)
+      {          xout = REAL(Xout)[k];
+                 REAL(yout)[k*(mstar+1)] = xout;
+                 F77_CALL(sysappsln)(&xout,z,fspace,ispace);
+                 for (j=0;j<mstar;j++) REAL(yout)[k*(mstar+1) + j+1] = z[ j];
+      }  /* end main x loop */
+
   ii = ncomp+7;
   PROTECT(ISTATE = allocVector(INTSXP, ii+6));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;

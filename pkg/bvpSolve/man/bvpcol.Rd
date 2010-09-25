@@ -8,13 +8,17 @@
   Solves Boundary Value Problems For Ordinary
   Differential Equations By Collocation.
   
-  This is an implementation of the fortran code colnew.f written by
-  U. Ascher and G. Bader.
+  This is an implementation of the fortran codes colsys.f and colnew.f written by
+  respectively U. Ascher, J. christiansen  and R.D. Russell (colsys), 
+  and U. Ascher and G. Bader (colnew).
 }
 
 \note{
   colnew.f (Bader and Ascher, 1987), is a modification of the code
-  colsys.f (Ascher, Christiansen and Russell, 1981). 
+  colsys.f (Ascher, Christiansen and Russell, 1981), which incorporates 
+  a new basis representation replacing b-splines, and improvements for
+  the linear and nonlinear algebraic equation solvers. To toggle on/off
+  colsys, set \code{bspline} = \code{TRUE}/\code{FALSE}
 }
 
 \usage{
@@ -22,8 +26,8 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
   jacfunc=NULL, bound = NULL, jacbound = NULL, 
   leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
-  ncomp = NULL, atol = 1e-8, colp = NULL, fullOut = TRUE, 
-  dllname = NULL, initfunc = dllname, 
+  ncomp = NULL, atol = 1e-8, colp = NULL, bspline = FALSE,
+  fullOut = TRUE, dllname = NULL, initfunc = dllname, 
   rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
   initforc = NULL, fcontrol = NULL, verbose = FALSE, ...) 
 }
@@ -159,7 +163,8 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   \item{posbound }{only used if \code{bound} is given: a vector with the position 
     (in the mesh) of the boundary conditions - its values should be sorted - and 
     it should be within the range of \code{x};
-    (posbound corresponds to fortran input "Zeta" in the colnew FORTRAN code.  )
+    (posbound corresponds to fortran input "Zeta" in the colnew/colsys 
+     FORTRAN codes.  )
     See last example.
     Note that two-point boundary value problems can also be specified via 
     \code{leftbc} (which is simpler). 
@@ -194,6 +199,10 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   \item{atol }{ error tolerance, a scalar.
   }
   \item{colp }{number of collocation points per subinterval.
+  }
+  \item{bspline }{if \code{FALSE}, then code colnew is used the default, 
+    if \code{TRUE}, then fortran code colsys is used. Code colnew 
+    incorporates a new basis representation, while colsys uses b-splines.
   }
   \item{fullOut }{if set to \code{TRUE}, then the collocation output required
     e.g. for continuation will be returned in attributes \code{rwork} and 
@@ -277,8 +286,8 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \details{
-  This is an implementation of the Collocation method called "colnew" to 
-  solve multi-point boundary value problems of ordinary
+  This is an implementation of the Collocation methods called "colnew" and 
+  "colsys" to solve multi-point boundary value problems of ordinary
   differential equations.
   
   The ODEs and boundary conditions are made available through the
@@ -326,6 +335,10 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   systems of boundary value problems,
   math. comp. 33, 659-679.
 
+  U. Ascher, J. Christiansen and R.D. Russell, (1979)
+  colsys - a collocation code for boundary value problems,
+  lecture notes comp.sc. 76, springer verlag,
+  B. Childs et. al. (eds.), 164-185.
 }
 
 \keyword{math}
@@ -408,7 +421,7 @@ f2 <- function(x, y, parms)
 }
 
 x    <- seq(1, 6, 0.1)
-sol  <- bvpcol(yini = c(1, NA), yend = c(-0.5, NA),
+sol  <- bvpcol(yini = c(1, NA), yend = c(-0.5, NA), bspline = TRUE,
                x = x, func = f2)
 plot(sol, which = 1)
 
@@ -502,8 +515,9 @@ df4th <- function(x, y, parms, R)
 # jacobian of boundary - same as previous
 
 # order = 4 specifies the equation to be 4th order
+# solve with bspline false
 R    <- 100
-sol  <- bvpcol(x = seq(0, 1, by = 0.01), 
+sol  <- bvpcol(x = seq(0, 1, by = 0.01),
           ynames = c("y", "dy", "d2y", "d3y"),
           posbound = c(0, 0, 1, 1), func = f4th, R = R, order = 4, 
           bound = g2, jacfunc = df4th, jacbound = dg2)
