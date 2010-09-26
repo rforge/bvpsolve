@@ -1,7 +1,6 @@
-todos:
-
-compiled code and bvpcol
-
 changed from version 1.2
-- added bvpcol
+- added bvpcol from fortran sources colnew   
 - removed "guess" as input parameter for bvptwp - added "ynames" instead.
+
+version 1.2.1
+- added fortran code colsys; triggered by setting argument "bspline"=TRUE

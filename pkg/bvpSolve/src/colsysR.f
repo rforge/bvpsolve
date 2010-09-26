@@ -473,7 +473,10 @@ c----------------------------------------------------------------------
       external fsub, dfsub, gsub, dgsub, guess
       dimension m(*), zeta(*), iset(*), ltol(*), tol(*),
      1     fixpnt(*), ispace(*), fspace(*), ipar(*), rpar(*), icount(*)
+c karline: added counters
       integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
+
       CHARACTER(len=100) msg
 
 c***********************************************************************
@@ -2154,7 +2157,8 @@ c
 c
 c...         the linear case
 c
-  210        call fsub (mstar, xx, z, f,rpar,ipar)
+  210        continue
+             call fsub (mstar, xx, z, f,rpar,ipar)
              nfunc = nfunc +1
 
              do 220 j=1,ncomp
@@ -2281,6 +2285,9 @@ c**********************************************************************
       common /bsplin/  vncol(66,7), vnsave(66,5), vn(66)
       dimension q(nrow,*), z(*), df(ncomp,*),rpar(*),ipar(*)
       dimension xi(*), basef(620), alpho(*), dg(40)
+      integer nfunc, njac, nstep, nbound, njacbound
+      common/coldiag/nfunc, njac, nstep, nbound, njacbound
+
       CHARACTER(len=100) msg
 c
       nk = nc
