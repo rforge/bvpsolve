@@ -586,6 +586,48 @@ mtext(outer = TRUE, side = 3, line = -1.5, cex = 1.5,
 }
 \label{fig:ode3b}
 \end{figure}
+\clearpage
+
+\section{Plotting bvpSolve objects}
+It is possible to plot several outputs of the same model at once, and to add
+observed conditions.
+
+<<label=swirl3,include=FALSE>>=
+plot (Solcol, Sol2b, which = c("y1","y4"), lty = 1)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=swirl3,fig=TRUE,echo=FALSE, width = 8, height = 5>>=
+<<swirl3>>
+@
+\end{center}
+\caption{Plotting multiple scenario's at once - see text for \R-code.
+}
+\label{fig:swirl3}
+\end{figure}
+It is also relatively simple to add observed data. If not specified, then
+only the variables, in common between the output and data will be plotted:
+<<>>=
+obsdat <- matrix (ncol = 2, data = 
+      c(seq(0, 1, 0.2), c(-1, -0.4, -0.1, 0.1, 0.4, 1)))
+colnames (obsdat) <- c("x", "y1")
+obsdat
+@
+<<label=swirl4,include=FALSE>>=
+plot(Solcol, Sol2b, obs = obsdat)
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=swirl4,fig=TRUE,echo=FALSE>>=
+<<swirl4>>
+@
+\end{center}
+\caption{Plotting multiple scenario's with observed data - see text for \R-code.
+}
+\label{fig:swirl4}
+\end{figure}
 
 \clearpage
 

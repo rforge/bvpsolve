@@ -379,7 +379,7 @@ end  <- c( 0.1 / sqrt(p+0.01), NA)
 # Solve bvp
 sol  <- bvpcol(yini = init, yend = end, 
                x = seq(-0.1, 0.1, by = 0.001), func = fun)
-plot(sol, type = "l", which = 1)
+plot(sol, which = 1)
 
 # add analytical solution
 curve(x/sqrt(p+x*x), add = TRUE, type = "p")
@@ -392,15 +392,21 @@ plot(zoom, which = 1, main = "zoom in on [-0.0005,0.0005]")
 
 ## =============================================================================
 ## Example 1b: 
-## Same problem, now solved as a second-order equation.
+## Same problem, now solved as a second-order equation 
+## and with different value of "p".
 ## =============================================================================
 
 fun2 <- function(t, y, pars)
 { dy <- - 3 * p * y[1] / (p+t*t)^2
   list(dy)
 }
+
+p <- 1e-4
 sol2  <- bvpcol(yini = init, yend = end, order = 2, 
                 x = seq(-0.1, 0.1, by = 0.001), func = fun2)
+
+# plot both runs at once:
+plot(sol, sol2, which = 1)
 
 ## =============================================================================
 ## Example 2: simple
@@ -531,7 +537,11 @@ sol2  <- bvpcol(x = seq(0,1,by=0.01), ynames = c("y","dy","d2y","d3y"),
           posbound = c(0, 0, 1, 1), func = f4th, R = 10000, order = 4, 
           bound = g2, jacfunc = df4th, jacbound = dg2, yguess = sol)
 
-plot(sol2)
+# plot both at same time
+plot(sol, sol2, lwd = 2)
+
+legend("bottomright", leg = c(100,10000), title = "R = ", 
+  col = 1:2, lty = 1:2, lwd = 2)
 
 ## =============================================================================
 ## Example 4  - a multipoint bvp
