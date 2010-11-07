@@ -23,13 +23,13 @@
 
 \usage{
 bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL, 
-  order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
-  jacfunc=NULL, bound = NULL, jacbound = NULL, 
-  leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
-  ncomp = NULL, atol = 1e-8, colp = NULL, bspline = FALSE,
-  fullOut = TRUE, dllname = NULL, initfunc = dllname, 
-  rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
-  initforc = NULL, fcontrol = NULL, verbose = FALSE, ...) 
+        order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
+        jacfunc = NULL, bound = NULL, jacbound = NULL, 
+        leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
+        ncomp = NULL, atol = 1e-8, colp = NULL, bspline = FALSE,
+        fullOut = TRUE, dllname = NULL, initfunc = dllname, 
+        rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
+        initforc = NULL, fcontrol = NULL, verbose = FALSE, ...) 
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -179,7 +179,7 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
     \code{NULL}.
     
     For higher-order derivatives, specifying the order can improve computational
-    efficiency (when using \code{bvpcol}- but this interface is more complex. 
+    efficiency, but this interface is more complex. 
     
     If \code{order} is not \code{NULL}, the number of equations in \code{func} 
     must equal the length of \code{order}; the summed values of \code{order}
@@ -362,12 +362,11 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
 #--------------------------------
 # Derivative function
 #--------------------------------
-fun <- function(t, y, pars)
-{ dy1 <- y[2]
+fun <- function(t, y, pars) { 
+  dy1 <- y[2]
   dy2 <- - 3 * p * y[1] / (p+t*t)^2
   return(list(c(dy1,
                 dy2))) }
-
 
 # parameter value
 p    <- 1e-5
@@ -449,8 +448,7 @@ curve(0.0588713*cos(x)/sqrt(x) + 1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 ## =============================================================================
 
 # derivative function: 4 first-order derivatives
-f1st<- function(x, y, parms, R)
-{
+f1st<- function(x, y, parms, R) {
   list(c(y[2],
          y[3],
          y[4],
@@ -458,8 +456,7 @@ f1st<- function(x, y, parms, R)
 }
 
 # jacobian of derivative function
-df1st <- function(x, y, parms, R)
-{
+df1st <- function(x, y, parms, R) {
  df <- matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
              0,         1,      0,       0,
              0,         0,      1,       0,
@@ -468,8 +465,7 @@ df1st <- function(x, y, parms, R)
 }
 
 # boundary
-g2 <- function(i, y, parms, R)
-{
+g2 <- function(i, y, parms, R)  {
   if (i == 1) return (y[1])
   if (i == 2) return (y[2])
   if (i == 3) return (y[1] - 1)
@@ -477,8 +473,7 @@ g2 <- function(i, y, parms, R)
 }
 
 # jacobian of boundary
-dg2 <- function(i, y, parms, R)
-{
+dg2 <- function(i, y, parms, R)  {
   if (i == 1) return(c(1, 0, 0, 0))
   if (i == 2) return(c(0, 1, 0, 0))
   if (i == 3) return(c(1, 0, 0, 0))
@@ -504,14 +499,12 @@ plot(sol)
 ## =============================================================================
 
 # derivative function: one fourth-order derivative
-f4th <- function(x, y, parms, R)
-{
+f4th <- function(x, y, parms, R) {
   list(R * (y[2]*y[3] - y[1]*y[4]))
 }
 
 # jacobian of derivative function
-df4th <- function(x, y, parms, R)
-{
+df4th <- function(x, y, parms, R)  {
  df <- matrix(nrow = 1, ncol = 4, byrow = TRUE, data = c(
              -1*R*y[4], R*y[3], R*y[2], -R*y[1]))
 }

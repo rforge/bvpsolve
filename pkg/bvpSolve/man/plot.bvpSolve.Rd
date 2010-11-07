@@ -9,8 +9,8 @@
 Plot the output of boundary value solver routines.
 }
 \usage{
-\method{plot}{bvpSolve}(x, ..., which = NULL, ask = NULL, obs = NULL, 
-  obspar= list())
+\method{plot}{bvpSolve}(x, ..., which = NULL, ask = NULL, 
+                        obs = NULL, obspar= list())
 \method{print}{bvpSolve}(x, ...)
 }
 
@@ -20,7 +20,6 @@ Plot the output of boundary value solver routines.
     
     It is allowed to pass several objects of class
     \code{bvpSolve} after \code{x} (unnamed) - see second example.
-    
   }
   \item{which }{the name(s) or the index to the variables that should be
     plotted.  Default = all variables, except the first column.
@@ -35,8 +34,15 @@ Plot the output of boundary value solver routines.
     will be added as \code{points} to the plots. \code{obs} can also be a 
     \code{list} with multiple data.frames and/or matrices containing 
     observed data.
-    The first column of an observed data set should contain the \code{x}-variable
-    (independent variable of the differential equation). 
+    
+    By default the first column of an observed data set should contain 
+    the \code{time}-variable.  The other columns contain the observed values
+    and they should have names that are known in \code{x}.
+    
+    If the first column of \code{obs} consists of factors or characters (strings),
+    then it is assumed that the data are presented in long (database) format,
+    where the first three columns contain (name, time, value).  
+    
     If \code{obs} is not \code{NULL} and \code{which} is \code{NULL}, 
     then the variables, common to both \code{obs} and \code{x} will be plotted.
   }
@@ -99,8 +105,7 @@ Plot the output of boundary value solver routines.
 ##      u(0) = v(0) = w(0) = 1,  z(0) = -10,  w(1) = y(1)
 ## =============================================================================
 
-musn <- function(t, Y, pars)
-{
+musn <- function(t, Y, pars)  {
   with (as.list(Y),
   {
    du <- 0.5 * u * (w-u)/v
@@ -127,7 +132,7 @@ bound <- function(i,y,pars) {
 
 xguess <- seq(0, 1, len = 5)
 yguess <- matrix(ncol = 5, (rep(c(1, 1, 1, -10, 0.91), times = 5)) )
-rownames(yguess) <- c("u","v","w","z","y")
+rownames(yguess) <- c("u", "v", "w", "z", "y")
 
 sol  <- bvpcol (bound = bound, x = seq(0, 1, by = 0.05), 
           leftbc = 4, func = musn, xguess = xguess, yguess = yguess)
@@ -178,9 +183,14 @@ plot(twp, twp2, twp3, type = c("l", "b", "p"),
      main = paste ("State Variable", names(ini)), 
      col = c("red", "blue", "orange"), cex = 2)
 
-# Assume we have two 'data sets':
+## =============================================================================
+## Assume we have two 'data sets':
+## =============================================================================
+# data set in 'wide' format
 obs1 <- cbind(time = c(0, 0.5, 1), Tet = c(0.4, 0.0, -0.4))
-obs2 <- cbind(time = c(0, 0.5, 1), Tet = c(0.35, 0.0, -0.35))
+
+# data set in 'long' format
+obs2 <- data.frame(name = "Tet", time = c(0, 0.5, 1), value = c(0.35, 0.0, -0.35))
 
 plot(twp, twp2, obs = obs1, obspar = list(pch = 16, cex = 1.5))
 

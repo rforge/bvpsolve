@@ -9,7 +9,7 @@
 }
 \usage{
 \S3method{diagnostics}{bvpSolve}(obj, ...)
-\S3method{approx}{bvpSolve}(x, xout=NULL, ...)
+\S3method{approx}{bvpSolve}(x, xout = NULL, ...)
 }
 \arguments{
   \item{obj }{the output as produced by \code{bvptwp}, \code{bvpcol} 

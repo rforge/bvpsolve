@@ -17,13 +17,13 @@
 
 \usage{
 bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL, 
-  order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
-  jacfunc=NULL, bound = NULL, jacbound = NULL, 
-  leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
-  ncomp = NULL, atol = 1e-8, cond = FALSE, allpoints = TRUE, 
-  dllname = NULL, initfunc = dllname, 
-  rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
-  initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
+       order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
+       jacfunc = NULL, bound = NULL, jacbound = NULL, 
+       leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
+       ncomp = NULL, atol = 1e-8, cond = FALSE, allpoints = TRUE, 
+       dllname = NULL, initfunc = dllname, 
+       rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
+       initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -414,8 +414,8 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
 #--------------------------------
 # Derivative function
 #--------------------------------
-fun <- function(t, y, pars)
-{ dy1 <- y[2]
+fun <- function(t, y, pars) {
+  dy1 <- y[2]
   dy2 <- - 3*p*y[1] / (p+t*t)^2
   return(list(c(dy1,
                 dy2))) }
@@ -442,8 +442,8 @@ curve(x/sqrt(p+x*x), add = TRUE, type = "p")
 ## Same problem, now solved as a second-order equation.
 ## =============================================================================
 
-fun2 <- function(t, y, pars)
-{ dy <- - 3 * p * y[1] / (p+t*t)^2
+fun2 <- function(t, y, pars)  {
+  dy <- - 3 * p * y[1] / (p+t*t)^2
   list(dy)
 }
 sol2  <- bvptwp(yini = init, yend = end, order = 2, 
@@ -460,11 +460,10 @@ sol2  <- bvptwp(yini = init, yend = end, order = 2,
 ## dy2/dx  = - 1/x*dy/dx - (1-1/(4x^2)y + sqrt(x)*cos(x)
 ## =============================================================================
 
-f2 <- function(x, y, parms)
-{
- dy  <- y[2]
- dy2 <- -1/x*y[2] - (1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
- list(c(dy, dy2))
+f2 <- function(x, y, parms) {
+  dy  <- y[2]
+  dy2 <- -1/x*y[2] - (1-1/(4*x^2))*y[1] + sqrt(x)*cos(x)
+  list(c(dy, dy2))
 }
 
 x    <- seq(1, 6, 0.1)
@@ -484,12 +483,12 @@ curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 ## =============================================================================
 
 Prob24 <- function(x, y, pars, xi) {
-  A <- 1+x*x
-  AA <- 2*x
-  ga <- 1.4
-  list(c(y[2],
-       (((1+ga)/2 -xi*AA)*y[1]*y[2]-y[2]/y[1]-
-       (AA/A)*(1-(ga-1)*y[1]^2/2))/(xi*A*y[1])  ))
+   A <- 1+x*x
+   AA <- 2*x
+   ga <- 1.4
+   list(c(y[2],
+        (((1+ga)/2 -xi*AA)*y[1]*y[2]-y[2]/y[1]-
+        (AA/A)*(1-(ga-1)*y[1]^2/2))/(xi*A*y[1])  ))
 }
 
 ini <- c(0.9129, NA)
@@ -517,7 +516,6 @@ mod1b  <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
         yguess = t(mod1[,2:3]))
 lines(mod1b, lwd = 2, col = "red")
 
-
 ## =============================================================================
 ## Example 4  - solved with specification of boundary, and jacobians
 ## d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
@@ -530,13 +528,11 @@ lines(mod1b, lwd = 2, col = "red")
 ## dy4/dx = R*(y2*y3 -y*y4)
 ## =============================================================================
 
-f2<- function(x, y, parms, R)
-{
+f2<- function(x, y, parms, R) {
   list(c(y[2], y[3], y[4], R*(y[2]*y[3] - y[1]*y[4]) ))
 }
 
-df2 <- function(x, y, parms, R)
-{
+df2 <- function(x, y, parms, R) {
  df <- matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
              0,        1,     0,     0,
              0,        0,     1,     0,
@@ -544,23 +540,20 @@ df2 <- function(x, y, parms, R)
              -1*R*y[4],R*y[3],R*y[2],-R*y[1]))
 }
 
-g2 <- function(i, y, parms, R)
-{
+g2 <- function(i, y, parms, R) {
   if (i == 1) return(y[1])
   if (i == 2) return(y[2])
   if (i == 3) return(y[1]-1)
   if (i == 4) return(y[2])
 }
 
-dg2 <- function(i, y, parms, R)
-{
+dg2 <- function(i, y, parms, R) {
   if (i == 1) return(c(1, 0, 0, 0))
   if (i == 2) return(c(0, 1, 0, 0))
   if (i == 3) return(c(1, 0, 0, 0))
   if (i == 4) return(c(0, 1, 0, 0))
 }
 
-require(bvpSolve)
 init <- c(1, NA)
 R    <- 100
 sol  <- bvptwp(x = seq(0, 1, by = 0.01), leftbc = 2,

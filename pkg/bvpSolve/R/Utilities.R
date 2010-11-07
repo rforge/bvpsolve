@@ -56,20 +56,43 @@ print.bvpSolve <- function(x, ...)
 ### Merge two observed data files; assumed that first column = 'x' and ignored
 ### ============================================================================
 
+# from 3-columned format (what, where, value) to wide format...
+convert2wide <- function(Data) {
+    cnames   <- as.character(unique(Data[,1]))
+
+    MAT      <- Data[Data[,1] == cnames[1], 2:3]
+    colnames.MAT <- c("x", cnames[1])
+
+    for ( ivar in cnames[-1]) {
+      sel <- Data[Data[,1] == ivar, 2:3]
+      nt  <- cbind(sel[,1],matrix(nrow = nrow(sel), ncol = ncol(MAT)-1, data = NA),sel[,2])
+      MAT <- cbind(MAT, NA)
+      colnames(nt) <- colnames(MAT)
+      MAT <- rbind(MAT, nt)
+      colnames.MAT <- c(colnames.MAT, ivar)
+    }
+  colnames(MAT) <- colnames.MAT
+  return(MAT)
+}
+
+
 mergeObs <- function(obs, Newobs) {
-      
+
   if (! class(Newobs) %in% c("data.frame","matrix"))
     stop ("the elements in 'obs' should be either a 'data.frame' or a 'matrix'")
-      
+
+  if (is.character(Newobs[,1]) | is.factor(Newobs[,1]))
+    Newobs <- convert2wide(Newobs)
+
   obsname <- colnames(obs)
 
 ## check if some observed variables in NewObs are already in obs
   newname <- colnames(Newobs)[-1]    # 1st column = x-var and ignored
   ii <- which (newname %in% obsname)
   if (length(ii) > 0)
-    obsname <- c(obsname, newname[-ii] ) 
+    obsname <- c(obsname, newname[-ii] )
   else
-    obsname <- c(obsname, newname) 
+    obsname <- c(obsname, newname)
 
 ## padding with NA of the two datasets
   O1 <- matrix(nrow = nrow(Newobs), ncol = ncol(obs), data = NA)
@@ -82,15 +105,16 @@ mergeObs <- function(obs, Newobs) {
   colnames(O1) <- obsname
 
   nnewcol <- ncol(Newobs)-1 - length (ii)  # number of new columns
-  if (nnewcol > 0) {     
+  if (nnewcol > 0) {
      O2 <- matrix(nrow = nrow(obs), ncol = nnewcol, data = NA)
      O2 <- cbind(obs, O2)
      colnames(O2) <- obsname
   } else O2 <- obs
-      
-  obs <- rbind(O2, O1) 
-  return(obs) 
+
+  obs <- rbind(O2, O1)
+  return(obs)
 }
+
 ## =============================================================================
 ## Set the mfrow parameters and whether to "ask" for opening a new device
 ## =============================================================================
@@ -212,6 +236,8 @@ plot.bvpSolve <- function (x, ..., which = NULL, ask = NULL, obs = NULL,
          }
        obsname <- colnames(obs) 
       } else {
+       if (is.character(obs[,1]) | is.factor(obs[,1]))   # long format - convert
+          obs <- convert2wide(obs)
        obsname <- colnames(obs) 
        if (! class(obs) %in% c("data.frame", "matrix"))
          stop ("'obs' should be either a 'data.frame' or a 'matrix'")
