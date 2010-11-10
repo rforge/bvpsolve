@@ -457,7 +457,7 @@ f1st<- function(x, y, parms, R) {
 
 # jacobian of derivative function
 df1st <- function(x, y, parms, R) {
- df <- matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
+     matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
              0,         1,      0,       0,
              0,         0,      1,       0,
              0,         0,      0,       1,
@@ -505,7 +505,7 @@ f4th <- function(x, y, parms, R) {
 
 # jacobian of derivative function
 df4th <- function(x, y, parms, R)  {
- df <- matrix(nrow = 1, ncol = 4, byrow = TRUE, data = c(
+  matrix(nrow = 1, ncol = 4, byrow = TRUE, data = c(
              -1*R*y[4], R*y[3], R*y[2], -R*y[1]))
 }
 
