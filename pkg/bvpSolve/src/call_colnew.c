@@ -52,12 +52,12 @@ static void C_bvp_guess_func (double *x, double *y,  double *ydot)
   
   REAL(X)[0]   = *x;
 
-  PROTECT(R_fcall = lang2(R_bvp_guess_func,X));  incr_N_Protect();
+  PROTECT(R_fcall = lang2(R_bvp_guess_func, X));    incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
 
   p = fmax(1e-7, *x*1e-7 );
   REAL(X)[0]   = *x+p;
-  PROTECT(R_fcall2 = lang2(R_bvp_guess_func,X)); incr_N_Protect();
+  PROTECT(R_fcall2 = lang2(R_bvp_guess_func, X));   incr_N_Protect();
   PROTECT(ans2 = eval(R_fcall2, R_envir));          incr_N_Protect();
   
   /* both have the same dimensions... */
@@ -171,7 +171,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 /******************************************************************************/
 
 /* These R-structures will be allocated and returned to R*/
-  SEXP yout=NULL, ISTATE, RWORK;
+  SEXP yout=NULL, ISTATE, ICOUNT, RWORK;
 
   int  j, ii, ncomp, k, nx, ntol, nfixpnt, isForcing, type;
   double aleft, aright, *zeta, *fspace, *tol, *fixpnt, *z, *rpar;
@@ -219,8 +219,8 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   iset  = (int *)    R_alloc(ii, sizeof(int));
   for (j = 0; j < ii; j++) iset[j] = INTEGER(Iset)[j];
 
-  icount  = (int *)    R_alloc(5, sizeof(int));
-  for (j = 0; j<5; j++) icount[j] = 0;
+  icount  = (int *)    R_alloc(6, sizeof(int));
+  for (j = 0; j < 6; j++) icount[j] = 0;
   
   FullOut = INTEGER(Iset)[ii];
   
@@ -369,8 +369,10 @@ C....         = -3  If There Is An Input Data Error.
       }  /* end main x loop */
 
   ii = ncomp+7;
+  PROTECT(ICOUNT = allocVector(INTSXP, 6));incr_N_Protect();
   PROTECT(ISTATE = allocVector(INTSXP, ii+6));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
+  for (k = 0; k < 6; k++)  INTEGER(ICOUNT)[k] = icount[k];
   for (k = 0; k < 5; k++)  INTEGER(ISTATE)[k+1] = icount[k];
   for (k = 0; k < ii; k++) INTEGER(ISTATE)[k+6] = ispace[k];
   if (FullOut) 
@@ -380,6 +382,7 @@ C....         = -3  If There Is An Input Data Error.
 
   PROTECT(RWORK = allocVector(REALSXP, ii));incr_N_Protect();
   for (k = 0; k<ii; k++) REAL(RWORK)[k] = fspace[k];
+  setAttrib(yout, install("icount"), ICOUNT);
   setAttrib(yout, install("istate"), ISTATE);
   setAttrib(yout, install("rstate"), RWORK); 
   }

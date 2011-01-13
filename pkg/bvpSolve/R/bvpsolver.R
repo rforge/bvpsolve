@@ -401,13 +401,6 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   }
 
   if ( is.null(jacbound)) {
-      if (is.null(bound)) {
-        JMat <- matrix(data=0, nrow=neq, ncol = mstar)    #check neq, mstar
-        iibb <- c(which( !is.na(Y)),which(!is.na(yend)))
-        JMat[cbind(1:neq,iibb)] <- 1
-        JacBound <- function (ii, state) 
-           return(JMat[ii,])
-        }
     JacBound <- function (ii, state)  {
     BJAC        <- numeric(mstar)
     perturbfac  <- 1e-8
@@ -448,7 +441,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   Xguess <- xguess
   Yguess <- yguess
 # check dimensions
-  if (! is.null(yguess) && ! is.null(yguess))
+  if (! is.null(yguess) && ! is.null(xguess))
      if (length(xguess) != ncol(yguess))
        stop("yguess should have as many columns as length of xguess")
        
@@ -585,7 +578,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
     rwork <- ATT$rstate
     if ( length (rwork) == 0)
        stop ("attributes(yguess)$rstate should be present, if continuation is requested")
-    iwork <- ATT$istate[-(1:6)]  # first 6 elements nothing to do with continuation 
+    iwork <- ATT$istate[-(1:6)]  # first 6 elements nothing to do with continuation
     if ( length (iwork) == 0)
        stop ("attributes(yguess)$istate should be present, if continuation is requested")
              
@@ -598,7 +591,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   Xguess <- xguess
   Yguess <- yguess
 # check dimensions
-  if (! is.null(yguess) && ! is.null(yguess))
+  if (! is.null(yguess) && ! is.null(xguess))
      if (length(xguess) != ncol(yguess))
        stop("yguess should have as many columns as length of xguess")
        
@@ -670,6 +663,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
             as.double(fixpnt), as.double (rpar), as.integer (ipar), 
             Func, JacFunc, Bound, JacBound, GuessFunc, ModelInit, initpar,
             flist, type = as.integer(bspline), rho,  PACKAGE="bvpSolve")
+  ic <- attributes(out)$icount
   nn <- attributes(out)$istate
   rn <- attributes(out)$rstate
   nn[2] <- nn[2] + 1  # add test function evaluation
@@ -698,7 +692,9 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
   attr(out,"bspline") <- bspline
   dimnames(out) <- list(nm,NULL)
  
-  names(nn)[1:10] <- c("flag","nfunc", "njac",	
+  names(ic)[1:6] <- c("nfunc", "njac", "nstep", "nbound", "njacbound","ncont")
+
+  names(nn)[1:10] <- c("flag","nfunc", "njac",
   	 "nstep", "nbound", "njacbound","nmesh","ncoll","neqs","ncomps")
   attributes(out)$istate <- nn
   attributes(out)$rstate <- rn

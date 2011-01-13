@@ -1,3 +1,6 @@
+c Francesca 13/01/2011: modified newteq to work with rshgiv
+c  modified external and intrinsic instructions
+
 c ===================================================================================
 * karline: to make this code compatible with R:
 * 1. change all write(6,...) -> rprint
@@ -10,21 +13,21 @@ c ==============================================================================
 * 7. added iset, to contain several 'counters'
 c ===================================================================================
 
- 
+
 c ===================================================================================
 c print R-messages
 c ===================================================================================
 
       subroutine rprint(msg)
       character (len=100) msg
-      
+
             call dblepr(msg, 100, 0, 0)
-      end subroutine 
+      end subroutine
 
 c ===================================================================================
 c initu resets u after re-meshing for linear problems or for nonlinear problems
 c when interpolation of the old solution is not used.
-c it interpolates between (Xguess,Yguess), if these are inputted 
+c it interpolates between (Xguess,Yguess), if these are inputted
 c otherwise sets to constant value...
 c ===================================================================================
 
@@ -35,12 +38,12 @@ c ==============================================================================
       character(len=100) msg
 
       logical use_c, comp_c, giv_u
-      integer nmguess, ureset 
+      integer nmguess, ureset
       common/algprs/nminit, iprint, idum, use_c, comp_c
       common/gu/ nmguess, giv_u, ureset
 
       ureset = ureset + 1
-      if (iprint .ne. -1) then 
+      if (iprint .ne. -1) then
         write(msg,99) 0.d0
         call Rprint(msg)
       endif
@@ -146,7 +149,10 @@ C
       dimension wrk(lwrkfl), iwrk(lwrkin)
       dimension iseries(*)
       logical linear, givmsh, giveu, full, useC
-      external fsub, dfsub, gsub, dgsub
+      external fsub
+      external dfsub
+      external gsub
+      external dgsub
       character(len=100) msg
 
 
@@ -158,15 +164,16 @@ C
 c Karline: diagnostic properties
       integer nfunc, njac, nstep, nbound, njacbound
       common/diagnost/nfunc, njac, nstep, nbound, njacbound
-      intrinsic abs, min
+      intrinsic abs
+      intrinsic min
 
       parameter ( zero = 0.0d+0 )
 
       use_c = useC
 
-c Karline: set this = 1 => always computed...      
-      COMP_C =  .TRUE.  
-      giv_u = giveu  
+c Karline: set this = 1 => always computed...
+      COMP_C =  .TRUE.
+      giv_u = giveu
       nmguess = nmsh
 
 c initialise counters
@@ -467,7 +474,10 @@ c ksks: add precis as argument: machine precision...
 
       logical linear, giveu, givmsh, ddouble
 
-      external fsub, dfsub, gsub, dgsub
+      external fsub
+      external dfsub
+      external gsub
+      external dgsub
 
       common/mchprs/flmin, flmax, epsmch
 
@@ -802,8 +812,8 @@ c end if if(comp_c)
        call fail4( ncomp, nmsh, nlbc, ntol, ltol,
      *       xx, nudim, u, rhs, linear, nmax,
      *       nmold, xxold, uold, ratdc,
-     *       iorder, iflnwt, itnwt, ddouble , maxmsh, numbig, 
-     *       nummed,wrkrhs,amg,stab_cond,stiff_cond,nfail4,nfxpnt, 
+     *       iorder, iflnwt, itnwt, ddouble , maxmsh, numbig,
+     *       nummed,wrkrhs,amg,stab_cond,stiff_cond,nfail4,nfxpnt,
      * fixpnt, irefin,itcond,itcondmax,rpar,ipar,xguess, yguess)
 
 
@@ -890,7 +900,7 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
      *           utrial, rhstri,
      *           uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit,
      *           ajac, topblk, botblk, bhold, chold, ipvblk,
-     *           fsub, dfsub, gsub, dgsub, iter, iflnwt, 
+     *           fsub, dfsub, gsub, dgsub, iter, iflnwt,
      *           rpar, ipar, frscal)
 
          endif
@@ -1023,7 +1033,7 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
      *           utrial, rhstri,
      *           uint, ftmp, dftmp1, dftmp2, dgtm, tmprhs, xmerit,
      *           ajac, topblk, botblk, bhold, chold, ipvblk,
-     *           fsub, dfsub, gsub, dgsub, iter, iflnwt, 
+     *           fsub, dfsub, gsub, dgsub, iter, iflnwt,
      *           rpar, ipar, frscal)
 
 
@@ -1601,7 +1611,8 @@ c
       parameter (power = 1.0d+0/6.0d+0, one = 1.0d+0)
       parameter (zero = 0.0d+0, huge = 1.0d+30)
 
-      intrinsic abs, max
+      intrinsic abs
+      intrinsic max
 
       save  dfold, oldrt1, savedu, reposs
 
@@ -1792,7 +1803,7 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
          endif
 
       end if
-      if (.not. maxmsh)  
+      if (.not. maxmsh)
      &   call initu(ncomp, nmsh, xx, nudim, u, xguess, yguess)
 
 *     end of logic for .not. onto6
@@ -2458,7 +2469,8 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       parameter ( zero = 0.0d+0, one = 1.0d+0 )
       parameter ( rtst = 50.0d+0, tstrat = 0.1d+0 )
 
-      intrinsic abs, max
+      intrinsic abs
+      intrinsic max
       character(len=100) msg
 
 *  blas: idamax
@@ -3135,13 +3147,15 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension  ipivot(ncomp*nmsh)
       logical    better
 
-      external   fsub, gsub
+      external   fsub
+      external gsub
 
       logical use_c, comp_c
       common/algprs/ nminit, iprint, idum, use_c, comp_c
       common/mchprs/flmin, flmax, epsmch
 
-      intrinsic  abs, max
+      intrinsic  abs
+      intrinsic max
 
 *  blas: dcopy, dssq
 
@@ -3237,7 +3251,7 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 *  two-norm at the trial point.
 
       rnold = rnsq
-      call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub, 
+      call fneval(ncomp, nmsh, xx, ncomp, utrial, fval, fsub,
      *   rpar, ipar)
       call rhscal (ncomp, nmsh, nlbc, xx, ncomp, utrial, defcor,
      *   fsub, gsub, rhstri, rnsq, fval, ftmp, uint, rpar, ipar)
@@ -3331,7 +3345,10 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
       dimension  ipivot(ncomp*nmsh)
       integer    job
       logical    ludone
-      external   fsub, dfsub, gsub, dgsub
+      external   fsub
+      external   dfsub
+      external   gsub
+      external   dgsub
 
       logical use_c, comp_c
       common/algprs/ nminit, iprint, idum, use_c, comp_c
@@ -3448,7 +3465,10 @@ c      iflag = 0
       logical rhsgiv
 
 
-      external   fsub, dfsub, gsub, dgsub
+      external   fsub
+      external   dfsub
+      external   gsub
+      external   dgsub
 
       parameter  ( zero   = 0.0d+0, one    = 1.0d+0 )
       parameter ( two = 2.0d+0, half = 0.5d+0, fourth = 0.25d+0 )
@@ -3462,7 +3482,8 @@ c      iflag = 0
       save  gtpdeb, mfsrch, epsaf, epsag, eta, rmu, tolabs, alfmax
       save  tolrel, toltny
 
-      intrinsic  abs, max
+      intrinsic  abs
+      intrinsic  max
 
 *  blas: dcopy
 
@@ -3516,7 +3537,8 @@ c
 
       if (.not. rhsgiv) then
 *  If necessary, evaluate the right-hand side at the initial u.
-
+         call fneval(ncomp, nmsh, xx, nudim, u, fval, fsub,
+     *    rpar, ipar)
          call rhscal (ncomp, nmsh, nlbc, xx, nudim, u, defcor,
      *      fsub, gsub, rhs, rnsq, fval, ftmp, uint, rpar, ipar)
       endif
@@ -3893,7 +3915,7 @@ c  at the initial point of the line search.
       return
       end
 
-      subroutine fneval(ncomp, nmsh, xx, nudim, u, fval, fsub, 
+      subroutine fneval(ncomp, nmsh, xx, nudim, u, fval, fsub,
      *   rpar, ipar)
       implicit double precision (a-h,o-z)
       dimension rpar(*),ipar(*)
@@ -3911,7 +3933,7 @@ c  at the initial point of the line search.
 
       do 50 im = 1, nmsh-1
          hmsh = xx(im+1) - xx(im)
-         call fsub (ncomp, xx(im+1), u(1,im+1), fval(1,im+1), 
+         call fsub (ncomp, xx(im+1), u(1,im+1), fval(1,im+1),
      *     rpar, ipar)
    50 continue
       nstep = nstep + 1
@@ -3938,7 +3960,8 @@ c  at the initial point of the line search.
       dimension bhold(ncomp, ncomp, nmsh-1),
      *             chold(ncomp, ncomp, nmsh-1)
 
-      external  dfsub, dgsub
+      external  dfsub
+      external  dgsub
 
       logical use_c, comp_c
       common/algprs/ nminit, iprint, idum, use_c, comp_c
@@ -4005,7 +4028,7 @@ c  at the initial point of the line search.
 
 
   200 continue
-      
+
       njac = njac + 1 + ninter*2
 
       do 220 i = nlbc+1, ncomp
@@ -4032,7 +4055,8 @@ c  at the initial point of the line search.
       dimension rpar(*),ipar(*)
       dimension xx(*), u(nudim,*)
       dimension rhs(*), fval(ncomp,*), ftmp(*), uint(*)
-      external fsub, gsub
+      external fsub
+      external gsub
 
       parameter ( zero = 0.0d+0, half = 0.5d+0, eighth = 0.125d+0 )
       parameter ( one = 1.0d+0, four = 4.0d+0, six = 6.0d+0 )
@@ -4073,7 +4097,7 @@ c  at the initial point of the line search.
      *            (fval(ic,im) + fval(ic,im+1) + four*ftmp(ic))/six
    40    continue
    50 continue
-      
+
       nfunc = nfunc + ninter
 
       nrhs = ninter*ncomp
@@ -4105,7 +4129,8 @@ c  at the initial point of the line search.
       dimension  xx(nmsh), u(nudim,nmsh), defcor(ncomp,nmsh-1)
       dimension  rhs(ncomp*nmsh), fval(ncomp,nmsh)
       dimension  ftmp(ncomp), uint(ncomp)
-      external   fsub, gsub
+      external   fsub
+      external   gsub
 
       logical use_c, comp_c
       common/algprs/ nminit, iprint, idum, use_c, comp_c
@@ -4252,7 +4277,9 @@ c  at the initial point of the line search.
       dimension  xxold(*), ermx(*)
       logical    ddouble , maxmsh
 
-      intrinsic abs, max, int
+      intrinsic abs
+      intrinsic  max
+      intrinsic  int
       character(len=100) msg
 
 *  blas: dcopy
@@ -5052,7 +5079,8 @@ cf
 
       logical use_c, comp_c
       common/algprs/ nminit, iprint, idum, use_c, comp_c
-      intrinsic abs, max
+      intrinsic abs
+      intrinsic max
 
       parameter ( one = 1.0d+0, zero = 0.0d+0 )
       character(len=100) msg
@@ -5861,7 +5889,8 @@ c  end of getptq
       dimension rerr(ncomp, *)
       logical adjrer
 
-      intrinsic abs, max
+      intrinsic abs
+      intrinsic max
 
       parameter ( one = 1.0d+0, zero = 0.0d+0 )
       character(len=100) msg
@@ -5979,7 +6008,9 @@ c#
       dimension  xxold(*), ermx(*), amg(*), r4(nmsh)
       logical    ddouble , maxmsh, stab_cond
 
-      intrinsic abs, max, int
+      intrinsic abs
+      intrinsic max
+      intrinsic int
 
 *  blas: dcopy
 *  double precision dlog
@@ -6360,7 +6391,9 @@ c   endif use the conditioning and the error
       dimension  xxold(*),  amg(*), r4(nmsh)
       logical    ddouble , maxmsh, add
 
-      intrinsic abs, max, int
+      intrinsic abs
+      intrinsic max
+      intrinsic int
 
 *  blas: dcopy
 *  double precision dlog
@@ -6633,7 +6666,9 @@ c  220 continue
       dimension  xxold(*),  amg(*), r4(*)
       logical    ddouble , maxmsh, add
 
-      intrinsic abs, max, int
+      intrinsic abs
+      intrinsic max
+      intrinsic int
 
 *  blas: dcopy
 *  double precision dlog
@@ -6919,7 +6954,10 @@ c  220 continue
       dimension  xx(*)
       dimension  amg(*), r4(*)
 
-      intrinsic abs, max, int
+      intrinsic abs
+      intrinsic max
+      intrinsic int
+
 
 *  blas: dcopy
 *  double precision dlog
