@@ -299,7 +299,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
       }
       
       # expand jacobian
-      JAC <- matrix(nr = mstar, nc = mstar, 0)
+      JAC <- matrix(nrow = mstar, ncol = mstar, 0)
       JAC[cbind(higord,higord+1)] <- 1
       if (! is.null(jacfunc))
         JacFunc <- function(x, state)  {
@@ -352,7 +352,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
 
 ## in case jacobian function is not defined...
   if ( is.null(jacfunc) & type == 2) {
-    JAC      <- matrix(nr=neq,nc=mstar)
+    JAC      <- matrix(nrow = neq, ncol = mstar)
     perturbfac  <- 1e-8
 
     JacFunc <- function (x, state)  {
@@ -368,7 +368,7 @@ bvpsolver <- function(type = 1,       # 1 = bvptwp, 2 = bvpcol
       return(JAC)
     }
   }  else if ( is.null(jacfunc) & type == 1) {
-    JAC      <- matrix(nr=mstar,nc=mstar)
+    JAC      <- matrix(nrow = mstar, ncol = mstar)
     perturbfac  <- 1e-8
 
     JacFunc <- function (x, state)  {
