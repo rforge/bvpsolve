@@ -13,6 +13,9 @@
   that uses conditioning in the mesh selection.
 
   written by J.R. Cash, F. Mazzia and M.H. Wright.
+
+  It is possible to solve stiff systems, by using an automatic continuation
+  strategy. This then uses the code 'acdc'
 }
 
 \usage{
@@ -23,7 +26,8 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
        ncomp = NULL, atol = 1e-8, cond = FALSE, allpoints = TRUE, 
        dllname = NULL, initfunc = dllname, 
        rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
-       initforc = NULL, fcontrol = NULL, verbose = FALSE, ...)
+       initforc = NULL, fcontrol = NULL, verbose = FALSE,
+        epsini = NULL, eps = epsini, ...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -83,8 +87,24 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
   }
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
+
+    If \code{eps} is given a value then it should be the **first** element in
+    \code{parms}.
   }
-  \item{ynames }{The names of the variables; used to label the output, and 
+  \item{epsini }{the initial value of the continuation parameter. If
+    \code{NULL} and \code{eps} is given a value, then \code{epsini} takes
+    the default starting value of 0.5. For many singular perturbation type
+    problems, the choice of 0.1 < \code{eps} < 1 represents a (fairly) easy
+    problem. The user should attempt to specify an initial
+    problem that is not `too' challenging.
+    \code{epsini} must be initialised strictly less than 1 and greater than 0.
+  }
+  \item{eps }{the desired value of precision for which the user would like
+    to solve the problem. \code{eps} must be less than or equal to
+    \code{epsini}. If this is given a value, it must be the first value in
+    \code{parms}.
+  }
+  \item{ynames }{The names of the variables; used to label the output, and
     avaliable within the functions.
     
     If \code{ynames} is \code{NULL}, names can also be passed via \code{yini},  
@@ -476,45 +496,30 @@ curve(0.0588713*cos(x)/sqrt(x)+1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
       1/4*x^(3/2)*sin(x), add = TRUE, type = "l")
 
 ## =============================================================================
-## Example 3  - using continuation
-## Problem nr 24 from http://www.ma.ic.ac.uk/~jcash/BVP_software/PROBLEMS.PDF
-## xi*A*y*y'' -((1+ga)/2-xi*A'*y*y'+y'/y+(A'/A*(1-(ga-1)/2*y^2)=0
-## where A = 1 + x2, y(x=0) = 0:9129, y(x=1) = 0:375
+## Example 3  - solved with automatic continuation
+## d2y/dx2 = y/xi
 ## =============================================================================
 
-Prob24 <- function(x, y, pars, xi) {
-   A <- 1+x*x
-   AA <- 2*x
-   ga <- 1.4
-   list(c(y[2],
-        (((1+ga)/2 -xi*AA)*y[1]*y[2]-y[2]/y[1]-
-        (AA/A)*(1-(ga-1)*y[1]^2/2))/(xi*A*y[1])  ))
-}
+Prob1 <- function(t, y, xi)
+   list(c( y[2] , y[1]/xi ))
 
-ini <- c(0.9129, NA)
-end <- c(0.375, NA)
+x <-  seq(0, 1, by = 0.01)
+xi <- 0.1
+twp <- bvptwp(yini = c(1, NA), yend = c(0, NA), x = x,
+             islin = TRUE, func = Prob1, parms = xi, eps = xi)
 
-# This problem needs an initial guess for y; (as it divides by y,
-# the default, 0, does not work)
+xi <-0.00001
+twp2 <- bvptwp(yini = c(1, NA), yend = c(0, NA), x = x,
+               islin = TRUE, func = Prob1, parms = xi, eps = xi)
 
-# guess of y; set equal to 1
-xguess <- c(0, 1)
-yguess <- matrix(nrow = 2, ncol = 2, data = 1)
+plot(twp, twp2, which = 1, main = "test problem 1")
 
-# start with relatively large value of xi
-xi <- 0.01
-print(system.time(
-mod1  <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
-          func = Prob24, xi = xi, xguess = xguess, yguess = yguess)
-))        
-plot(mod1[,1:2], ylim = c(0.4,1.4), type = "l", lwd = 2)
+# exact solution
+curve(exp(-x/sqrt(xi))-exp((x-2)/sqrt(xi))/(1-exp(-2/sqrt(xi))),
+      0, 1, add = TRUE, type = "p")
 
-# use previous solution to initialise solver for smaller xi
-xi <- 0.005
-mod1b  <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
-        func = Prob24, xi = xi, xguess = mod1[,1], 
-        yguess = t(mod1[,2:3]))
-lines(mod1b, lwd = 2, col = "red")
+curve(exp(-x/sqrt(0.1))-exp((x-2)/sqrt(0.1))/(1-exp(-2/sqrt(0.1))),
+      0, 1, add = TRUE, type = "p")
 
 ## =============================================================================
 ## Example 4  - solved with specification of boundary, and jacobians

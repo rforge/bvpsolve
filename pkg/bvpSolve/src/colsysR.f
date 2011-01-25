@@ -2,7 +2,7 @@ c-----------------------------------------------------------------------
 * karline: to make this code compatible with R:
 * 1. change all write statements into rprint statements
 * 2. changed all ( ,1) declarations into (,*)
-* 3. TODO changed interface to fsub, gsub to make it compatible with TWPBVPC
+* 3. added rpar, ipar to calls of guess
 * 4. TODO added counters
 * 5. renamed ipar -> iset and solutn -> guess
 c all subroutines renamed, with "sys" in front.
@@ -335,7 +335,7 @@ c             approximation for  z(u(x)) and for dmval(u(x))= vector
 c             of the mj-th derivatives of u(x). it should have the
 c             heading
 c
-c                       subroutine guess (x , z , dmval)
+c                       subroutine guess (x , z , dmval, rpar, ipar)
 c
 c             note that this subroutine is needed only if using
 c             iset(9) = 1, and then all  mstar  components of z
@@ -2088,7 +2088,7 @@ c
 c
 c...         case where user provided current approximation
 c
-             call guess (zeta(izeta), z, dmval)
+             call guess (zeta(izeta), z, dmval, rpar, ipar)
              go to (130, 140), mode
 c
 c...         other nonlinear case
@@ -2126,7 +2126,7 @@ c
 c
 c...         use initial approximation provided by the user.
 c
-             call guess(xx, z, dmval)
+             call guess(xx, z, dmval, rpar, ipar)
              go to (190, 250), mode
 c
 c...         find  rhs  values

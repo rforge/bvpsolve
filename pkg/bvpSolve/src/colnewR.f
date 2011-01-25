@@ -3,6 +3,7 @@ c ==============================================================================
 * 1. change all write statements into rprint statements
 * 2. changed all ( ,1) declarations into (,*)
 * 3. changed interface to fsub, gsub to make it compatible with TWPBVPC
+* 3. added rpar, ipar to calls of guess
 * 4. added counters
 * 5. renamed ipar -> iset and solutn -> guess
 c ===================================================================================
@@ -335,7 +336,7 @@ C             approximation for  z(u(x)) and for dmval(u(x))= vector
 C             of the mj-th derivatives of u(x). it should have the
 C             heading
 C
-C                       subroutine guess (x , z , dmval)
+C                       subroutine guess (x , z , dmval, rpar, ipar)
 C
 C             note that this subroutine is needed only if using
 C             ISET(9) = 1, and then all  mstar  components of z
@@ -2205,7 +2206,7 @@ C
 C
 C...       case where user provided current approximation
 C
-           CALL GUESS (XII, ZVAL, DMVAL)
+           CALL GUESS (XII, ZVAL, DMVAL, RPAR, IPAR)
            GO TO 110
 C
 C...       other nonlinear case
@@ -2249,7 +2250,7 @@ C
 C
 C...         use initial approximation provided by the user.
 C
-             CALL GUESS (XCOL, ZVAL, DMZO(IRHS) )
+             CALL GUESS (XCOL, ZVAL, DMZO(IRHS) , RPAR, IPAR)
              GO TO 170
 C
 C...         find  rhs  values
@@ -2319,7 +2320,7 @@ C
 C
 C...       case where user provided current approximation
 C
-           CALL GUESS (ARIGHT, ZVAL, DMVAL)
+           CALL GUESS (ARIGHT, ZVAL, DMVAL, RPAR, IPAR)
            GO TO 250
 C
 C...       other nonlinear case

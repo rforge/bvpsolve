@@ -18,6 +18,16 @@ void F77_NAME(twpbvpc)(int*, int*, double *, double *,
        double *, int *, int *, int *, int *, int *, int *, int *,
        double *, double *, int*);
 
+/* wrapper above the derivate function that first estimates the
+values of the forcing functions - when model in compiled code */
+
+static void dll_bvp_deriv_func_forc (int *neq, double *x, double *y,
+                         double *ydot, double *rpar, int *ipar)
+{
+  updatedeforc(x);
+  derfun(neq, x, y, ydot, rpar, ipar);
+}
+
 /* interface between fortran function calls and R functions */
 
 static void C_bvp_deriv_func (int *n,  double *x, double *y, double *ydot,
@@ -34,16 +44,6 @@ static void C_bvp_deriv_func (int *n,  double *x, double *y, double *ydot,
   for (i = 0; i < *n ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
   
   my_unprotect(2);
-}
-
-/* wrapper above the derivate function that first estimates the
-values of the forcing functions */
-
-static void C_bvp_deriv_func_forc (int *neq, double *x, double *y,
-                         double *ydot, double *rpar, int *ipar)
-{
-  updatedeforc(x);
-  derfun(neq, x, y, ydot, rpar, ipar);
 }
 
 /* interface between fortran call to jacobian and R function */
@@ -246,7 +246,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 	  /* here overruling deriv_func if forcing */
       if (isForcing) {
         derfun =     (C_deriv_func_type *) R_ExternalPtrAddr(derivfunc);
-        deriv_func = (C_deriv_func_type *) C_bvp_deriv_func_forc;
+        deriv_func = (C_deriv_func_type *) dll_bvp_deriv_func_forc;
       }
   } else {      /* interface functions between fortran and R */
       deriv_func = C_bvp_deriv_func;

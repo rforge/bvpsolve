@@ -2,15 +2,20 @@
 \alias{bvpcol}
 \title{
   Solves multipoint boundary value problems of ordinary differential equations,
-  using a collocation method
+  using a collocation method.
 }
 \description{
   Solves Boundary Value Problems For Ordinary
   Differential Equations By Collocation.
-  
+
+  It is possible to solve stiff systems, by using an automatic continuation strategy
+
   This is an implementation of the fortran codes colsys.f and colnew.f written by
   respectively U. Ascher, J. christiansen  and R.D. Russell (colsys), 
   and U. Ascher and G. Bader (colnew).
+
+  The continuation strategy is an implementation of the fortran code colmod
+  written by J.R. Cash, M.H. Wright and F. Mazzia.
 }
 
 \note{
@@ -19,6 +24,14 @@
   a new basis representation replacing b-splines, and improvements for
   the linear and nonlinear algebraic equation solvers. To toggle on/off
   colsys, set \code{bspline} = \code{TRUE}/\code{FALSE}
+
+  colmod is a revised version of the package colnew by
+  Bader and Ascher (1987), which in turn is a modification of the package
+  colsys by Ascher, Christiansen and Russell (1981). Colmod has been
+  adapted to allow an automatic continuation strategy to
+  be used (Cash et al., 1995).
+
+  The mesh selection algorithm used in colmod differs from that used in colnew
 }
 
 \usage{
@@ -29,7 +42,8 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
         ncomp = NULL, atol = 1e-8, colp = NULL, bspline = FALSE,
         fullOut = TRUE, dllname = NULL, initfunc = dllname, 
         rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
-        initforc = NULL, fcontrol = NULL, verbose = FALSE, ...) 
+        initforc = NULL, fcontrol = NULL, verbose = FALSE,
+        epsini = NULL, eps = epsini,...)
 }
 \arguments{
   \item{yini }{either a vector with the initial (state) variable values for
@@ -90,8 +104,24 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   }
   \item{parms }{vector or a list with parameters passed to \code{func},
     \code{jacfunc}, \code{bound} and \code{jacbound} (if present).
+
+    If \code{eps} is given a value then it should be the **first** element in
+    \code{parms}.
   }
-  \item{ynames }{The names of the variables; used to label the output, and 
+  \item{epsini }{the initial value of the continuation parameter. If
+    \code{NULL} and \code{eps} is given a value, then \code{epsini} takes
+    the default starting value of 0.5. For many singular perturbation type
+    problems, the choice of 0.1 < \code{eps} < 1 represents a (fairly) easy
+    problem. The user should attempt to specify an initial
+    problem that is not `too' challenging.
+    \code{epsini} must be initialised strictly less than 1 and greater than 0.
+  }
+  \item{eps }{the desired value of precision for which the user would like
+    to solve the problem. \code{eps} must be less than or equal to
+    \code{epsini}. If this is given a value, it must be the first value in
+    \code{parms}.
+  }
+  \item{ynames }{The names of the variables; used to label the output, and
     avaliable within the functions.
     
     If \code{ynames} is \code{NULL}, names can also be passed via \code{yini},  
@@ -286,7 +316,8 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \details{
-  This is an implementation of the Collocation methods called "colnew" and 
+  If \code{eps} does not have a value, then the method is based on an implementation
+  of the Collocation methods called "colnew" and
   "colsys" to solve multi-point boundary value problems of ordinary
   differential equations.
   
@@ -305,6 +336,23 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   number of subintervals was exceeded, then it is recommended that
   'the program be run again with a larger value for this maximum.'
 
+  If \code{eps} does have a value, then the method is based on an implementation
+  of the Collocation methods called "colmod".
+  The type of problems which this is designed to solve typically
+  involve a small positive parameter 0 < eps << 1.
+  As eps becomes progressively smaller, the problem normally becomes
+  increasingly difficult to approximate numerically (for example, due
+  to the appearance of narrow transition layers in the profile of the
+  analytic solution).
+
+  The idea of continuation is to solve a chain of problems in which the
+  parameter eps decreases monotonically towards some desired value.
+  That is, a sequence of problems is attempted to be solved:
+
+  epsini  > eps1  > eps2  > eps3  >  .....  > eps  > 0
+
+  where \code{epsini} is a user provided starting value and \code{eps} is a
+  user desired final value for the parameter.
 }
 
 \seealso{
@@ -339,6 +387,11 @@ bvpcol (yini = NULL, x, func, yend = NULL, parms = NULL,
   colsys - a collocation code for boundary value problems,
   lecture notes comp.sc. 76, springer verlag,
   B. Childs et. al. (eds.), 164-185.
+
+  J. R. Cash, G. Moore and R. W. Wright, (1995)
+  an automatic continuation strategy for the solution of
+  singularly perturbed linear two-point boundary value problems,
+  j. comp. phys. 122, 266-279.
 }
 
 \keyword{math}
@@ -408,7 +461,7 @@ sol2  <- bvpcol(yini = init, yend = end, order = 2,
 plot(sol, sol2, which = 1)
 
 ## =============================================================================
-## Example 2: simple
+## Example 1c: simple
 ## solve d2y/dx2 + 1/x*dy/dx + (1-1/(4x^2)y = sqrt(x)*cos(x),
 ## on the interval [1,6] and with boundary conditions:
 ## y(1)=1, y(6)=-0.5
@@ -436,6 +489,54 @@ curve(0.0588713*cos(x)/sqrt(x) + 1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 
 
 ## =============================================================================
+## Example 2. Uses continuation
+## Test problem 24
+## =============================================================================
+
+Prob24<- function(t, y, ks) {     #eps is called ks here
+  A <- 1+t*t
+  AA <- 2*t
+  ga <- 1.4
+  list(c(y[2],(((1+ga)/2 -ks*AA)*y[1]*y[2]-y[2]/y[1]-
+               (AA/A)*(1-(ga-1)*y[1]^2/2))/(ks*A*y[1])))
+}
+
+ini <- c(0.9129, NA)
+end <- c(0.375, NA)
+xguess <- c(0, 1)
+yguess <- matrix(nrow = 2, ncol = 2, 0.9 )
+
+# bvpcol works with eps NOT too small, and good initial condition ...
+sol <- bvpcol(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+              xguess = xguess, yguess = yguess,
+              parms = 0.1, func = Prob24, verbose = FALSE)
+
+# when continuation is used: does not need a good initial condition
+sol2 <- bvpcol(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+                  parms = 0.05, func = Prob24,
+                  eps = 0.05)
+                  
+#zoom <- approx(sol2, xout = seq(0.01, 0.02, by  = 0.0001))
+#plot(zoom, which = 1, main = "zoom in on [0.01, 0.02]")
+
+sol3 <- bvpcol(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+                  parms = 0.01, func = Prob24 , eps = 0.01)
+
+sol4 <- bvpcol(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+                  parms = 0.001, func = Prob24, eps = 0.001)
+
+print(system.time(
+sol5 <- bvpcol(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
+                  parms = 1e-4, func = Prob24, eps = 1e-4)
+))
+
+plot(sol, sol2, sol3, sol4, sol5, which = 1, main = "test problem 24",
+     lwd = 2)
+
+legend("topright", col = 1:5, lty = 1:5, lwd = 2,
+       legend = c("0.05", "0.01", "0.001", "0.0001"), title = "eps")
+
+## =============================================================================
 ## Example 3  - solved with specification of boundary, and jacobians
 ## d4y/dx4 =R(dy/dx*d2y/dx2 -y*dy3/dx3)
 ## y(0)=y'(0)=0
@@ -448,24 +549,24 @@ curve(0.0588713*cos(x)/sqrt(x) + 1/4*sqrt(x)*cos(x)+0.740071*sin(x)/sqrt(x)+
 ## =============================================================================
 
 # derivative function: 4 first-order derivatives
-f1st<- function(x, y, parms, R) {
+f1st<- function(x, y, S) {
   list(c(y[2],
          y[3],
          y[4],
-         R * (y[2]*y[3] - y[1]*y[4]) ))
+         1/S*(y[2]*y[3] - y[1]*y[4]) ))
 }
 
 # jacobian of derivative function
-df1st <- function(x, y, parms, R) {
-     matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
+df1st <- function(x, y, S) {
+ matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
              0,         1,      0,       0,
              0,         0,      1,       0,
              0,         0,      0,       1,
-             -1*R*y[4], R*y[3], R*y[2], -R*y[1]))
+             -1*y[4]/S, y[3]/S, y[2]/S, -y[1]/S))
 }
 
 # boundary
-g2 <- function(i, y, parms, R)  {
+g2 <- function(i, y, S)  {
   if (i == 1) return (y[1])
   if (i == 2) return (y[2])
   if (i == 3) return (y[1] - 1)
@@ -473,7 +574,7 @@ g2 <- function(i, y, parms, R)  {
 }
 
 # jacobian of boundary
-dg2 <- function(i, y, parms, R)  {
+dg2 <- function(i, y, S)  {
   if (i == 1) return(c(1, 0, 0, 0))
   if (i == 2) return(c(0, 1, 0, 0))
   if (i == 3) return(c(1, 0, 0, 0))
@@ -482,10 +583,10 @@ dg2 <- function(i, y, parms, R)  {
 
 # we use posbound to specify the position of boundary conditions
 # we can also use leftbc = 2 rather than posbound = c(0,0,1,1)
-R    <- 100  
-sol  <- bvpcol(x = seq(0, 1, by = 0.01), 
+S    <- 1/100
+sol  <- bvpcol(x = seq(0, 1, by = 0.01),
           ynames = c("y", "dy", "d2y", "d3y"),
-          posbound = c(0, 0, 1, 1), func = f1st, R = R,  
+          posbound = c(0, 0, 1, 1), func = f1st, parms = S, eps = S,
           bound = g2, jacfunc = df1st, jacbound = dg2)
 
 plot(sol)
@@ -499,14 +600,14 @@ plot(sol)
 ## =============================================================================
 
 # derivative function: one fourth-order derivative
-f4th <- function(x, y, parms, R) {
-  list(R * (y[2]*y[3] - y[1]*y[4]))
+f4th <- function(x, y, S) {
+  list(1/S * (y[2]*y[3] - y[1]*y[4]))
 }
 
 # jacobian of derivative function
-df4th <- function(x, y, parms, R)  {
+df4th <- function(x, y, S)  {
   matrix(nrow = 1, ncol = 4, byrow = TRUE, data = c(
-             -1*R*y[4], R*y[3], R*y[2], -R*y[1]))
+             -1*y[4]/S, y[3]/S, y[2]/S, -y[1]/S))
 }
 
 # boundary function - same as previous example
@@ -515,26 +616,30 @@ df4th <- function(x, y, parms, R)  {
 
 # order = 4 specifies the equation to be 4th order
 # solve with bspline false
-R    <- 100
-sol  <- bvpcol(x = seq(0, 1, by = 0.01),
+S    <- 1/100
+sol  <- bvpcol (x = seq(0, 1, by = 0.01),
           ynames = c("y", "dy", "d2y", "d3y"),
-          posbound = c(0, 0, 1, 1), func = f4th, R = R, order = 4, 
-          bound = g2, jacfunc = df4th, jacbound = dg2)
+          posbound = c(0, 0, 1, 1), func = f4th, order = 4,
+          parms = S, eps = S, bound = g2, jacfunc = df4th,
+          jacbound = dg2 )
 
 plot(sol)
 
-# Use continuation to find solution of a more difficult example
+# Use (manual) continuation to find solution of a more difficult example
 # Previous solution collocation from sol passed ("guess = sol")
 
-sol2  <- bvpcol(x = seq(0,1,by=0.01), ynames = c("y","dy","d2y","d3y"),
-          posbound = c(0, 0, 1, 1), func = f4th, R = 10000, order = 4, 
-          bound = g2, jacfunc = df4th, jacbound = dg2, yguess = sol)
+sol2  <- bvpcol(x = seq(0, 1, by = 0.01),
+          ynames = c("y", "dy", "d2y", "d3y"),
+          posbound = c(0, 0, 1, 1), func = f4th,
+          parms = 1e-6, order = 4, eps = 1e-6,
+          bound = g2, jacfunc = df4th, jacbound = dg2 )
 
 # plot both at same time
 plot(sol, sol2, lwd = 2)
 
-legend("bottomright", leg = c(100,10000), title = "R = ", 
-  col = 1:2, lty = 1:2, lwd = 2)
+legend("bottomright", leg = c(100, 10000), title = "R = ",
+         col = 1:2, lty = 1:2, lwd = 2)
+
 
 ## =============================================================================
 ## Example 4  - a multipoint bvp

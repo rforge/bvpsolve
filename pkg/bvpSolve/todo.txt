@@ -3,4 +3,12 @@ changed from version 1.2
 - removed "guess" as input parameter for bvptwp - added "ynames" instead.
 
 version 1.2.1
-- added fortran code colsys; triggered by setting argument "bspline"=TRUE
+- added fortran code colsys; triggered from bvpcol by setting argument "bspline"=TRUE
+- added fortran codes colmod; triggered from bvpcol by arguments eps and epsini
+- added fortran codes acdc; triggered from bvptwp by arguments eps and epsini
+
+
+todo:
+- forcings in colmod/acdc
+- compiled code in colmod/acdc
+- bvptwpL...
