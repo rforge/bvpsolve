@@ -376,8 +376,12 @@ C....         = -3  If There Is An Input Data Error.
 	}
   else
 	{
-   if (iflag == -4)
-	  warning("The maximum number of continuation steps has been reached and the model did not yet converge - returning the last values \n");
+    if (iflag == 2) {
+ 	    Rprintf("The Problem was **not** solved for the requested eps value\n");
+      Rprintf("Results are for eps equal to %g.\n", epsmin);
+	  }
+    if (iflag == -4)
+	   warning("The maximum number of continuation steps has been reached and the model did not yet converge - returning the last values \n");
 
     nx = LENGTH(Xout);
     z  =(double *) R_alloc(mstar, sizeof(double));

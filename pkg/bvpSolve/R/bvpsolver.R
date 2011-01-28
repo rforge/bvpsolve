@@ -718,6 +718,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             ModelInit, initpar,
             flist, type = as.integer(0), rho, PACKAGE="bvpSolve")
 
+  EPS <- attributes(out)$eps
   nn <- attr(out,"istate")
   rn <- attr(out,"rstate")
   mesh <- nn[9]
@@ -761,6 +762,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   names(rn) <- c("kappa1","gamma1","sigma","kappa","kappa2")
   attr(out,"rstate") <- rn
   attr(out,"name") <- "bvptwp"
+  attr(out,"eps")     <- EPS
   out
 
 ## =============================================

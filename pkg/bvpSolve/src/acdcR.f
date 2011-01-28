@@ -1725,7 +1725,7 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
 ***bugfix 2jul01
       Save Nvold
       LOGICAL use_c, comp_c
-      LOGICAL stiff_cond	,stab_cond,  ill_cond_newt
+      LOGICAL stiff_cond  ,stab_cond,  ill_cond_newt
 
       Common/acAlgprs/ Nminit, Iprint,Maxcon,Itsaim,Uval0,use_c,comp_c
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
@@ -5428,14 +5428,14 @@ c         r4(i) = r4(i)+(xx(i+1)-xx(i))*(r2/(xx(nmsh)-xx(1)))*cfac
        fatt_r3  = r3*1.0d-3
        fatt_r1r3= max(r3,0.25d0)
         nptm = 0
-	    nptr = 0
+          nptr = 0
 
          r1m = one
 
         do i=1,nmsh-1
-	    if (r4(i) .ge. fatt_r1r3)  nptm = nptm + 1
-	    if (r4(i) .le. fatt_r3)  nptr = nptr + 1
-	    enddo
+          if (r4(i) .ge. fatt_r1r3)  nptm = nptm + 1
+          if (r4(i) .le. fatt_r3)  nptr = nptr + 1
+          enddo
 
 
       if (nptm .LE. 1) then

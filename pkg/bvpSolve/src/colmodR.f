@@ -718,27 +718,27 @@ C.... Print The Input Data For Checking.
       If ( Nonlin .gt. 0 )                          Go To 60
 
       Write (msg,1000) Ncomp, (M(Ip), Ip = 1,Ncomp)
-	  call rprint(msg)
+        call rprint(msg)
       Go To 70
    60 Write (msg,1001) Ncomp, (M(Ip), Ip = 1,Ncomp)
-	  call rprint(msg)
+        call rprint(msg)
 
    70 Write (msg,1002) (Zeta(Ip), Ip = 1,Mstar)
-	  call rprint(msg)
+        call rprint(msg)
 
       If ( Nfxpnt .gt. 0 ) THEN
         Write (msg,1003) Nfxpnt, (Fixpnt(Ip), Ip = 1,Nfxpnt)
-  	  call rprint(msg)
+        call rprint(msg)
       endif
       Write (msg,1004) K
-	  call rprint(msg)
+        call rprint(msg)
       Write (msg,1005) (Ltol(Ip), Ip = 1,Ntol)
-	  call rprint(msg)
+        call rprint(msg)
       Write (msg,1006) (Tol(Ip), Ip = 1,Ntol)
-	  call rprint(msg)
+        call rprint(msg)
       If (Iguess .ge. 2) then
-	  Write (msg,1007)
-	  call rprint(msg)
+        Write (msg,1007)
+        call rprint(msg)
       endif
       Write (msg,1008) Eps, Epsmin
    80 Continue
@@ -798,15 +798,15 @@ C.... Ispace  And  Fspace.
       Nmaxf = (Ndimf - Nfixf) / Nsizef
       Nmaxi = (Ndimi - Nfixi) / Nsizei
       If ( Iprint .lt. 0 ) then
-	   Write(msg,1009) Nmaxf, Nmaxi
- 	   call rprint(msg)
+         Write(msg,1009) Nmaxf, Nmaxi
+         call rprint(msg)
       Endif
       Nmax = Min( Nmaxf, Nmaxi )
       If ( Nmax .lt. N )                            Return
       If ( Nmax .lt. Nfxpnt+1 )                     Return
       If (Nmax .lt. 2*Nfxpnt+2 .and. Iprint .lt. 1)  Then
-	  Write(msg,1010)
-	  call rprint(msg)
+        Write(msg,1010)
+        call rprint(msg)
       Endif
 
 C.... Generate Pointers To Break Up Fspace And Ispace.
@@ -1037,8 +1037,8 @@ C.... Increase The Continuation Step Counter Ncs.
 
       Ncs = Ncs+1
       If (Iprint .lt. 1) Then
-	  Write(msg,1011) Ncs, Eps
-	  call rprint(msg)
+        Write(msg,1011) Ncs, Eps
+        call rprint(msg)
       Endif 
       Iflag = 1
 
@@ -1047,8 +1047,8 @@ C.... Then This Will Be The Last Problem We Attempt.
 
       If (Ncs .eq. Maxcon) Then
          If (Iprint .lt. 1) Then
-	     Write(Msg,1012) Maxcon
-	     call rprint(msg)
+           Write(Msg,1012) Maxcon
+           call rprint(msg)
          Endif 
          Iback = 1
          Ifinal = 1
@@ -1083,8 +1083,8 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
 
          If (Ifinal .eq. 1) Then
             If (Iprint .lt. 1) Then
-		    Write(msg,1013) Eps
-	        call rprint(msg)
+              Write(msg,1013) Eps
+              call rprint(msg)
             Endif
             if (eps_changed) iflag = 2
 c F            If (Eps .gt. (1.00001d0*Epsmin)) iflag = -6
@@ -1124,8 +1124,8 @@ C.... The User Is Warned Of This Possibility.
 
          If (Iprec .eq. 0 .and. Phit .gt. Phimax) Then
             If (Iprint .lt. 1) Then
-		    Write(msg,1014) Eps
-		    call rprint(msg)
+              Write(msg,1014) Eps
+              call rprint(msg)
             Endif
             Epsp = Eps
             Iprec = 1
@@ -1280,13 +1280,16 @@ C.... Reached Our Final Problem
          If (Dele .lt. 0.01d0*E(3) .or. (N .gt. (Nmax/2))) Then
             Ep = E(3)
             Epsmin = One/Ep
+C KARLINE: added...
+	      eps_changed = .true.
+
             If (Iprint .lt. 1) Then
                If (Dele .lt. 0.01d0*E(3)) Then
                   Write(msg,1015) Epsmin
-	            call rprint(msg)
+                  call rprint(msg)
                Else
                   Write(msg,1016) Epsmin
-	            call rprint(msg)
+                  call rprint(msg)
                Endif
             Endif
             Emin = Ep
@@ -1435,15 +1438,15 @@ C.... If Iback = 1 Then The Final Problem Has Not Been Solved.
 C.... In This Case We Stop.
 
          If (Iback .eq. 1) Then
-            If (Iprint .lt. 1) Then
+C            If (Iprint .lt. 1) Then   ! karline: toggled this off
                If (Epsp .ne. Zero) Then
                   Write(msg,1017) Eps,Iflag,Eps,Epsp
-		        call rprint(msg)
+                  call rprint(msg)
                Else
                   Write(msg,1018) Eps,Iflag,Eps
-	            call rprint(msg)
+                  call rprint(msg)
                Endif
-            Endif
+C            Endif
             if (ncs .eq. Maxcon) iflag = -4
             Goto 340
          Endif
@@ -1460,8 +1463,8 @@ C.... Tolerances. We Alter Epsmin Accordingly.
 C.... Insert Details For Backtracking
 
          If (Iprint .lt. 1) Then 
-	     Write(msg,1019)
-  	     call rprint(msg)
+           Write(msg,1019)
+           call rprint(msg)
          Endif
          Ifinal = 0
          N = Nbk1
@@ -1471,8 +1474,8 @@ C.... Insert Details For Backtracking
             Ep = E(3)
             Epsmin = One/Ep
             If (Iprint .lt. 1) Then
-		    Write(msg,1015) Epsmin
-	        call rprint(msg)
+              Write(msg,1015) Epsmin
+              call rprint(msg)
             Endif
             Emin = Ep
             Iback = 1
@@ -1572,21 +1575,21 @@ C.... *****************************************************************
 
       If (Iflag .eq. 1 .and. Iprint .eq. 0) Then
 C         Write(msg,1020) ('Z',Ltol(J), J=1,Ntol)
-C		call rprint(msg)
+C         call rprint(msg)
          Jstep = Max(N/30,1)
          Iadd = Jstep*Mstar
          Ind = N + 1
          Do 390 I = 1, N, Jstep
 C            Write(msg,1021) I,Fspace(I),(Fspace(Ind+Ltol(J)),J=1,Ntol)
-C  	      call rprint(msg)
+C           call rprint(msg)
             Ind = Ind + Iadd
  390     Continue
          Ind = N+1 + Nz - Mstar
 C         Write(msg,1021) N+1,Fspace(N+1),(Fspace(Ind+Ltol(J)),J=1,Ntol)
-C 	   call rprint(msg)
+C        call rprint(msg)
 
 C         Write(msg,1022)
-C 	   call rprint(msg)
+C        call rprint(msg)
       Endif
 
       icount(1) = nfunc
@@ -1767,12 +1770,12 @@ C
  30   If ( Msing .lt. 0 )                      Go To 40
       If ( Iprint .lt. 1 ) Then
       Write (msg,1000)
- 	  call rprint(msg)
+        call rprint(msg)
       Endif
       Go To 460
  40   If ( Iprint .lt. 1 )  Then
         Write (msg,1001)
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       Iflag = 0
       Return
@@ -1801,12 +1804,12 @@ C
      +     MFsub, MDfsub, MGsub, MDgsub, MGuess, Eps, Rpar, Ipar )
 C
       If ( Iprint .lt. 0 )  Then
-	  Write(msg,1002)
-	  call rprint(msg)
+        Write(msg,1002)
+        call rprint(msg)
       Endif
       If ( Iprint .lt. 0 )  Then
-	  Write (msg,1003) Iter, Rnold
-	  call rprint(msg)
+        Write (msg,1003) Iter, Rnold
+        call rprint(msg)
       Endif
       Go To 70
 C
@@ -1816,7 +1819,7 @@ C.... Newton Step ( = 0) Or A Fixed Jacobian Iteration ( = 1).
 C
  60   If ( Iprint .lt. 0 )  Then
         Write (msg,1003) Iter, Rnorm
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       Rnold = Rnorm
       Call MLsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
@@ -1876,12 +1879,12 @@ C
 C.... Convergence Obtained
 C
       If ( Iprint .eq. -1 ) Then 
-	  Write (msg,1004) Iter
-	  call rprint(msg)
+        Write (msg,1004) Iter
+        call rprint(msg)
       Endif
       If ( Iprint .eq. 0 )  Then 
-	  Write (msg,1016) Iter
-	  call rprint(msg)
+        Write (msg,1016) Iter
+        call rprint(msg)
       Endif
       If (Iatt .eq. -1) Nits = Iter
       Go To 400
@@ -1890,11 +1893,11 @@ C.... Convergence Of Fixed Jacobian Iteration Failed.
 C
  130  If ( Iprint .lt. 0 ) Then 
         Write (msg,1003) Iter, Rnorm
-	  call rprint(msg)
+        call rprint(msg)
       Endif 
       If ( Iprint .lt. 0 ) Then 
-	  Write (msg,1005)
-	  call rprint(msg)
+        Write (msg,1005)
+        call rprint(msg)
       Endif 
       Iconv = 0
       Relax = Rstart
@@ -1921,7 +1924,7 @@ C.... Evaluate Rhs And Find The First Newton Correction.
 C
  160  If(Iprint .lt. 0)  Then
         Write (msg,1006)
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       Call MLsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dqdmz, Integs, Ipvtg, Ipvtw, Rnold, 1,
@@ -2020,15 +2023,15 @@ C
       Anfix = Sqrt(Anfix / Dfloat(Nz+Ndmz))
       If ( Icor .eq. 1 )                         Go To 280
       If (Iprint .lt. 0)  Then
-	  Write (msg,1007) Iter, Relax, Anorm,
+        Write (msg,1007) Iter, Relax, Anorm,
      +     Anfix, Rnold, Rnorm
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       Go To 290
  280  If (Iprint .lt. 0) Then
         Write (msg,1008) Relax, Anorm, Anfix,
      +     Rnold, Rnorm
-	  call rprint(msg)
+        call rprint(msg)
       Endif
  290  Icor = 0
 C
@@ -2086,12 +2089,12 @@ C
 C.... Convergence Obtained
 C
       If ( Iprint .eq. -1 )  Then
-	  Write (msg,1004) Iter
-	  call rprint(msg)
+        Write (msg,1004) Iter
+        call rprint(msg)
       Endif
       If ( Iprint .eq. 0 ) Then
-	  Write (msg,1016) Iter
-	  call rprint(msg)
+        Write (msg,1016) Iter
+        call rprint(msg)
       Endif
       If (Iatt .eq. -1) Nits = Iter
 C
@@ -2107,12 +2110,12 @@ C
  390  If (Anfix .lt. Precis .or. Rnorm .lt. Precis) Then
          If (Iatt .eq. -1) Nits = Iter
          If ( Iprint .eq. -1 )  Then
-	     Write (msg,1004) Iter
-	     call rprint(msg)
+           Write (msg,1004) Iter
+           call rprint(msg)
          Endif
          If ( Iprint .eq. 0 ) Then
-	     Write (msg,1016) Iter
-	     call rprint(msg)
+           Write (msg,1016) Iter
+           call rprint(msg)
          Endif 
       Endif
 
@@ -2124,9 +2127,9 @@ C
  400  If ( Iprint .ge. 0 )                     Go To 420
       Do 410 J = 1, Mstar
          Write(msg,1009) J
-	   call rprint(msg)
+         call rprint(msg)
          Write(msg,1010) (Z(Lj), Lj = J, Nz, Mstar)
- 	   call rprint(msg)
+         call rprint(msg)
  410  Continue
 
 C.... Check For Error Tolerance Satisfaction
@@ -2142,12 +2145,12 @@ C.... Diagnostics For Failure Of Nonlinear Iteration.
 C
  430  If ( Iprint .lt. 1 ) Then
         Write (msg,1011) Iter
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       Go To 450
  440  If( Iprint .lt. 1 ) Then
         Write(msg,1012) Relax, Relmin
-   	  call rprint(msg)
+        call rprint(msg)
       Endif
  450  Iflag = -2
       Return
@@ -2184,8 +2187,8 @@ C.... Pick A New Mesh
      +           Slope, Accum, Nfxpnt, Fixpnt, Slpold, Nvold, Voldmsh)
             If (Iprec .eq. 2) Then
                If (Iprint .lt. 1) Then
-			   Write(msg,1013)
-	           call rprint(msg)
+                 Write(msg,1013)
+                 call rprint(msg)
                Endif
                Iflag = -1
             Else
@@ -2199,8 +2202,8 @@ C.... Pick A New Mesh
      +     Slope, Accum, Nfxpnt, Fixpnt, Slpold, Nvold, Voldmsh)
       If (Iprec .eq. 2) Then
          If (Iprint .lt. 1) Then 
-	     Write(msg,1013)
-	     call rprint(msg)
+           Write(msg,1013)
+           call rprint(msg)
          Endif
          Iflag = -1
          Return
@@ -2215,12 +2218,12 @@ C.... Exit If Expected N Is Too Large (But May Try N = Nmax Once)
       N = N / 2
       Iflag = -1
       If ( Iconv .eq. 0 .and. Iprint .lt. 1 ) Then
-	  Write (msg,1014)
-	  call rprint(msg)
+        Write (msg,1014)
+        call rprint(msg)
       Endif
       If ( Iconv .eq. 1 .and. Iprint .lt. 1 ) Then
-	  Write (msg,1015)
-	  call rprint(msg)
+        Write (msg,1015)
+        call rprint(msg)
       Endif
       Return
  480  If ( Iconv .eq. 0 )  Imesh = 1
@@ -2405,8 +2408,8 @@ C.... Iguess = 2, 3 Or 4.
 C
       Noldp1 = Nold + 1
 C      If (Iprint .lt. 0)  Then
-C	  Write(msg,1000) Nold,(Xiold(I), I = 1,Noldp1)
-C	  call rprint(msg)
+C       Write(msg,1000) Nold,(Xiold(I), I = 1,Noldp1)
+C       call rprint(msg)
 C      Endif
       If ( Iguess .ne. 3 )                          Go To 40
 C
@@ -2480,7 +2483,7 @@ C
       Go To 220
   110 If ( Iprint .lt. 1 ) Then
         Write(msg,1001)
-	  call rprint(msg)
+        call rprint(msg)
       Endif
       N = N2
       Return
@@ -2708,8 +2711,8 @@ C.... Naccum = Expected N To Achieve .1x User Requested Tolerances
 C
       Naccum = Int(Accum(Nold+1) + 1.d0)
       If ( Iprint .lt. 0 ) Then
-	  Write(msg,1002) Degequ, Naccum
-	  call rprint(msg)
+        Write(msg,1002) Degequ, Naccum
+        call rprint(msg)
       Endif
 C
 C.... This Assures That Halving Will Be Possible Later (For Error Est)
@@ -2722,8 +2725,8 @@ C.... We Do Not Violate The Maximum Mesh Size.
 C
       If (Ifinal .eq. 1 .and. Iatt .eq. 0) Then
          If ( Iprint .lt. 1 ) Then
-	     Write(msg,1007)
-	     call rprint(msg)
+           Write(msg,1007)
+           call rprint(msg)
          Endif
          N = Min(Nmax2-10,Naccum/2)
       Else
@@ -2909,21 +2912,21 @@ C
       Np1 = N + 1
       If (Mode .le. 2) Then
 C         If ( Iprint .eq. -1 ) Then
-C	     Write(msg,1003) N, (Xi(I),I = 1,Np1)
-C	     call rprint(msg)
+C          Write(msg,1003) N, (Xi(I),I = 1,Np1)
+C          call rprint(msg)
 C         Endif
          If ( Iprint .eq. 0 ) Then
-	     Write(msg,1004) N
-	     call rprint(msg)
+           Write(msg,1004) N
+           call rprint(msg)
          Endif
       Else
 C         If ( Iprint .eq. -1 ) Then
-C	      Write(msg,1005) N, (Xi(I),I = 1,Np1)
-C	      call rprint(msg)
+C           Write(msg,1005) N, (Xi(I),I = 1,Np1)
+C           call rprint(msg)
 C         Endif
          If ( Iprint .eq. 0 )  Then
-	     Write(msg,1006) N
-	     call rprint(msg)
+           Write(msg,1006) N
+           call rprint(msg)
          Endif
       Endif
 
@@ -3198,13 +3201,13 @@ C
       If ( Iprint .gt. 0 )                          Return
       If ( Ifin .eq. 0 .and. Iprint .eq. 0) Return
       Write(msg,1000)
-	call rprint(msg)
+      call rprint(msg)
 
       Lj = 1
       Do 70 J = 1,Ncomp
            Mj = Lj - 1 + M(J)
            Write(msg,1001) J, (Errest(L), L =  Lj, Mj)
-	     call rprint(msg)
+           call rprint(msg)
            Lj = Mj + 1
    70 Continue
       Return
@@ -3495,7 +3498,7 @@ C....     Build A Row Of  A  Corresponding To A Boundary Point
 C
  260       Izm = Izeta+Mstar
            Call MGderiv (G(Ig), Nrow, Izm, Zval, Dgz, 2, MDgsub, 
-     +		 Eps, Rpar, Ipar)
+     +         Eps, Rpar, Ipar)
  270       Izeta = Izeta + 1
            Go To 240
 C
@@ -3602,7 +3605,7 @@ C
       Return
       End
       Subroutine MGderiv ( Gi, Nrow, Irow, Zval, Dgz, Mode, MDgsub, 
-     +	Eps, Rpar, Ipar)
+     +    Eps, Rpar, Ipar)
 C
 C**********************************************************************
 C
@@ -3990,8 +3993,8 @@ C
       If ( X .ge. Xi(1)-Precis .and. X .le. Xi(N+1)+Precis )
      +                                              Go To 40
       If (Iprint .lt. 1) Then
-	  Write(msg,1000) X, Xi(1), Xi(N+1)
-	  call rprint(msg)
+        Write(msg,1000) X, Xi(1), Xi(N+1)
+        call rprint(msg)
       Endif
       If ( X .lt. Xi(1) )  X = Xi(1)
       If ( X .gt. Xi(N+1) )  X = Xi(N+1)
