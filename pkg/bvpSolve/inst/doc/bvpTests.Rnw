@@ -1206,15 +1206,13 @@ Function \code{bvpshoot} cannot solve this problem for small $\xi$
 Function \code{bvptwp} can solve it for small $\xi$ if initiated with good
 initial guesses:
 <<>>=
-xi <- 0.01
+xi <- 0.02
 mod2 <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
                 order = 2, func = Prob24, xi = xi, 
                 xguess = mod2[,1], yguess = t(mod2[,2:3]))
-@
-<<>>=
-xi <- 0.005
+xi <- 0.01
 mod3 <- bvptwp(yini = ini, yend = end, x = seq(0, 1, by = 0.01),
-                order = 2, func = Prob24, xi = xi, 
+                order = 2, func = Prob24, xi = xi,
                 xguess = mod2[,1], yguess = t(mod2[,2:3]))
 @
 <<label=prob24,include=FALSE>>=

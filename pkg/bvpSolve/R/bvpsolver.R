@@ -7,7 +7,7 @@
 bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL, 
      ynames=NULL, xguess=NULL, yguess=NULL, jacfunc=NULL, bound=NULL, 
      jacbound=NULL, leftbc=NULL, posbound=NULL, islin=FALSE, nmax=1000, 
-     ncomp=NULL, atol=1e-8, cond = FALSE, allpoints=TRUE, 
+     ncomp=NULL, atol=1e-8, cond = FALSE, lobatto = FALSE, allpoints=TRUE,
      dllname=NULL, initfunc=dllname, rpar = NULL, ipar = NULL, nout = 0,
      forcings=NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
      epsini = NULL, eps = epsini,  ...)   {
@@ -20,7 +20,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      islin, nmax, ncomp, atol, 
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     cond, allpoints, colp = NULL, fullOut = TRUE,
+     cond, lobatto, allpoints, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = NULL, epsini = NULL, ... )
   else {
     if (parms[1] != eps)
@@ -32,7 +32,7 @@ bvptwp<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      posbound, islin, nmax, ncomp, atol,
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     cond, allpoints, colp = NULL, fullOut = TRUE,
+     cond, lobatto = FALSE, allpoints, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = eps, epsini = epsini,  ... )
   }
 }
@@ -58,7 +58,7 @@ bvpcol<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      islin, nmax, ncomp, atol, 
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     cond = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
+     cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
      bspline = bspline, eps = NULL, epsini = NULL,... )
   else  {
     if (parms[1] != eps)
@@ -71,7 +71,7 @@ bvpcol<- function(yini=NULL, x, func, yend=NULL, parms=NULL, order = NULL,
      islin, nmax, ncomp, atol,
      dllname, initfunc, rpar, ipar, nout,
      forcings, initforc, fcontrol, verbose,
-     cond = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
+     cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
      bspline = bspline, eps = eps, epsini = epsini, ... )
   }
 }
@@ -91,7 +91,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
      islin = FALSE, nmax = 1000, ncomp = NULL, atol = 1e-8,
      dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
      forcings = NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
-     cond = FALSE, allpoints = TRUE, colp = NULL, fullOut = TRUE,
+     cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = NULL, epsini = NULL, ...)   {
 
   rho <- environment(func)
@@ -694,7 +694,6 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
      stop (" eps must be smaller of equal to epsini")
   }
 
-
  if (type == 1)
   out <- .Call("call_bvptwp",as.integer(mstar), as.double(fixpt),
             as.double(aleft),as.double(aright),as.integer(leftbc),
@@ -704,7 +703,8 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             as.double(Xguess), as.double(Yguess),
             as.double(Rpar), as.integer(Ipar), as.integer(cond),
             Func, JacFunc, Bound, JacBound, ModelInit, initpar,
-            flist, type = as.integer(1), rho, PACKAGE="bvpSolve")
+            flist, as.integer(lobatto), type = as.integer(1),
+            rho, PACKAGE="bvpSolve")
  else
   out <- .Call("call_acdc", as.integer(mstar), as.double(fixpt),
             as.double(aleft), as.double(aright), as.integer(leftbc),

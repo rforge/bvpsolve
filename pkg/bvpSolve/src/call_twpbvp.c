@@ -2,8 +2,8 @@
 #include <string.h>
 #include "bvpSolve.h"
 
-/* definition of the calls to the fortran functions - in file twpbvpc.f
-*/
+/* definition of the calls to the fortran functions - in files twpbvpc.f,
+twpbvplc.f, twpbvpa.f */
 
 void F77_NAME(twpbvpc)(int*, int*, double *, double *,
        int *, double *, int *, int *, double *,
@@ -16,7 +16,20 @@ void F77_NAME(twpbvpc)(int*, int*, double *, double *,
 		   void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
        double *, double *, double *, double *, double *, 
        double *, int *, int *, int *, int *, int *, int *, int *,
-       double *, double *, int*);
+       int *, double *, int *, double *, int*);
+
+void F77_NAME(twpbvplc)(int*, int*, double *, double *,
+       int *, double *, int *, int *, double *,
+       int *, int *, int *, int *, int *,
+       double *, int *, double *, int *,
+       int *, double *, int*, int*, double *,
+       void (*)(int *, double *, double *, double *, double *, int *), /* fsub(n,x,u,f,rp,ip)   */
+		   void (*)(int *, double *, double *, double *, double *, int *), /* dfsub(n,x,u,df,rp,ip) */
+		   void (*)(int *, int *, double *, double *, double *, int *),    /* gsub(i,n,u,g,rp,ip)   */
+		   void (*)(int *, int *, double *, double *, double *, int *),    /* dgsub(i,n,u,dg,rp,ip) */
+       double *, double *, double *, double *, double *,
+       double *, int *, int *, int *, int *, int *, int *, int *,
+       int *, double *, int *, double *, int*);
 
 /* wrapper above the derivate function that first estimates the
 values of the forcing functions - when model in compiled code */
@@ -107,7 +120,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     SEXP Rpar, SEXP Ipar, SEXP UseC, 
     SEXP derivfunc, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP Initfunc, SEXP Parms, SEXP flist, 
-    SEXP Type, SEXP rho)
+    SEXP Lobatto, SEXP Type, SEXP rho)
 
 {
 /******************************************************************************/
@@ -122,7 +135,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   double aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2; 
   int  liseries, *iseries, indnms, nxdim, type;
   int *ltol, *iwrk, *iset, ntol, iflag, nfixpnt, linear, givmesh, 
-      givu, nmesh, isDll;
+      givu, nmesh, isDll, nugdim, nmshguess, lobatto;
   int full, useC;
   
   /* pointers to functions passed to FORTRAN */
@@ -141,8 +154,9 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   aleft  =REAL(Aleft)[0];
   aright =REAL(Aright)[0];
 
-  ncomp  = INTEGER(Ncomp)[0];    /* number of equations */
-  type   = INTEGER(Type)[0];     /* 1 = bvptwp */
+  ncomp   = INTEGER(Ncomp)[0];    /* number of equations */
+  type    = INTEGER(Type)[0];     /* 1 = bvptwp */
+  lobatto = INTEGER(Lobatto)[0];  /* 0 = bvptwp , 1 = bvptwpl*/
 
   nlbc   = INTEGER(Nlbc)[0];     /* number of left boundary conditions */
   nmax   = INTEGER(Nmax)[0];     /* max number of mesh points */
@@ -268,14 +282,27 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 */
   liseries = nmax;
   iseries = (int *)    R_alloc(liseries, sizeof(int));
-    
+  nugdim = ncomp;
+  nmshguess = nmesh;
+
+  if (lobatto == 1)
+	F77_CALL(twpbvplc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
+        &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, &nxdim, xx,
+        &ncomp, u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
+        deriv_func, jac_func, bound_func, jacbound_func,
+        &ckappa1, &gamma1, &sigma, &ckappa, &ckappa2,
+        rpar, ipar, &iflag, &liseries, iseries, &indnms,
+        &full, &useC, &nmshguess, xguess, &nugdim,
+        yguess, iset);
+  else
 	F77_CALL(twpbvpc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
         &ntol, ltol, tol, &linear, &givmesh, &givu, &nmesh, &nxdim, xx,
         &ncomp, u, &nmax, &lwrkfl, wrk, &lwrkin, iwrk, precis,
         deriv_func, jac_func, bound_func, jacbound_func, 
         &ckappa1, &gamma1, &sigma, &ckappa, &ckappa2, 
         rpar, ipar, &iflag, &liseries, iseries, &indnms, 
-        &full, &useC, xguess, yguess, iset);
+        &full, &useC, &nmshguess, xguess, &nugdim,
+        yguess, iset);
 
 /*  iflag - The Mode Of Return From twpbvp  */
 	if (iflag == 4)      {

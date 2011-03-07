@@ -14,8 +14,11 @@
 
   written by J.R. Cash, F. Mazzia and M.H. Wright.
 
+  Rather than MIRK, it is also possible to select a lobatto method. This
+  then uses the code 'twpbvplc', written  by Cash and Mazzia.
+
   It is possible to solve stiff systems, by using an automatic continuation
-  strategy. This then uses the code 'acdc'
+  strategy. This then uses the code 'acdc'.
 }
 
 \usage{
@@ -23,8 +26,8 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
        order = NULL, ynames = NULL, xguess = NULL, yguess = NULL, 
        jacfunc = NULL, bound = NULL, jacbound = NULL, 
        leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
-       ncomp = NULL, atol = 1e-8, cond = FALSE, allpoints = TRUE, 
-       dllname = NULL, initfunc = dllname, 
+       ncomp = NULL, atol = 1e-8, cond = FALSE, lobatto = FALSE,
+       allpoints = TRUE, dllname = NULL, initfunc = dllname,
        rpar = NULL, ipar = NULL, nout = 0, forcings = NULL, 
        initforc = NULL, fcontrol = NULL, verbose = FALSE,
         epsini = NULL, eps = epsini, ...)
@@ -198,6 +201,8 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
   \item{atol }{error tolerance, a scalar.
   }
   \item{cond }{if \code{TRUE}, uses conditioning in the mesh selection
+  }
+  \item{lobatto }{if \code{TRUE}, selects a lobatto method.
   }
   \item{allpoints }{sometimes the solver estimates the solution in a number
     of extra points, and by default the solutions at these extra points will
@@ -411,6 +416,11 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
   Cash, J. R. and F. Mazzia, A new mesh selection algorithm, based on 
    conditioning, for two-point boundary value codes. J. Comput. Appl. Math. 184  
    (2005), no. 2, 362--381.
+
+  Cash, J. R. and F. Mazzia, in press.
+      Hybrid Mesh Selection Algorithms Based on Conditioning for
+      Two-Point Boundary Value Problems, Journal of Numerical Analysis,
+     Industrial and Applied Mathematics.
 
   \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
