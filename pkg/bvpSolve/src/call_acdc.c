@@ -176,7 +176,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   double *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis, *xguess, *yguess;
   double epsmin, epsini, aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2;
   int liseries, *iseries, nxdim, type, *icount;
-  int *ltol, *iwrk, *iset, ntol, iflag, nfixpnt, linear, givmesh;
+  int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh;
   int full, useC, givu, giveps, nmesh, isDll, nugdim, nmshguess;
 
 /* pointers to functions passed to FORTRAN                                    */
@@ -261,9 +261,6 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   iwrk = (int *)   R_alloc(lwrkin, sizeof(int));
      for (j = 0; j < lwrkin; j++) iwrk[j] = 0;
-
-  iset = (int*)    R_alloc(6, sizeof(int));
-     for (j = 0; j < 6; j++) iset[j] = 0;
 
   precis = (double *) R_alloc(3,sizeof(double));
   precis[0] = DBL_MIN;
@@ -364,15 +361,14 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     for (j = 0; j < ncomp*nx; j++) REAL(yout)[nx+j] =  u[j];
   }
 
-  PROTECT(ISTATE = allocVector(INTSXP, 18)); incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, 13)); incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
-  for (j = 0; j < 6; j++)
-    INTEGER(ISTATE)[1+j] = iset[j];
-  INTEGER(ISTATE)[7] = nmax;
-  INTEGER(ISTATE)[8] = nmesh;
-  INTEGER(ISTATE)[9] = lwrkfl;
-  INTEGER(ISTATE)[10] = lwrkin;
-  for (j = 0; j < 6; j++) INTEGER(ISTATE)[11+1] = icount[j];
+  for (j = 0; j < 7; j++)
+    INTEGER(ISTATE)[1+j] = icount[j];
+  INTEGER(ISTATE)[9] = nmax;
+  INTEGER(ISTATE)[10] = nmesh;
+  INTEGER(ISTATE)[11] = lwrkfl;
+  INTEGER(ISTATE)[12] = lwrkin;
 
   setAttrib(yout, install("istate"), ISTATE);
 

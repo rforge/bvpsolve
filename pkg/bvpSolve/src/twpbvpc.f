@@ -140,7 +140,7 @@ c
 *  are computed)
 
       nminit = 11
-	iprint = -1
+      iprint = -1
 
 c initialise counters
       ureset = 0
@@ -388,9 +388,9 @@ c ksks: add precis as argument: machine precision...
 
       iset(1) = nfunc
       iset(2) = njac
-      iset(3) = nstep
-      iset(4) = nbound
-      iset(5) = njacbound
+      iset(3) = nbound
+      iset(4) = njacbound
+      iset(5) = nstep
       iset(6) = ureset
 
       return

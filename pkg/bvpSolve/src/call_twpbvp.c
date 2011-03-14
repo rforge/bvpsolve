@@ -326,14 +326,14 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     for (j = 0; j < ncomp*nx; j++) REAL(yout)[nx+j] =  u[j];
   }
  
-  PROTECT(ISTATE = allocVector(INTSXP, 11));incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, 13));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
   for (j = 0; j < 6; j++)
     INTEGER(ISTATE)[1+j] = iset[j];
-  INTEGER(ISTATE)[7] = nmax;
-  INTEGER(ISTATE)[8] = nmesh;
-  INTEGER(ISTATE)[9] = lwrkfl;
-  INTEGER(ISTATE)[10] = lwrkin;
+  INTEGER(ISTATE)[9] = nmax;
+  INTEGER(ISTATE)[10] = nmesh;
+  INTEGER(ISTATE)[11] = lwrkfl;
+  INTEGER(ISTATE)[12] = lwrkin;
     
   setAttrib(yout, install("istate"), ISTATE);
 

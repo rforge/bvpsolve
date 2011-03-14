@@ -2,7 +2,11 @@
 
 C.... *****************************************************************
 C November 2010. Bugs removed by Francesca Mazzia
+C
+C karline: changed the exit strategy if epsmin was changed - FRANCESCA CAN YOU CHECK?
+C
 C karline: to make this code compatible with R:
+C
 C 1. change all write statements into rprint statements and 
 C    clean up formats (no /h; toggle off excessive writes)
 C 3. changed interface to MFsub, Mgsub etc.. and added rpar, ipar
@@ -1281,7 +1285,8 @@ C.... Reached Our Final Problem
             Ep = E(3)
             Epsmin = One/Ep
 C KARLINE: added...
-	      eps_changed = .true.
+            eps_changed = .true.
+            iflag = 2
 
             If (Iprint .lt. 1) Then
                If (Dele .lt. 0.01d0*E(3)) Then
@@ -1294,7 +1299,19 @@ C KARLINE: added...
             Endif
             Emin = Ep
             Iback = 1
-            Goto 290
+C KARLINE: ADDED THAT - NOW DIRECTLY TO 340, NOT TO 290!
+               If (Epsp .ne. Zero) Then
+                  Write(msg,1017) Eps,Iflag,Eps,Epsp
+                  call rprint(msg)
+               Else
+                  Write(msg,1018) Eps,Iflag,Eps
+                  call rprint(msg)
+               Endif
+            if (ncs .eq. Maxcon) iflag = -4
+            Goto 340
+
+C            Goto 290
+C KARLINE: CHANGES TILL HERE
          Endif
 
 C.... The Following Section Of Code Calculates The Desired Value
@@ -1480,6 +1497,12 @@ C.... Insert Details For Backtracking
             Emin = Ep
             Iback = 1
             Iflag = 1
+C KARLINE: ADDED THE GOTO... and iflag changed and epschanged...
+            eps_changed = .true.
+            iflag = 2
+            GOTO 340
+C KARLINE: CHANGES TILL HERE         
+
          Endif
 
          If (Nss .eq. 1) Then
@@ -1628,16 +1651,16 @@ C-----------------------------------------------------------------------
      +        ' Epsilon = ',D9.4)
  1014 Format(' ** Machine Precision (Possibly) Not Sufficient For',
      +        ' Epsilon Less Than ',D9.4)
- 1015 Format (' Continuation Steps Too Small, Change Epsmin To ',D9.4)
- 1016 Format (' Storage Limit Being Approached, Change Epsmin To ',
+ 1015 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
+ 1016 Format (' Storage Limit Being Approached, Change Eps To ',
      +     D9.4)
  1017 Format (' Final Problem Epsilon = ',D10.4,
      +        ' Not Solved, Iflag =',I3, ' Try Running Problem Again',
-     +        ' With Epsmin Greater Than ',D9.4,' Machine Precision',
+     +        ' With Eps Greater Than ',D9.4,' Machine Precision',
      +        ' (Possibly) Not Sufficient For Eps Less Than ',D9.4)
  1018 Format (' Final Problem Epsilon = ',D10.4,
      +        ' Not Solved, Iflag =',I3,' Try Running Problem Again',
-     +        ' With Epsmin Greater Than ',D9.4)
+     +        ' With Eps Greater Than ',D9.4)
  1019 Format (' ** Failed Step - Bactracking For Larger Value ',
      +          'Of Epsilon')
  1020 Format(' The Final Mesh And Solution Components Are:',
@@ -3434,7 +3457,8 @@ C
 C....       Fill In  Rhs  Values (And Accumulate Its Norm).
 C
              Call MFsub (Xcol, Zval, F, Eps, Rpar, Ipar)
-             nfunc=nfunc*1
+C KARLINE: was *1 -> +1
+             nfunc=nfunc+1
              Do 195 Jj = 1, Ncomp
                Value = Dmz(Irhs) - F(Jj)
                Rhs(Irhs) = - Value

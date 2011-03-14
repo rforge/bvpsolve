@@ -3,7 +3,8 @@ c francesca: add precis as argument: machine precision...
 c changed acinitu, added in input more information about xguess,uguess
 c
 c ===================================================================================
-c karline: subroutines renamed by adding ac in front 
+c karline: some subroutines renamed by adding ac in front 
+C karline: changed the exit strategy if epsmin was changed - FRANCESCA CAN YOU CHECK?
 c ===================================================================================
 
 
@@ -113,7 +114,7 @@ c Francesca: added counters
       integer nfunc, njac, nstep, nbound, njacbound
       common /Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
 
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
       Parameter ( Zero = 0.0d+0, One = 1.0d+0, Two = 2.0d+0 )
       Parameter ( Three = 3.0d+0, Third = 1.0d+0/3.0d+0, Huge = 1.d+30 )
 
@@ -608,16 +609,9 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
                call rprint(msg)
             Endif
 
-            icount(1) = nfunc
-            icount(2) = njac
-            icount(5) = nstep
-            icount(3) = nbound
-            icount(4) = njacbound
-            icount(6) = nc
-            icount(7) = nss
-            icount(8) = maxmesh
             if (eps_changed) iflbvp = -1
-            Return
+C KARLINE: CHANGED
+            GOTO 100
          Endif
 
 C.... When Bactracking The Program Should Find A Problem That It Can
@@ -812,7 +806,9 @@ C.... Reached Our Final Problem
             Emin = Ep
             Iback = 1
             eps_changed=.true.
-            Goto 70
+C KARLINE: ADDED THAT - NOW GOTO 100, NOT TO 70 which crashes R!
+C            Goto 70
+            GOTO 100 
          Endif
 
 C.... The Following Section Of Code Calculates The Desired Value
@@ -963,8 +959,8 @@ C.... We Are Backtracking.
 C.... If Iback = 1 Then The Final Problem Has Not Been Solved.
 C.... In This Case We Stop.
 
-         If (Iback .eq. 1) Then
-            If (Iprint .ge. 0) Then
+         If (Iback .eq. 1) Then 
+C            If (Iprint .ge. 0) Then          Karline: toggled this off
                If (Epsp .ne. Zero) Then
                   Write(msg,1014) Eps,Iflbvp,Eps,Epsp
                   call rprint(msg)
@@ -972,17 +968,10 @@ C.... In This Case We Stop.
                   Write(msg,1015) Eps,Iflbvp,Eps
                   call rprint(msg)
                Endif
-            Endif
-            icount(1) = nfunc
-            icount(2) = njac
-            icount(5) = nstep
-            icount(3) = nbound
-            icount(4) = njacbound
-            icount(6) = nc
-            icount(7) = nss
-            icount(8) = maxmesh
+C            Endif
             if (nc .eq. Maxcon) Iflbvp=2
-            Return
+C KARLINE CHANGED THAT
+            GOTO 100 
          Endif
 
 C.... If Iprec = 2, Then We Know That We Cannot Define A Mesh On
@@ -1012,6 +1001,11 @@ C.... Insert Details For Backtracking
             Emin = Ep
             Iback = 1
             Iflbvp = 0
+C KARLINE: ADDED THE GOTO... and iflag changed and epschanged...
+            eps_changed = .true.
+            Iflbvp = -1
+            GOTO 100
+C KARLINE: CHANGES TILL HERE         
          Endif
 
          If (Nss .eq. 1) Then
@@ -1073,6 +1067,18 @@ C.... *****************************************************************
 
       Goto 50
 
+C KARLINE: ADDED THAT...
+100   CONTINUE
+      icount(1) = nfunc
+      icount(2) = njac
+      icount(3) = nbound
+      icount(4) = njacbound
+      icount(5) = nstep
+      icount(6) = nc
+      icount(7) = nss
+      icount(8) = maxmesh
+      Return
+
 C-----------------------------------------------------------------------
  1000 Format(' The Number Of (Linear) Differential Equations Is ',I3)
  1001 Format(' The Number Of (Nonlinear) Differential Equations Is ',
@@ -1098,19 +1104,19 @@ C-----------------------------------------------------------------------
      +        ' Epsilon Less Than ',D9.4)
  1014 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
      +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
-     +      ' With Epsmin Greater Than ',D9.4,' ', ' Machine Precision',
+     +      ' With Eps Greater Than ',D9.4,' ', ' Machine Precision',
      +      ' (Possibly) Not Sufficient For Eps Less Than ',D9.4)
  1015 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
      +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
-     +        ' With Epsmin Greater Than ',D9.4)
+     +        ' With Eps Greater Than ',D9.4)
  1016 Format (' ** Failed Step - Bactracking For Larger Value ',
      +          'Of Epsilon')
  1018 Format(' The Final Mesh And Solution Components Are:',' ',
      +       5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
  1019 Format(I6,41d19.8)
  1020 Format(1x,72('$'))
- 1021 Format (' Continuation Steps Too Small, Change Epsmin To ',D9.4)
- 1022 Format (' Storage Limit Being Approached, Change Epsmin To ',
+ 1021 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
+ 1022 Format (' Storage Limit Being Approached, Change Eps To ',
      +     D9.4)
 C-----------------------------------------------------------------------
       End
@@ -1201,7 +1207,7 @@ C.... This Subroutine Is Used For Saving And Re-Inserting Solutions.
 
       logical stab_kappa, stab_gamma, stab_cond, stiff_cond, ill_cond
       logical stab_kappa1, ill_cond_newt, stab_sigma, comparekappa
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
 
       Intrinsic Max
 
@@ -1729,7 +1735,7 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
 
       Common/acAlgprs/ Nminit, Iprint,Maxcon,Itsaim,Uval0,use_c,comp_c
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
       Intrinsic Max
 
       Logical Errok
@@ -1868,7 +1874,7 @@ c              Call Initu(Ncomp, Nmsh, Nudim, U)
       Common /acAlgprs/ Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
 c       St1 --> Tmp(ncomp,10)
 c       St2 --> Tmp(ncomp,11)
 c       St3 --> Tmp(ncomp,12)
@@ -2047,7 +2053,7 @@ c      end do
       Common /acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
       Logical Linear
 
 c      St1 --> Tmp(ncomp,13)
@@ -2332,7 +2338,7 @@ c      St4 --> Tmp(ncomp,16)
       Common/acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
       Common/Mchprs/ Flmin,Flmax, Epsmch
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
 
       intrinsic  abs
       intrinsic  max
@@ -2536,7 +2542,7 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
       LOGICAL use_c, comp_c
       Common/acAlgprs/Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
 
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
 *  blas: dcopy, dload
 
       parameter  ( one = 1.0d+0, zero = 0.0d+0 )
@@ -2663,7 +2669,7 @@ c      iflag = 0
 
       common/mchprs/ flmin, flmax, epsmch
 
-      CHARACTER(len=180) msg
+      CHARACTER(len=100) msg
       logical gtpdeb, imprvd, braktd, crampd, extrap, vset, wset
       save  gtpdeb, mfsrch, epsaf, epsag, eta, rmu, tolabs, alfmax
       save  tolrel, toltny
@@ -3256,7 +3262,7 @@ c  at the initial point of the line search.
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
       common/mchprs/ flmin, flmax, epsmch
       intrinsic abs
-      character(len=180) msg
+      character(len=100) msg
 
 *  blas: dssq
 
@@ -3407,7 +3413,7 @@ c      endif
       LOGICAL use_c, comp_c
       Common/acAlgprs/Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      character (len=180) msg
+      character (len=100) msg
 *  Blas: Dcopy
 
       Parameter (Half = 0.5d+0)
@@ -4192,8 +4198,8 @@ c
       factor = five
       tol    = tolabs
       xtry   = alfa
-      if (debug) write (nout, 1000) alfmax, oldf, oldg, tolabs,
-     *   alfuzz, epsaf, epsag, tolrel, crampd
+c      if (debug) write (nout, 1000) alfmax, oldf, oldg, tolabs,
+c     *   alfuzz, epsaf, epsag, tolrel, crampd
       go to 800
 c
 c  ---------------------------------------------------------------------
@@ -4220,7 +4226,7 @@ c
       if (alfa .gt. alfuzz) sigdec = ctry   .le.    epsaf
       imprvd = sigdec  .and.  ( ftry - fbest ) .le. (- epsaf)
 c
-      if (debug) write (nout, 1100) alfa, ftry, ctry
+c      if (debug) write (nout, 1100) alfa, ftry, ctry
       if (.not. imprvd) go to 130
 c
 c  we seem to have an improvement.  the new point becomes the
@@ -4329,11 +4335,11 @@ c
       btrue  = alfbst + b
       alfaw  = alfbst + xw
       gap    = b - a
-      if (debug) write (nout, 1200) atrue, btrue, gap, tol,
-     *   nsamea, nsameb, braktd, closef, imprvd, conv1, conv2, conv3,
-     *   extrap, alfbst, fbest, cbest, alfaw, fw
+c      if (debug) write (nout, 1200) atrue, btrue, gap, tol,
+c     *   nsamea, nsameb, braktd, closef, imprvd, conv1, conv2, conv3,
+c     *   extrap, alfbst, fbest, cbest, alfaw, fw
       if (vset) alfav  = alfbst + xv
-      if (debug  .and.  vset) write (nout, 1300) alfav, fv
+c      if (debug  .and.  vset) write (nout, 1300) alfav, fv
       if (convrg  .and.  moved) go to 910
 c
 c  exit if the step is too small.
@@ -4383,7 +4389,7 @@ c
       if (.not. moved) s = oldg
       if (      moved) s = oldg - two*gw
       q = two*(oldg - gw)
-      if (debug) write (nout, 2100)
+c      if (debug) write (nout, 2100)
       go to 600
 c
 c  three points available.  use  fbest,  fw  and  fv.
@@ -4391,7 +4397,7 @@ c
  450   gv = (fv - fbest)/xv
       s  = gv - (xv/xw)*gw
       q  = two*(gv - gw)
-      if (debug) write (nout, 2200)
+c      if (debug) write (nout, 2200)
 c
 c  ---------------------------------------------------------------------
 c  construct an artificial interval  (artifa, artifb)  in which the
@@ -4422,7 +4428,7 @@ c  polynomial fit, the default  xtry  is one tenth of  xw.
 c
  610   if (vset  .and.  moved) go to 620
       xtry   = xw/ten
-      if (debug) write (nout, 2400) xtry
+c      if (debug) write (nout, 2400) xtry
       go to 700
 c
 c  three points exist in the interval of uncertainty.  check whether
@@ -4465,7 +4471,7 @@ c
       if (daux .ge. dtry)   xtry = five*dtry*(point1 + dtry/daux)/eleven
       if (daux .lt. dtry)   xtry = half*sqrt( daux )*sqrt( dtry )
       if (endpnt .lt. zero) xtry = - xtry
-      if (debug) write (nout, 2500) xtry, daux, dtry
+c      if (debug) write (nout, 2500) xtry, daux, dtry
 c
 c  if the points are configured for an extrapolation set the artificial
 c  bounds so that the artificial interval lies strictly within  (a,b).
@@ -4488,7 +4494,7 @@ c  accept the polynomial fit.
 c
       xtry = zero
       if (abs( s*xw ) .ge. q*tol) xtry = (s/q)*xw
-      if (debug) write (nout, 2600) xtry
+c      if (debug) write (nout, 2600) xtry
 c
 c  ---------------------------------------------------------------------
 c  test for  xtry  being larger than  alfmax  or too close to  a  or  b.
@@ -5377,7 +5383,7 @@ C
 
       logical pdebug, use_c, comp_c, linear
       common/acalgprs/nminit,pdebug,iprint, idum, uval0, use_c, comp_c
-      character (len=180) msg
+      character (len=100) msg
       parameter  ( zero = 0.0d+0, one = 1.0d+0 )
 
 * the function moncond compute the monitor function based on the

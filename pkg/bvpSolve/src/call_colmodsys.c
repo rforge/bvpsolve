@@ -235,7 +235,7 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
   zeta   =(double *) R_alloc(ii, sizeof(double));
     for (j = 0; j < ii;j++) zeta[j] = REAL(Zeta)[j];
 
-  ii = LENGTH(Iset);    /* length of iset */
+  ii = LENGTH(Iset) - 1;    /* length of iset */
   iset  = (int *)    R_alloc(ii, sizeof(int));
     for (j = 0; j < ii;j++) iset[j] = INTEGER(Iset)[j];
   FullOut = INTEGER(Iset)[ii];
@@ -395,12 +395,13 @@ C....         = -3  If There Is An Input Data Error.
       }  /* end main x loop */
   ii = ncomp+7;
   PROTECT(ICOUNT = allocVector(INTSXP, 7)); incr_N_Protect();
-  PROTECT(ISTATE = allocVector(INTSXP, ii+1)); incr_N_Protect();
+  PROTECT(ISTATE = allocVector(INTSXP, ii+6)); incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
-  for (k = 0; k < 6; k++) INTEGER(ICOUNT)[k] = icount[k];
-  for (k = 0; k < ii; k++) INTEGER(ISTATE)[k+1] = ispace[k];
-  if (FullOut) 
-    ii = ispace[7];
+  for (k = 0; k < 7; k++) INTEGER(ICOUNT)[k] = icount[k];
+  for (k = 0; k < 5; k++)  INTEGER(ISTATE)[k+1] = icount[k];
+  for (k = 0; k < ii; k++) INTEGER(ISTATE)[k+6] = ispace[k];
+  if (FullOut)
+    ii = ispace[6];
   else 
     ii = 1;
   PROTECT(EPSS = allocVector(REALSXP, 2)); incr_N_Protect();
@@ -409,7 +410,7 @@ C....         = -3  If There Is An Input Data Error.
   
   setAttrib(yout, install("eps"), EPSS);
   PROTECT(RWORK = allocVector(REALSXP, ii));incr_N_Protect();
-  for (k = 0;k<ii;k++) REAL(RWORK)[k] = fspace[k];
+  for (k = 0; k < ii; k++) REAL(RWORK)[k] = fspace[k];
   setAttrib(yout, install("istate"), ISTATE);
   setAttrib(yout, install("icount"), ICOUNT);
   setAttrib(yout, install("rstate"), RWORK);

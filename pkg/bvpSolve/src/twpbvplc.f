@@ -120,7 +120,7 @@ c
 *  are computed)
 
       nminit = 11
-	iprint = -1
+      iprint = -1
 
 c initialise counters
       ureset = 0
@@ -370,9 +370,9 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       iset(1) = nfunc
       iset(2) = njac
-      iset(3) = nstep
-      iset(4) = nbound
-      iset(5) = njacbound
+      iset(3) = nbound
+      iset(4) = njacbound
+      iset(5) = nstep
       iset(6) = ureset
 C karline moved return statement to here...
       return
@@ -1444,9 +1444,9 @@ c
 
          Call Fsub (Ncomp,Xxc1,Tmp(1,1),Tmp(1,5),rpar,ipar)
          Call Fsub (Ncomp,Xxc2,Tmp(1,2),Tmp(1,6),rpar,ipar)
+         nfunc = nfunc + 2
 
          Call Dfsub (Ncomp,Xxc1,Tmp(1,1),Df(1,1),rpar,ipar)
-
          Do 30 I = 1, Ncomp
             Tmp(I,5) = Tmp(I,5)-Tmp(I,3)
             Tmp(I,6) = Tmp(I,6)-Tmp(I,4)
@@ -1465,6 +1465,7 @@ c
                Dhold(I+Ncomp,J+Ncomp) = -A33*Dfij
  32         Continue
  35      Continue
+         njac  = njac + 2
 
          Do 40 I = 1,Ncomp
            Dhold(I,I) = Dhold(I,I) + One
@@ -1478,8 +1479,6 @@ c
             Tmp(I,3) = Tmp(I,3) + Tmp(I,7)
             Tmp(I,4) = Tmp(I,4) + Tmp(I,8)
  45      Continue
-         nfunc = nfunc + 2
-         njac  = njac + 2
          Jc = 0
          If (Linear) Goto 70
 
@@ -1564,17 +1563,17 @@ C      dimension t1(2),t2(2),t3(2),t4(2)
       a6=7.0D+0/90.0D+0
       b6=16.0D+0/45.0D+0
       c6=2.0D+0/15.0D+0
-         hmsh = xx(im+1) - xx(im)
-        Do 10 Ic=1,Ncomp
+      hmsh = xx(im+1) - xx(im)
+      Do 10 Ic=1,Ncomp
             t1(ic) = (a5*u(ic, im+1) + b5*u(ic, im))
      *         + hmsh*(c5*fval(ic,im)- d5*fval(ic,im+1))
             t2(ic) = (b5*u(ic,im+1) + a5*u(ic,im))
      *         + hmsh*(-c5*fval(ic,im+1) + d5*fval(ic,im))
 
- 10     continue
-        call fsub (ncomp, xx(im) + fourth*hmsh, t1,
+ 10   continue
+      call fsub (ncomp, xx(im) + fourth*hmsh, t1,
      *          t3,rpar,ipar)
-        call fsub (ncomp, xx(im) + thfrth*hmsh, t2,
+      call fsub (ncomp, xx(im) + thfrth*hmsh, t2,
      *          t4,rpar,ipar)
 
       Do 20 Ic=1,Ncomp
@@ -1583,8 +1582,10 @@ C      dimension t1(2),t2(2),t3(2),t4(2)
      *          - f5*hmsh*(t4(ic) - t3(ic))
  20   continue
 
-         call fsub(ncomp, half*(xx(im) + xx(im+1)), t1,
+      call fsub(ncomp, half*(xx(im) + xx(im+1)), t1,
      *          t2,rpar,ipar)
+      nfunc = nfunc+3
+
       do 30 Ic=1,Ncomp
             defexp(ic) = hmsh*(a6*(fval(ic,im+1) + fval(ic,im))
      *           + b6*(t3(ic) + t4(ic)) + c6*t2(ic))
@@ -1592,7 +1593,7 @@ C      dimension t1(2),t2(2),t3(2),t4(2)
       Au=Max(abs(u(Ic,Im)),abs(u(ic,Im+1)))
       au=0.0D+0
       Defexp(ic)=defexp(ic)/max(1.0D+0,Au)
-      nfunc = nfunc+3
+
  30   continue
 
       return
@@ -1685,6 +1686,7 @@ c      St4 --> Tmp(ncomp,16)
             Call Fsub (Ncomp,Xxc1,Tmp(1,1),Tmp(1,7),rpar,ipar)
             Call Fsub (Ncomp,Xxc2,Tmp(1,2),Tmp(1,8),rpar,ipar)
             Call Fsub (Ncomp,Xxc3,Tmp(1,3),Tmp(1,9),rpar,ipar)
+            nfunc = nfunc+3
 
             Call Dfsub(Ncomp,Xxc1,Tmp(1,1),Df,rpar,ipar)
             Do 30 I = 1, Ncomp
@@ -1734,8 +1736,7 @@ c      St4 --> Tmp(ncomp,16)
                Tmp(I,5) = Tmp(I,5) + Tmp(I,11)
                Tmp(I,6) = Tmp(I,6) + Tmp(I,12)
  65         Continue
-           nfunc = nfunc+3
-           njac  = njac+ 3
+            njac  = njac+ 3
             Jc = 0
             If (Linear) Goto 90
 

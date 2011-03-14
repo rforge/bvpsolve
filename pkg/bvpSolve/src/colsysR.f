@@ -733,9 +733,9 @@ c...  prepare output
   250 fspace(n+1+i) = fspace(laldif-1+i)
   259 icount(1) = nfunc
       icount(2) = njac
-      icount(3) = nstep
-      icount(4) = nbound
-      icount(5) = njacbound
+      icount(3) = nbound
+      icount(4) = njacbound
+      icount(5) = nstep
       return
 c-----------------------------------------------------------------------
   260 format(37h the number of (linear) diff eqns is , i3, 1x,

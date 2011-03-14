@@ -758,9 +758,9 @@ C
 
   259 icount(1) = nfunc
       icount(2) = njac
-      icount(3) = nstep
-      icount(4) = nbound
-      icount(5) = njacbound
+      icount(3) = nbound
+      icount(4) = njacbound
+      icount(5) = nstep
  
       RETURN
 C----------------------------------------------------------------------

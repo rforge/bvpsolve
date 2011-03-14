@@ -12,9 +12,9 @@ c print R-messages
 c ===================================================================================
 
       subroutine rprint(msg)
-      character (len=150) msg
+      character (len=100) msg
 
-            call dblepr(msg, 150, 0, 0)
+            call dblepr(msg, 100, 0, 0)
       end subroutine
 
 c ===================================================================================
@@ -2055,7 +2055,7 @@ c ==============================================================================
       dimension  ipivot(ncomp*nmsh)
       logical    better
 
-      external   fsub
+      external fsub
       external gsub
 
       logical use_c, comp_c

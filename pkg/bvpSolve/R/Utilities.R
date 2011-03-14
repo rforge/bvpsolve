@@ -27,8 +27,8 @@ approx.bvpSolve <- function(x, xout=NULL, ...){
   if (il <= 0)
     stop ("'approx' requires at least one value to approximate")   
 
-  z <- rep(1, istate[4])
-  if (! Attr$colmod)
+  z <- rep(1, istate[4])    #### WAS 4
+  if (Attr$colmod)
     appone <- function(x)
       .Fortran("mappsln", as.double(x),
             result = as.double(z), as.double(rstate), as.integer(istate))$result
@@ -439,21 +439,20 @@ diagnostics.bvpSolve<- function(obj, ...) {
   
     if (idid ==0)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
-    df <- c( "The return code                             :",   #1
-             "The number of function evaluations          :", 
-             "The number of jacobian evaluations          :",	
-             "The number of steps                         :", 
-             "The number of boundary evaluations          :", 
-             "The number of boundary jacobian evaluations :", 
-             "The number of mesh resets                   :",
-             "The maximal number of mesh points           :",   #2
-             "The actual number of mesh points            :",
-             "The size of the real work array             :",
-             "The size of the integer work array          :"
+    df <- c( "The return code                               :",   #1
+             "The number of function evaluations            :",
+             "The number of jacobian evaluations            :",
+             "The number of boundary evaluations            :",
+             "The number of boundary jacobian evaluations   :",
+             "The number of steps                           :",
+             "The number of mesh resets                     :",
+             "The maximal number of mesh points             :",   #2
+             "The actual number of mesh points              :",
+             "The size of the real work array               :",
+             "The size of the integer work array            :"
              )
 
-
-    printmessage(df, istate)
+    printmessage(df, istate[c(1:7,10:13)])
 
     cat("\n--------------------\n")
     cat(paste( "conditioning pars"))
@@ -466,26 +465,40 @@ diagnostics.bvpSolve<- function(obj, ...) {
              "kappa2  :")
     printmessage(df, rstate)
     
-    
+    if (Attr$acdc == TRUE)
+      cat(paste("    The problem was solved for final eps equal to :",
+               Attr$eps[1]," \n"))
   } else if (Attr$name == "bvpcol") {
     if (idid ==1)  cat("  Integration was successful.\n") else
        cat("  Integration was NOT successful\n")
-    df <- c( "The return code                                   :",   #1
-             "The number of function evaluations                :", 
-             "The number of jacobian evaluations                :",	
-             "The number of steps                               :", 
-             "The number of boundary evaluations                :", 
-             "The number of boundary jacobian evaluations       :", 
-             "The actual number of mesh points                  :",
-             "The number of collocation points per subinterval  :",
-             "The number of equations                           :",
-             "The number of components (variables)              :",
-             rep(
-             "The order of each equation                        :",istate[4+5]))
-
-
-    printmessage(df, istate[-c(11:13)])
-    }    
+    if (! Attr$colmod)  {
+     df <- c( "The return code                                   :",   #1
+              "The number of function evaluations                :",
+              "The number of jacobian evaluations                :",
+              "The number of boundary evaluations                :",
+              "The number of boundary jacobian evaluations       :",
+              "The number of steps                               :",
+              "The actual number of mesh points                  :",
+              "The number of collocation points per subinterval  :",
+              "The number of equations                           :",
+              "The number of components (variables)              :")
+       printmessage(df, istate[1:10])
+    } else {
+     df <- c( "The return code                                   :",   #1
+              "The number of function evaluations                :",
+              "The number of jacobian evaluations                :",
+              "The number of boundary evaluations                :",
+              "The number of boundary jacobian evaluations       :",
+              "The number of continuation steps                  :",
+              "The number of succesfull continuation steps       :",
+              "The actual number of mesh points                  :",
+              "The number of collocation points per subinterval  :",
+              "The number of equations                           :",
+              "The number of components (variables)              :")
+       printmessage(df, c(idid,Attr$icount[1:6],istate[7:10]))
+    cat(paste("    The problem was solved for final eps equal to     :",Attr$eps[1]," \n"))
+    }
+  }
 
 }
 

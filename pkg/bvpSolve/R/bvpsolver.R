@@ -721,7 +721,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   EPS <- attributes(out)$eps
   nn <- attr(out,"istate")
   rn <- attr(out,"rstate")
-  mesh <- nn[9]
+  mesh <- nn[11]
   attr(out,"istate") <- NULL
 
 #(  if(verbose) print(names(baseenv()$last.warning))  # dangerous...
@@ -756,8 +756,9 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   if (!jacPresent)
        nn[2] <- nn[2] + nn[3] * (mstar+1)
 
-  names(nn) <- c("flag",	"nfunc", "njac",	"nstep", "nbound", "njacbound",
-    "ureset","nmax","nmesh","nrwork","niwork")
+  if (type == 1) attr(out,"acdc") <- FALSE else attr(out,"acdc") <- TRUE
+  names(nn) <- c("flag",	"nfunc", "njac", "nbound", "njacbound", "nstep",
+    "ureset","","","nmax","nmesh","nrwork","niwork")
   attr(out,"istate") <- nn
   names(rn) <- c("kappa1","gamma1","sigma","kappa","kappa2")
   attr(out,"rstate") <- rn
@@ -912,9 +913,9 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   ic  <- attributes(out)$icount
   rn  <- attributes(out)$rstate
   nn[2] <- nn[2] + 1  # add test function evaluation
-  if (!jacPresent)
+  if (!jacPresent)    # add function evaluations due to jacobian.
        nn[2] <- nn[2] + nn[3] * (mstar+1)
-
+  ic[1] <- nn[2]
      nm <- c("x",
           if (!is.null(Ynames)) Ynames else as.character(1:mstar))
 # if there are other variables...
@@ -940,8 +941,8 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   attr(out,"eps")     <- EPS
   dimnames(out) <- list(nm,NULL)
 
-  names(nn)[1:5] <- c("flag", "nmesh","ncoll","neqs","ncomps")
   names(ic)[1:6] <- c("nfunc", "njac", "nbound", "njacbound","ncont", "nsuccescont")
+  names(nn)[1:10] <- c("flag", "nfunc", "njac", "nbound", "njacbound","ncont", "nmesh","ncoll","neqs","ncomps")
   attributes(out)$icount <- ic
   attributes(out)$istate <- nn
   attributes(out)$rstate <- rn
