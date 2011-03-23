@@ -84,7 +84,7 @@ boundjac <- function (i, y, pars)
   return(c(1, 0))
 
 
-print(system.time(Sol <- as.data.frame(bvptwp(x = x, leftbc = 1, 
+print(system.time(Sol <- as.data.frame(bvptwp(x = x, leftbc = 1,
         func = fun, bound = boundfun, ncomp = 2,
         jacbound = boundjac, jacfunc = jacfun), verbose = TRUE)))
 lines(Sol[,1], Sol[,2],type = "l", col = "blue")

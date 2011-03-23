@@ -285,8 +285,8 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
    isDll = 0;
   }
 
+  PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
   if (isDll == 0) {
-    PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
     PROTECT(EPS = NEW_NUMERIC(1));              incr_N_Protect();
     PROTECT(J = NEW_INTEGER(1));                incr_N_Protect();
     PROTECT(Y = allocVector(REALSXP,mstar));    incr_N_Protect();
@@ -331,10 +331,11 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
 
       jacbound_func = C_colmod_jacbound;
       R_cont_jacbound_func = jacboundfunc;
-
-      guess_func = (C_guess_func2_type *) C_colmod_guess;
-      R_cont_guess_func = guessfunc;
    }
+
+   guess_func = (C_guess_func2_type *) C_colmod_guess;
+   R_cont_guess_func = guessfunc;
+
 /* Call the fortran function                                                  */
 	  F77_CALL(colmod) (&ncomp, m, aleft, aright, zeta, iset, ltol,
         tol, fixpnt, ispace, fspace, &iflag, &epsini, &epsmin,

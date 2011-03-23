@@ -129,13 +129,14 @@ static void C_bvp_bound_func (int *ii, int * n, double *y, double *gout,
 {
   int i;
   SEXP R_fcall, ans;
-                             INTEGER(J)[0] = *ii;
+                                INTEGER(J)[0] = *ii;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i] = y[i];
 
   PROTECT(R_fcall = lang3(R_bvp_bound_func,J,Y));   incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));       incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
   /* only one element returned... */
   gout[0] = REAL(ans)[0];
+
   my_unprotect(2);
 }
 
@@ -260,8 +261,8 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 
 /* initialise global R-variables... */
 
+  PROTECT(X  = NEW_NUMERIC(1));                 incr_N_Protect();
   if (isDll == 0) {
-    PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
     PROTECT(J  = NEW_INTEGER(1));               incr_N_Protect();
     PROTECT(Y = allocVector(REALSXP,mstar));    incr_N_Protect();
   }

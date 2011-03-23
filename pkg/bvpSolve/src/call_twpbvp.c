@@ -61,7 +61,7 @@ static void C_bvp_deriv_func (int *n,  double *x, double *y, double *ydot,
 
 /* interface between fortran call to jacobian and R function */
 static void C_bvp_jac_func (int *n,  double *x, double *y, double *pd,
-  double * rpar, int * ipar)
+                            double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -79,7 +79,7 @@ static void C_bvp_jac_func (int *n,  double *x, double *y, double *pd,
 /* interface between fortran call to boundary condition and corresponding R function */
 
 static void C_bvp_bound_func (int *ii, int *n, double *y, double *gout,
-  double * rpar, int * ipar)
+                              double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -96,7 +96,7 @@ static void C_bvp_bound_func (int *ii, int *n, double *y, double *gout,
 /*interface between fortran call to jacobian of boundary and corresponding R function */
 
 static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
-     double * rpar, int * ipar)
+                                 double * rpar, int * ipar)
 {
   int i;
   SEXP R_fcall, ans;
@@ -107,7 +107,6 @@ static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
   PROTECT(ans = eval(R_fcall, R_envir));             incr_N_Protect();
 
   for (i = 0; i < *n ; i++)  dg[i] = REAL(ans)[i];
-  
   my_unprotect(2);
 }
 
