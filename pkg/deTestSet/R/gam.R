@@ -1,0 +1,215 @@
+
+### ============================================================================
+### gams-- solves ordinary differential equation systems using the generalised
+### adams method
+###
+### ============================================================================
+
+gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
+  jacfunc=NULL, jactype = "fullint", verbose=FALSE, hmax=NULL, hini=0, 
+  ynames=TRUE, minord=NULL, maxord=NULL, bandup=NULL, banddown=NULL, 
+  maxsteps=1e4, maxnewtit = c(10,18,26,36), 
+  dllname=NULL, initfunc=dllname, initpar=parms, 
+  rpar=NULL, ipar=NULL, nout=0, outnames=NULL, forcings=NULL,
+  initforc = NULL, fcontrol=NULL, ...)
+{
+
+### check input
+  hmax <- checkInput (y, times, func, rtol, atol,
+    jacfunc, NULL, 0, hmax, hini, dllname)
+  n <- length(y)
+  if (hini <= 0) hini <- 1e-6
+### atol and rtol have to be of same length here...
+  if (length(rtol) != length(atol)) {
+    if (length(rtol) > length(atol))
+      atol <- rep(atol, length.out=n)
+    else 
+      rtol <- rep(rtol, length.out=n)
+  }
+
+### Jacobian 
+    full = TRUE
+    if (jactype == "fullint" ) {  # full, calculated internally
+      ijac <- 0
+      banddown = n 
+    } else if (jactype == "fullusr" ) { # full, specified by user function
+      ijac <- 1
+      banddown <- n 
+    } else if (jactype == "bandusr" ) { # banded, specified by user function
+      ijac <- 1
+      full <- FALSE
+      if (is.null(banddown) || is.null(bandup))   
+        stop("'bandup' and 'banddown' must be specified if banded Jacobian")
+    } else if (jactype == "bandint" ) { # banded, calculated internally
+      ijac <- 0
+      full <- FALSE
+      if (is.null(banddown) || is.null(bandup))   
+        stop("'bandup' and 'banddown' must be specified if banded Jacobian")
+    } else
+     stop("'jactype' must be one of 'fullint', 'fullusr', 'bandusr' or 'bandint'")
+ 
+  # check other specifications depending on Jacobian
+  if (ijac == 1 && is.null(jacfunc)) 
+    stop ("'jacfunc' NOT specified; either specify 'jacfunc' or change 'jactype'")
+
+  if (is.null (maxord)) maxord <- 9
+  if (is.null (minord)) minord <- 3
+  if (maxord < minord) stop ("'maxord' cannot be smaller than 'minord'")
+  if (maxord > 9) stop ("'maxord' too large: should be <= 9")
+  if (maxord < 3) stop ("'maxord' too small: should be >= 3")
+  if (minord > 9) stop ("'minord' too large: should be <= 9")
+  if (minord < 3) stop ("'minord' too small: should be >= 3")
+
+  if (is.null(bandup  )) bandup   <-n  
+
+### model and Jacobian function  
+  JacFunc   <- NULL
+  Ynames    <- attr(y,"names")
+  RootFunc <- NULL
+  flist     <- list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
+  ModelInit <- NULL
+
+  if (is.character(func)) {   # function specified in a DLL
+    DLL <- checkDLL(func,jacfunc,dllname,
+                    initfunc,verbose,nout, outnames)
+
+    ModelInit <- DLL$ModelInit
+    Func    <- DLL$Func
+    JacFunc <- DLL$JacFunc
+    Nglobal <- DLL$Nglobal
+    Nmtot   <- DLL$Nmtot
+
+    if (! is.null(forcings))
+      flist <- checkforcings(forcings,times,dllname,initforc,verbose,fcontrol)
+
+    rho <- NULL
+    if (is.null(ipar)) ipar<-0
+    if (is.null(rpar)) rpar<-0
+  } else {
+
+    if (is.null(initfunc))
+      initpar <- NULL # parameter initialisation not needed if function is not a DLL
+
+    rho <- environment(func)
+    # func and jac are overruled, either including ynames, or not
+    # This allows to pass the "..." arguments and the parameters
+
+    if (ynames)  {
+      Func    <- function(time,state) {
+        attr(state,"names") <- Ynames
+         unlist(func   (time,state,parms,...))
+      }
+         
+      Func2   <- function(time,state)  {
+        attr(state,"names") <- Ynames
+        func   (time,state,parms,...)
+      }
+         
+      JacFunc <- function(time,state) {
+        attr(state,"names") <- Ynames
+        jacfunc(time,state,parms,...)
+      }
+    } else {                          # no ynames...
+      Func    <- function(time,state)
+         unlist(func   (time,state,parms,...))
+        
+      Func2   <- function(time,state)
+        func   (time,state,parms,...)
+         
+      JacFunc <- function(time,state)
+        jacfunc(time,state,parms,...)
+
+    }
+        
+    ## Check function and return the number of output variables +name
+    FF <- checkFunc(Func2,times,y,rho)
+    Nglobal<-FF$Nglobal
+    Nmtot <- FF$Nmtot
+
+    ## Check jacobian function
+    if (ijac == 1) {
+      tmp <- eval(JacFunc(times[1], y), rho)
+      if (!is.matrix(tmp))
+         stop("Jacobian function 'jacfunc' must return a matrix\n")
+      dd <- dim(tmp)
+      if ((!full && dd != c(bandup+banddown+1,n)) ||
+          ( full && dd != c(n,n)))
+         stop("Jacobian dimension not ok")
+     } 
+  }                                                                                
+
+
+### work arrays iwork, rwork
+  # length of rwork and iwork
+  if (full)
+    lrw = 2 * n * n + 42 * n + 18
+  else 
+    lrw = (3 * banddown + 2 * bandup + 44) * n + 18
+
+  liw   <- 24 + n
+
+  # only first 20 elements passed; other will be allocated in C-code
+  iwork <- vector("integer",20)
+  rwork <- vector("double",20)
+  rwork[] <- 0.
+  iwork[] <- 0
+
+  iwork[2] <- maxsteps
+  iwork[3] <- minord
+  iwork[4] <- maxord
+
+  if (is.null (maxnewtit)) 
+    maxnewtit <- c(10,18,26,36) 
+  else {
+    if (length(maxnewtit) != 4)
+      stop("'maxit' should be an integer vector of length 4")
+    ii <- which (is.na(maxnewtit))
+      if (length(ii) > 0)
+        maxnewtit[ii] <- c(10,18,26,36)[ii]
+  }
+     
+  iwork[5:8] <- maxnewtit
+
+  rwork[1] <- .Machine$double.neg.eps
+  rwork[2] <- hmax
+  
+  if(is.null(times)) times<-c(0,1e8)
+
+### print to screen...
+  if (verbose) {
+    printtask(0,func,jacfunc)
+    printM("\n--------------------")
+    printM("Integration method")
+    printM("--------------------")
+   
+    printM( "the Adams method")  
+    if (jactype == "fullusr" ) 
+      printM(" with a user-supplied full (NEQ by NEQ) Jacobian") 
+    else if (jactype == "fullint" ) 
+      printM(" with an internally generated full Jacobian")
+    else if (jactype == "bandusr" ) 
+      printM(" with a user-supplied banded Jacobian")  
+    else if (jactype == "bandint" )  
+      printM(" with an internally generated banded Jacobian")
+  }
+
+### calling solver
+  storage.mode(y) <- storage.mode(times) <- "double"
+  tcrit <- NULL
+  out <- .Call("call_gam",y,times,Func,initpar,
+               rtol, atol, rho, tcrit, JacFunc, ModelInit,  
+               as.integer(verbose), as.double(rwork),
+               as.integer(iwork), as.integer(ijac),as.integer(Nglobal),
+               as.integer(lrw),as.integer(liw), 
+               as.integer(banddown), as.integer(bandup), as.double(hini),
+               as.double (rpar), as.integer(ipar),
+               flist, PACKAGE="deTestSet")
+
+### saving results
+  out <- saveOut(out, y, n, Nglobal, Nmtot, func, Func2,
+                 iin= 1:6, iout=c(1:4,10,12))
+
+  attr(out, "type") <- "gam"
+  if (verbose) diagnostics(out)
+  return(out)
+}
