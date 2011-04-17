@@ -663,14 +663,13 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
 
   ntol <- mstar
   if (type == 1) {
-    lwrkfl <- nmax*(6*mstar*mstar + 22*mstar+3) + 6*mstar*mstar +
-              22*mstar + 2*ntol
-    lwrkin <- nmax*(2*mstar+3)+2*mstar
+	  lwrkfl <- nmax*(5*mstar*mstar + 16*mstar+4) + 14*mstar*mstar +
+			  24*mstar + 2*ntol
+	  lwrkin <- nmax*(2*mstar+2)+3*mstar
   } else {
-    lwrkfl <- nmax*(5*mstar*mstar + 13*mstar+7) + 13*mstar*mstar  +
-              16  *mstar + 2* ntol
-    if (! islin) lwrkfl = lwrkfl + mstar*nmax
-    lwrkin<- 2*nmax +  2* mstar*nmax + mstar
+	  lwrkfl <- nmax*(5*mstar*mstar + 14*mstar+6) + 14*mstar*mstar +
+              19*mstar + 2*ntol
+      lwrkin <- nmax*(2*mstar+2)+3*mstar
   }
   if (length(atol) ==1)
     atol <- rep(atol,len=mstar)

@@ -3,15 +3,15 @@ c francesca: add precis as argument: machine precision...
 c changed acinitu, added in input more information about xguess,uguess
 c
 c ===================================================================================
-c karline: some subroutines renamed by adding ac in front 
-C karline: changed the exit strategy if epsmin was changed - FRANCESCA CAN YOU CHECK?
+c karline: some subroutines renamed by adding ac in front
+C karline: changed the exit strategy if epsmin was changed
 c ===================================================================================
 
 
 c ===================================================================================
 c acinitu resets u after re-meshing for linear problems or for nonlinear problems
 c when interpolation of the old solution is not used.
-c it interpolates between (Xguess,Yguess), if these are inputted 
+c it interpolates between (Xguess,Yguess), if these are inputted
 c otherwise sets to constant value...
 c ===================================================================================
 
@@ -21,17 +21,18 @@ c ==============================================================================
       implicit double precision (a-h,o-z)
       dimension xx(*), u(nudim, *), xguess(*), uguess(nugdim,*)
 
-      character(len=100) msg
+      character(len=150) msg
 
       logical use_c, comp_c, giv_u
-      integer nmguess, ureset 
-      Common/acAlgprs/Nminit,Iprint,Maxcon,Itsaim,Uval0,use_c,comp_c
+      integer nmguess, ureset
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       common/acgu/ giv_u, ureset
 
-      
+
 
       ureset = ureset + 1
-    
+
    99 format('acinitu',1pd15.5)
 
       IF (giv_u) THEN
@@ -39,11 +40,11 @@ c ==============================================================================
         write(msg,99) 0.0d0
         call Rprint(msg)
        endif
-        
+
        call acinterp(ncomp, nmsh, xx, nudim, u,
      *                  nugdim,nmguess, xguess, uguess)
-     
-      ELSE   
+
+      ELSE
        if (iprint .ne. -1) then
         write(msg,99) Uval0
         call Rprint(msg)
@@ -106,7 +107,8 @@ c          added "useC" for specification of conditioning
       External acdgsub
 c Francesca: added use_c and comp_c
       LOGICAL use_c, comp_c
-      Common /acAlgprs/ Nminit,Iprint,Maxcon,Itsaim,Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       Common /acConvg/ Nits
       Common /acMshvar/ Hsml,Npr,Pmax,Hord
@@ -114,7 +116,7 @@ c Francesca: added counters
       integer nfunc, njac, nstep, nbound, njacbound
       common /Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       Parameter ( Zero = 0.0d+0, One = 1.0d+0, Two = 2.0d+0 )
       Parameter ( Three = 3.0d+0, Third = 1.0d+0/3.0d+0, Huge = 1.d+30 )
 
@@ -164,7 +166,7 @@ c     +        Write (6,1003) Nfxpnt, (Fixpnt(I), I=1,Nfxpnt)
       Endif
 
 C.... Check For Invalid Input Parameters.  If Any Parameters Are
-C.... Invalid, Exit With The Flag Iflbvp Set To 2.
+C.... Invalid, Exit With The Flag Iflbvp Set To 4
 
       Iflbvp = 4
       If (Ncomp .le. 0)  Return
@@ -175,7 +177,7 @@ C.... Invalid, Exit With The Flag Iflbvp Set To 2.
       If (Nfxpnt .lt. 0)  Return
       If (Maxcon .lt. 0)  Return
       If (.not. Givmsh) Nmsh = 1
-      
+
       If (Givmsh .and. Nmshguess .lt. Nfxpnt+2) Return
       If (Givmsh .and. nmshguess .gt. nucol ) Return
       If (Givmsh .and. xguess(1) .ne. Aleft) Return
@@ -209,20 +211,18 @@ C.... Invalid, Exit With The Flag Iflbvp Set To 2.
 C.... Calculate Maximum Number Of Mesh Points Possible With The
 C.... Given Floating-Point And Integer Workspace.
 
-      Isp = Lwrkfl - 2*Ntol - 20*Ncomp - 14*Ncomp*Ncomp
 
-      If (Linear) Then
-         Iden = 5*Ncomp*Ncomp + 15*Ncomp + 5
-      Else
-         Iden = 5*Ncomp*Ncomp + 15*Ncomp + 5
-      Endif
+      isp = lwrkfl  - 2*ntol - 19*ncomp - 14*ncomp*ncomp
+      iden = 5*ncomp*ncomp + 14*ncomp + 6
+      nmax1 = isp/iden
 
-      Nmax1 = Isp/Iden
+      isp = lwrkin - 3*ncomp
+      nmax2 = isp/(2*ncomp+2)
 
-      Isp = Lwrkin - 3*Ncomp
-      Nmax2 = Isp/(Ncomp+2)
-
-      Nmax = Min(Nmax1, Nmax2)
+      nmax = min(nmax1,nmax2)
+* nmax from workspace
+      nmax = min(nmax, nucol)
+* nmax from size of u and xx
       If (Iprint .eq. 1) then
          Write(msg,1007) Nmax
          call rprint(msg)
@@ -240,116 +240,117 @@ C.... Partition Floating Point Workspace.
 
       Irhs = 1
       Lrhs = Ncomp*Nmax
-
+* 1 ncomp*nmax
       Itpblk = Irhs + Lrhs
       Ltpblk = Ncomp*Nlbc
-
+* 1 ncomp*ncomp
       Ibtblk = Itpblk + Ltpblk
       Lbtblk = Ncomp*(ncomp - Nlbc)
-
+* 2 ncomp*ncomp
       Iajac = Ibtblk + Lbtblk
       Lajac = 2*Ncomp*Ncomp*Nmax
-
+* 2 ncomp*ncomp*nmax
       Ibhold = Iajac + Lajac
       Lbhold = Ncomp*Ncomp*Nmax
-
+* 3 ncomp*ncomp*nmax
       Ichold = Ibhold + Lbhold
       Lchold = Ncomp*Ncomp*Nmax
-
+* 4 ncomp*ncomp*nmax
       Ifval = Ichold + Lchold
       Lfval = Ncomp*Nmax
-
+* 2 ncomp*nmax
       Idef = Ifval + Lfval
       Ldef = Ncomp*(Nmax-1)
-
+* 3 ncomp*nmax
       idef6 = idef
       ldef6 = ncomp*(nmax-1)
-
+* 4 ncomp*nmax
       Idef8 = Idef6 + Ldef6
       Ldef8 = Ncomp*(Nmax-1)
-
+* 5 ncomp*nmax
       Iuold = Idef8 + Ldef8
       Luold = Ncomp*Nmax
-
+* 6 ncomp*nmax
       Itmrhs = Iuold + Luold
       Ltmrhs = Ncomp*Nmax
-
+* 7 ncomp*nmax
       Irhtri = Itmrhs + Ltmrhs
       Lrhtri = Ncomp*Nmax
-
+* 8 ncomp*nmax
       Idelu = Irhtri + Lrhtri
       Ldelu = Ncomp*Nmax
-
+* 9 ncomp*nmax
       Ixmer = Idelu + Ldelu
       Lxmer = Ncomp*Nmax
-
+* 10 ncomp*nmax
       Iutri = Ixmer + Lxmer
       Lutri = Ncomp*Nmax
-
+* 11 ncomp*nmax
       Iermx = Iutri + Lutri
       Lermx = Nmax
-
+* 1 nmax
       Irtdc = Iermx + Lermx
       Lrtdc = Nmax
-
+* 2 nmax
       Ixxold = Irtdc + Lrtdc
       Lxxold = Nmax
-
+* 3 nmax
       Iuint = Ixxold + Lxxold
       Luint = Ncomp
-
+* 1 ncomp
       Iftmp = Iuint + Luint
       Lftmp = Ncomp
-
+* 2 ncomp
       Idgtm = Iftmp + Lftmp
       Ldgtm = Ncomp
-
+* 3 ncomp
       Idftm1 = Idgtm + Ldgtm
       Ldftm1 = Ncomp*Ncomp
-
+* 3 ncomp*ncomp
       Idftm2 = Idftm1 + Ldftm1
       Ldftm2 = Ncomp*Ncomp
-
+* 4 ncomp*ncomp
       Itmp = Idftm2 + Ldftm2
       Ltmp = Ncomp*16
-
+* 19 ncomp
       Idsq = Itmp + Ltmp
       Ldsq = Ncomp*Ncomp
-
+* 5 ncomp*ncomp
       Ietst6 = Idsq + Ldsq
       Letst6 = Ntol
-
+* 1 ntol
       Ietst8 = Ietst6 + Letst6
       Letst8 = Ntol
-
+* 2 ntol
       Iextra = Ietst8 + Letst8
       Lextra = 9*Ncomp*Ncomp
-
+* 14 ncomp*ncomp
       Iextra1 = Iextra + Lextra
       Lextra1 = Nmax
-
+* 4 nmax
       iamg = Iextra1 + Lextra1
       lamg = ncomp*nmax
-
+* 12 ncomp*nmax
       ic1 = iamg + lamg
       lc1 = ncomp*ncomp*nmax
-
+* 5 ncomp*ncomp*nmax
 
       iwrkrhs = ic1+lc1
       lwrkrhs = ncomp*nmax
-
+* 13 ncomp*nmax
       ir4 = iwrkrhs + lwrkrhs
       lr4 = nmax
-
-
+* 5 nmax
       Imsh =  ir4 + lr4
       Lmsh = Nmax
+* 6 nmax
 
       If (Linear) Then
          Ilast = Imsh + Lmsh
       Else
          Isol = Imsh + Lmsh
          Lsol = Ncomp*Nmax
+* 14 ncomp*nmax
          Ilast = Isol + Lsol
       Endif
 
@@ -365,11 +366,16 @@ C.... Partition Integer Workspace.
       Lipvbk = Ncomp*Nmax
 
       Iipvlu = Iipvbk + Lipvbk
-      Lipvlu = Ncomp
+      Lipvlu = 3*Ncomp
 
 
       iisign = iipvlu + lipvlu
       lisign = ncomp*nmax
+
+      if (iprint .eq. 1) then
+        write(msg,*) 'integer workspace', iisign+lisign
+        call rprint(msg)
+      end if
 
 C.... *****************************************************************
 C.... Initialisation And Explanation Of Variables Used In The
@@ -461,7 +467,7 @@ C.... Selection Process.
       Iusep = 0
 
 C .... Initialize Xx and U
-      
+
       If (.not. Giveu .and. .not. Givmsh) Then
          Nmsh = Nminit
          If (Nmsh .lt. Nfxpnt+2) Nmsh = Nfxpnt + 2
@@ -475,14 +481,14 @@ C .... Initialize Xx and U
 
 c      If (.not. Giveu) Then
 c         Call Initu(Ncomp, Nmsh, Nudim, U)
-c       
+c
 c      else
 c         Call Matcop(Nudim, Nudim, Ncomp, Nmsh, Uguess, U)
 c      endif
- 
-      call acinitu(ncomp, nmsh, xx, nudim, u, 
+
+      call acinitu(ncomp, nmsh, xx, nudim, u,
      +            nugdim,nmshguess,xguess,Uguess)
-      
+
 C.... Calculate Phimax, Which Is The Largest Monitor Function Value
 C.... That We Believe Is Permissible In Double Precision For The Given
 C.... Tolerance.
@@ -594,19 +600,22 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
                call rprint(msg)
                Write(msg,1012) Eps
                call rprint(msg)
-               Write(msg,1018) ('U',Ltol(J), J=1,Ntol)
-               call rprint(msg)
-               Write(msg,*)
-               call rprint(msg)
-               Jstep = Max(Nmsh/30,1)
-               Do 55 I = 1, Nmsh-1, Jstep
-                  Write(msg,1019) I,Xx(I),(U(Ltol(J),I),J=1,Ntol)
-                  call rprint(msg)
- 55            Continue
-               Write(msg,1019) Nmsh,Xx(Nmsh),(U(Ltol(J),Nmsh),J=1,Ntol)
-               call rprint(msg)
-               Write(msg,1020)
-               call rprint(msg)
+C Karline: removed these print statements
+C               Write(msg,*)'The Final Mesh And Solution Components:'
+C               call rprint(msg)
+C               Write(msg,1018) ('U',Ltol(J), J=1,Ntol)
+C               call rprint(msg)
+C               Write(msg,*)
+C               call rprint(msg)
+C               Jstep = Max(Nmsh/30,1)
+C               Do 55 I = 1, Nmsh-1, Jstep
+C                  Write(msg,1019) I,Xx(I),(U(Ltol(J),I),J=1,Ntol)
+C                  call rprint(msg)
+C 55            Continue
+C               Write(msg,1019) Nmsh,Xx(Nmsh),(U(Ltol(J),Nmsh),J=1,Ntol)
+C               call rprint(msg)
+C               Write(msg,1020)
+C               call rprint(msg)
             Endif
 
             if (eps_changed) iflbvp = -1
@@ -797,10 +806,10 @@ C.... Reached Our Final Problem
             If (Iprint .ge. 0) Then
                If (Dele .lt. 0.01d0*E(3)) Then
                   Write(msg,1021) Epsmin
-                     call rprint(msg)
+                  call rprint(msg)
                Else
                   Write(msg,1022) Epsmin
-                     call rprint(msg)
+                  call rprint(msg)
                Endif
             Endif
             Emin = Ep
@@ -808,7 +817,7 @@ C.... Reached Our Final Problem
             eps_changed=.true.
 C KARLINE: ADDED THAT - NOW GOTO 100, NOT TO 70 which crashes R!
 C            Goto 70
-            GOTO 100 
+            GOTO 100
          Endif
 
 C.... The Following Section Of Code Calculates The Desired Value
@@ -959,7 +968,7 @@ C.... We Are Backtracking.
 C.... If Iback = 1 Then The Final Problem Has Not Been Solved.
 C.... In This Case We Stop.
 
-         If (Iback .eq. 1) Then 
+         If (Iback .eq. 1) Then
 C            If (Iprint .ge. 0) Then          Karline: toggled this off
                If (Epsp .ne. Zero) Then
                   Write(msg,1014) Eps,Iflbvp,Eps,Epsp
@@ -971,7 +980,7 @@ C            If (Iprint .ge. 0) Then          Karline: toggled this off
 C            Endif
             if (nc .eq. Maxcon) Iflbvp=2
 C KARLINE CHANGED THAT
-            GOTO 100 
+            GOTO 100
          Endif
 
 C.... If Iprec = 2, Then We Know That We Cannot Define A Mesh On
@@ -1005,7 +1014,7 @@ C KARLINE: ADDED THE GOTO... and iflag changed and epschanged...
             eps_changed = .true.
             Iflbvp = -1
             GOTO 100
-C KARLINE: CHANGES TILL HERE         
+C KARLINE: CHANGES TILL HERE
          Endif
 
          If (Nss .eq. 1) Then
@@ -1111,10 +1120,9 @@ C-----------------------------------------------------------------------
      +        ' With Eps Greater Than ',D9.4)
  1016 Format (' ** Failed Step - Bactracking For Larger Value ',
      +          'Of Epsilon')
- 1018 Format(' The Final Mesh And Solution Components Are:',' ',
-     +       5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
- 1019 Format(I6,41d19.8)
- 1020 Format(1x,72('$'))
+C 1018 Format(' 5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
+C 1019 Format(I6,41d19.8)
+C 1020 Format(1x,72('$'))
  1021 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
  1022 Format (' Storage Limit Being Approached, Change Eps To ',
      +     D9.4)
@@ -1203,11 +1211,12 @@ C.... This Subroutine Is Used For Saving And Re-Inserting Solutions.
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       Common /acConvg/ Nits
       LOGICAL use_c, comp_c
-      Common/acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
 
       logical stab_kappa, stab_gamma, stab_cond, stiff_cond, ill_cond
       logical stab_kappa1, ill_cond_newt, stab_sigma, comparekappa
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
       Intrinsic Max
 
@@ -1257,7 +1266,7 @@ c Karline: use precis instead of d1mach
       If (.not. Linear) Then
          CALL Dload(Ntol, One, Etest6, 1)
       Else
-         Do 10 I = 1, Ntol 
+         Do 10 I = 1, Ntol
             Etest6(I) = One/Max(Quan6, Tol(I)**Third)
    10    Continue
       Endif
@@ -1733,9 +1742,10 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
       LOGICAL use_c, comp_c
       LOGICAL stiff_cond  ,stab_cond,  ill_cond_newt
 
-      Common/acAlgprs/ Nminit, Iprint,Maxcon,Itsaim,Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       Intrinsic Max
 
       Logical Errok
@@ -1828,7 +1838,7 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
       If (.not. Maxmsh .and. Iprec .ne. 2) Then
          If (Linear .and. (Ifinal .eq. 1 .or. Iatt .ne. 0)) Then
 c              Call Initu(Ncomp, Nmsh, Nudim, U)
-              call acinitu(ncomp, nmsh, xx, nudim, u, 
+              call acinitu(ncomp, nmsh, xx, nudim, u,
      +            nugdim,nmshguess,xguess,uguess)
          Else
 ***bugfix 2jul01
@@ -1871,10 +1881,11 @@ c              Call Initu(Ncomp, Nmsh, Nudim, U)
 
       Logical Linear,use_c,comp_c
 
-      Common /acAlgprs/ Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c       St1 --> Tmp(ncomp,10)
 c       St2 --> Tmp(ncomp,11)
 c       St3 --> Tmp(ncomp,12)
@@ -2050,10 +2061,11 @@ c      end do
      +      A43,A44,A45,B1,B2,B3,C1,C2,C3,C16,C26,C36,C123,C223,
      +      C323,C14,C24,C34
       logical use_c,comp_c
-      Common /acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       Logical Linear
 
 c      St1 --> Tmp(ncomp,13)
@@ -2335,10 +2347,11 @@ c      St4 --> Tmp(ncomp,16)
       external   acgsub
 
       logical  use_c, comp_c
-      Common/acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common/Mchprs/ Flmin,Flmax, Epsmch
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
       intrinsic  abs
       intrinsic  max
@@ -2540,9 +2553,10 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
       external   acgsub
       external   acdgsub
       LOGICAL use_c, comp_c
-      Common/acAlgprs/Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 *  blas: dcopy, dload
 
       parameter  ( one = 1.0d+0, zero = 0.0d+0 )
@@ -2579,7 +2593,7 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
 
       call dcopy(ncomp*nmsh,rhs,1,tmprhs,1)
       call dcopy(ncomp*nmsh,tmprhs,1,delu,1)
-      
+
 
       job = 0
       call colrow(isize, topblk,nlbc, ncomp, ajac, ncomp, 2*ncomp,
@@ -2656,7 +2670,8 @@ c      iflag = 0
       logical rhsgiv
 
       LOGICAL use_c, comp_c
-      Common/acAlgprs/ Nminit,Iprint,Maxcon,Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       external   acfsub
       external   acdfsub
       external   acgsub
@@ -2669,7 +2684,7 @@ c      iflag = 0
 
       common/mchprs/ flmin, flmax, epsmch
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       logical gtpdeb, imprvd, braktd, crampd, extrap, vset, wset
       save  gtpdeb, mfsrch, epsaf, epsag, eta, rmu, tolabs, alfmax
       save  tolrel, toltny
@@ -2722,7 +2737,7 @@ c
       alfold = one
       alfa = zero
 
-      
+
       if (.not. rhsgiv) then
 
 *  If necessary, evaluate the right-hand side at the initial u.
@@ -2733,10 +2748,10 @@ c
      *      acfsub, acgsub, rhs, rnsq, fval, ftmp, uint,eps,rpar,ipar)
       endif
 
-     
+
 
       rnsqtr = rnsq
-      
+
 *  At any given Newton iteration, rnprev is the value of rnsq at
 *  the immediately preceding Newton iteration.
 
@@ -3262,7 +3277,7 @@ c  at the initial point of the line search.
       common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
       common/mchprs/ flmin, flmax, epsmch
       intrinsic abs
-      character(len=100) msg
+      character(len=150) msg
 
 *  blas: dssq
 
@@ -3411,9 +3426,10 @@ c      endif
       Dimension Xx(*), Xxold(*)
       Logical Maxmsh
       LOGICAL use_c, comp_c
-      Common/acAlgprs/Nminit,Iprint,Maxcon, Itsaim, Uval0,use_c,comp_c
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      character (len=100) msg
+      character (len=150) msg
 *  Blas: Dcopy
 
       Parameter (Half = 0.5d+0)
@@ -3726,7 +3742,7 @@ C
             Dx = Rlen/Irefin(Im)
             Do 300 J = 2, Irefin(Im)
                New = New + 1
-                              
+
                if (New .ge. Nmax) goto 360
                Xx(New) = Xxold(Im) + (J-1)*Dx
 
@@ -4616,7 +4632,7 @@ c  end of getptq
 *  By Construction, Xx(1) = Xxold(1).  Copy The First Ncomp
 *  Components Of Uold Into Those Of U.
 
-     
+
       Call Dcopy(Ncomp, Uold(1,1), 1, U(1,1), 1)
 
       I = 2
@@ -5290,7 +5306,7 @@ C
             Dx = Rlen/Irefin(Im)
             Do 300 J = 2, Irefin(Im)
                New = New + 1
-               if (New .ge. Nmax) goto 360 
+               if (New .ge. Nmax) goto 360
                Xx(New) = Xxold(Im) + (J-1)*Dx
                If (Xx(New) .eq. Xx(New-1)) Then
                   Iprec = 2
@@ -5382,8 +5398,9 @@ C
 *  double precision dlog
 
       logical pdebug, use_c, comp_c, linear
-      common/acalgprs/nminit,pdebug,iprint, idum, uval0, use_c, comp_c
-      character (len=100) msg
+      common/algprs/ nminit, iprint, idum, use_c, comp_c
+      Common/acAlgprs/Maxcon,Itsaim,Uval0
+      character (len=150) msg
       parameter  ( zero = 0.0d+0, one = 1.0d+0 )
 
 * the function moncond compute the monitor function based on the
@@ -5393,7 +5410,7 @@ C
          r4(i) = (xx(i+1)-xx(i))*dabs(amg(i+1)- amg(i))
        end do
 
-    
+
 
        r2 = r4(1)
        do i=2,nmsh-1
@@ -5405,13 +5422,13 @@ C
       else
          cfac=1d-5
       endif
-      
+
 
        do i=1,nmsh-1
 c         r4(i) = r4(i)+(xx(i+1)-xx(i))*(r2/(xx(nmsh)-xx(1)))*cfac
           r4(i) = r4(i)+(r2/(xx(nmsh)-xx(1)))*cfac
        end do
-       
+
        r1 = r4(1)
        do i=2,nmsh-1
           r1 = max(r1,r4(i))

@@ -1,18 +1,5 @@
 
 c ===================================================================================
-* karline: to make this code compatible with R:
-* 1. change all write(6,...) -> rprint
-* 2. add initu (in file twpbvpa.f)
-* 3. pass precisions, in 3-valued vector "precis", as passed form C calling routine
-*         - do not use d1mach of original FORTRAN code
-* 4. add argument useC for conditioning or not
-* 5. add arguments xguess and yguess (used if givu=TRUE)
-* 6. got rid of "pdebug"
-* 7. added iset, to contain several 'counters'
-c ===================================================================================
-
-
-c ===================================================================================
 c main driver for twpbvpc, written by Jeff Cash and Francesca Mazzia
 c with small adaptations to make it work with R by Karline Soetaert
 c ===================================================================================
@@ -41,7 +28,12 @@ C
 *                            (ONLY IF USE_C = .true.)
 *     IFLBVP = 4   terminated invalid input
 *
-
+* WORKSPACE IN INPUT
+* WRK workspace WRK(LWRKFL)
+*      LWRKFL>=16*NCOMP+3*NCOMP*NCOMP+16*NCOMP*NXXDIM
+*             +5*NCOMP*NCOMP*NXXDIM+3*NXXDIM
+* IWRK workspace IWRK(LWRKIN)
+*      LWRKIN>=2*NCOMP*NXXDIM+2*NXXDIM+NCOMP
 *
 *  The subroutine twpbvpc is intended to solve two-point boundary
 *  value problems.
@@ -53,6 +45,9 @@ C
 *   for two-point boundary value codes.
 *   J. Comput. Appl. Math.  184  (2005), no. 2, 362--381.
 *
+*  CASH, J. R. AND MAZZIA, F. 2009. Conditioning and Hybrid Mesh
+*   Selection Algorithms For Two Point Boundary Value Problems.
+*   Scalable Computing: Practice and Experience 10, 4, 347-361.
 *   Revision History
 *
 * revision  July 3,  2006
@@ -93,8 +88,19 @@ C
 *
 * The starting subroutine is twpbvp by J.R. Cash and M.H. Wright
 *
-* Francesca added nygdim devo aggiungere nmguess in input
-*  e Uval0 in common
+*
+c ===================================================================================
+* karline: to make this code compatible with R:
+* 1. change all write(6,...) -> rprint
+* 2. add initu (in file twpbvpa.f)
+* 3. pass precisions, in 3-valued vector "precis", as passed form C calling routine
+*         - do not use d1mach of original FORTRAN code
+* 4. add argument useC for conditioning or not
+* 5. add arguments xguess and yguess (used if givu=TRUE)
+* 6. got rid of "pdebug"
+* 7. added iset, to contain several 'counters'
+c ===================================================================================
+
 *
 
       implicit double precision (a-h,o-z)
@@ -197,12 +203,12 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 *  Calculate maximum number of mesh points possible with the
 *  given floating-point and integer workspace.
 
-      isp = lwrkfl - 2*ntol - 22*ncomp - 6*ncomp*ncomp
-      iden = 6*ncomp*ncomp + 22*ncomp + 3
+      isp = lwrkfl  - 2*ntol - 14*ncomp - 3*ncomp*ncomp
+      iden = 5*ncomp*ncomp + 16*ncomp + 3
       nmax1 = isp/iden
 
-      isp = lwrkin - 2*ncomp
-      nmax2 = isp/(2*ncomp+3)
+      isp = lwrkin - ncomp
+      nmax2 = isp/(2*ncomp+2)
 
       nmax = min(nmax1,nmax2)
 * nmax from workspace
@@ -222,31 +228,31 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       irhs = 1
       lrhs = ncomp*nmax
-
+* 1 ncomp*nmax
       itpblk = irhs + lrhs
       ltpblk = ncomp*nlbc
-
+* 2 ncomp*nmax
       ibtblk = itpblk + ltpblk
       lbtblk = ncomp*(ncomp - Nlbc)
-
+* 3 ncomp*nmax
       iajac = ibtblk + lbtblk
       lajac = 2*ncomp*ncomp*nmax
-
+* 2 ncomp*ncomp*nmax
       ibhold = iajac + lajac
       lbhold = ncomp*ncomp*nmax
-
+* 3 ncomp*ncomp*nmax
       ichold = ibhold + lbhold
       lchold = ncomp*ncomp*nmax
-
+* 4 ncomp*ncomp*nmax
       ifval = ichold + lchold
       lfval = ncomp*nmax
-
+* 4 ncomp*nmax
       idef = ifval + lfval
       ldef = ncomp*(nmax-1)
-
+* 5 ncomp*nmax
       idefex = idef + ldef
       ldefex = ncomp*(nmax-1)
-
+* 6 ncomp*nmax
 *  def6 uses the same space as defexp
 
       idef6 = idefex
@@ -254,7 +260,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       idefim = idef6 + ldef6
       ldefim = ncomp*(nmax-1)
-
+* 7 ncomp*nmax
 *  def8 uses the same space as defimp
 
       idef8 = idefim
@@ -262,80 +268,80 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       iusve = idef8 + ldef8
       lusve = ncomp*nmax
-
+* 8 ncomp*nmax
       iuold = iusve + lusve
       luold = ncomp*nmax
-
+* 9 ncomp*nmax
       itmrhs = iuold + luold
       ltmrhs = ncomp*nmax
-
+* 10 ncomp*nmax
       irhtri = itmrhs + ltmrhs
       lrhtri = ncomp*nmax
-
+* 11 ncomp*nmax
       idelu = irhtri + lrhtri
       ldelu = ncomp*nmax
-
+* 12 ncomp*nmax
       ixmer = idelu + ldelu
       lxmer = ncomp*nmax
 
 *  rerr occupies the same space as xmerit
       irerr = ixmer
       lrerr = ncomp*nmax
-
+* 13 ncomp*nmax
       iutri = irerr + lrerr
       lutri = ncomp*nmax
-
+* 14 ncomp*nmax
       iermx = iutri + lutri
       lermx = nmax
-
+* 1 nmax
       irtdc = iermx + lermx
       lrtdc = nmax
-
+* 2 nmax
       ixxold = irtdc + lrtdc
       lxxold = nmax
-
+* 3 nmax
       iuint = ixxold + lxxold
       luint = ncomp
-
+* 1 ncomp
       iftmp = iuint + luint
       lftmp = ncomp
-
+* 2 ncomp
       idgtm = iftmp + lftmp
       ldgtm = ncomp
-
+* 3 ncomp
       idftm1 = idgtm + ldgtm
       ldftm1 = ncomp*ncomp
-
+* 1 ncomp*ncomp
       idftm2 = idftm1 + ldftm1
       ldftm2 = ncomp*ncomp
-
+* 2 ncomp*ncomp
       itmp = idftm2 + ldftm2
       ltmp = ncomp*8
-
+* 11 ncomp
       idsq = itmp + ltmp
       ldsq = ncomp*ncomp
-
+* 3 ncomp*ncomp
       idexr = idsq + ldsq
       ldexr = ncomp
-
+* 12 ncomp
       ietst6 = idexr + ldexr
       letst6 = ntol
-
+* 1 ntol
       ietst8 = ietst6 + letst6
       letst8 = ntol
-
+* 2 ntol
       iamg = ietst8 + letst8
       lamg = ncomp*nmax
-
+* 15 ncomp*nmax
       ic1 = iamg + lamg
       lc1 = ncomp*ncomp*nmax
-
+* 5 ncomp*ncomp*nmax
       idelta0 = ic1 + lc1
       ldelta0 = ncomp*2
-
+* 14 ncomp
       iwrkrhs = idelta0+ldelta0
       lwrkrhs = ncomp*nmax
-
+* 16 ncomp*nmax
       ilast = iwrkrhs +  lwrkrhs
 
 
@@ -345,7 +351,6 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       ENDIF
 
  903   format(1h ,'ilast',i10)
-
 
 
 *  Partition integer workspace.
@@ -364,6 +369,12 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       iisign = iipvlu + lipvlu
       lisign = ncomp*nmax
+
+      if (iprint .eq. 1) then
+        write(msg,*) 'integer workspace', iisign+lisign
+        call rprint(msg)
+      end if
+
 
 c ksks: add precis as argument: machine precision...
       call bvpsol(ncomp, nmsh, nlbc, aleft, aright,
@@ -798,7 +809,7 @@ c karline: added ill_cond_newt
          call fail4( ncomp, nmsh, nlbc, ntol, ltol,
      *       xx, nudim, u, rhs, linear, nmax,
      *       nmold, xxold, uold, ratdc,
-     *       iorder, iflnwt, itnwt, ddouble , maxmsh, 
+     *       iorder, iflnwt, itnwt, ddouble , maxmsh,
      *       numbig,nummed,wrkrhs,amg,stab_cond,stiff_cond,
      *       ill_cond_newt,nfail4,nfxpnt,fixpnt, irefin,itcond,
      *       itcondmax,rpar,ipar,nmguess,xguess,nygdim, yguess)

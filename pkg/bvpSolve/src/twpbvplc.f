@@ -27,14 +27,26 @@ c ==============================================================================
 *                            (ONLY IF USE_C = .true.)
 *     IFLBVP = 4   terminated invalid input
 *
+
+* WORKSPACE IN INPUT
+*
+* WRK workspace WRK(LWRKFL)
+*   LWRKFL >= 24*NCOMP+16*NCOMP*NCOMP+14*NCOMP*NXXDIM
+*                 +5*NCOMP*NCOMP*NXXDIM+4*NXXDIM)
+* IWRK workspace IWRK(LWRKIN)
+*    LWRKIN >= 2*NCOMP*NXXDIM+2*NXXDIM+3*NCOMP)
+*
 *  The subroutine twpbvpl is intended to solve two-point boundary
 *  value problems.
-*
 * References:
-*  Cash, J. R.; Mazzia, F.
-*      Hybrid Mesh Selection Algorithms Based on Conditioning for
-*      Two-Point Boundary Value Problems, Journal of Numerical Analysis,
-*     Industrial and Applied Mathematics, in press
+*
+*  CASH, J. R. AND MAZZIA, F. 2006. Hybrid mesh selection algorithms
+*  based on conditioning for two-point boundary value problems.
+*  JNAIAM J. Numer. Anal. Ind. Appl. Math. 1, 1, 81-90.
+*
+*  CASH, J. R. AND MAZZIA, F. 2009. Conditioning and Hybrid Mesh
+*   Selection Algorithms For Two Point Boundary Value Problems.
+*   Scalable Computing: Practice and Experience 10, 4, 347-361.
 *
 *   Revision History
 *
@@ -72,7 +84,7 @@ c ==============================================================================
 *
 *     Revision February 2011 (Francesca Mazzia)
 *          changed the input parameters in order to have the same
-*          input of twpbvpc that work with R
+*          input of twpbvpc that works with R
 *          All the subroutine in common with twpbvpc are in a companion
 *          file called  twpbvpa.f
 *
@@ -177,12 +189,12 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 *  Calculate maximum number of mesh points possible with the
 *  given floating-point and integer workspace.
 
-      isp = lwrkfl - 3 - 2*ntol - 22*ncomp - 6*ncomp*ncomp
-      iden = 6*ncomp*ncomp + 22*ncomp + 3
+      isp = lwrkfl  - 2*ntol - 24*ncomp - 14*ncomp*ncomp
+      iden = 5*ncomp*ncomp + 14*ncomp + 4
       nmax1 = isp/iden
 
-      isp = lwrkin - 2*ncomp-3
-      nmax2 = isp/(2*ncomp+3)
+      isp = lwrkin - 3*ncomp
+      nmax2 = isp/(2*ncomp+2)
 
       nmax = min(nmax1,nmax2)
 * nmax from workspace
@@ -202,28 +214,28 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       irhs = 1
       lrhs = ncomp*nmax
-
+* 1 ncomp*nmax
       itpblk = irhs + lrhs
       ltpblk = ncomp*nlbc
-
+* 1 ncomp*ncomp
       ibtblk = itpblk + ltpblk
       lbtblk = ncomp*(ncomp - Nlbc)
-
+* 2 ncomp*ncomp
       iajac = ibtblk + lbtblk
       lajac = 2*ncomp*ncomp*nmax
-
+* 2 ncomp*ncomp*nmax
       ibhold = iajac + lajac
       lbhold = ncomp*ncomp*nmax
-
+* 3 ncomp*ncomp*nmax
       ichold = ibhold + lbhold
       lchold = ncomp*ncomp*nmax
-
+* 4 ncomp*ncomp*nmax
       ifval = ichold + lchold
       lfval = ncomp*nmax
-
+* 2 ncomp*nmax
       idef = ifval + lfval
       ldef = ncomp*(nmax-1)
-
+* 3 ncomp*nmax
       idefex = idef + ldef
 *      ldefex = ncomp*(nmax-1)
 
@@ -231,7 +243,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       idef6 = idefex
       ldef6 = ncomp*(nmax-1)
-
+* 4 ncomp*nmax
       idefim = idef6 + ldef6
 *      ldefim = ncomp*(nmax-1)
 
@@ -239,88 +251,88 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 
       idef8 = idefim
       ldef8 = ncomp*(nmax-1)
-
+* 5 ncomp*nmax
       iusve = idef8 + ldef8
       lusve = ncomp*nmax
-
+* 6 ncomp*nmax
       iuold = iusve + lusve
       luold = ncomp*nmax
-
+* 7 ncomp*nmax
       itmrhs = iuold + luold
       ltmrhs = ncomp*nmax
-
+* 8 ncomp*nmax
       irhtri = itmrhs + ltmrhs
       lrhtri = ncomp*nmax
-
+* 9 ncomp*nmax
       idelu = irhtri + lrhtri
       ldelu = ncomp*nmax
-
+* 10 ncomp*nmax
       ixmer = idelu + ldelu
 *      lxmer = ncomp*nmax
 
 *  rerr occupies the same space as xmerit
       irerr = ixmer
       lrerr = ncomp*nmax
-
+* 11 ncomp*nmax
       iutri = irerr + lrerr
       lutri = ncomp*nmax
-
+* 12 ncomp*nmax
       iermx = iutri + lutri
       lermx = nmax
-
+* 1  nmax
       irtdc = iermx + lermx
       lrtdc = nmax
-
+* 2  nmax
       ixxold = irtdc + lrtdc
       lxxold = nmax
-
+* 3  nmax
       iuint = ixxold + lxxold
       luint = ncomp
-
+* 1 ncomp
       iftmp = iuint + luint
       lftmp = ncomp
-
+* 2 ncomp
       idgtm = iftmp + lftmp
       ldgtm = ncomp
-
+* 3 ncomp
       idftm1 = idgtm + ldgtm
       ldftm1 = ncomp*ncomp
-
+* 3 ncomp*ncomp
       idftm2 = idftm1 + ldftm1
       ldftm2 = ncomp*ncomp
-
+* 4 ncomp*ncomp
       itmp = idftm2 + ldftm2
       ltmp = ncomp*20
-
+* 23 ncomp
       idsq = itmp + ltmp
       ldsq = ncomp*ncomp
-
+* 5 ncomp*ncomp
       idexr = idsq + ldsq
       ldexr = ncomp
-
+* 24 ncomp
       ietst6 = idexr + ldexr
       letst6 = ntol
-
+* 1 ntol
       ietst8 = ietst6 + letst6
       letst8 = ntol
-
+* 2 ntol
       iamg = ietst8 + letst8
       lamg = ncomp*nmax
-
+* 13 ncomp*nmax
       ic1 = iamg + lamg
       lc1 = ncomp*ncomp*nmax
-
+* 5 ncomp*ncomp*nmax
 
       iwrkrhs = ic1+lc1
       lwrkrhs = ncomp*nmax
-
+* 14 ncomp*nmax
       ir4 = iwrkrhs + lwrkrhs
       lr4 = nmax
-
-      ibhold = ir4 + lr4
-      lbhold = 9*ncomp*ncomp
-
-      ilast = iwrkrhs +  lwrkrhs
+* 4  nmax
+      idhold = ir4 + lr4
+      ldhold = 9*ncomp*ncomp
+* 14 ncomp*ncomp
+      ilast = idhold +  ldhold
 
 
       if (iprint .eq. 1) then
@@ -342,10 +354,15 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       lipvbk = ncomp*nmax
 
       iipvlu = iipvbk + lipvbk
-      lipvlu = ncomp
+      lipvlu = 3*ncomp
 
       iisign = iipvlu + lipvlu
-*      lisign = ncomp*nmax
+      lisign = ncomp*nmax
+
+      if (iprint .eq. 1) then
+        write(msg,*) 'integer workspace', iisign+lisign
+        call rprint(msg)
+      end if
 
       call bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
      *   nfxpnt, fixpnt, ntol, ltol, tol, nmax, linear,
@@ -353,7 +370,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
      *   wrk(idefex), wrk(idefim), wrk(idef), wrk(idelu),
      *   wrk(irhs), wrk(ifval),
      *   wrk(itpblk), wrk(ibtblk), wrk(iajac), wrk(ibhold),
-     *   wrk(ichold), wrk(ibhold), iwrk(iipvbk), iwrk(iipvlu),
+     *   wrk(ichold), wrk(idhold), iwrk(iipvbk), iwrk(iipvlu),
      *   iwrk(iisign), wrk(iuint), wrk(iftmp), wrk(itmrhs),
      *   wrk(idftm1), wrk(idftm2), wrk(idgtm),
      *   wrk(iutri), wrk(irhtri), wrk(ixmer),
@@ -1377,7 +1394,6 @@ c ==============================================================================
       Dimension Def6(Ncomp,Nmsh-1), Def8(Ncomp,Nmsh-1),Tmp(Ncomp,*)
       Dimension Df(Ncomp,Ncomp), Ltol(Ntol), Tol(Ntol)
       Dimension Ip(2*Ncomp), Dhold(2*Ncomp,2*Ncomp)
-      Dimension St1(200), St2(200), St3(200)
       External Fsub
       external Dfsub
 

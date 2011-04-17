@@ -163,7 +163,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     SEXP Nmesh, SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
     SEXP Rpar, SEXP Ipar, SEXP UseC, SEXP Epsini, SEXP Eps,
     SEXP derivfunc, SEXP jacfunc, SEXP boundfunc, SEXP jacboundfunc,
-    SEXP Initfunc, SEXP Parms, SEXP flist, SEXP Type, SEXP rho)
+    SEXP Initfunc, SEXP Parms, SEXP flist, SEXP rho)
 {
 /******************************************************************************/
 /******                   DECLARATION SECTION                            ******/
@@ -175,7 +175,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis, *xguess, *yguess;
   double epsmin, epsini, aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2;
-  int liseries, *iseries, nxdim, type, *icount;
+  int liseries, *iseries, nxdim, *icount;
   int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh;
   int full, useC, givu, giveps, nmesh, isDll, nugdim, nmshguess;
 
@@ -197,7 +197,6 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   ncomp  = INTEGER(Ncomp)[0];    /* number of equations */
   n_eq   = ncomp;
-  type   = INTEGER(Type)[0];     /* 1 = bvptwp */
 
   nlbc    = INTEGER(Nlbc)[0];    /* number of left boundary conditions */
   nmax    = INTEGER(Nmax)[0];    /* max number of mesh points */

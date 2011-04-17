@@ -119,7 +119,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     SEXP Rpar, SEXP Ipar, SEXP UseC, 
     SEXP derivfunc, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP Initfunc, SEXP Parms, SEXP flist, 
-    SEXP Lobatto, SEXP Type, SEXP rho)
+    SEXP Lobatto, SEXP rho)
 
 {
 /******************************************************************************/
@@ -154,7 +154,6 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   aright =REAL(Aright)[0];
 
   ncomp   = INTEGER(Ncomp)[0];    /* number of equations */
-  type    = INTEGER(Type)[0];     /* 1 = bvptwp */
   lobatto = INTEGER(Lobatto)[0];  /* 0 = bvptwp , 1 = bvptwpl*/
 
   nlbc   = INTEGER(Nlbc)[0];     /* number of left boundary conditions */

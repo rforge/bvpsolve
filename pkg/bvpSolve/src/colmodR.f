@@ -631,7 +631,7 @@ C----------------------------------------------------------------------
       External MGsub
       External MDgsub
       External MGuess
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
 c Francesca
       logical eps_changed
@@ -1301,7 +1301,9 @@ C KARLINE: added...
             Iback = 1
 C KARLINE: ADDED THAT - NOW DIRECTLY TO 340, NOT TO 290!
                If (Epsp .ne. Zero) Then
-                  Write(msg,1017) Eps,Iflag,Eps,Epsp
+                  Write(msg,1018) Eps,Iflag,Eps
+                  call rprint(msg)
+                  Write(msg,1017) Epsp
                   call rprint(msg)
                Else
                   Write(msg,1018) Eps,Iflag,Eps
@@ -1654,19 +1656,17 @@ C-----------------------------------------------------------------------
  1015 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
  1016 Format (' Storage Limit Being Approached, Change Eps To ',
      +     D9.4)
- 1017 Format (' Final Problem Epsilon = ',D10.4,
-     +        ' Not Solved, Iflag =',I3, ' Try Running Problem Again',
-     +        ' With Eps Greater Than ',D9.4,' Machine Precision',
-     +        ' (Possibly) Not Sufficient For Eps Less Than ',D9.4)
+ 1017 Format (' Machine Precision',
+     +        ' (Possibly) Not Sufficient For Eps < ',D9.4)
  1018 Format (' Final Problem Epsilon = ',D10.4,
-     +        ' Not Solved, Iflag =',I3,' Try Running Problem Again',
-     +        ' With Eps Greater Than ',D9.4)
+     +        ' Not Solved, Iflag =',I3,' Try Again',
+     +        ' With Eps > ',D9.4)
  1019 Format (' ** Failed Step - Bactracking For Larger Value ',
      +          'Of Epsilon')
- 1020 Format(' The Final Mesh And Solution Components Are:',
-     +       5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
- 1021 Format(I6,41d19.8)
- 1022 Format(1x,82('$'))
+C 1020 Format(' The Final Mesh And Solution Components Are:',
+C     +       5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
+C 1021 Format(I6,41d19.8)
+C 1022 Format(1x,82('$'))
 C-----------------------------------------------------------------------
       End
 
@@ -1746,7 +1746,7 @@ C
       External MGsub
       External MDgsub
       External MGuess
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
 
 *  The Parameter Inumb Is A Counter Used To Limit To Three The Number
@@ -2417,7 +2417,7 @@ C
      +                Root(40), Jtol(40), Ltol(40), Ntol
       Common /Flags/ Ifinal,Iatt,Iback,Iprec
       Common /Mshvar/ Pmax,Hord,Hsml
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 C
       Nfxp1 = Nfxpnt +1
       Iprec = Min(Iprec,1)
@@ -3155,7 +3155,7 @@ C
       Common /MColbas/ B(28), Acol(28,7), Asave(28,4)
       Common /MColest/ Wgtmsh(40), Wgterr(40), Tolin(40),
      +                Root(40), Jtol(40), Ltol(40), Ntol
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 C
 C.... Error Estimates Are To Be Generated And Tested
 C.... To See If The Tolerance Requirements Are Satisfied.
@@ -3997,7 +3997,7 @@ C
       Dimension Z(*), Dmz(*), Bm(4), Coef(*)
 C
       Common /MColout/ Precis, Iprint
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 C
       Go To (10, 30, 80, 90), Mode
 C

@@ -498,7 +498,7 @@ c     2                   FSUB, DFSUB, GSUB, DGSUB, GUESS)
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
 C
 C*********************************************************************
@@ -852,7 +852,7 @@ C
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
 C
       EXTERNAL FSUB, DFSUB, GSUB, DGSUB, GUESS
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
 C
 C...  constants for control of nonlinear iteration
@@ -1484,7 +1484,7 @@ C
       COMMON /COLBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /COLEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (len = 100) msg 
+      CHARACTER (len = 150) msg 
 C
       NFXP1 = NFXPNT +1
       GO TO (180, 100, 50, 20, 10), MODE
@@ -1978,7 +1978,7 @@ C
       COMMON /COLBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /COLEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (len = 100) msg 
+      CHARACTER (len = 150) msg 
 
 C
 C...  error estimates are to be generated and tested
@@ -2128,7 +2128,7 @@ C
       COMMON /COLBAS/ B(28), ACOL(28,7), ASAVE(28,4)
 C
       EXTERNAL DFSUB, DGSUB
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 
@@ -2818,7 +2818,7 @@ C
       DIMENSION Z(*), DMZ(*), BM(4), COEF(*)
 C
       COMMON /COLOUT/ PRECIS, IOUT, IPRINT
-      CHARACTER (len = 100) msg 
+      CHARACTER (len = 150) msg 
 
 C
       GO TO (10, 30, 80, 90), MODE

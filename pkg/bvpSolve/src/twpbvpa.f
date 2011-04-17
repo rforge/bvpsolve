@@ -12,9 +12,9 @@ c print R-messages
 c ===================================================================================
 
       subroutine rprint(msg)
-      character (len=100) msg
+      character (len=150) msg
 
-            call dblepr(msg, 100, 0, 0)
+            call dblepr(msg, 150, 0, 0)
       end subroutine
 
 c ===================================================================================
@@ -30,7 +30,7 @@ c ==============================================================================
       implicit double precision (a-h,o-z)
       dimension xx(*), u(nudim, *), xguess(*), uguess(nugdim,*)
 
-      character(len=100) msg
+      character(len=150) msg
 
       logical use_c, comp_c, giv_u
       integer nmguess, ureset

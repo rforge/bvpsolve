@@ -6,4 +6,5 @@ inst/doc/.*[.]o
 inst/doc/.*[.]rc
 ^Rplots.pdf$
 work
+src/.*[.]dll
 todo.txt

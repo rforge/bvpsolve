@@ -477,7 +477,7 @@ c karline: added counters
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
 c***********************************************************************
 c
@@ -816,7 +816,7 @@ c
       common /eqord/  ind(5), ineq(20), mnd(5), nd, neq
       common /errors/ tol(40),wgtmsh(40),tolin(40),root(40),
      1       jtol(40),ltol(40),ntol
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
 c...  constants for control of nonlinear iteration
 c
@@ -1347,7 +1347,7 @@ c
       common /bsplin/ vncol(66,7), vnsave(66,5), vn(66)
       dimension d1(40), d2(40), zv(40), slope(*), accum(*), valstr(*)
       dimension xi(*), xiold(*), xij(*), aldif(*), fixpnt(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       nfxp1 = nfxpnt +1
       go to (180, 100, 50, 20, 10), mode
@@ -1719,7 +1719,7 @@ c
      3     5.097d-13, 2.290d-12, 2.446d-11, 2.331d-10, 2.936d-9,
      4     3.593d-8,  7.001d-16, 3.363d-15, 3.921d-14, 4.028d-13,
      5     5.646d-12, 7.531d-11, 1.129d-9  /
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
 c...  assign weights for error estimate
 c
@@ -1851,7 +1851,7 @@ c
       common /nonln/ precis,nonlin,iter,limit,icare,iprint,iguess,ifreez
       common /bsplin/ vncol(66,7), vnsave(66,5), vn(66)
       dimension xiold(*), aldif(*), valstr(*), work(mstar,*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       ifin = 1
       noldp1 = nold + 1
@@ -2010,7 +2010,7 @@ c*********************************************************************
       dimension aldif(*), rhs(*), a(*), ipiv(*), integs(3,*)
       dimension z(40), f(40), df(800), dmval(20)
       dimension rpar(*), ipar(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
@@ -2288,7 +2288,7 @@ c**********************************************************************
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       nk = nc
       if (mode .eq. 2)  nk = nc + ncomp - 1
@@ -2501,7 +2501,7 @@ c
       common /nonln/ precis,nonlin,iter,limit,icare,iprint,iguess,ifreez
       common /side/  zeta(40), aleft, aright, izeta
       dimension z(*), vn(*), xi(*), aldif(*), m(*), dmval(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       go to (10, 60, 70, 10, 80), mode
 c
@@ -2611,7 +2611,7 @@ c***********************************************************************
 c
       implicit real*8 (a-h,o-z)
       dimension vn(*), m(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       xrho = 1.d0 - rhox
       ivn = 0
 c
@@ -2659,7 +2659,7 @@ c**********************************************************************
 c
       implicit real*8 (a-h,o-z)
       dimension vn(*), xi(*), m(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       md1 = m(ncomp) -1
       if(md1 .le. 0)                                return
       xil = xi(1)
@@ -2738,7 +2738,7 @@ c
       common /eqord/ ind(5), ineq(20), mnd(5), nd, neq
       dimension basef(*), vn(*), xmesh(*)
       dimension alphd(80), alphdo(80), alphn(280) , alphno(280)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       go to (10, 20, 30, 40), mode
 c
@@ -3012,7 +3012,7 @@ c***********************************************************************
 c
       implicit real*8 (a-h,o-z)
       dimension aldif(*), alpha(*), xi(*), m(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       kd = k * ncomp
       incomp = 0
       k3 = 0
@@ -3126,7 +3126,7 @@ c
       common /order/ k,ncomp,mstar,kd,kdm,mnsum,m(20)
       dimension uhigh(*) , ar(20), arm1(20)
       dimension aldif(*), xiold(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
       dn2 = 1.d0 / (xiold(i+1) - xiold(i))
       incomp = 0
@@ -3204,7 +3204,7 @@ c
       integer integs(3,nbloks),ipivot(*),iflag, i,index,indexb,indexn,
      1        last,ncol,nrow
       double precision bloks(*),scrtch(*)
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
       iflag = 1
       indexb = 1
       indexn = 1
@@ -3267,7 +3267,7 @@ c
       integer ipivot(nrow),ncol,last,iflag, i,ipivi,ipivk,j,k,kp1
       double precision w(nrow,ncol),d(nrow), awikdi,colmax,ratio,rowmax
       double precision dabs,dmax1
-      CHARACTER(len=100) msg
+      CHARACTER(len=150) msg
 c
 c...  initialize ipivot, d
 c
