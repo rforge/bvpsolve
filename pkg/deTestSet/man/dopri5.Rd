@@ -36,7 +36,7 @@ cashkarp (y, times, func, parms, rtol = 1e-6, atol = 1e-6,
   verbose = FALSE, hmax = NULL, hini = hmax, ynames = TRUE, 
   maxsteps = 10000, dllname = NULL, initfunc = dllname, initpar = parms, 
   rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
-  initforc = NULL, fcontrol = NULL, ...)
+  initforc = NULL, fcontrol = NULL, stiffness = 0, ...)
 
 }
 
@@ -154,6 +154,14 @@ cashkarp (y, times, func, parms, rtol = 1e-6, atol = 1e-6,
   }
   \item{fcontrol }{A list of control parameters for the forcing functions.
     See \link{forcings} or vignette \code{compiledCode}.
+  }
+  \item{stiffness }{How the stiffness of the solution should be estimated.
+   Default = No stiffness estimate; when = \code{stiffness = 1} or \code{-1}: all stiffness estimates
+   calculated ; when = \code{stiffness = 2} or \code{-2}: stiffness based on
+   eigenvalue approximation;  when = \code{stiffness = 3} or \code{-3}: stiffness
+   based on error estimate; when = \code{stiffness = 4} or \code{-4}: stiffness
+   based on conditioning. Positive values of \code{stiffness} will cause the
+   integration to stop; negative values will continue anyway.
   }
   \item{... }{additional arguments passed to \code{func} and
     \code{jacfunc} allowing this to be a generic function.

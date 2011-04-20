@@ -7,7 +7,7 @@
 around the implemented DAE solvers}
 
 \usage{dae(y, times, parms, dy, res = NULL, func = NULL,
-    method = c("mebdfi", "daspk", "radau"), ...)
+    method = c("mebdfi", "daspk", "radau", "gams"), ...)
 }
 \arguments{
   \item{y }{the initial (state) values for the DAE system, a vector. If
@@ -74,7 +74,7 @@ around the implemented DAE solvers}
     for more information).
   }
   \item{method }{the solver to use, either a string (\code{"mebdfi"},
-    \code{"daspk"}), \code{"radau"} or a function that performs integration.
+    \code{"daspk"}), \code{"radau"}, \code{"gams"} or a function that performs integration.
   }
   \item{... }{additional arguments passed to the solvers.
   }

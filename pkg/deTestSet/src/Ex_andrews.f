@@ -41,7 +41,6 @@ c-----------------------------------------------------------------------
       implicit none
       DOUBLE PRECISION T, Y(27), DELTA(27), YPRIME(27),RPAR(*), CJ
       INTEGER I, J, IERR, N, IPAR(*)
-      character (len=100) msg
 C
       N = 27
       CALL andfunc(N, T, Y, DELTA, rpar, ipar)

@@ -2,42 +2,42 @@
 ### ============================================================================
 ### dopri5-- Dormand-Prince runge-kutta  of order 54
 ### ============================================================================
-dopri5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-  verbose=FALSE, hmax = NULL, hini = hmax, ynames=TRUE, maxsteps=10000, 
-  dllname=NULL, initfunc=dllname, initpar=parms, 
-  rpar=NULL, ipar=NULL, nout=0, outnames=NULL, forcings=NULL,
-  initforc = NULL, fcontrol=NULL, ...) {
+dopri5 <- function(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
+  verbose = FALSE, hmax = NULL, hini = hmax, ynames = TRUE, maxsteps = 10000,
+  dllname = NULL, initfunc = dllname, initpar = parms,
+  rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
+  initforc = NULL, fcontrol = NULL, ...) {
 
    rk5 (y, times, func, parms, rtol, atol,
   verbose, hmax, hini, ynames, maxsteps, 
   dllname, initfunc, initpar, 
   rpar, ipar, nout, outnames, forcings,
-  initforc, fcontrol, type=2, ...)
+  initforc, fcontrol, type=2, stiffness = 0, ...)
 
 }
 
-cashkarp <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-  verbose=FALSE, hmax = NULL, hini = hmax, ynames=TRUE, maxsteps=10000, 
-  dllname=NULL, initfunc=dllname, initpar=parms, 
-  rpar=NULL, ipar=NULL, nout=0, outnames=NULL, forcings=NULL,
-  initforc = NULL, fcontrol=NULL, ...) {
+cashkarp <- function(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
+  verbose = FALSE, hmax = NULL, hini = hmax, ynames = TRUE, maxsteps = 10000,
+  dllname = NULL, initfunc = dllname, initpar = parms,
+  rpar=NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
+  initforc = NULL, fcontrol = NULL, stiffness = 0, ...) {
 
    rk5 (y, times, func, parms, rtol, atol,
   verbose, hmax, hini, ynames, maxsteps, 
   dllname, initfunc, initpar, 
   rpar, ipar, nout, outnames, forcings,
-  initforc, fcontrol, type=3, ...)
+  initforc, fcontrol, type=3, stiffness = stiffness, ...)
 
 }
 
 
 
 
-rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-  verbose=FALSE, hmax = NULL, hini = hmax, ynames=TRUE, maxsteps=10000, 
-  dllname=NULL, initfunc=dllname, initpar=parms, 
-  rpar=NULL, ipar=NULL, nout=0, outnames=NULL, forcings=NULL,
-  initforc = NULL, fcontrol=NULL, type, ...)
+rk5 <- function(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
+  verbose = FALSE, hmax = NULL, hini = hmax, ynames = TRUE, maxsteps = 10000,
+  dllname = NULL, initfunc = dllname, initpar = parms,
+  rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
+  initforc = NULL, fcontrol = NULL, type, stiffness = 0, ...)
 {
 
 ### check input
@@ -46,6 +46,7 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
   n <- length(y)
   if (is.null(hini)) hini <- 0
   if (hini <= 0) hini <- 0
+
 ### atol and rtol have to be of same length here...
   if (length(rtol) != length(atol)) {
     if (length(rtol) > length(atol))
@@ -60,7 +61,7 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
 
 ### model function  
   Ynames    <- attr(y,"names")
-  flist     <- list(fmat=0,tmat=0,imat=0,ModelForc=NULL)
+  flist     <- list(fmat = 0, tmat = 0, imat = 0, ModelForc = NULL)
   ModelInit <- NULL
 
   if (is.character(func)) {   # function specified in a DLL
@@ -116,9 +117,12 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
 
 ### work arrays iwork, rwork
   # length of rwork and iwork
-  lrw <- 8 * n + 5 * n + 21
-  liw <- 21 + n
+  if (type == 3)
+    lrw <- 19 * n + 7 * n + 21
+  else
+    lrw <- 8 * n + 5 * n + 21
 
+  liw <- 21 + n
   # only first 20 elements passed; other will be allocated in C-code
   iwork <- vector("integer",20)
   rwork <- vector("double",20)
@@ -128,17 +132,34 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
   iwork[1] <- maxsteps
   iwork[2] <- 1
   iwork[3] <- 1
-  iwork[4] <- 0 # stifness test toggled on
   iwork[5] <- n
-
+  if (type == 3) {
+## stiffness
+    iwork[4] <- iwork[6] <- iwork[7] <- -1   # No detection, the default
+          if (stiffness == 1)  {  # All stiffness estimates used and stop
+     iwork[4] <- iwork[6] <- iwork[7] <- 2
+   } else if (stiffness == -1) {  # All stiffness estimates used and continue
+     iwork[4] <- iwork[6] <- iwork[7] <- 1
+   } else if (stiffness == 2)     # based on eigenvalue approximation and stop
+     iwork[4] <- 2
+     else if (stiffness == -2)    # based on eigenvalue approximation and continue
+     iwork[4] <- 1
+     else if (stiffness == 3)     # based on error estimates and stop
+     iwork[6] <- 2
+     else if (stiffness == -3)    # based on error estimates and continue
+     iwork[6] <- 1
+     else if (stiffness == 4)     # based on conditioning and stop
+     iwork[7] <- 2
+     else if (stiffness == -4)    # based on conditioning and continue
+     iwork[7] <- 1
+  }
   rwork[1] <- .Machine$double.neg.eps
   rwork[2] <- 0.9       # safety factor error reductin
 
   rwork[6] <- hmax
   rwork[7] <- hini      ## will be 0 in c-code
-  
-  if(is.null(times)) times<-c(0,1e8)
 
+  if(is.null(times)) times<-c(0,1e8)
 
 ### calling solver
   storage.mode(y) <- storage.mode(times) <- "double"
@@ -147,9 +168,9 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
                rtol, atol, rho, ModelInit,  
                as.integer(verbose), as.double(rwork),
                as.integer(iwork), as.integer(Nglobal),
-               as.integer(lrw),as.integer(liw),
+               as.integer(lrw), as.integer(liw),
                as.double (rpar), as.integer(ipar),
-               flist,  as.integer(type), PACKAGE="deTestSet")   # type 2 or 3
+               flist,  as.integer(type), PACKAGE = "deTestSet")   # type 2 or 3
 ### print to screen...
   if (verbose) {
     printtask(0,func,NULL)
@@ -163,7 +184,8 @@ rk5 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
 ### saving results
   out <- saveOut(out, y, n, Nglobal, Nmtot, func, Func2,
                  iin= 1:5, iout=c(1,3,2,13,13))
-
+  if (Nglobal > 0)  attributes(out)$istate[3] <- attributes(out)$istate[3] + nrow(out)
+  attributes(out)$istate[3] <- attributes(out)$istate[3] + 2
   attr(out, "type") <- integrator
   if (verbose) diagnostics(out)
   return(out)

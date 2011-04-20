@@ -323,7 +323,7 @@ C     .. SAVE STATEMENT ..
       SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10
 C     ..
 
-      character (len=180) MSG
+      character (len=150) MSG
 
 
 C KS: hard-coded LOUT = 0 (never used anymore...)
@@ -439,7 +439,7 @@ C     .. COMMON BLOCKS ..
      +     NEWPAR,NRE,NJE,NPSET,NQUSED,NRENEW,NSTEP
       SAVE T,H,HMIN,HMAX,KFLAG,JSTART
 C     ..
-      character (len=180) MSG
+      character (len=150) MSG
 
       IF (IDID.EQ.0) THEN
 C        I.E. NORMAL CONTINUATION OF INTEGRATION
@@ -2205,7 +2205,7 @@ C     .. DATA STATEMENTS ..
       DATA  EL(2),ELST(2),OLDLO/3*1.0D+0/
       DATA  ZERO,ONE/0.0D+0,1.0D+0/
 C     ..
-      character (len=180) MSG
+      character (len=150) MSG
 
  6000 TOLD = T
       KFLAG = 0
@@ -3776,7 +3776,7 @@ C
 *     ..
 *     .. Data statements ..
       DATA               FIRST / .TRUE. / , IWARN / .FALSE. /
-      character (len=180) MSG
+      character (len=150) MSG
 
 *     ..
 *     .. Executable Statements ..

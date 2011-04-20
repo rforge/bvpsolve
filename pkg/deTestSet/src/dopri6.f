@@ -195,7 +195,7 @@ C *** *** *** *** *** *** *** *** *** *** *** *** ***
       DIMENSION Y(N),ATOL(*),RTOL(*),WORK(LWORK),IWORK(LIWORK)
       DIMENSION RPAR(*),IPAR(*),VSTI(N)
       LOGICAL ARRET
-	CHARACTER (LEN=80) MSG 
+      CHARACTER (LEN=150) MSG
       EXTERNAL FCN,SOLOUT
 C *** *** *** *** *** *** ***
 C        SETTING THE PARAMETERS 
@@ -214,9 +214,9 @@ C -------- NMAX , THE MAXIMAL NUMBER OF STEPS -----
          NMAX=IWORK(1)
          IF(NMAX.LE.0)THEN
             IF (IPRINT.GT.0) THEN
-		     WRITE(MSG,*)
+               WRITE(MSG,*)
      &          ' WRONG INPUT IWORK(1)=',IWORK(1)
-               CALL rwarn(MSG) 
+               CALL RPRINT(MSG) 
             ENDIF
             ARRET=.TRUE.
          END IF
@@ -228,9 +228,9 @@ C -------- METH   COEFFICIENTS OF THE METHOD
          METH=IWORK(2)
          IF(METH.LE.0.OR.METH.GE.4)THEN
             IF (IPRINT.GT.0) THEN
-		     WRITE(MSG,*)
+               WRITE(MSG,*)
      &          ' CURIOUS INPUT IWORK(2)=',IWORK(2)
-               CALL rwarn(MSG) 
+               CALL RPRINT(MSG) 
             ENDIF
             ARRET=.TRUE.
          END IF
@@ -244,18 +244,18 @@ C -------- NRDENS   NUMBER OF DENSE OUTPUT COMPONENTS
       NRDENS=IWORK(5)
       IF(NRDENS.LT.0.OR.NRDENS.GT.N)THEN
          IF (IPRINT.GT.0) THEN 
-	      WRITE(MSG,*)
+            WRITE(MSG,*)
      &           ' CURIOUS INPUT IWORK(5)=',IWORK(5)
-            CALL rwarn(MSG) 
+            CALL RPRINT(MSG) 
           ENDIF
 
          ARRET=.TRUE.
       ELSE
             IF(NRDENS.GT.0.AND.IOUT.LT.2)THEN
                IF (IPRINT.GT.0) THEN
-			   WRITE(MSG,*)
+                 WRITE(MSG,*)
      &      ' WARNING: PUT IOUT=2 FOR DENSE OUTPUT '
-                 CALL rwarn(MSG) 
+                 CALL RPRINT(MSG) 
                ENDIF
 
             END IF 
@@ -271,9 +271,9 @@ C -------- UROUND   SMALLEST NUMBER SATISFYING 1.D0+UROUND>1.D0
          UROUND=WORK(1)
          IF(UROUND.LE.1.D-35.OR.UROUND.GE.1.D0)THEN
             IF (IPRINT.GT.0) THEN
-		     WRITE(MSG,*)
+               WRITE(MSG,*)
      &        ' WHICH MACHINE DO YOU HAVE? YOUR UROUND WAS:',WORK(1)
-              CALL rwarn(MSG) 
+              CALL RPRINT(MSG) 
             ENDIF
 
             ARRET=.TRUE.
@@ -286,9 +286,9 @@ C -------  SAFETY FACTOR -------------
          SAFE=WORK(2)
          IF(SAFE.GE.1.D0.OR.SAFE.LE.1.D-4)THEN
             IF (IPRINT.GT.0) THEN
-		    WRITE(MSG,*)
+              WRITE(MSG,*)
      &          ' CURIOUS INPUT FOR SAFETY FACTOR WORK(2)=',WORK(2)
-              CALL rwarn(MSG) 
+              CALL RPRINT(MSG) 
             ENDIF
             ARRET=.TRUE.
          END IF
@@ -314,9 +314,9 @@ C --------- BETA FOR STEP CONTROL STABILIZATION -----------
             BETA=WORK(5)
             IF(BETA.GT.0.2D0)THEN
                IF (IPRINT.GT.0) THEN
-			   WRITE(MSG,*)
+                 WRITE(MSG,*)
      &          ' CURIOUS INPUT FOR BETA: WORK(5)=',WORK(5)
-                 CALL rwarn(MSG) 
+                 CALL RPRINT(MSG) 
             ENDIF
             ARRET=.TRUE.
          END IF
@@ -344,9 +344,9 @@ C ------ TOTAL STORAGE REQUIREMENT -----------
       ISTORE=IEYS+5*NRDENS-1
       IF(ISTORE.GT.LWORK)THEN
         IF (IPRINT.GT.0) THEN
-	    WRITE(MSG,*)
+          WRITE(MSG,*)
      &   ' INSUFFICIENT STORAGE FOR WORK, MIN. LWORK=',ISTORE
-          CALL rwarn(MSG) 
+          CALL RPRINT(MSG) 
          ENDIF
 
         ARRET=.TRUE.
@@ -355,9 +355,9 @@ C ------ TOTAL STORAGE REQUIREMENT -----------
       ISTORE=ICOMP+NRDENS-1
       IF(ISTORE.GT.LIWORK)THEN
         IF (IPRINT.GT.0) THEN
-	     WRITE(MSG,*)
+           WRITE(MSG,*)
      &   ' INSUFFICIENT STORAGE FOR IWORK, MIN. LIWORK=',ISTORE
-           CALL rwarn(MSG) 
+           CALL RPRINT(MSG) 
          ENDIF
 
         ARRET=.TRUE.
@@ -401,7 +401,7 @@ C ----------------------------------------------------------
       DIMENSION Y(N),Y1(N),YSTI(N),ATOL(*),RTOL(*),RPAR(*),IPAR(*)
       DIMENSION CONT(5*NRD),ICOMP(NRD),VSTI(N)
       LOGICAL REJECT,LAST 
-      CHARACTER(LEN=80) MSG
+      CHARACTER(LEN=150) MSG
       EXTERNAL FCN
       COMMON /CONDO5/XOLD,HOUT
 C *** *** *** *** *** *** ***
@@ -494,18 +494,18 @@ C ------- STIFFNESS DETECTION
  64         CONTINUE  
             IF (STDEN.GT.0.D0) HLAMB=SQRT(STNUM/STDEN) 
 c            IF (IPRINT .GT. 0) THEN
-c		    write(MSG,188) hlamb,stden
+c             write(MSG,188) hlamb,stden
 c188          format(1x,'the first stiffness estimate',2g22.10)
-c             CALL rwarn(MSG) 
+c             CALL RPRINT(MSG) 
 c            ENDIF
             IF (HLAMB.GT.3.25D0) THEN
                NONSTI=0
                IASTI=IASTI+1  
                IF (IASTI.EQ.15) THEN
                   IF (IPRINT.GT.0) THEN
-				             WRITE (MSG,*) 
+                               WRITE (MSG,*) 
      &               ' THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X   
-                      CALL rwarn(MSG) 
+                      CALL RPRINT(MSG) 
                   ENDIF
                   IF (IPRINT.LE.0) GOTO 76
                END IF
@@ -604,28 +604,28 @@ C --- FAIL EXIT
       RETURN
   77  CONTINUE
       IF (IPRINT.GT.0) THEN
-	  WRITE(MSG,979)X   
-         CALL rwarn(MSG) 
+        WRITE(MSG,979)X   
+         CALL RPRINT(MSG) 
     
         WRITE(MSG,*)' STEP SIZE T0O SMALL, H=',H
-         CALL rwarn(MSG) 
+         CALL RPRINT(MSG) 
       ENDIF
       IDID=-3
       RETURN
   78  CONTINUE
       IF (IPRINT.GT.0) THEN
-	  WRITE(MSG,979)X   
-         CALL rwarn(MSG) 
+        WRITE(MSG,979)X   
+         CALL RPRINT(MSG) 
         WRITE(MSG,*)
      &     ' MORE THAN NMAX =',NMAX,'STEPS ARE NEEDED' 
-         CALL rwarn(MSG) 
+         CALL RPRINT(MSG) 
       ENDIF
       IDID=-2
       RETURN
   79  CONTINUE
       IF (IPRINT.GT.0) THEN
-	  WRITE(MSG,979)X
-         CALL rwarn(MSG) 
+        WRITE(MSG,979)X
+         CALL RPRINT(MSG) 
       ENDIF
  979  FORMAT(' EXIT OF DOPRI5 AT X=',E18.4) 
       IDID=2
@@ -729,7 +729,7 @@ C     APPROXIMATION TO THE II-TH COMPONENT OF THE SOLUTION AT X.
 C ----------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DIMENSION CON(5*ND),ICOMP(ND)
-	DOUBLE PRECISION VAL(*)
+      DOUBLE PRECISION VAL(*)
       COMMON /CONDO5/XOLD,H
 C ----- COMPUTE PLACE OF II-TH COMPONENT
 C      I=0

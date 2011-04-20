@@ -106,3 +106,50 @@ int initEvents(SEXP list, SEXP);
 void updateevent(double*, double*, int*);
 
 
+
+/* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                         DECLARATIONS for time lags
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+/*==========================================
+  R-functions
+==========================================*/
+int noff;
+
+SEXP getPastValue   (SEXP T, SEXP nr);
+SEXP getPastGradient(SEXP T, SEXP nr);
+
+/*==========================================
+  C- utilities, functions
+==========================================*/
+/* Hermitian interpolation */
+double Hermite (double t0, double t1, double y0, double y1, double dy0,
+                double dy1, double t);
+
+double dHermite(double t0, double t1, double y0, double y1, double dy0,
+                double dy1, double t);
+
+int initLags(SEXP elag, int solver, int nroot);
+
+/* history vectors  */
+void inithist(int max, int maxlags, int solver, int nroot);
+
+void updatehistini(double t, double *y, double *dY, double *rwork, int *iwork);
+void updatehist(double t, double *y, double *dy, double *rwork, int *iwork);
+
+int nexthist(int i);
+double interpolate(int i, int k, double t0, double t1, double t,
+  double *Yh, int nq);
+
+
+/*==========================================
+  Global variables for history arrays
+==========================================*/
+/* time delays */
+int interpolMethod;  /* for time-delays : 1 = hermite; 2=dense */
+
+int indexhist, indexlag, endreached, starthist;
+double *histvar, *histdvar, *histtime, *histhh, *histsave;
+int    *histord;
+int    histsize, offset;
+int    initialisehist, lyh, lhh, lo;

@@ -98,8 +98,8 @@ void returnearly (int Print) {
   int j, k;
   if (Print) 
     warning("Returning early. Results are accurate, as far as they go\n");
-  PROTECT(YOUT2 = allocMatrix(REALSXP,ntot+1,(it+2))); incr_N_Protect();
-  for (k = 0; k < it+2; k++)
+  PROTECT(YOUT2 = allocMatrix(REALSXP,ntot+1,it)); incr_N_Protect();
+  for (k = 0; k < it; k++)
     for (j = 0; j < ntot+1; j++)
       REAL(YOUT2)[k*(ntot+1) + j] = REAL(YOUT)[k*(ntot+1) + j];
 }   

@@ -19,8 +19,9 @@
   
 }
 \usage{
-gams(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
-  jacfunc = NULL, jactype = "fullint", verbose = FALSE, 
+gams(y, times, func, parms, nind = c(length(y), 0, 0),
+  rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint",
+  mass = NULL, massup = NULL, massdown = NULL, verbose = FALSE,
   hmax = NULL, hini = 0, ynames = TRUE, minord = NULL, 
   maxord = NULL, bandup = NULL, banddown = NULL, 
   maxsteps = 1e4, maxnewtit = c(10, 18, 26, 36), 
@@ -66,6 +67,13 @@ gams(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
   \item{parms }{vector or list of parameters used in \code{func} or
     \code{jacfunc}.
   }
+  \item{nind }{if a DAE system: a three-valued vector with the number of
+    variables of index 1, 2, 3 respectively.
+    The equations must be defined such that the index 1 variables precede
+    the index 2 variables which in turn precede the index 3 variables.
+    The sum of the variables of different index should equal N,
+    the total number of variables.
+  }
   \item{rtol }{relative error tolerance, either a
     scalar or an array as long as \code{y}. See details.
   }
@@ -95,6 +103,23 @@ gams(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
     \code{"fullint"}, \code{"fullusr"}, \code{"bandusr"} or
     \code{"bandint"} - either full or banded and estimated internally or
     by user.
+  }
+  \item{mass }{the mass matrix.
+      If not \code{NULL}, the problem is a linearly
+     implicit DAE and defined as \eqn{M\, dy/dt = f(t,y)}{M dy/dt = f(t,y)}.
+     If the mass-matrix \eqn{M} is full, it should be of dimension
+     \eqn{n^2}{n*n} where \eqn{n} is the number of \eqn{y}-values;
+     if banded the number of rows should be less than \eqn{n},
+     and the mass-matrix is stored diagonal-wise with element \eqn{(i, j)}
+     stored in \code{mass(i - j + mumas + 1, j)}.
+
+     If \code{mass = NULL} then the model is an ODE (default)
+  }
+  \item{massup }{number of non-zero bands above the diagonal of the \code{mass}
+    matrix, in case it is banded.
+  }
+  \item{massdown }{number of non-zero bands below the diagonal of the \code{mass}
+  matrix, in case it is banded.
   }
   \item{verbose }{if \code{TRUE}: full output to the screen, e.g. will
     print the \code{diagnostiscs} of the integration - see details.
@@ -285,6 +310,66 @@ yini <- c(y1 = 1.0, y2 = 0, y3 = 0)
 out <- gams(func = Chemistry, times = times, y = yini, parms = NULL)
 plot(out, log = "x", type = "l", lwd = 2)
 
+
+## =============================================================================
+## Example 3: DAE
+## Car axis problem, index 3 DAE, 8 differential, 2 algebraic equations
+## from
+## F. Mazzia and C. Magherini. Test Set for Initial Value Problem Solvers,
+## release 2.4. Department
+## of Mathematics, University of Bari and INdAM, Research Unit of Bari,
+## February 2008.
+## Available at http://www.dm.uniba.it/~testset.
+## =============================================================================
+
+## Problem is written as M*y = f(t,y,p).
+## caraxisfun implements the right-hand side:
+
+caraxisfun <- function(t, y, parms) {
+  with(as.list(y), {
+
+    yb <- r * sin(w * t)
+    xb <- sqrt(L * L - yb * yb)
+    Ll <- sqrt(xl^2 + yl^2)
+    Lr <- sqrt((xr - xb)^2 + (yr - yb)^2)
+
+    dxl <- ul; dyl <- vl; dxr <- ur; dyr <- vr
+
+    dul  <- (L0-Ll) * xl/Ll      + 2 * lam2 * (xl-xr) + lam1*xb
+    dvl  <- (L0-Ll) * yl/Ll      + 2 * lam2 * (yl-yr) + lam1*yb - k * g
+
+    dur  <- (L0-Lr) * (xr-xb)/Lr - 2 * lam2 * (xl-xr)
+    dvr  <- (L0-Lr) * (yr-yb)/Lr - 2 * lam2 * (yl-yr) - k * g
+
+    c1   <- xb * xl + yb * yl
+    c2   <- (xl - xr)^2 + (yl - yr)^2 - L * L
+
+    list(c(dxl, dyl, dxr, dyr, dul, dvl, dur, dvr, c1, c2))
+  })
+}
+
+eps <- 0.01; M <- 10; k <- M * eps^2/2;
+L <- 1; L0 <- 0.5; r <- 0.1; w <- 10; g <- 1
+
+yini <- c(xl = 0, yl = L0, xr = L, yr = L0,
+          ul = -L0/L, vl = 0,
+          ur = -L0/L, vr = 0,
+          lam1 = 0, lam2 = 0)
+
+# the mass matrix
+Mass      <- diag(nrow = 10, 1)
+Mass[5,5] <- Mass[6,6] <- Mass[7,7] <- Mass[8,8] <- M * eps * eps/2
+Mass[9,9] <- Mass[10,10] <- 0
+Mass
+
+# index of the variables: 4 of index 1, 4 of index 2, 2 of index 3
+index <- c(4, 4, 2)
+
+times <- seq(0, 3, by = 0.01)
+out <- gams(y = yini, mass = Mass, times = times, func = caraxisfun,
+        parms = NULL, nind = index)
+
+plot(out, which = 1:4, type = "l", lwd = 2)
 
 }
 \references{

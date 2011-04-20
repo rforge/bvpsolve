@@ -5,13 +5,16 @@
 ###
 ### ============================================================================
 
-gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-  jacfunc=NULL, jactype = "fullint", verbose=FALSE, hmax=NULL, hini=0, 
-  ynames=TRUE, minord=NULL, maxord=NULL, bandup=NULL, banddown=NULL, 
-  maxsteps=1e4, maxnewtit = c(10,18,26,36), 
-  dllname=NULL, initfunc=dllname, initpar=parms, 
-  rpar=NULL, ipar=NULL, nout=0, outnames=NULL, forcings=NULL,
-  initforc = NULL, fcontrol=NULL, ...)
+gams <- function(y, times, func, parms, nind = c(length(y),0,0),
+  rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint",
+  mass = NULL, massup = NULL, massdown = NULL,
+  verbose = FALSE, hmax = NULL, hini = 0,
+  ynames = TRUE, minord = NULL, maxord = NULL,
+  bandup = NULL, banddown = NULL,
+  maxsteps = 1e4, maxnewtit = c(10, 18, 26, 36),
+  dllname = NULL, initfunc = dllname, initpar = parms,
+  rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
+  initforc = NULL, fcontrol = NULL, ...)
 {
 
 ### check input
@@ -26,6 +29,12 @@ gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
     else 
       rtol <- rep(rtol, length.out=n)
   }
+
+### index
+  if (length(nind) != 3)
+    stop("length of `nind' must be = 3")
+  if (sum(nind) != n)
+    stop("sum of of `nind' must equal n, the number of equations")
 
 ### Jacobian 
     full = TRUE
@@ -137,20 +146,42 @@ gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
          stop("Jacobian dimension not ok")
      } 
   }                                                                                
+### The mass matrix
+   mlmas <- n
+   mumas <- n
+  if (is.null(mass)) {
+   imas  <- 0
+   lmas  <- n
+   MassFunc <- NULL
+  } else {
+     imas  <- 1
+
+     dimens <- dim(mass)
+     if(is.null(dimens)) {
+       mass <- matrix(nrow = 1, data = mass)
+       dimens <- dim(mass)
+     }
+     if (dimens[2] != n)
+       stop ("mass matrix should have as many columns as number of variables in 'y'")
+     if (dimens[1] != n) {
+       mumas <- massup
+       mlmas <- massdown
+       if (dimens[1] != mlmas + mumas +1)
+       stop ("nr of rows in mass matrix should equal the number of variables in 'y' or 'massup'+'massdown'+1 ")
+     }
+   MassFunc <- function (n, lm) {
+     if (nrow(mass) != lm || ncol(mass) != n)
+       stop ("dimensions of mass matrix not ok")
+     return(mass)
+   }
+  }
+
+  nrmas <- as.integer(c(imas, mlmas, mumas))
 
 
 ### work arrays iwork, rwork
-  # length of rwork and iwork
-  if (full)
-    lrw = 2 * n * n + 42 * n + 18
-  else 
-    lrw = (3 * banddown + 2 * bandup + 44) * n + 18
-
-  liw   <- 24 + n
-
-  # only first 20 elements passed; other will be allocated in C-code
-  iwork <- vector("integer",20)
-  rwork <- vector("double",20)
+  iwork <- vector("integer",27)
+  rwork <- vector("double",21)
   rwork[] <- 0.
   iwork[] <- 0
 
@@ -159,7 +190,7 @@ gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
   iwork[4] <- maxord
 
   if (is.null (maxnewtit)) 
-    maxnewtit <- c(10,18,26,36) 
+    maxnewtit <- c(10, 18, 26, 36)
   else {
     if (length(maxnewtit) != 4)
       stop("'maxit' should be an integer vector of length 4")
@@ -169,7 +200,8 @@ gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
   }
      
   iwork[5:8] <- maxnewtit
-
+  iwork[25:27] <- nind
+  
   rwork[1] <- .Machine$double.neg.eps
   rwork[2] <- hmax
   
@@ -200,7 +232,7 @@ gams <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
                rtol, atol, rho, tcrit, JacFunc, ModelInit,  
                as.integer(verbose), as.double(rwork),
                as.integer(iwork), as.integer(ijac),as.integer(Nglobal),
-               as.integer(lrw),as.integer(liw), 
+               nrmas, MassFunc,
                as.integer(banddown), as.integer(bandup), as.double(hini),
                as.double (rpar), as.integer(ipar),
                flist, PACKAGE="deTestSet")

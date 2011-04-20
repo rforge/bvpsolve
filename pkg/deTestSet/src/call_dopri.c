@@ -13,10 +13,14 @@
    C_deriv_func_forc_dop provides the interface between the function specified in
    a DLL and the integrator, in case there are forcing functions.
    
-   karline soetaert
+ karline soetaert
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/*  some globals */
+ int type ;     /* 1 = dopri 8, 2 = dopri5, 3 = cashkarp */
+ int lrc;
 
-/* definition of the calls to the FORTRAN subroutines in file dopri853 and 
+
+/* definition of the calls to the FORTRAN subroutines in file cash.f, dopri853 and 
    dopri5.f */
 		     
 void F77_NAME(cashkarp)( int *,
@@ -48,9 +52,7 @@ void F77_NAME(dop853)( int *,
 
 /* continuous output formula */
 void F77_NAME(contd5)(int *, double *, double *,int *, int *, double *);
-
 void F77_NAME(contd5ck)(int *, double *, double *,int *, int *, double *);
-
 void F77_NAME(contd8)(int *, double *, double *,int *, int *, double *);
 
 /* wrapper above the derivate function in a dll that first estimates the
@@ -125,35 +127,15 @@ static void saveOut (double t, double *y) {
 }
 
 /* function called by Fortran to check for output */
-
-static void C_solout8(int * nr, double * told, double *t, double * y, int * neq, 
+static void C_solout(int * nr, double * told, double *t, double * y, int * neq, 
   double * con, int *icomp, int * nd, double * rpar, int * ipar, int * irtrn, double *xout)
 {
+  if (*told == *t) return;
 
   while (*told <= tt[it] && tt[it] < *t) {
-    F77_CALL(contd8) (neq, &tt[it], con, icomp, nd, ytmp);
-    saveOut(tt[it], ytmp);	     
-    it++;
-  }
-}
-
-static void C_solout5(int * nr, double * told, double *t, double * y, int * neq, 
-  double * con, int *icomp, int * nd, double * rpar, int * ipar, int * irtrn, double *xout)
-{
-
-  while (*told <= tt[it] && tt[it] < *t) {
-    F77_CALL(contd5) (neq, &tt[it], con, icomp, nd, ytmp);
-    saveOut(tt[it], ytmp);	     
-    it++;
-  }
-}
-
-static void C_solout5ck(int * nr, double * told, double *t, double * y, int * neq, 
-  double * con, int *icomp, int * nd, double * rpar, int * ipar, int * irtrn, double *xout)
-{
-
-  while (*told <= tt[it] && tt[it] < *t) {
-    F77_CALL(contd5ck) (neq, &tt[it], con, icomp, nd, ytmp);
+    if (type == 1)      F77_CALL(contd8)   (neq, &tt[it], con, icomp, nd, ytmp);
+    else if (type == 2) F77_CALL(contd5)   (neq, &tt[it], con, icomp, nd, ytmp);
+    else if (type == 3) F77_CALL(contd5ck) (neq, &tt[it], con, icomp, nd, ytmp);
     saveOut(tt[it], ytmp);	     
     it++;
   }
@@ -177,7 +159,7 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 /******                   DECLARATION SECTION                            ******/
 /******************************************************************************/
 
-  int  j, nt, latol, lrtol, lrw, liw, type;
+  int  j, nt, latol, lrtol, lrw, liw;
   int  isForcing;
   double *Atol, *Rtol, hini=0, *ww;
   int itol, iout, idid, mflag;
@@ -200,6 +182,9 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   
   mflag = INTEGER(verbose)[0];
   type  = INTEGER(Type)[0];     /* 1 = dopri 8, 2 = dopri5, 3 = cashkarp */
+  lrc = 4;
+  if (type == 1) lrc = 8;
+  
   /* is function a dll ?*/
   isDll = inherits(derivfunc, "NativeSymbol");
 
@@ -245,7 +230,7 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   /* Initialization of Parameters, Forcings (DLL) */
   initParms (initfunc, parms);
   isForcing = initForcings(flist);
-  
+
   if (nout > 0 ) {
      xdytmp= (double *) R_alloc(n_eq, sizeof(double));
      for (j = 0; j < n_eq; j++) xdytmp[j] = 0.; 
@@ -267,13 +252,7 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
       R_deriv_func = derivfunc;
       R_envir = rho;
   }
-  if (type == 1)
-  	solout = C_solout8;              
-  else if (type == 2)
-  	solout = C_solout5;              
-  else
-    solout = C_solout5ck;
-    
+  solout = C_solout;              
   iout = 2;                           /* solout called after each step */
   idid = 0;
 
@@ -283,7 +262,8 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   tout = REAL(times)[nt-1];
 
   saveOut (tin, xytmp);               /* save initial condition */ 
-  
+//  it++;
+
   if (type == 1)
     F77_CALL(dop853) ( &n_eq, deriv_func, &tin, xytmp, &tout,  
 		     Rtol, Atol, &itol, solout, &iout,
@@ -304,11 +284,20 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
      warning("step size becomes too small");
   else if (idid == -4)   
      warning("problem is probably stiff - interrupted");
-	  
+  else if (idid == -5)
+     warning("stopped based on error estimation");
+  else if (idid == -6)
+     warning("stopped based on conditioning estimation; the problem is stiff (sigma > 100)");
+  else if (idid == -7)
+     warning("stopped based on conditioning estimation; the stepsize is restricted only by stability reason");
+  else if (idid == -8)
+     warning("stopped based on conditioning estimation; the stepsize is restricted only by stability reason and kappa > 1");
+  else if (idid == -9)
+     warning("stopped based on conditioning estimation; kappa >   1e20");
+
 /*                   ####  an error occurred   ####                           */    
-  if (idid < 0 ) {
+  if (idid < 0 )
     returnearly (1);
-  }
 
   saveOut (tin, xytmp);              /* save final condition */
 

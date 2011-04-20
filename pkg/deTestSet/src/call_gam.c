@@ -3,7 +3,7 @@
 #include "de.h"
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Ordinary differential equation solver gam.
+   differential algebraic equation solver gam.
    
    The C-wrappers that provide the interface between FORTRAN codes and R-code 
    are: C_deriv_func_gam: interface with R-code "func", passes derivatives  
@@ -12,15 +12,15 @@
   
    C_deriv_func_forc_gam provides the interface between the function specified in
    a DLL and the integrator, in case there are forcing functions.
-   
+
    karline soetaert
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 int maxt;
 
-/* definition of the calls to the FORTRAN subroutines in file gam.f**/
+/* definition of the calls to the FORTRAN subroutines in file gamd.f**/
 
-void F77_NAME(gam)( int *,
+void F77_NAME(gamd)( int *,
          void (*)(int *, double *, double *, double *,
                               double *, int *),         // func
 		     double *, double *, double *, double *,
@@ -28,6 +28,8 @@ void F77_NAME(gam)( int *,
 		     void (*)(int *, double *, double *, double *,  // jac
 			            int *, double*, int*),
 		     int *, int *, int *, 
+ 	       void (*)(int *, double *, int *, double *, int *),              // mas
+		     int *, int *, int *,
  	       void (*)(int *, double *, double *, double *,  // solout
 			            int *, int *, int *, double *, int *, int *),
 		     int *, double *, int *, int *, int*, double *, int*, int*);
@@ -89,6 +91,25 @@ static void C_deriv_out_gam (int *nOut, double *t, double *y,
 
   my_unprotect(2);                                  
 }      
+/* the mass matrix function */
+static void C_mas_func (int *neq, double *am, int *lmas,
+                             double *yout, int *iout)
+{
+  int i;
+  SEXP NEQ, LM, R_fcall, ans;
+
+  PROTECT(NEQ = NEW_INTEGER(1));                  incr_N_Protect();
+  PROTECT(LM = NEW_INTEGER(1));                   incr_N_Protect();
+
+                              INTEGER(NEQ)[0] = *neq;
+                              INTEGER(LM) [0] = *lmas;
+  PROTECT(R_fcall = lang3(R_mas_func,NEQ,LM));   incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));         incr_N_Protect();
+
+  for (i = 0; i <*lmas * *neq; i++)   am[i] = REAL(ans)[i];
+
+  my_unprotect(4);
+}
 
 /* save output in R-variables */
 
@@ -151,13 +172,14 @@ typedef void C_jac_func_type_gam  (int *, double *, double *, double *,
 typedef void C_solout_type (int *, double *, double *, double *,
   int *, int *, int *, double *, int *, int *) ;
 
+typedef void C_mas_type (int *, double *, int *, double *, int *);
 
 /* MAIN C-FUNCTION, CALLED FROM R-code */
 
 SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP Tcrit, SEXP jacfunc, SEXP initfunc, 
     SEXP verbose, SEXP rWork, SEXP iWork, SEXP jT, 
-    SEXP nOut, SEXP lRw, SEXP lIw, SEXP ML, SEXP MU, SEXP Hini,
+    SEXP nOut, SEXP Nrmas, SEXP masfunc, SEXP ML, SEXP MU, SEXP Hini,
     SEXP Rpar, SEXP Ipar, SEXP flist)
 
 {
@@ -165,14 +187,15 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 /******                   DECLARATION SECTION                            ******/
 /******************************************************************************/
 
-  int  j, nt, latol, lrtol, lrw, liw;
+  int  j, nt, latol, lrtol, imas, mlmas, mumas;
   int  isForcing;
   double *Atol, *Rtol, hini, sum;
-  int itol, ijac, mflag,  ml, mu, iout, idid;
+  int itol, ijac, mflag,  ml, mu, iout, idid, liw, lrw;
 
   /* pointers to functions passed to FORTRAN */
   C_jac_func_type_gam   *jac_func_gam = NULL;
   C_solout_type         *solout = NULL;
+  C_mas_type            *mas_func = NULL;
 
 /******************************************************************************/
 /******                         STATEMENTS                               ******/
@@ -215,14 +238,19 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   /* tolerance specifications */
   if (latol == 1 ) itol = 0;
   else             itol = 1;
-  
+
+  /* mass matrix */
+  imas  = INTEGER(Nrmas)[0];
+  mlmas = INTEGER(Nrmas)[1];
+  mumas = INTEGER(Nrmas)[2];
+
   /* work vectors */
-  liw = INTEGER (lIw)[0];
+  liw = 27;
   iwork = (int *) R_alloc(liw, sizeof(int));
   for (j=0; j<LENGTH(iWork); j++) iwork[j] = INTEGER(iWork)[j];
   for (j=LENGTH(iWork); j<liw; j++) iwork[j] = 0;
 
-  lrw = INTEGER(lRw)[0];
+  lrw = 21;
   rwork = (double *) R_alloc(lrw, sizeof(double));
   for (j=0; j<length(rWork); j++) rwork[j] = REAL(rWork)[j];
   for (j=length(rWork); j<lrw; j++) rwork[j] = 0.;
@@ -269,6 +297,11 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 	    }
     }
 
+  if (!isNull(masfunc))   {
+	      R_mas_func = masfunc;
+	      mas_func= C_mas_func;
+  }
+
   solout = C_solout;              
   iout = 1;                           /* solout used */
   idid = 0;
@@ -281,8 +314,9 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   saveOut (tin, xytmp);               /* save initial condition */ 
   it = it +1;
   
-  F77_CALL(gam) ( &n_eq, deriv_func, &tin, xytmp, &tout, &hini,
-		     Rtol, Atol, &itol, jac_func_gam, &ijac, &ml, &mu, solout, &iout,
+  F77_CALL(gamd) ( &n_eq, deriv_func, &tin, xytmp, &tout, &hini,
+		     Rtol, Atol, &itol, jac_func_gam, &ijac, &ml, &mu,
+         mas_func, &imas, &mlmas, &mumas, solout, &iout,
 		     rwork, &lrw, iwork, &liw, out, ipar, &idid);
   if (idid == -1)  
      warning("input is not consistent");

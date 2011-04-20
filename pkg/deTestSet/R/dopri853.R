@@ -118,6 +118,7 @@ dopri853 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
 ### calling solver
   storage.mode(y) <- storage.mode(times) <- "double"
   tcrit <- NULL
+
   out <- .Call("call_dop",y,times,Func,initpar,
                rtol, atol, rho, ModelInit,  
                as.integer(verbose), as.double(rwork),
@@ -130,6 +131,7 @@ dopri853 <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
   out <- saveOut(out, y, n, Nglobal, Nmtot, func, Func2,
                  iin= 1:5, iout=c(1,3,2,13,13))
 
+  if (Nglobal > 0)  attributes(out)$istate[3] <- attributes(out)$istate[3] + nrow(out)
   attr(out, "type") <- "dopri853"
   if (verbose) diagnostics(out)
   return(out)
