@@ -8,8 +8,8 @@
 ##
 ## =============================================================================
 
-orego <- function(times=0:360, yini =NULL, 
-  parms=list(),  ...) {
+orego <- function(times = 0:360, yini =NULL,
+                  parms = list(),  ...) {
 
 ### derivative function
   orego <- function(t,y,parms) {
@@ -29,7 +29,7 @@ orego <- function(times=0:360, yini =NULL,
 
 
 ### solve
-   out <- ode(func=orego, parms=parameter, y = yini, times=times,
+   out <- ode(func = orego, parms = parameter, y = yini, times = times,
    ...)
 
    return(out)

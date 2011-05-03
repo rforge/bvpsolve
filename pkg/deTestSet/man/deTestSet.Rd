@@ -20,7 +20,7 @@
   
   In addition to all solvers present in package \code{deSolve}, 
   \code{deTestSet} contains the initial value problem solvers 
-  \code{gams}, and \code{mebdfi}, implementing a generalised adams method 
+  \code{gamd}, and \code{mebdfi}, implementing a generalised adams method
   and a differential algebraic equation solver of index up to three.
   
 
@@ -50,7 +50,7 @@
   for integrating 1-D, 2-D and 3-D models from package \code{deSolve}
   
   \code{\link{dae}}, a general interface to the dae solvers, including
-  \code{mebdfi} and \code{daspk} (deSolve)
+  \code{mebdfi}, \code{gamd}, and \code{daspk} and \code{radau} (deSolve)
 
 }
 

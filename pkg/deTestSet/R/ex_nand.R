@@ -14,8 +14,8 @@
 #             C[Y] * Y' - f[Y,t] = 0
 # 
 # ---------------------------------------------------------------------
-nand <- function(times = 0:80, yini =NULL, dyini = NULL,
-  parms=list(), method = "mebdfi", maxsteps = 1e5, ...) {
+nand <- function(times = 0:80, yini = NULL, dyini = NULL,
+                 parms=list(), method = "mebdfi", maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(RGS = 4, RGD = 4, RBS = 10, RBD = 10,
@@ -36,11 +36,11 @@ nand <- function(times = 0:80, yini =NULL, dyini = NULL,
     
 ### solve
 
-   ind <- c(14,0,0)  # index of the system
+   ind <- c(14, 0, 0)  # index of the system
 
-   out <- dae(y=yini, dy=dyini, times=times, res="nandres", nind=ind,
-          dllname="deTestSet",  initfunc="nandpar", method=method,
-          parms=parameter, maxsteps=maxsteps, ...)
+   out <- dae(y = yini, dy=dyini, times = times, res = "nandres", nind = ind,
+          dllname = "deTestSet",  initfunc = "nandpar", method = method,
+          parms = parameter, maxsteps = maxsteps, ...)
 
   return(out)
 }

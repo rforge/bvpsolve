@@ -27,7 +27,7 @@ c----------------------------------------------------------------------
 
       EXTERNAL daeparms
       double precision parms(25)
-      common /myparms/parms
+      common /polcom/parms
 
       call deparms(25, parms)
       return
@@ -45,7 +45,7 @@ c----------------------------------------------------------------------
       double precision k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,
      +  k13,k14,k15,k16,k17,k18,k19,k20,k21,k22,k23,k24,k25,r(25)
       
-      common /myparms/k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,
+      common /polcom/k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,
      +         k15,k16,k17,k18,k19,k20,k21,k22,k23,k24,k25
 
       r( 1) = k1 *y( 1)
@@ -110,7 +110,7 @@ c----------------------------------------------------------------------
       integer i,j
       double precision k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,
      +               k15,k16,k17,k18,k19,k20,k21,k22,k23,k24,k25
-      common /myparms/k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,
+      common /polcom/k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,
      +         k15,k16,k17,k18,k19,k20,k21,k22,k23,k24,k25
 
       do 20 j=1,neqn

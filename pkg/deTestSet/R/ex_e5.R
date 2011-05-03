@@ -9,8 +9,8 @@
 ## =============================================================================
 
 
-E5 <- function(times=c(0,10^(seq(-5,12,by=0.1))), yini =NULL, 
-  parms=list(), atol=1e-15, rtol=1e-15, maxsteps = 1e5, ...) {
+E5 <- function(times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
+               parms = list(), atol = 1e-15, rtol = 1e-15, maxsteps = 1e5, ...) {
 
 ### derivative function
   E3 <- function(t,y,parms) {
@@ -34,8 +34,9 @@ E5 <- function(times=c(0,10^(seq(-5,12,by=0.1))), yini =NULL,
 
 
 ### solve
-   out <- ode(func=E3, parms=parameter, y = yini, 
-      times=times, atol=atol, rtol=rtol, maxsteps=maxsteps, ...)
+   out <- ode(func = E3, parms = parameter, y = yini,
+              times = times, atol = atol, rtol = rtol,
+              maxsteps = maxsteps, ...)
 
     return(out)
 }

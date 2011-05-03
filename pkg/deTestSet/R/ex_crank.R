@@ -4,9 +4,10 @@
 ###      index 2 DAE of dimension 24
 ### ============================================================================
 
-crank <- function(times=seq(0,0.1,by=0.001), yini =NULL, dyini = NULL, 
-  parms=list(), method = "mebdfi", maxsteps=1e6, options = list(), 
-  ...) {
+crank <- function(times = seq(0, 0.1, by = 0.001),
+                  yini = NULL, dyini = NULL,
+                  parms=list(), method = "mebdfi",
+                  maxsteps = 1e6, options = list(),  ...) {
 
 ### check input 
     parameter <- c(M1 = 0.36, M2 = 0.151104, M3 = 0.075552, 
@@ -50,18 +51,19 @@ crank <- function(times=seq(0,0.1,by=0.001), yini =NULL, dyini = NULL,
       stop("illegal value in options")
     
     nind   <- c(14,10,0)    # index of system
-   if (method %in% c("mebdfi","daspk"))
+   if (method %in% c("mebdfi", "daspk"))
    
-    crank <- dae(y=yini, dy=dyini, times=times, 
-          res="crankres", nind=nind, method = method, 
-          dllname="deTestSet",initfunc="crankpar", parms=parameter, 
-          ipar=ipar ,maxsteps=maxsteps, ...)
+    crank <- dae(y = yini, dy = dyini, times = times,
+          res = "crankres", nind = nind, method = method,
+          dllname = "deTestSet", initfunc = "crankpar", parms = parameter,
+          ipar = ipar, maxsteps = maxsteps, ...)
    else 
-   crank <- dae(y=yini, times=times,nind=nind, 
+   crank <- dae(y = yini, times = times, nind = nind,
           func = "crankfunc", mass =  as.double(c(rep(1, 14), rep(0, 10))),
           massup = 0, massdown = 0,
-          dllname="deTestSet", "crankpar", parms=parameter, method = method, 
-          ipar = ipar, maxsteps=maxsteps, ...)
+          dllname = "deTestSet", initfunc = "crankpar",
+          parms = parameter, method = method,
+          ipar = ipar, maxsteps = maxsteps, ...)
 
     return(crank)
 }

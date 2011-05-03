@@ -22,7 +22,7 @@ c-----------------------------------------------------------------------
 
       EXTERNAL daeparms
       double precision parms(19)
-      common /myparms/parms
+      common /transcom/parms
 
       call daeparms(19, parms)
       return
@@ -41,7 +41,7 @@ c----------------------------------------------------------------------
      +                 pi,uet,fac1,fac2,c1,c2,c3,c4,c5
       parameter (pi=3.1415926535897931086244d0)
 
-      common /myparms/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
+      common /transcom/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
      +          r5, r6, r7, r8, r9, c1, c2, c3, c4, c5
 
 C
@@ -70,7 +70,7 @@ c----------------------------------------------------------------------------
      +                 pi,uet,fac1,fac2,c1,c2,c3,c4,c5
       parameter (pi=3.1415926535897931086244d0)
 
-      common /myparms/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
+      common /transcom/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
      +          r5, r6, r7, r8, r9, c1, c2, c3, c4, c5
       
       uet   = 0.1d0*sin(200d0*pi*t)
@@ -102,7 +102,7 @@ c----------------------------------------------------------------------
      +                 pi,uet,fac1,fac2,c1,c2,c3,c4,c5
       parameter (pi=3.1415926535897931086244d0)
 
-      common /myparms/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
+      common /transcom/ub, uf, alpha, beta, r0, r1, r2, r3, r4,
      +          r5, r6, r7, r8, r9, c1, c2, c3, c4, c5
 c
       fac1p = beta*dexp((y(2)-y(3))/uf)/uf

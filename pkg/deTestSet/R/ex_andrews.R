@@ -6,8 +6,9 @@
 ###          by joints without friction
 ### ============================================================================
 
-andrews <- function(times=seq(0,0.03,by=0.001), yini =NULL, dyini = NULL, 
-  parms=list(), method = "mebdfi", maxsteps = 1e5, ...) {
+andrews <- function(times = seq(0, 0.03, by = 0.001),
+                    yini = NULL, dyini = NULL,
+                    parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(m1=.04325, m2=.00365, m3=.02373 ,m4=.00706 ,
@@ -47,17 +48,18 @@ andrews <- function(times=seq(0,0.03,by=0.001), yini =NULL, dyini = NULL,
 
    ind <- c(7,7,13)  # index of the system
 
-   if (method %in% c("mebdfi","daspk"))
-   AndOut <- dae(y=yini, dy=dyini, times=times, res="andres", nind=ind,
-          dllname="deTestSet", jacres="andjac", initfunc="andpar",
-          parms=parameter, jactype="fullusr", method = method, 
-          maxsteps=maxsteps, ...)
+   if (method %in% c("mebdfi", "daspk"))
+   AndOut <- dae(y = yini, dy = dyini, times = times,
+                 res = "andres", nind = ind,
+                 dllname = "deTestSet", jacres = "andjac", initfunc = "andpar",
+                 parms = parameter, jactype = "fullusr", method = method,
+                 maxsteps = maxsteps, ...)
    else
-   AndOut <- dae(y=yini, times=times,nind=ind, 
+   AndOut <- dae(y = yini, times = times, nind = ind,
           func = "andfunc", mass =  as.double(c(rep(1, 14), rep(0, 13))),
           massup = 0, massdown = 0, 
-          dllname="deTestSet", initfunc="andpar", parms=parameter, 
-          method = method, maxsteps=maxsteps, ...)
+          dllname = "deTestSet", initfunc = "andpar", parms = parameter,
+          method = method, maxsteps = maxsteps, ...)
 
   return(AndOut)
 }

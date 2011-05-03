@@ -27,7 +27,7 @@ c----------------------------------------------------------------------
 
       EXTERNAL deparms
       double precision parms(16)
-      common /myparms/parms
+      common /ringcom/parms
 
       call deparms(16, parms)
       return
@@ -59,7 +59,7 @@ c----------------------------------------------------------------------
       double precision c,cs,cp,r,rp,lh,ls1,ls2,ls3,rg1,rg2,rg3,ri,rc,
      +                 gamma,delta,pi,
      +                 uin1,uin2,ud1,ud2,ud3,ud4,qud1,qud2,qud3,qud4
-      common /myparms/c, cs, cp, r, rp, lh, ls1, ls2, ls3,
+      common /ringcom/c, cs, cp, r, rp, lh, ls1, ls2, ls3,
      +     rg1, rg2, rg3, ri, rc, gamma, delta  
       parameter (pi=3.141592653589793238462643383d0)
 

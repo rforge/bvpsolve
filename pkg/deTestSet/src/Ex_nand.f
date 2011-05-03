@@ -26,7 +26,7 @@ c----------------------------------------------------------------------
       EXTERNAL daeparms
       
       double precision parms(14)
-      common / const / parms
+      common / nandcom / parms
 
         CALL daeparms(14,parms)
         
@@ -137,7 +137,7 @@ C ---------------------------------------------------------------------
      *                  DELTA, CURIS, VTH, VDD, VBB, rpar(*)
 	integer ipar(*) 
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
       CALL nandPULSE(T,V1,V1D,0.D0,5.D0,5.D0,5.D0,5.D0,5.D0,20.D0)
@@ -218,7 +218,7 @@ C ---------------------------------------------------------------------------
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
 C
@@ -266,7 +266,7 @@ C --- Enhancement-type
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
 
@@ -322,7 +322,7 @@ C ---------------------------------------------------------------------------
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
 C
@@ -358,7 +358,7 @@ C ---------------------------------------------------------------------------
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
 
@@ -460,7 +460,7 @@ C ---------------------------------------------------------------------
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
  
       EXTERNAL nandCBDBS
@@ -520,7 +520,7 @@ C ---------------------------------------------------------------------------
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB
 
-      COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
+      COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
 
       PHIB=0.87D0

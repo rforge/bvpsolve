@@ -1,11 +1,11 @@
 
 ### ============================================================================
-### gams-- solves ordinary differential equation systems using the generalised
+### gamd-- solves ordinary differential equation systems using the generalised
 ### adams method
 ###
 ### ============================================================================
 
-gams <- function(y, times, func, parms, nind = c(length(y),0,0),
+gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
   rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint",
   mass = NULL, massup = NULL, massdown = NULL,
   verbose = FALSE, hmax = NULL, hini = 0,

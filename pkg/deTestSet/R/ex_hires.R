@@ -11,8 +11,8 @@
 ##
 ## =============================================================================
 
-hires <- function(times=seq(0,5,by=0.01), yini =NULL, 
-  parms=list(),  ...) {
+hires <- function(times = seq(0, 5, by = 0.01), yini = NULL,
+                  parms = list(),  ...) {
 
 ### derivative function
   hires <- function(t,y,parms) {
@@ -41,8 +41,9 @@ hires <- function(times=seq(0,5,by=0.01), yini =NULL,
 
 
 ### solve
-   out <- ode(func=hires, parms=parameter, y = yini, times=times,
-   ...)
+   out <- ode(func = "hiresfun",  dllname = "deTestSet",
+              initfunc = "hirespar", parms = parameter,
+              y = yini, times = times, ...)
 
    return(out)
 }

@@ -7,7 +7,7 @@ Estimates the reference solution of the problem
 \usage{
 reference (name = c("andrews", "beam", "caraxis", "crank", "E5", 
     "emep", "fekete", "vdpol", "hires", "nand", "orego", 
-    "pollution", "ring", "rober", "transistor",      
+    "pleiades", "pollution", "ring", "rober", "transistor",
     "tube", "twobit", "wheelset")) 
 }
 

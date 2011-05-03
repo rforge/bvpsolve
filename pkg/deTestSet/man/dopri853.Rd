@@ -245,7 +245,7 @@ E. Hairer, S.P. Norsett AND G. Wanner, Solving Ordinary
     \item \code{\link{ode.2D}} for integrating 2-D models,
     \item \code{\link{ode.3D}} for integrating 3-D models,
     \item \code{\link{mebdfi}} for integrating DAE models,
-    \item \code{\link{gams}} for the generalised adams method
+    \item \code{\link{gamd}} for the generalised adams method
   }
 
   \code{\link{diagnostics}} to print diagnostic messages.

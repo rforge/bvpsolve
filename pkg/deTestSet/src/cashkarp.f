@@ -1056,7 +1056,7 @@ c the error is the maximum of the three error estimation
             ERR = ERRy
          END IF
          if (iprint .gt. 0 ) then
-           write(msg,478) x, errys,erryys,ERR
+           write(msg, 478) x, errys, erryys, ERR
            call rprint(msg)
  478       format(1x,'time ', g12.5,
      &    '  the 3 error estimates based on ys',3g22.10)
@@ -1065,7 +1065,6 @@ c the error is the maximum of the three error estimation
        END IF
 cF end if 444
       END IF
-
 
 C     We jump here if there is no testing
 
@@ -1082,6 +1081,7 @@ C         write(msg,433) h, hnew, fac, err
 C         call rprint(msg)
 C      end if
 C 433   format(1x,'new h',4g18.10)
+
       IF(ERR.LE.1.D0)THEN
 C --- STEP IS ACCEPTED
          FACOLD=MAX(ERR,1.0D-4)
@@ -1118,6 +1118,7 @@ C            END IF
             END IF
           END IF
         END IF
+
 c        This is the end of the second stiffness detector
 c set up continuous output
           IF (IOUT.GE.2 .AND. HERMITE) THEN
@@ -1158,9 +1159,10 @@ c computation of kappa gamma and sigma
          sigma = (kappa/gamma)*(XPH-XST)
 
          IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME',XPH, 'KAPPA',kappa/ENORMVE,
-     &     'gamma',(gamma/ENORMVE)/(XPH-XST), 'sigma',sigma,
-     &     'sigmatot',sigmatot
+            write(msg,*) 'TIME',XPH, 'KAPPA',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'gamma',(gamma/ENORMVE)/(XPH-XST),
+     &     'sigma',sigma,'sigmatot',sigmatot
             CALL rprint(msg)
          END IF
 
@@ -1193,7 +1195,6 @@ cf  computation of errz the relative error between y and ys
         ERRZ = SQRT(ERRZ/N)
 cf end of computation of errz
 
-
         IF ((ABS(ERRZ-ERRZOLD) .LT. 1d-5).AND.(ERRZ .LT. 5d-3)) THEN
            NNST = NNST+1
            NNEST =0
@@ -1207,6 +1208,7 @@ cf end of computation of errz
 c
 cf  restarting
          IF (NNST .GT. 50 .AND. SIGMAtot .LT. 50) THEN
+
            nrestart = 1
            ENORMY = 0.0d0
            DO I=1,N
@@ -1264,11 +1266,11 @@ cF initialization of the conditioning parameters
          END IF
          IF (NRESTART .EQ. 0) SIGMATOT=SIGMA
 
-
         IF (  ( nst .GT. MAXnst .OR. IaStiS .GT. MAXIaSti )
      &   .OR. ( (errz .LT. 1e-5) .AND. (sigmatot .GT. sigmamMAX) )
      &   .OR.  sigmatot .GT. sigmaMAX
      &   .OR. KAPPA/ENORMVE  .GT. 1d20 ) THEN
+
             IF  (sigmatot .GT. sigmaMAX) THEN
 C Karline: always print if nwarn1=0
 C              IF ( (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1)
@@ -1293,6 +1295,7 @@ C     &          .AND. (NWARN1 .EQ. 0) ) THEN
               nwarn2=1
               IDID=-7
             endif
+
             if ((nst .GT. MAXnst .AND. kappa/ENORMVE .GT. 1.01)
      &          .AND. (NWARN3 .EQ. 0) ) THEN
                IF (IPRINT .GT. 0  .OR. NSTIFFCOND.EQ.1 ) THEN
@@ -1362,11 +1365,13 @@ C --- FAIL EXIT
       IDID=-4
       RETURN
   760 CONTINUE
+
       IF (NSTIFFCOND .GT.0 ) THEN
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
       END IF
+      IDID = -4
       RETURN
   77  CONTINUE
       IF (IPRINT.GT.0) THEN

@@ -9,8 +9,9 @@
 ##
 ## =============================================================================
 
-ring <- function(times=seq(0,1e-3,by=1e-6), yini =NULL, dyini=NULL,
-  parms=list(), method = "mebdfi", maxsteps=1e6,...) {
+ring <- function(times = seq(0, 1e-3, by = 1e-6),
+                 yini = NULL, dyini = NULL,
+                 parms = list(), method = "mebdfi", maxsteps = 1e6, ...) {
 
 # initial conditions of state variables
 
@@ -31,15 +32,15 @@ ring <- function(times=seq(0,1e-3,by=1e-6), yini =NULL, dyini=NULL,
     checkini(15, yini, dyini)
     
 ### solve
-   if (method %in% c("mebdfi","daspk"))
-  out <- mebdfi(y=yini, dy=dyini, times=times, res="ringres", 
-          dllname="deTestSet", initfunc="ringpar",
-          parms=parameter,  maxsteps=maxsteps, ...)
+   if (method %in% c("mebdfi", "daspk"))
+  out <- mebdfi(y = yini, dy = dyini, times = times, res = "ringres",
+          dllname = "deTestSet", initfunc = "ringpar",
+          parms = parameter,  maxsteps = maxsteps, ...)
    else
-   out <- dae(y=yini, times=times, 
+   out <- dae(y = yini, times = times,
           func = "ringfunc", 
-          dllname="deTestSet",  initfunc="ringpar", parms=parameter, 
-          method = method,  maxsteps=maxsteps, ...)
+          dllname = "deTestSet", initfunc = "ringpar", parms = parameter,
+          method = method,  maxsteps = maxsteps, ...)
 
   return(out)
 }

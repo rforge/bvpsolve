@@ -54,7 +54,7 @@ mebdfi(y, times, func = NULL, parms, dy = NULL, res = NULL,
     \code{func} must be defined as: \code{func <- function(t, y,
     parms,...)}.  \cr \code{t} is the current time point in the
     integration, \code{y} is the current estimate of the variables in
-    the ODE system.  If the initial values \code{y} has a \code{names}
+    the ODE or DAE system.  If the initial values \code{y} has a \code{names}
     attribute, the names will be available inside \code{func}, unless
     \code{ynames} is FALSE. \code{parms} is a vector or list of
     parameters.  \code{...} (optional) are any other arguments passed to
@@ -558,7 +558,7 @@ J.R. Cash, Stable recursions with applications to the
   well as in an R-function. See deSolve's vignette \code{"compiledCode"}
   for details.  Examples
   in Fortran are in the \file{dynload} subdirectory of the
-  \code{daeSolve} package directory.
+  \code{deSolve} package directory.
 
   The diagnostics of the integration can be printed to screen
   by calling \code{\link{diagnostics}}. If \code{verbose} = \code{TRUE},
@@ -570,7 +570,8 @@ J.R. Cash, Stable recursions with applications to the
 }
 \seealso{
   \itemize{
-    \item \code{\link{daspk}} another DAE solver,
+    \item \code{\link{gamd}} another DAE solver,
+    \item \code{\link{daspk}} another DAE solver from package \code{deSolve},
   }
 
   \code{\link{diagnostics}} to print diagnostic messages.

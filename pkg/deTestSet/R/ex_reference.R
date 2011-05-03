@@ -4,7 +4,7 @@
 ### Finds exact, reference solution for certain problem
 ### ============================================================================
 reference <- function(name=c("andrews","beam","caraxis","crank","E5","emep","fekete",
-    "vdpol","hires","nand","orego","pollution","ring","rober","transistor",      
+    "vdpol","hires","nand","orego","pleiades","pollution","ring","rober","transistor",
     "tube","twobit","wheelset")) {
   switch(name,
     "vdpol" = c(0.1706167732170469e1, -0.8928097010248125e-3),
@@ -43,6 +43,7 @@ reference <- function(name=c("andrews","beam","caraxis","crank","E5","emep","fek
                    -0.15949425684022, 0.37839614386969e-3,
                    0.14173214964613,-0.10124044903201e-1,
                    -0.56285630573753e-2) ,
+    "pleiades" =  .Fortran("pleiasoln", 28,y = as.double(rep(0.,28))  )$y,
     "beam" =      .Fortran("beamsoln", 80,y = as.double(rep(0.,80))   )$y,
     "andrews" =   .Fortran("andsoln", 27,y = as.double(rep(0.,27))    )$y,
     "crank" =     .Fortran("cranksoln", 24,y = as.double(rep(0.,24))  )$y,

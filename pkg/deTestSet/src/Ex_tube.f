@@ -27,7 +27,7 @@ c----------------------------------------------------------------------
 
       EXTERNAL daeparms
       double precision parms(8)
-      common /myparms/parms
+      common /tubecom/parms
 
       call daeparms(8, parms)
       return
@@ -44,7 +44,7 @@ c----------------------------------------------------------------------
       DIMENSION Y(N),DELTA(N),IPAR(*),RPAR(*),YPRIME(N)
       double precision nu,g,rho,rcrit,length,k,d,b,pi,a,c,v,x
 c      
-      common/myparms/nu, g, rho, rcrit, length, k, d, b
+      common/tubecom/nu, g, rho, rcrit, length, k, d, b
       parameter(pi    = 3.141592653589793238462643383d0 )            
 
       a = pi*d**2/4d0
@@ -82,7 +82,7 @@ c-----------------------------------------------------------------------
      +                 ein(nnodes),eout(nnodes),rghres(nnodes,nnodes)
       double precision rtla,r,that,that2,a,mu
       double precision nu,g,rho,rcrit,length,k,d,b,pi
-      common/myparms/nu, g, rho, rcrit, length, k, d, b
+      common/tubecom/nu, g, rho, rcrit, length, k, d, b
       parameter(pi    = 3.141592653589793238462643383d0 )            
 
       a = pi*d**2/4d0

@@ -1,25 +1,30 @@
-\name{gams}
-\alias{gams}
+\name{gamd}
+\alias{gamd}
 
-\title{Generalised Adams IVP Solver for ODE}
+\title{Generalised Adams IVP Method for DAE}
 
 \description{
   Solves the initial value problem for stiff or nonstiff systems of
-  ordinary differential equations (ODE) in the form: \deqn{dy/dt = 
-  f(t,y)} 
+  either:
+  \itemize{
+    \item a system of ordinary differential equations (ODE) of the form
+      \deqn{y' = f(t,y,...)} or
+    \item a system of linearly implicit DAES in the
+       form \deqn{M y' = f(t,y)}
+  }
   
-  The \R function \code{gams} provides an interface to the Fortran ODE
-  solver gam, written by Felice Iavernaro and Francesca Mazzia.
+  The \R function \code{gamd} provides an interface to the Fortran DAE
+  solver gamd, written by Felice Iavernaro and Francesca Mazzia.
   
   It implements the generalized adams methods of order 3-5-7-9 with 
   step size control and continuous output.
   
-  The system of ODE's is written as an \R function or can be defined in
+  The system of DAE's is written as an \R function or can be defined in
   compiled code that has been dynamically loaded.
   
 }
 \usage{
-gams(y, times, func, parms, nind = c(length(y), 0, 0),
+gamd(y, times, func, parms, nind = c(length(y), 0, 0),
   rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint",
   mass = NULL, massup = NULL, massdown = NULL, verbose = FALSE,
   hmax = NULL, hini = 0, ynames = TRUE, minord = NULL, 
@@ -31,7 +36,7 @@ gams(y, times, func, parms, nind = c(length(y), 0, 0),
 }
 
 \arguments{
-  \item{y }{the initial (state) values for the ODE system. If \code{y}
+  \item{y }{the initial (state) values for the DAE or ODE system. If \code{y}
     has a name attribute, the names will be used to label the output
     matrix.
   }
@@ -40,7 +45,7 @@ gams(y, times, func, parms, nind = c(length(y), 0, 0),
     to be taken; set \code{times} = \code{NULL}.
   }
   \item{func }{either an \R-function that computes the values of the
-    derivatives in the ODE system (the \emph{model definition}) at time
+    derivatives in the DAE or ODE system (the \emph{model definition}) at time
     t, or a character string giving the name of a compiled function in a
     dynamically loaded shared library.
   
@@ -61,7 +66,7 @@ gams(y, times, func, parms, nind = c(length(y), 0, 0),
     If \code{func} is
     a string, then \code{dllname} must give the name of the shared
     library (without extension) which must be loaded before
-    \code{gam()} is called. See deSolve package vignette \code{"compiledCode"}
+    \code{gamd()} is called. See deSolve package vignette \code{"compiledCode"}
     for more details.
   }
   \item{parms }{vector or list of parameters used in \code{func} or
@@ -220,7 +225,7 @@ gams(y, times, func, parms, nind = c(length(y), 0, 0),
   in \code{times} and as many columns as elements in \code{y} plus the number of "global"
   values returned in the next elements of the return from \code{func},
   plus and additional column for the time value.  There will be a row
-  for each element in \code{times} unless the FORTRAN routine `gam'
+  for each element in \code{times} unless the FORTRAN routine `gamd'
   returns with an unrecoverable error. If \code{y} has a names
   attribute, it will be used to label the columns of the output value.
 
@@ -276,20 +281,20 @@ yini  <- 1:5
 times <- 1:20
 
 ## default: stiff method, internally generated, full Jacobian
-out   <- gams(yini, times, f1, parms = 0, jactype = "fullint")
+out   <- gamd(yini, times, f1, parms = 0, jactype = "fullint")
 plot(out)
 
 ## stiff method, user-generated full Jacobian
-out2  <- gams(yini, times, f1, parms = 0, jactype = "fullusr",
+out2  <- gamd(yini, times, f1, parms = 0, jactype = "fullusr",
               jacfunc = fulljac)
 
 ## stiff method, internally-generated banded Jacobian
 ## one nonzero band above (up) and below(down) the diagonal
-out3  <- gams(yini, times, f1, parms = 0, jactype = "bandint",
+out3  <- gamd(yini, times, f1, parms = 0, jactype = "bandint",
                               bandup = 1, banddown = 1)
 
 ## stiff method, user-generated banded Jacobian
-out4  <- gams(yini, times, f1, parms = 0, jactype = "bandusr",
+out4  <- gamd(yini, times, f1, parms = 0, jactype = "bandusr",
               jacfunc = bandjac, bandup = 1, banddown = 1)
 
 
@@ -307,7 +312,7 @@ Chemistry <- function (t, y, p) {
 times <- 10^(seq(0, 10, by = 0.1))
 yini <- c(y1 = 1.0, y2 = 0, y3 = 0)
 
-out <- gams(func = Chemistry, times = times, y = yini, parms = NULL)
+out <- gamd(func = Chemistry, times = times, y = yini, parms = NULL)
 plot(out, log = "x", type = "l", lwd = 2)
 
 
@@ -366,7 +371,7 @@ Mass
 index <- c(4, 4, 2)
 
 times <- seq(0, 3, by = 0.01)
-out <- gams(y = yini, mass = Mass, times = times, func = caraxisfun,
+out <- gamd(y = yini, mass = Mass, times = times, func = caraxisfun,
         parms = NULL, nind = index)
 
 plot(out, which = 1:4, type = "l", lwd = 2)
@@ -387,9 +392,9 @@ properties and implementation techniques, proceedings of NUMDIFF8,
 Appl. Num. Math. 28 (2-4) (1998) 107-126.
 }
 \details{
-  The work is done by the FORTRAN subroutine \code{gam}, whose
+  The work is done by the FORTRAN 90 subroutine \code{gamd}, whose
   documentation should be consulted for details. The implementation
-  is based on the Fortran 77 version from November 25, 1999.
+  is based on the Fortran 90 version from 2007/24/05.
     
   There are four standard choices for the jacobian which can be specified with
   \code{jactype}.
@@ -407,7 +412,7 @@ Appl. Num. Math. 28 (2-4) (1998) 107-126.
       function \code{jacfunc}; the size of the bands specified by
       \code{bandup} and \code{banddown}.
     }
-    \item{jactype = "bandint"}{a banded Jacobian, calculated by gams;
+    \item{jactype = "bandint"}{a banded Jacobian, calculated by gamd;
       the size of the bands specified by \code{bandup} and
       \code{banddown}.
     }
@@ -438,6 +443,8 @@ Appl. Num. Math. 28 (2-4) (1998) 107-126.
 }
 \seealso{
   \itemize{
+    \item \code{\link{mebdfi}} another DAE solver from package \code{deTestSet},
+    \item \code{\link{daspk}} another DAE solver from package \code{deSolve},
     \item \code{\link{ode}} for a general interface to most of the ODE solvers
       from package \code{deSolve},
     \item \code{\link{ode.1D}} for integrating 1-D models,

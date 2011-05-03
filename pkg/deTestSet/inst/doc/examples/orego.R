@@ -8,7 +8,7 @@
 ##
 ## =============================================================================
 
-require(deSolve)
+require(deTestSet)
 
 # -------------------------------------------------------
 # problem formulation
@@ -19,10 +19,10 @@ yini <- 1:3
 
 # derivative function
 orego <- function(t,y,parms) {
-   f1<- 77.27*(y[2]+y[1]-y[1]*y[2]-8.375e-6*y[1]*y[1])
-   f2=(y[3]-(1. +y[1])*y[2])/77.27
-   f3=0.161 *(y[1]-y[3])
-   list(c(f1,f2,f3))
+   f1 <- 77.27 * (y[2] + y[1] - y[1]*y[2] - 8.375e-6*y[1]*y[1])
+   f2 <- (y[3] - (1. +y[1])*y[2])/77.27
+   f3 <- 0.161 *(y[1] - y[3])
+   list(c(f1, f2, f3))
 }
 
 # -------------------------------------------------------
@@ -30,11 +30,27 @@ orego <- function(t,y,parms) {
 # -------------------------------------------------------
 
 times <- 0:360
-out <- ode(func=orego, parms=parms, y = yini, times=times,
-  atol=1e-10, rtol=1e-10, maxsteps=1e5)
+print (system.time(
+out <- ode(func = orego, parms = parms, y = yini, times = times,
+           atol = 1e-10, rtol = 1e-10, maxsteps = 1e5)
+))
+print (system.time(
+out2 <- ode(func = orego, parms = parms, y = yini, times = times,
+           atol = 1e-10, rtol = 1e-10, maxsteps = 1e5, method = mebdfi)
+))
+print (system.time(
+out3 <- ode(func = orego, parms = parms, y = yini, times = times,
+           atol = 1e-10, rtol = 1e-10, maxsteps = 1e5, method = gamd)
+))
+## CRASHES R
+print (system.time(
+out4 <- ode(func = orego, parms = parms, y = yini, times = times,
+            atol = 1e-10, rtol = 1e-10, maxsteps = 1e5, method = cashkarp,
+            stiffness = 4)
+))
 
-plot(out, type="l", lwd=2, col="darkblue", log="y")
-mtext(side=3, outer=TRUE, line=-1.5, cex=1.5, "oregonator")
+plot(out, out2, out3, lwd = 2, log = "y")
+mtext(side = 3, outer = TRUE, line = -1.5, cex = 1.5, "oregonator")
 
 # -------------------------------------------------------
 # Compare with exact solution

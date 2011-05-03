@@ -23,15 +23,25 @@ c-----------------------------------------------------------------------
 c     residual function
 c-----------------------------------------------------------------------
 
-      SUBROUTINE carres(X,Y,YPRIME,cj,DELTA,ier,RPAR,IPAR)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	    parameter(N=10)
+      SUBROUTINE carpar(daeparms)
 
-      DIMENSION Y(N),DELTA(N),IPAR(*),RPAR(*),YPRIME(N)
-      double precision m,eps, k
+      EXTERNAL daeparms
+      double precision parms(7)
+      common /carcom/parms
+
+      call daeparms(7, parms)
+      return
+      end
+
+      SUBROUTINE carres(X,Y,YPRIME,cj,DELTA,ier,RPAR,IPAR)
+      IMPLICIT NONE
+	integer i, N, ipar(*), ier
+	parameter(N=10)
+
+      DOUBLE PRECISION x,Y(N),DELTA(N),RPAR(*),YPRIME(N), cj
+      double precision eps, m, l, l0, r,w, g, k
+      common /carcom/eps, m, l, l0, r,w, g
 C
-      M = 10d0
-      eps = 1d-2
       k = m*eps*eps/2d0
       
       call carfunc(n,x,y,delta,rpar,ipar)
@@ -49,18 +59,13 @@ C
       end
 c-----------------------------------------------------------------------
       subroutine carfunc(neqn,t,y,f,rpar,ipar)
+      implicit none
       integer neqn,ierr,ipar(*), i
       double precision t,y(neqn),f(neqn),rpar(*)      
-      double precision M,L,L0,w,r,xb,yb,Ll,Lr,eps,g,
-     +                 xl,yl,xr,yr,lam1,lam2
+      double precision xb,yb,Ll,Lr,xl,yl,xr,yr,lam1,lam2
 
-      eps = 1d-2
-      M   = 10d0
-      L   = 1d0
-      L0  = 0.5d0
-      r   = 0.1d0
-      w   = 10d0
-      g   = 1d0
+      double precision eps, m, l, l0, r,w, g
+      common /carcom/eps, m, l, l0, r,w, g
       yb  = r*sin(w*t)
       xb  = sqrt(L*L-yb*yb)
 

@@ -10,7 +10,7 @@ problem is in the file emep.f available at [MM08].
 }
 \usage{
 emep (times = seq(14400, 417600, by = 10), yini = NULL, 
-  parms = list(), rtol = 0.1, atol = 0.1, maxsteps = 1e5, ...)
+  parms = list(), rtol = 1e-5, atol = 0.1, maxsteps = 1e5, ...)
 }
 
 \arguments{

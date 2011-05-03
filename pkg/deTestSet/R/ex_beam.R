@@ -10,20 +10,20 @@
 ## =============================================================================
 
 
-beam <- function(times = seq(0,5,by=0.01), yini = NULL, 
+beam <- function(times = seq(0, 5, by = 0.01), yini = NULL,
     ...) {
 
 ### check input 
 
     # there are no parameters...
 
-    if (is.null(yini)) yini <- rep(0,80)
+    if (is.null(yini)) yini <- rep(0, 80)
 
-    checkini(80,yini)
+    checkini(80, yini)
 
 ### solve 
-    out <- ode(func="beamf", parms=NULL, dllname="deTestSet", y = yini, 
-           times=times, initfunc=NULL,  ...)
+    out <- ode(func = "beamf", parms = NULL, dllname = "deTestSet", y = yini,
+           times = times, initfunc = NULL,  ...)
 
   return(out)
 }

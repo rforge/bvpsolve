@@ -8,8 +8,8 @@
 ##
 ## =============================================================================
 
-pollution <- function(times = seq(0, 10, 0.1), yini =NULL, 
-  parms=list(),  ...) {
+pollution <- function(times = seq(0, 10, 0.1), yini = NULL,
+  parms = list(),  ...) {
 
 ### check input 
     parameter <- c(
@@ -39,9 +39,9 @@ pollution <- function(times = seq(0, 10, 0.1), yini =NULL,
           "HNO3", "O1D", "SO2", "SO4", "NO3", "N2O5")
 
 ### solve
-   out <- ode(y=yini, times=times, func ="polf", 
-            dllname="deTestSet", initfunc="polpar",
-            parms=parameter, ...)
+   out <- ode(y = yini, times = times, func = "polf", jacfunc = "poljac",
+              dllname = "deTestSet", initfunc = "polpar",
+              parms = parameter, ...)
 
   return(out)
 }

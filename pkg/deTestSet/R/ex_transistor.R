@@ -8,7 +8,7 @@
 ##
 ## =============================================================================
 
-transistor <- function(times = seq(0, 0.2, 0.001), yini =NULL, dyini = NULL,
+transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
   parms=list(), method = "mebdfi", maxsteps = 1e5, ...) {
 
 ### check input 
@@ -33,11 +33,12 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini =NULL, dyini = NULL,
 ### solve
 
    ind <- c(8,0,0)  # index of the system
-   if (method %in% c("mebdfi","daspk"))
-    out <- mebdfi(y=yini, dy=dyini, times=times, res="transres", nind=ind,
-          dllname="deTestSet",  initfunc="transpar", jactype = "bandint",
-          banddown = 2, bandup = 1,
-          parms=parameter, maxsteps=maxsteps)
+   if (method %in% c("mebdfi", "daspk"))
+    out <- mebdfi(y = yini, dy = dyini, times = times,
+                  res = "transres", nind = ind,
+                  dllname = "deTestSet",  initfunc = "transpar",
+                  jactype = "bandint", banddown = 2, bandup = 1,
+                  parms = parameter, maxsteps = maxsteps)
    else {
      mass <- matrix(nrow = 3, ncol = 8, data=0)
      mass[1,2] <- parameter["c1"]
@@ -52,12 +53,13 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini =NULL, dyini = NULL,
      mass[3,4] <- parameter["c3"]
      mass[3,7] <- parameter["c5"]
      
-     out <- dae(y=yini, times=times,nind=ind, 
-          func = "transfunc", mass =  mass,
-          massup = 1, massdown = 1, jactype = "bandint",
-          banddown = 2, bandup = 1,
-          dllname="deTestSet", initfunc="transpar", parms=parameter, 
-          method = method, maxsteps=maxsteps, ...)
+     out <- dae(y = yini, times = times, nind = ind,
+                func = "transfunc", mass =  mass,
+                massup = 1, massdown = 1, jactype = "bandint",
+                banddown = 2, bandup = 1,
+                dllname = "deTestSet", initfunc = "transpar",
+                parms = parameter,
+                method = method, maxsteps = maxsteps, ...)
    }
   return(out)
 }

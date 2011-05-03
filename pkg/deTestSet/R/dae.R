@@ -1,5 +1,5 @@
 dae <- function (y, times, parms, dy, res = NULL, func = NULL,
-    method = c("mebdfi", "daspk", "radau", "gams"), ...)
+    method = c("mebdfi", "daspk", "radau", "gamd"), ...)
 {
     if (is.null(method))
         method <- "mebdfi"
@@ -7,10 +7,13 @@ dae <- function (y, times, parms, dy, res = NULL, func = NULL,
         out <- method(y=y, times=times, parms=parms, dy=dy, res=res, ...)
     else if (is.function(method) & !is.null(func))
         out <- method(y=y, times=times, parms=parms, func=func, ...)
-    else out <- switch(match.arg(method),
+    else if(!is.null(res)) out <- switch(match.arg(method),
       mebdfi = mebdfi(y=y, times=times, parms=parms, dy=dy, res=res, ...),
-      daspk  = daspk (y=y, times=times, parms=parms, dy=dy, res=res, ...),
+      daspk  = daspk (y=y, times=times, parms=parms, dy=dy, res=res, ...))
+    else out <- switch(match.arg(method),
+      mebdfi = mebdfi(y=y, times=times, parms=parms, dy=dy, func=func, ...),
+      daspk  = daspk (y=y, times=times, parms=parms, dy=dy, func=func, ...),
       radau  = radau (y=y, times=times, parms=parms, func=func, ...),
-      gams   = gams  (y=y, times=times, parms=parms, func=func, ...))
+      gamd   = gamd  (y=y, times=times, parms=parms, func=func, ...))
     return(out)
 }

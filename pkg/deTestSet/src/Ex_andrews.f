@@ -26,7 +26,7 @@ c----------------------------------------------------------------------
       EXTERNAL daeparms
       
       double precision parms(42)
-      common / myparms/ parms
+      common / andcom/ parms
 
         CALL daeparms(42,parms)
         
@@ -63,7 +63,7 @@ C-----------------------------------------------------------------------
       DOUBLE PRECISION m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
      +     i1,i2,i3,i4,i5,i6,i7,d,da,e,ea,rr,ra,l0,
      +     ss,sa,sb,sc,sd,ta,tb,u,ua,ub,zf,zt,fa,mom
-      common/myparms/ m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
+      common/andcom/ m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
      +     i1,i2,i3,i4,i5,i6,i7,d,da,e,ea,rr,ra,l0,
      +     ss,sa,sb,sc,sd,ta,tb,u,ua,ub,zf,zt,fa,mom
 
@@ -216,7 +216,7 @@ c-----------------------------------------------------------------------
       DOUBLE PRECISION m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
      +     i1,i2,i3,i4,i5,i6,i7,d,da,e,ea,rr,ra,l0,
      +     ss,sa,sb,sc,sd,ta,tb,u,ua,ub,zf,zt,fa,mom
-      common/myparms/ m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
+      common/andcom/ m1,m2,m3,m4,m5,m6,m7,xa,ya,xb,yb,xc,yc,c0,
      +     i1,i2,i3,i4,i5,i6,i7,d,da,e,ea,rr,ra,l0,
      +     ss,sa,sb,sc,sd,ta,tb,u,ua,ub,zf,zt,fa,mom
 

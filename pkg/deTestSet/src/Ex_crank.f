@@ -34,7 +34,7 @@ c----------------------------------------------------------------------
 
       EXTERNAL daeparms
       double precision parms(14)
-      common /myparms/parms
+      common /crankcom/parms
 
       call daeparms(14, parms)
       return
@@ -188,7 +188,7 @@ C
 
       Double precision M1, M2, M3, L1, L2, J1, J2, EE, NUE,
      *             BB, HH, RHO, GRAV, OMEGA
-      common /myparms/M1, M2, M3, L1, L2, J1, J2, EE, NUE,
+      common /crankcom/M1, M2, M3, L1, L2, J1, J2, EE, NUE,
      *             BB, HH, RHO, GRAV, OMEGA
      
       double precision PI

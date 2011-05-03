@@ -3,9 +3,7 @@ to the integration routines */
 
 #include "de.h"
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Forcing functions (compiled code) from deSolve version 1.5
-   Events (R- and compiled code) from deSolve version 1.6
-   
+   Forcing functions (compiled code)
    **FORCING FUNCTIONS**, or external variables need to be interpolated 
    at each time step. This is done in this part of C-code.
 

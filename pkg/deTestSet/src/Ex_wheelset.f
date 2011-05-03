@@ -27,7 +27,7 @@ c----------------------------------------------------------------------
 
       EXTERNAL daeparms
       double precision parms(25)
-      common /myparms/parms
+      common /wheelcom/parms
 
       call daeparms(25, parms)
       return
@@ -50,7 +50,7 @@ c----------------------------------------------------------------------
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
-      COMMON /myparms/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
+      COMMON /wheelcom/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
 C
@@ -191,7 +191,7 @@ C
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
-      COMMON /myparms/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
+      COMMON /wheelcom/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
       PARAMETER( TOL   = 0.00000001d0)
@@ -521,7 +521,7 @@ C
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
-      COMMON /myparms/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
+      COMMON /wheelcom/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
 
@@ -742,7 +742,7 @@ C====================================================================
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
-      COMMON /myparms/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
+      COMMON /wheelcom/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
 
@@ -820,7 +820,7 @@ C
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
-      COMMON /myparms/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
+      COMMON /wheelcom/ MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
 C

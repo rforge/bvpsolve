@@ -10,6 +10,7 @@
 #
 # use ReacTran to solve this..
 require(ReacTran)
+require(deTestSet)
 
 # -------------------------------------------------------
 # problem formulation
@@ -39,11 +40,11 @@ medAKZO <- function(t,y,parms) {
     phi <- if (t <= 5) 2 else 0
 
     # rate of change: only u is transported
-    du <- tran.1D(C=u, D=D, C.up=phi, dx=dx)$dC - k*u*v
+    du <- tran.1D(C = u, D = D, C.up = phi, dx = dx)$dC - k*u*v
     dv <- - k*u*v
 
     # return the rate of changes, concatenated, as a list
-    list(c(du,dv))
+    list(c(du, dv))
 }
 
 # -------------------------------------------------------
@@ -51,11 +52,21 @@ medAKZO <- function(t,y,parms) {
 # -------------------------------------------------------
 
 # time sequence
-times <- seq(0,20, by = 0.01)
+times <- seq(from = 0, to = 20, by = 0.01)
 
 print(system.time(
-  out  <- ode.1D(func=medAKZO, times=times, parms=NULL, y=yini, nspec=2)
+  out  <- ode.1D(func = medAKZO, times = times, parms = NULL,
+                 names = c("u", "v"),  y = yini, nspec = 2)
 ))
+print(system.time(
+  out2  <- ode.1D(func = medAKZO, times = times, parms = NULL,
+                 y = yini, nspec = 2, method = mebdfi,  restructure = TRUE)
+))
+### TAKES TOOO LONG
+#print(system.time(
+#  out3  <- ode.1D(func = medAKZO, times = times, parms = NULL,
+#                 y = yini, nspec = 2, method = gamd,  restructure = TRUE)
+#))
 
 # -------------------------------------------------------
 # plot
@@ -63,14 +74,10 @@ print(system.time(
 
 # remove time column
 Out <- out[,-1]
-
-par (mfrow=c(2,2))  # 2 rows, 2 columns
-image(Out[,1:N],x=times, y = x, col=femmecol(), main="u", zlim=c(0,2))
-image(Out[,-(1:N)],x=times, y = x,col=femmecol(), main="v", zlim=c(0,2))
-
+image( out, which = c("u", "v"), zlim=c(0,2), mfrow = c(2,2))
 emptyplot()
-colorlegend(zlim=c(0,2), digit=2, posx=c(0.5,0.53))
+colorlegend(zlim = c(0, 2), digit = 2, posx = c(0.5, 0.53))
 
-plot(out,which=1,type="l",lwd=2, mfrow=NULL, col="darkblue", main="u")
-for ( i in 1:10) lines(times,out[,10*i],col="lightblue")
-mtext(outer=TRUE,side=3,"Chemical AKZO",line=-1.5, cex=1.5)
+plot(out, which = 1, lwd = 2, mfrow = NULL, col = "darkblue", main = "u")
+for ( i in 1:10) lines(times, out[,10*i], col = "lightblue")
+mtext(outer = TRUE,side = 3,"Chemical AKZO",line = -1.5, cex = 1.5)

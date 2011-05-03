@@ -8,8 +8,7 @@
 ##
 ## =============================================================================
 
-vdpol <- function(times = 0:2000, yini = NULL, 
-  parms=list(), ...) {
+vdpol <- function(times = 0:2000, yini = NULL, parms = list(), ...) {
 
 ### derivative function
   Vdpol <- function(t,y,mu) {
@@ -29,7 +28,7 @@ vdpol <- function(times = 0:2000, yini = NULL,
 
 
 ### solve
-    out <- ode(func=Vdpol, parms=parameter, y = yini, times=times,
+    out <- ode(func = Vdpol, parms = parameter, y = yini, times = times,
        ...)
 
     return(out)

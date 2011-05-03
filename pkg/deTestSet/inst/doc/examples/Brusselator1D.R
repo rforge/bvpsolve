@@ -10,6 +10,7 @@
 ## =============================================================================
 
 require(ReacTran)
+require(deTestSet)
 
 #-----------------------------
 # model function
@@ -36,7 +37,7 @@ brusselator1D <- function(t, y, parms) {
 #-----------------------------
 
 Nx   <- 200    # number of boxes
-Grid <- setup.grid.1D(x.up=0, x.down=1, N=Nx)
+Grid <- setup.grid.1D(x.up = 0, x.down = 1, N = Nx)
 
 #-----------------------------
 # Parameters, initial values 
@@ -47,8 +48,8 @@ B  <- 3
 Dx <- 0.02       # diffusion coefficient
 
 # initial conditions
-uini <- 1+sin(2*pi*Grid$x.mid)
-vini <- rep(x=3, times=Nx)
+uini <- 1 + sin(2*pi*Grid$x.mid)
+vini <- rep(x = 3, times = Nx)
 
 yini <- c(uini, vini)
 
@@ -56,25 +57,30 @@ yini <- c(uini, vini)
 # solve model 
 #-----------------------------
 
-times <- seq(from=0, to=10, by=0.01)
+times <- seq(from = 0, to = 10, by = 0.01)
 
 print(system.time(
-  out <- ode.1D(y=yini, parms=NULL, func = brusselator1D, nspec=2,
-     dimens=Nx, times=times)
+  out <- ode.1D(y = yini, parms = NULL, func = brusselator1D, nspec = 2,
+     dimens = Nx, times = times)
 ))
+
+# works only for deSolve version 1.10
+print(system.time(
+  out <- ode.1D(y = yini, parms = NULL, func = brusselator1D, nspec = 2,
+     dimens = Nx, times = times, method = mebdfi, restructure = TRUE)
+))
+
 
 #-----------------------------
 # plot output
 #-----------------------------
-par(mfrow=c(2,2))
-image(out, main=c("U","V"), ylab="distance",  
-  grid = Grid$x.mid, add.contour=TRUE, mfrow=NULL)
-
-mtext(side=3, outer=TRUE, line=-1.2,"1-D Brusselator", cex=1.5, font=2)
-
+par(mfrow = c(2, 2))
+image(out, main = c("U","V"), ylab = "distance",
+  grid = Grid$x.mid, add.contour = TRUE, mfrow = NULL)
 par(mar=c(1,1,1,1))
-U <- out[,2:(Nx+1)]
-persp(U, col=drapecol(U),border=NA,theta=30,xlab="time",ylab="x")
+image(out, main = c("U","V"), ylab = "distance", method = "persp",
+  grid = Grid$x.mid, border = NA, theta = 30, mfrow = NULL)
 
-V <- out[,(Nx+2):(2*Nx+1)]
-persp(V, col=drapecol(V),border=NA,theta=30,xlab="time",ylab="x")
+mtext(side = 3, outer = TRUE, line = -1.2,"1-D Brusselator",
+      cex = 1.5, font = 2)
+

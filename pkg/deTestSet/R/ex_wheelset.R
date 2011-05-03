@@ -37,9 +37,13 @@ wheelset <- function(times = seq(0,10,by=0.001), yini =NULL, dyini = NULL,
 ### solve
    ind  <- c(15,2,0)
 
-   out <- dae(y=yini,dy=dyini,times=times,res="wheelres", nind=ind,
-          dllname="deTestSet", initfunc="wheelpar", parms=parameter, 
-          maxsteps=maxsteps, method = method, ...)
-
+   if (method %in% c("mebdfi", "daspk"))
+     out <- dae(y = yini, dy = dyini, times = times,
+                res = "wheelres", nind = ind,
+                dllname = "deTestSet", initfunc = "wheelpar",
+                parms = parameter,
+                maxsteps = maxsteps, method = method, ...)
+   else
+     stop("cannot solve this implicit DAE with requested solver")
    return(out)
 }
