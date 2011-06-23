@@ -1,7 +1,7 @@
-SUBROUTINE rprint(msg)
-   CHARACTER (len=*) msg
-   CALL dblepr(msg, 150, 0, 0)
-END SUBROUTINE 
+        SUBROUTINE rprint(msg)
+         CHARACTER (len=*) msg
+         CALL dblepr(msg, 150, 0, 0)
+        END SUBROUTINE 
 
 
 !! THE CODE GAMD NUMERICALLY SOLVES A (POSSIBLY STIFF)
