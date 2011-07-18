@@ -1,16 +1,16 @@
         SUBROUTINE rprint(msg)
          CHARACTER (len=*) msg
          CALL dblepr(msg, 150, 0, 0)
-        END SUBROUTINE 
+        END SUBROUTINE
 
 
 !! THE CODE GAMD NUMERICALLY SOLVES A (POSSIBLY STIFF)
-!! SYSTEM OF FIRST 0RDER ORDINARY DIFFERENTIAL EQUATIONS 
+!! SYSTEM OF FIRST 0RDER ORDINARY DIFFERENTIAL EQUATIONS
 !! OR A LINEARLY IMPLICIT DAE
 !!
-!! Copyright (C)1997-2007   
+!! Copyright (C)1997-2007
 !! Authors: FRANCESCA MAZZIA (mazzia@dm.uniba.it)
-!!          FELICE IAVERNARO (felix@dm.uniba.it) 
+!!          FELICE IAVERNARO (felix@dm.uniba.it)
 !!
 !!
 !!This program is free software; you can redistribute it and/or
@@ -35,12 +35,12 @@
 
 !! THIS MODULE IS PART OF THE CODE GAMD
 !! THE CODE GAMD NUMERICALLY SOLVES A (POSSIBLY STIFF)
-!! SYSTEM OF FIRST 0RDER ORDINARY DIFFERENTIAL EQUATIONS 
+!! SYSTEM OF FIRST 0RDER ORDINARY DIFFERENTIAL EQUATIONS
 !! OR A LINEARLY IMPLICIT DAE
 !!
-!! Copyright (C)1997-2007   
-!! Authors: FRANCESCA MAZZIA (mazzia@dm.uniba.it) 
-!!          FELICE IAVERNARO (felix@dm.uniba.it) 
+!! Copyright (C)1997-2007
+!! Authors: FRANCESCA MAZZIA (mazzia@dm.uniba.it)
+!!          FELICE IAVERNARO (felix@dm.uniba.it)
 !!
 !!
 !!This program is free software; you can redistribute it and/or
@@ -356,56 +356,56 @@ SUBROUTINE SOLB (N, NDIM, A, ML, MU, B, IP)
       RETURN
 !!----------------------- END OF SUBROUTINE SOLB ------------------------
 END SUBROUTINE SOLB
- 
- 
- 
- 
- 
-FUNCTION  MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,Y) 
- 
-  !!----------------------------------------------------------------------- 
-  !!  MATRIX VECTOR MULTIPLICATION WITH BANDED MATRIX FMAS  
-  !!  INPUT.. 
-  !!    R      DECLARED DIMENSION OF ARRAY FMAS. 
-  !!    LDMAS  LEADING DIMENSION OF ARRAY FMAS. 
-  !!    MLMAS  LOWER BANDWIDTH OF FMAS (DIAGONAL IS NOT COUNTED). 
-  !!    MUMAS  UPPER BANDWIDTH OF FMAS (DIAGONAL IS NOT COUNTED). 
-  !!  OUTPUT.. 
-  !!    MATMULB = FMAS*Y 
-  !!----------------------------------------------------------------------- 
- 
-  USE PRECISION 
-  IMPLICIT NONE 
- 
-  !!   INPUT VARIABLES 
-  !!------------------------------------ 
-  INTEGER, INTENT(IN) :: R, LDMAS, MLMAS, MUMAS 
-  REAL(PREC), INTENT(IN) ::   FMAS(LDMAS,R), Y(R) 
-  !! 
-  !!   OUTPUT VARIABLES 
-  !!------------------------------------ 
-  REAL(PREC) :: MATMULB(R) 
-  !! 
-  !!   LOCAL VARIABLES 
-  !!------------------------------------ 
-  INTEGER  :: I, J 
-  REAL(PREC) ::  S1 
-  
-  !! 
-  !!   EXECUTABLE STATEMENTS 
-  !!--------------------------------- 
-  !! 
-  !!--------- ONE STEP OF THE ITERATION PROCEDURE 
- 
-      MATMULB(1:R)=0.D0 
-      DO I=1,R 
-         S1=0.0D0 
-         DO J=MAX(1,I-MLMAS),MIN(R,I+MUMAS) 
-            S1=S1+FMAS(I-J+MBDIAG,J)*Y(J) 
-         END DO 
-         MATMULB(I)=MATMULB(I)+S1 
-      END DO 
-END FUNCTION MATMULB 
+
+
+
+
+
+FUNCTION  MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,Y)
+
+  !!-----------------------------------------------------------------------
+  !!  MATRIX VECTOR MULTIPLICATION WITH BANDED MATRIX FMAS
+  !!  INPUT..
+  !!    R      DECLARED DIMENSION OF ARRAY FMAS.
+  !!    LDMAS  LEADING DIMENSION OF ARRAY FMAS.
+  !!    MLMAS  LOWER BANDWIDTH OF FMAS (DIAGONAL IS NOT COUNTED).
+  !!    MUMAS  UPPER BANDWIDTH OF FMAS (DIAGONAL IS NOT COUNTED).
+  !!  OUTPUT..
+  !!    MATMULB = FMAS*Y
+  !!-----------------------------------------------------------------------
+
+  USE PRECISION
+  IMPLICIT NONE
+
+  !!   INPUT VARIABLES
+  !!------------------------------------
+  INTEGER, INTENT(IN) :: R, LDMAS, MLMAS, MUMAS
+  REAL(PREC), INTENT(IN) ::   FMAS(LDMAS,R), Y(R)
+  !!
+  !!   OUTPUT VARIABLES
+  !!------------------------------------
+  REAL(PREC) :: MATMULB(R)
+  !!
+  !!   LOCAL VARIABLES
+  !!------------------------------------
+  INTEGER  :: I, J
+  REAL(PREC) ::  S1
+
+  !!
+  !!   EXECUTABLE STATEMENTS
+  !!---------------------------------
+  !!
+  !!--------- ONE STEP OF THE ITERATION PROCEDURE
+
+      MATMULB(1:R)=0.D0
+      DO I=1,R
+         S1=0.0D0
+         DO J=MAX(1,I-MLMAS),MIN(R,I+MUMAS)
+            S1=S1+FMAS(I-J+MBDIAG,J)*Y(J)
+         END DO
+         MATMULB(I)=MATMULB(I)+S1
+      END DO
+END FUNCTION MATMULB
 
 
 END MODULE LINALGGAMD
@@ -801,9 +801,9 @@ CONTAINS
     REAL(PREC), PARAMETER :: L31  =  6.411501944628007d-01,  &
                            & L51  =  6.743555662880509D-01,  &
                            & L71  =  7.109158294404152D-01,  &
-                           & L91  =  7.440547954061898d-01 
+                           & L91  =  7.440547954061898d-01
 
-   
+
     !!
     !!   EXECUTABLE STATEMENTS
     !!---------------------------------
@@ -814,7 +814,7 @@ CONTAINS
        FAC = -L31*H
     CASE(2)
        FAC = -L51*H
-    CASE(3)    
+    CASE(3)
        FAC = -L71*H
     CASE(4)
        FAC = -L91*H
@@ -953,10 +953,10 @@ SUBROUTINE NEWTGS(R,DBLK,LU,LDLU,FMAS,LDMAS,MLMAS,MUMAS,IPIV,F,DN,IJOB)
         DN(1:R,J) =  -F(1:R,J) + MATMUL(FMAS(1:R,1:R),DN(1:R,J-1))
         CALL  SOLLU(R,LU(1,1),LDLU,DN(1,J),IPIV(1),IJOB)
      END DO
- 
 
 
-  END SELECT 
+
+  END SELECT
 
   RETURN
 
@@ -972,7 +972,7 @@ SUBROUTINE INTERP(R,TP,YP,T1,F1,NT1,DBLKOLD,DBLK,T0,Y0)
   REAL(PREC), INTENT(IN) :: F1(R,*), T1(*), Y0(R), T0
   REAL(PREC), INTENT(IN OUT) :: YP(R,*), TP(*)
   INTEGER :: I,J, N, IT1, NT2, NTi
-  
+
   IF (DBLK < DBLKOLD) THEN
      NTi = MAX(5,NT1)
   ELSE
@@ -989,7 +989,7 @@ SUBROUTINE INTERP(R,TP,YP,T1,F1,NT1,DBLKOLD,DBLK,T0,Y0)
      END DO
   END DO
 
- 
+
 
   YP(1:R,1) = Y0(1:R)
 
@@ -1079,7 +1079,7 @@ END FUNCTION  CONTR
     !!
 SUBROUTINE  TERMNOT3(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
                     &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            &
-                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR) 
+                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR)
 
   USE PRECISION
   IMPLICIT NONE
@@ -1093,14 +1093,14 @@ SUBROUTINE  TERMNOT3(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
   !!------------------------------------
   REAL(PREC), INTENT(IN OUT) :: ERRNEWT, YP(R,5), FP(R,5), &
        &                   DN(R), F1(R,5),TP(5)
-  INTEGER, INTENT(IN OUT) :: NFCN 
+  INTEGER, INTENT(IN OUT) :: NFCN
   LOGICAL, INTENT(OUT):: TER
   !!
   !!   LOCAL VARIABLES
   !!------------------------------------
   INTEGER  :: J, IERR
   REAL(PREC) ::  ERRVJ, SUM, FAC, ZP(R)
- 
+
   EXTERNAL FCN
   !!
   !!   EXECUTABLE STATEMENTS
@@ -1108,383 +1108,383 @@ SUBROUTINE  TERMNOT3(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
   !!
   !!--------- ONE STEP OF THE ITERATION PROCEDURE
   TER = .FALSE.
- 
- 
-  SELECT CASE(IJOB) 
-  CASE(1,2)  !! ODE 
- 
-      DN(1:R)=(YP(1:R,2)-YP(1:R,1))- & 
-       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3)) 
- 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,2)=YP(J,2)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+
+
+  SELECT CASE(IJOB)
+  CASE(1,2)  !! ODE
+
+      DN(1:R)=(YP(1:R,2)-YP(1:R,1))- &
+       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3))
+
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,2)=YP(J,2)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
- 
-      DO J=1,R 
-         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) & 
-              &               +B312*FP(J,3)+ B313*FP(J,4) 
-         DN(J)=(YP(J,3)-YP(J,2))-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,3)=YP(J,3)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+
+      DO J=1,R
+         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) &
+              &               +B312*FP(J,3)+ B313*FP(J,4)
+         DN(J)=(YP(J,3)-YP(J,2))-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,3)=YP(J,3)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      DO J=1,R 
-         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) & 
-              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5) 
-         DN(J)=(YP(J,4)-YP(J,3))-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,4)=YP(J,4)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      DO J=1,R
+         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) &
+              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5)
+         DN(J)=(YP(J,4)-YP(J,3))-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,4)=YP(J,4)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(4),YP(1,4),F1(1,3),  RPAR,IPAR) ! removed ierr
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
-      NFCN = NFCN + 1 
- 
- 
-      DO J=1,R 
-         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) & 
-              & +L343*(F1(J,3)-FP(J,4))  & 
-              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5) 
-         DN(J)=(YP(J,5)-YP(J,4))-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,5)=YP(J,5)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-  
- 
-      ERRVJ = sqrt(ERRVJ/R) 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-    
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+      NFCN = NFCN + 1
+
+
+      DO J=1,R
+         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) &
+              & +L343*(F1(J,3)-FP(J,4))  &
+              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5)
+         DN(J)=(YP(J,5)-YP(J,4))-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,5)=YP(J,5)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+
+
+      ERRVJ = sqrt(ERRVJ/R)
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(5),YP(1,5),F1(1,4),  RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-          TER = .TRUE. 
-         RETURN 
-      END IF 
- 
- 
-  CASE(3,4)  !! DAE: FMAS A BAND MATRIX 
- 
-      DN(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1))- & 
-       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3)) 
- 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,2)=YP(J,2)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+          TER = .TRUE.
+         RETURN
+      END IF
+
+
+  CASE(3,4)  !! DAE: FMAS A BAND MATRIX
+
+      DN(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1))- &
+       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3))
+
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,2)=YP(J,2)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
-      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2)) 
-      DO J=1,R 
-         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) & 
-              &               +B312*FP(J,3)+ B313*FP(J,4) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,3)=YP(J,3)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2))
+      DO J=1,R
+         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) &
+              &               +B312*FP(J,3)+ B313*FP(J,4)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,3)=YP(J,3)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3)) 
-      DO J=1,R 
-         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) & 
-              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,4)=YP(J,4)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3))
+      DO J=1,R
+         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) &
+              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,4)=YP(J,4)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
-       
- 
- 
-      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4)) 
-      DO J=1,R 
-         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) & 
-              & +L343*(F1(J,3)-FP(J,4))  & 
-              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,5)=YP(J,5)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-  
- 
-      ERRVJ = sqrt(ERRVJ/R) 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-    
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+
+
+      ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4))
+      DO J=1,R
+         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) &
+              & +L343*(F1(J,3)-FP(J,4))  &
+              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,5)=YP(J,5)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+
+
+      ERRVJ = sqrt(ERRVJ/R)
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-          TER = .TRUE. 
-         RETURN 
-      END IF 
- 
- 
-  CASE(5)    !! DAE: FMAS A FULL MATRIX 
- 
-      DN(1:R)=MATMUL(FMAS(1:R,1:R),(YP(1:R,2)-YP(1:R,1)))- & 
-       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3)) 
- 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,2)=YP(J,2)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+          TER = .TRUE.
+         RETURN
+      END IF
+
+
+  CASE(5)    !! DAE: FMAS A FULL MATRIX
+
+      DN(1:R)=MATMUL(FMAS(1:R,1:R),(YP(1:R,2)-YP(1:R,1)))- &
+       &   H*(B311*FP(1:R,1)+B312*FP(1:R,2)+B313*FP(1:R,3))
+
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,2)=YP(J,2)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2)) 
-      DO J=1,R 
-         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) & 
-              &               +B312*FP(J,3)+ B313*FP(J,4) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,3)=YP(J,3)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2))
+      DO J=1,R
+         SUM = L321*(F1(J,1)-FP(J,2))+B311*FP(J,2) &
+              &               +B312*FP(J,3)+ B313*FP(J,4)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,3)=YP(J,3)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3)) 
-      DO J=1,R 
-         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) & 
-              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,4)=YP(J,4)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-      ERRVJ = sqrt(ERRVJ/R) 
- 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3))
+      DO J=1,R
+         SUM = L331*(F1(J,1)-FP(J,2))+L332*(F1(J,2)-FP(J,3)) &
+              & +B311*FP(J,3)+B312*FP(J,4)+B313*FP(J,5)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,4)=YP(J,4)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+      ERRVJ = sqrt(ERRVJ/R)
+
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
-       
- 
- 
-      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4)) 
-      DO J=1,R 
-         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) & 
-              & +L343*(F1(J,3)-FP(J,4))  & 
-              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5) 
-         DN(J)=ZP(J)-H*SUM 
-      END DO 
-      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-      ERRVJ = 0D0 
-      DO J=1,R 
-         YP(J,5)=YP(J,5)-DN(J) 
-         SUM = (DN(J)/SCAL(J)) 
-         ERRVJ =  ERRVJ + SUM*SUM 
-      END DO 
-  
- 
-      ERRVJ = sqrt(ERRVJ/R) 
-      ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-    
- 
-      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-         TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-      IERR = 0 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+
+
+      ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4))
+      DO J=1,R
+         SUM = L341*(F1(J,1)-FP(J,2))+L342*(F1(J,2)-FP(J,3)) &
+              & +L343*(F1(J,3)-FP(J,4))  &
+              & +B313*FP(J,3)+B312*FP(J,4)+B311*FP(J,5)
+         DN(J)=ZP(J)-H*SUM
+      END DO
+      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+      ERRVJ = 0D0
+      DO J=1,R
+         YP(J,5)=YP(J,5)-DN(J)
+         SUM = (DN(J)/SCAL(J))
+         ERRVJ =  ERRVJ + SUM*SUM
+      END DO
+
+
+      ERRVJ = sqrt(ERRVJ/R)
+      ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+
+      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+         TER = .TRUE.
+         RETURN
+      END IF
+
+      IERR = 0
       CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR) ! removed ierr
-      NFCN = NFCN + 1 
-      IF (IERR .NE.0) THEN 
-          TER = .TRUE. 
-         RETURN 
-      END IF 
- 
-  END SELECT 
+      NFCN = NFCN + 1
+      IF (IERR .NE.0) THEN
+          TER = .TRUE.
+         RETURN
+      END IF
+
+  END SELECT
 
   FP(1:R,2:5) = F1(1:R,1:4)
 
@@ -1492,24 +1492,24 @@ SUBROUTINE  TERMNOT3(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
 END SUBROUTINE TERMNOT3
     !!
     !!  SUBROUTINE TERMNOT5  (ORDER 5)
-    !!        
-SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    & 
-                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            & 
-                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR) 
+    !!
+SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
+                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            &
+                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR)
 
   USE PRECISION
   IMPLICIT NONE
 
   !!   INPUT VARIABLES
-  !!------------------------------------ 
-  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1) 
-  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1) 
+  !!------------------------------------
+  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1)
+  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1)
   !!
   !!   INPUT/OUTPUT VARIABLES
   !!------------------------------------
   REAL(PREC), INTENT(IN OUT) :: ERRNEWT, YP(R,7), FP(R,7), &
        &                   DN(R), F1(R,7),TP(7)
-  INTEGER, INTENT(IN OUT) :: NFCN 
+  INTEGER, INTENT(IN OUT) :: NFCN
   LOGICAL, INTENT(OUT):: TER
   !!
   !!   LOCAL VARIABLES
@@ -1524,11 +1524,11 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
   !!
   !!--------- ONE STEP OF THE ITERATION PROCEDURE
 
- 
 
-  TER = .FALSE. 
-  SELECT CASE(IJOB) 
-  CASE(1,2)  !! ODE 
+
+  TER = .FALSE.
+  SELECT CASE(IJOB)
+  CASE(1,2)  !! ODE
 
      DO J=1,R
         SUM = B511*FP(J,1)+B512*FP(J,2)+B513*FP(J,3)+B514*FP(J,4)&
@@ -1556,7 +1556,7 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
          TER = .TRUE.
         RETURN
      END IF
- 
+
      DO J=1,R
         SUM = L521*(F1(J,1)-FP(J,2))+B521*FP(J,1)+B522*FP(J,2)&
              &               +B523*FP(J,3)+B524*FP(J,4)+B525*FP(J,5)
@@ -1571,9 +1571,9 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
 
-  
+
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
@@ -1631,8 +1631,8 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
- 
+
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
@@ -1645,7 +1645,7 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
         TER = .TRUE.
         RETURN
      END IF
-  
+
      DO J=1,R
         SUM =  L551*(F1(J,1)-FP(J,2))+L552*(F1(J,2)-FP(J,3))&
              &+L553*(F1(J,3)-FP(J,4))+L554*(F1(J,4)-FP(J,5))&
@@ -1662,7 +1662,7 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
 
-  
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
@@ -1692,7 +1692,7 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-  
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
@@ -1704,378 +1704,378 @@ SUBROUTINE  TERMNOT5(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      IF (IERR .NE.0) THEN
         TER = .TRUE.
         RETURN
-     END IF 
+     END IF
 
-  CASE(3,4)  !! DAE: FMAS A BAND MATRIX 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM = B511*FP(J,1)+B512*FP(J,2)+B513*FP(J,3)+B514*FP(J,4)& 
-             &    +B515*FP(J,5) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR = 0 
-     CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L521*(F1(J,1)-FP(J,2))+B521*FP(J,1)+B522*FP(J,2)& 
-             &               +B523*FP(J,3)+B524*FP(J,4)+B525*FP(J,5) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
- 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
-     CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = L531*(F1(J,1)-FP(J,2))+L532*(F1(J,2)-FP(J,3))& 
-             &+B521*FP(J,2)+B522*FP(J,3)+B523*FP(J,4)+B524*FP(J,5)+B525*FP(J,6) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
-     CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM = L541*(F1(J,1)-FP(J,2))+L542*(F1(J,2)-FP(J,3))& 
-             &+L543*(F1(J,3)-FP(J,4))+B521*FP(J,3)+B522*FP(J,4)& 
-             &+B523*FP(J,5)+B524*FP(J,6)+B525*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
-     CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5)) 
-     DO J=1,R 
-        SUM =  L551*(F1(J,1)-FP(J,2))+L552*(F1(J,2)-FP(J,3))& 
-             &+L553*(F1(J,3)-FP(J,4))+L554*(F1(J,4)-FP(J,5))& 
-             &+B525*FP(J,3)+B524*FP(J,4)+B523*FP(J,5)+B522*FP(J,6)+B521*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
-     CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6)) 
-     DO J=1,R 
-        SUM =  L561*(F1(J,1)-FP(J,2))+L562*(F1(J,2)-FP(J,3))& 
-             &+L563*(F1(J,3)-FP(J,4))+L564*(F1(J,4)-FP(J,5))& 
-             &+L565*(F1(J,5)-FP(J,6))& 
-             &+B515*FP(J,3)+B514*FP(J,4)+B513*FP(J,5)+B512*FP(J,6)+B511*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR = 0 
-     CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
- 
- 
+  CASE(3,4)  !! DAE: FMAS A BAND MATRIX
 
-  CASE(5)    !! DAE: FMAS A FULL MATRIX 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM = B511*FP(J,1)+B512*FP(J,2)+B513*FP(J,3)+B514*FP(J,4)& 
-             &    +B515*FP(J,5) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR = 0 
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM = B511*FP(J,1)+B512*FP(J,2)+B513*FP(J,3)+B514*FP(J,4)&
+             &    +B515*FP(J,5)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L521*(F1(J,1)-FP(J,2))+B521*FP(J,1)+B522*FP(J,2)& 
-             &               +B523*FP(J,3)+B524*FP(J,4)+B525*FP(J,5) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
- 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L521*(F1(J,1)-FP(J,2))+B521*FP(J,1)+B522*FP(J,2)&
+             &               +B523*FP(J,3)+B524*FP(J,4)+B525*FP(J,5)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = L531*(F1(J,1)-FP(J,2))+L532*(F1(J,2)-FP(J,3))& 
-             &+B521*FP(J,2)+B522*FP(J,3)+B523*FP(J,4)+B524*FP(J,5)+B525*FP(J,6) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = L531*(F1(J,1)-FP(J,2))+L532*(F1(J,2)-FP(J,3))&
+             &+B521*FP(J,2)+B522*FP(J,3)+B523*FP(J,4)+B524*FP(J,5)+B525*FP(J,6)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM = L541*(F1(J,1)-FP(J,2))+L542*(F1(J,2)-FP(J,3))& 
-             &+L543*(F1(J,3)-FP(J,4))+B521*FP(J,3)+B522*FP(J,4)& 
-             &+B523*FP(J,5)+B524*FP(J,6)+B525*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM = L541*(F1(J,1)-FP(J,2))+L542*(F1(J,2)-FP(J,3))&
+             &+L543*(F1(J,3)-FP(J,4))+B521*FP(J,3)+B522*FP(J,4)&
+             &+B523*FP(J,5)+B524*FP(J,6)+B525*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5))   
-     DO J=1,R 
-        SUM =  L551*(F1(J,1)-FP(J,2))+L552*(F1(J,2)-FP(J,3))& 
-             &+L553*(F1(J,3)-FP(J,4))+L554*(F1(J,4)-FP(J,5))& 
-             &+B525*FP(J,3)+B524*FP(J,4)+B523*FP(J,5)+B522*FP(J,6)+B521*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
- 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM =  L551*(F1(J,1)-FP(J,2))+L552*(F1(J,2)-FP(J,3))&
+             &+L553*(F1(J,3)-FP(J,4))+L554*(F1(J,4)-FP(J,5))&
+             &+B525*FP(J,3)+B524*FP(J,4)+B523*FP(J,5)+B522*FP(J,6)+B521*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6)) 
-     DO J=1,R 
-        SUM =  L561*(F1(J,1)-FP(J,2))+L562*(F1(J,2)-FP(J,3))& 
-             &+L563*(F1(J,3)-FP(J,4))+L564*(F1(J,4)-FP(J,5))& 
-             &+L565*(F1(J,5)-FP(J,6))& 
-             &+B515*FP(J,3)+B514*FP(J,4)+B513*FP(J,5)+B512*FP(J,6)+B511*FP(J,7) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+        SUM =  L561*(F1(J,1)-FP(J,2))+L562*(F1(J,2)-FP(J,3))&
+             &+L563*(F1(J,3)-FP(J,4))+L564*(F1(J,4)-FP(J,5))&
+             &+L565*(F1(J,5)-FP(J,6))&
+             &+B515*FP(J,3)+B514*FP(J,4)+B513*FP(J,5)+B512*FP(J,6)+B511*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
- 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
+
+
+  CASE(5)    !! DAE: FMAS A FULL MATRIX
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM = B511*FP(J,1)+B512*FP(J,2)+B513*FP(J,3)+B514*FP(J,4)&
+             &    +B515*FP(J,5)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
+     CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L521*(F1(J,1)-FP(J,2))+B521*FP(J,1)+B522*FP(J,2)&
+             &               +B523*FP(J,3)+B524*FP(J,4)+B525*FP(J,5)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
+     CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = L531*(F1(J,1)-FP(J,2))+L532*(F1(J,2)-FP(J,3))&
+             &+B521*FP(J,2)+B522*FP(J,3)+B523*FP(J,4)+B524*FP(J,5)+B525*FP(J,6)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
+     CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM = L541*(F1(J,1)-FP(J,2))+L542*(F1(J,2)-FP(J,3))&
+             &+L543*(F1(J,3)-FP(J,4))+B521*FP(J,3)+B522*FP(J,4)&
+             &+B523*FP(J,5)+B524*FP(J,6)+B525*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
+     CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM =  L551*(F1(J,1)-FP(J,2))+L552*(F1(J,2)-FP(J,3))&
+             &+L553*(F1(J,3)-FP(J,4))+L554*(F1(J,4)-FP(J,5))&
+             &+B525*FP(J,3)+B524*FP(J,4)+B523*FP(J,5)+B522*FP(J,6)+B521*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
+     CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+        SUM =  L561*(F1(J,1)-FP(J,2))+L562*(F1(J,2)-FP(J,3))&
+             &+L563*(F1(J,3)-FP(J,4))+L564*(F1(J,4)-FP(J,5))&
+             &+L565*(F1(J,5)-FP(J,6))&
+             &+B515*FP(J,3)+B514*FP(J,4)+B513*FP(J,5)+B512*FP(J,6)+B511*FP(J,7)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
+     CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
 END SELECT
 
   FP(1:R,2:7) = F1(1:R,1:6)
@@ -2086,42 +2086,42 @@ END SUBROUTINE TERMNOT5
     !!
     !!  SUBROUTINE TERMNOT7  (ORDER 7)
     !!
-SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    & 
-                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            & 
-                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR) 
- 
-  USE PRECISION 
-  IMPLICIT NONE 
- 
-  !!   INPUT VARIABLES 
-  !!------------------------------------ 
-  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1) 
-  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1) 
+SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
+                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            &
+                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR)
+
+  USE PRECISION
+  IMPLICIT NONE
+
+  !!   INPUT VARIABLES
+  !!------------------------------------
+  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1)
+  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1)
   !!
   !!   INPUT/OUTPUT VARIABLES
   !!------------------------------------
   REAL(PREC), INTENT(IN OUT) :: ERRNEWT, YP(R,9), FP(R,9), &
        &                   DN(R), F1(R,9),TP(9)
-  INTEGER, INTENT(IN OUT) :: NFCN 
+  INTEGER, INTENT(IN OUT) :: NFCN
   LOGICAL, INTENT(OUT):: TER
   !!
   !!   LOCAL VARIABLES
   !!------------------------------------
   INTEGER  :: J, IERR
   REAL(PREC) ::  ERRVJ, SUM, FAC, ZP(R)
- 
+
   EXTERNAL FCN
   !!
   !!   EXECUTABLE STATEMENTS
   !!---------------------------------
   !!
   !!--------- ONE STEP OF THE ITERATION PROCEDURE
- 
 
-  TER = .FALSE. 
- 
-  SELECT CASE(IJOB) 
-  CASE(1,2)  !! ODE 
+
+  TER = .FALSE.
+
+  SELECT CASE(IJOB)
+  CASE(1,2)  !! ODE
 
      DO J=1,R
         SUM= B711*FP(J,1)+B712*FP(J,2)+B713*FP(J,3)&
@@ -2137,13 +2137,13 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
-  
+
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
- 
+
      IERR = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2166,12 +2166,12 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
      END IF
- 
+
      IERR = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2195,12 +2195,12 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
      END IF
-    
+
      IERR  = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2225,12 +2225,12 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-   
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-    
+
      IERR  = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4),  RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2255,12 +2255,12 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-    
+
      IERR  = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2286,12 +2286,12 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
      END IF
-   
+
      IERR  = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2317,7 +2317,7 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
@@ -2350,526 +2350,526 @@ SUBROUTINE  TERMNOT7(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
- 
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
- 
+
      IERR  = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
      IF (IERR .NE.0) THEN
         TER = .TRUE.
         RETURN
-     END IF 
- 
- 
-  CASE(3,4)  !! DAE: FMAS A BAND MATRIX 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM= B711*FP(J,1)+B712*FP(J,2)+B713*FP(J,3)& 
-             &          +B714*FP(J,4)+B715*FP(J,5)+B716*FP(J,6)+B717*FP(J,7) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2) - DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR = 0 
+     END IF
+
+
+  CASE(3,4)  !! DAE: FMAS A BAND MATRIX
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM= B711*FP(J,1)+B712*FP(J,2)+B713*FP(J,3)&
+             &          +B714*FP(J,4)+B715*FP(J,5)+B716*FP(J,6)+B717*FP(J,7)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2) - DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L721*(F1(J,1)-FP(J,2))+B721*FP(J,1)+B722*FP(J,2)+& 
-             &B723*FP(J,3)+B724*FP(J,4)+B725*FP(J,5)+B726*FP(J,6)+B727*FP(J,7) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L721*(F1(J,1)-FP(J,2))+B721*FP(J,1)+B722*FP(J,2)+&
+             &B723*FP(J,3)+B724*FP(J,4)+B725*FP(J,5)+B726*FP(J,6)+B727*FP(J,7)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = +L731*(F1(J,1)-FP(J,2))+L732*(F1(J,2) -FP(J,3))& 
-             & +B731*FP(J,1)+B732*FP(J,2)+B733*FP(J,3)& 
-             & +B734*FP(J,4)+B735*FP(J,5)+B736*FP(J,6)+B737*FP(J,7) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = +L731*(F1(J,1)-FP(J,2))+L732*(F1(J,2) -FP(J,3))&
+             & +B731*FP(J,1)+B732*FP(J,2)+B733*FP(J,3)&
+             & +B734*FP(J,4)+B735*FP(J,5)+B736*FP(J,6)+B737*FP(J,7)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM =L741*(F1(J,1)-FP(J,2))+L742*(F1(J,2)-FP(J,3))& 
-             & +L743*(F1(J,3)-FP(J,4))& 
-             & +B731*FP(J,2)+B732*FP(J,3)+B733*FP(J,4)& 
-             & +B734*FP(J,5)+B735*FP(J,6)+B736*FP(J,7)+B737*FP(J,8) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM =L741*(F1(J,1)-FP(J,2))+L742*(F1(J,2)-FP(J,3))&
+             & +L743*(F1(J,3)-FP(J,4))&
+             & +B731*FP(J,2)+B732*FP(J,3)+B733*FP(J,4)&
+             & +B734*FP(J,5)+B735*FP(J,6)+B736*FP(J,7)+B737*FP(J,8)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5)) 
-     DO J=1,R 
-        SUM = L751*(F1(J,1)-FP(J,2))+L752*(F1(J,2)-FP(J,3))& 
-             &+L753*(F1(J,3)-FP(J,4))+L754*(F1(J,4)-FP(J,5))& 
-             & +B731*FP(J,3)+B732*FP(J,4)+B733*FP(J,5)& 
-             & +B734*FP(J,6)+B735*FP(J,7)+B736*FP(J,8)+B737*FP(J,9) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM = L751*(F1(J,1)-FP(J,2))+L752*(F1(J,2)-FP(J,3))&
+             &+L753*(F1(J,3)-FP(J,4))+L754*(F1(J,4)-FP(J,5))&
+             & +B731*FP(J,3)+B732*FP(J,4)+B733*FP(J,5)&
+             & +B734*FP(J,6)+B735*FP(J,7)+B736*FP(J,8)+B737*FP(J,9)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6)) 
-     DO J=1,R 
-        SUM = L761*(F1(J,1)-FP(J,2))+L762*(F1(J,2)-FP(J,3))& 
-             &+L763*(F1(J,3)-FP(J,4))+L764*(F1(J,4)-FP(J,5))& 
-             &+L765*(F1(J,5)-FP(J,6))& 
-             & +B737*FP(J,3)+B736*FP(J,4)+B735*FP(J,5)& 
-             & +B734*FP(J,6)+B733*FP(J,7)+B732*FP(J,8)+B731*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+        SUM = L761*(F1(J,1)-FP(J,2))+L762*(F1(J,2)-FP(J,3))&
+             &+L763*(F1(J,3)-FP(J,4))+L764*(F1(J,4)-FP(J,5))&
+             &+L765*(F1(J,5)-FP(J,6))&
+             & +B737*FP(J,3)+B736*FP(J,4)+B735*FP(J,5)&
+             & +B734*FP(J,6)+B733*FP(J,7)+B732*FP(J,8)+B731*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,8)-YP(1:R,7)) 
-     DO J=1,R 
-        SUM = L771*(F1(J,1)-FP(J,2))+L772*(F1(J,2)-FP(J,3))& 
-        &+ L773*(F1(J,3)-FP(J,4))+L774*(F1(J,4)-FP(J,5))& 
-        &+ L775*(F1(J,5)-FP(J,6))+L776*(F1(J,6)-FP(J,7))& 
-        & +B727*FP(J,3)+B726*FP(J,4)+B725*FP(J,5)& 
-        & +B724*FP(J,6)+B723*FP(J,7)+B722*FP(J,8)+B721*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,8)=YP(J,8)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,8)-YP(1:R,7))
+     DO J=1,R
+        SUM = L771*(F1(J,1)-FP(J,2))+L772*(F1(J,2)-FP(J,3))&
+        &+ L773*(F1(J,3)-FP(J,4))+L774*(F1(J,4)-FP(J,5))&
+        &+ L775*(F1(J,5)-FP(J,6))+L776*(F1(J,6)-FP(J,7))&
+        & +B727*FP(J,3)+B726*FP(J,4)+B725*FP(J,5)&
+        & +B724*FP(J,6)+B723*FP(J,7)+B722*FP(J,8)+B721*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,8)=YP(J,8)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(8),YP(1,8),F1(1,7), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,9)-YP(1:R,8)) 
-     DO J=1,R 
-        SUM = L781*(F1(J,1)-FP(J,2))+L782*(F1(J,2)-FP(J,3))& 
-        &+ L783*(F1(J,3)-FP(J,4))+L784*(F1(J,4)-FP(J,5))& 
-        &+ L785*(F1(J,5)-FP(J,6))+L786*(F1(J,6)-FP(J,7))& 
-        &+ L787*(F1(J,7)-FP(J,8))& 
-        & +B717*FP(J,3)+B716*FP(J,4)+B715*FP(J,5)& 
-        & +B714*FP(J,6)+B713*FP(J,7)+B712*FP(J,8)+B711*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,9)=YP(J,9)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,9)-YP(1:R,8))
+     DO J=1,R
+        SUM = L781*(F1(J,1)-FP(J,2))+L782*(F1(J,2)-FP(J,3))&
+        &+ L783*(F1(J,3)-FP(J,4))+L784*(F1(J,4)-FP(J,5))&
+        &+ L785*(F1(J,5)-FP(J,6))+L786*(F1(J,6)-FP(J,7))&
+        &+ L787*(F1(J,7)-FP(J,8))&
+        & +B717*FP(J,3)+B716*FP(J,4)+B715*FP(J,5)&
+        & +B714*FP(J,6)+B713*FP(J,7)+B712*FP(J,8)+B711*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,9)=YP(J,9)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-  CASE(5)    !! DAE: FMAS A FULL MATRIX 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM= B711*FP(J,1)+B712*FP(J,2)+B713*FP(J,3)& 
-             &          +B714*FP(J,4)+B715*FP(J,5)+B716*FP(J,6)+B717*FP(J,7) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2) - DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-   
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+  CASE(5)    !! DAE: FMAS A FULL MATRIX
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM= B711*FP(J,1)+B712*FP(J,2)+B713*FP(J,3)&
+             &          +B714*FP(J,4)+B715*FP(J,5)+B716*FP(J,6)+B717*FP(J,7)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2) - DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L721*(F1(J,1)-FP(J,2))+B721*FP(J,1)+B722*FP(J,2)+& 
-             &B723*FP(J,3)+B724*FP(J,4)+B725*FP(J,5)+B726*FP(J,6)+B727*FP(J,7) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L721*(F1(J,1)-FP(J,2))+B721*FP(J,1)+B722*FP(J,2)+&
+             &B723*FP(J,3)+B724*FP(J,4)+B725*FP(J,5)+B726*FP(J,6)+B727*FP(J,7)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-         TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = +L731*(F1(J,1)-FP(J,2))+L732*(F1(J,2) -FP(J,3))& 
-             & +B731*FP(J,1)+B732*FP(J,2)+B733*FP(J,3)& 
-             & +B734*FP(J,4)+B735*FP(J,5)+B736*FP(J,6)+B737*FP(J,7) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+         TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = +L731*(F1(J,1)-FP(J,2))+L732*(F1(J,2) -FP(J,3))&
+             & +B731*FP(J,1)+B732*FP(J,2)+B733*FP(J,3)&
+             & +B734*FP(J,4)+B735*FP(J,5)+B736*FP(J,6)+B737*FP(J,7)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM =L741*(F1(J,1)-FP(J,2))+L742*(F1(J,2)-FP(J,3))& 
-             & +L743*(F1(J,3)-FP(J,4))& 
-             & +B731*FP(J,2)+B732*FP(J,3)+B733*FP(J,4)& 
-             & +B734*FP(J,5)+B735*FP(J,6)+B736*FP(J,7)+B737*FP(J,8) 
-        DN(J) =ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM =L741*(F1(J,1)-FP(J,2))+L742*(F1(J,2)-FP(J,3))&
+             & +L743*(F1(J,3)-FP(J,4))&
+             & +B731*FP(J,2)+B732*FP(J,3)+B733*FP(J,4)&
+             & +B734*FP(J,5)+B735*FP(J,6)+B736*FP(J,7)+B737*FP(J,8)
+        DN(J) =ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5)) 
-     DO J=1,R 
-        SUM = L751*(F1(J,1)-FP(J,2))+L752*(F1(J,2)-FP(J,3))& 
-             &+L753*(F1(J,3)-FP(J,4))+L754*(F1(J,4)-FP(J,5))& 
-             & +B731*FP(J,3)+B732*FP(J,4)+B733*FP(J,5)& 
-             & +B734*FP(J,6)+B735*FP(J,7)+B736*FP(J,8)+B737*FP(J,9) 
-        DN(J)=ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM = L751*(F1(J,1)-FP(J,2))+L752*(F1(J,2)-FP(J,3))&
+             &+L753*(F1(J,3)-FP(J,4))+L754*(F1(J,4)-FP(J,5))&
+             & +B731*FP(J,3)+B732*FP(J,4)+B733*FP(J,5)&
+             & +B734*FP(J,6)+B735*FP(J,7)+B736*FP(J,8)+B737*FP(J,9)
+        DN(J)=ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6)) 
-     DO J=1,R 
-        SUM = L761*(F1(J,1)-FP(J,2))+L762*(F1(J,2)-FP(J,3))& 
-             &+L763*(F1(J,3)-FP(J,4))+L764*(F1(J,4)-FP(J,5))& 
-             &+L765*(F1(J,5)-FP(J,6))& 
-             & +B737*FP(J,3)+B736*FP(J,4)+B735*FP(J,5)& 
-             & +B734*FP(J,6)+B733*FP(J,7)+B732*FP(J,8)+B731*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+        SUM = L761*(F1(J,1)-FP(J,2))+L762*(F1(J,2)-FP(J,3))&
+             &+L763*(F1(J,3)-FP(J,4))+L764*(F1(J,4)-FP(J,5))&
+             &+L765*(F1(J,5)-FP(J,6))&
+             & +B737*FP(J,3)+B736*FP(J,4)+B735*FP(J,5)&
+             & +B734*FP(J,6)+B733*FP(J,7)+B732*FP(J,8)+B731*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6),  RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,8)-YP(1:R,7)) 
-     DO J=1,R 
-        SUM = L771*(F1(J,1)-FP(J,2))+L772*(F1(J,2)-FP(J,3))& 
-        &+ L773*(F1(J,3)-FP(J,4))+L774*(F1(J,4)-FP(J,5))& 
-        &+ L775*(F1(J,5)-FP(J,6))+L776*(F1(J,6)-FP(J,7))& 
-        & +B727*FP(J,3)+B726*FP(J,4)+B725*FP(J,5)& 
-        & +B724*FP(J,6)+B723*FP(J,7)+B722*FP(J,8)+B721*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,8)=YP(J,8)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,8)-YP(1:R,7))
+     DO J=1,R
+        SUM = L771*(F1(J,1)-FP(J,2))+L772*(F1(J,2)-FP(J,3))&
+        &+ L773*(F1(J,3)-FP(J,4))+L774*(F1(J,4)-FP(J,5))&
+        &+ L775*(F1(J,5)-FP(J,6))+L776*(F1(J,6)-FP(J,7))&
+        & +B727*FP(J,3)+B726*FP(J,4)+B725*FP(J,5)&
+        & +B724*FP(J,6)+B723*FP(J,7)+B722*FP(J,8)+B721*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,8)=YP(J,8)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(8),YP(1,8),F1(1,7), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,9)-YP(1:R,8)) 
-     DO J=1,R 
-        SUM = L781*(F1(J,1)-FP(J,2))+L782*(F1(J,2)-FP(J,3))& 
-        &+ L783*(F1(J,3)-FP(J,4))+L784*(F1(J,4)-FP(J,5))& 
-        &+ L785*(F1(J,5)-FP(J,6))+L786*(F1(J,6)-FP(J,7))& 
-        &+ L787*(F1(J,7)-FP(J,8))& 
-        & +B717*FP(J,3)+B716*FP(J,4)+B715*FP(J,5)& 
-        & +B714*FP(J,6)+B713*FP(J,7)+B712*FP(J,8)+B711*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,9)=YP(J,9)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-  
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,9)-YP(1:R,8))
+     DO J=1,R
+        SUM = L781*(F1(J,1)-FP(J,2))+L782*(F1(J,2)-FP(J,3))&
+        &+ L783*(F1(J,3)-FP(J,4))+L784*(F1(J,4)-FP(J,5))&
+        &+ L785*(F1(J,5)-FP(J,6))+L786*(F1(J,6)-FP(J,7))&
+        &+ L787*(F1(J,7)-FP(J,8))&
+        & +B717*FP(J,3)+B716*FP(J,4)+B715*FP(J,5)&
+        & +B714*FP(J,6)+B713*FP(J,7)+B712*FP(J,8)+B711*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,9)=YP(J,9)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
- 
- 
- 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
+
+
   END SELECT
 
   FP(1:R,2:9) = F1(1:R,1:8)
@@ -2883,30 +2883,30 @@ END SUBROUTINE TERMNOT7
     !!
     !!  SUBROUTINE TERMNOT9  (ORDER 9)
     !!
-SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    & 
-                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            & 
-                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR) 
- 
-  USE PRECISION 
-  IMPLICIT NONE 
- 
-  !!   INPUT VARIABLES 
-  !!------------------------------------ 
-  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1) 
-  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1) 
+SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
+                    &  ERRNEWT,ERRNEWT0,TETAK0,LU, LDLU,IPIV,            &
+                    &  FMAS,LDMAS,MLMAS,MUMAS, SCAL,IJOB,TER,RPAR,IPAR)
+
+  USE PRECISION
+  IMPLICIT NONE
+
+  !!   INPUT VARIABLES
+  !!------------------------------------
+  INTEGER, INTENT(IN) :: R,  IJOB, IPIV(R), LDLU, LDMAS, MLMAS, MUMAS, IT, IPAR(1)
+  REAL(PREC), INTENT(IN) ::  H, SCAL(R), LU(LDLU,R), FMAS(LDMAS,R), ERRNEWT0, TETAK0, RPAR(1)
   !!
   !!   INPUT/OUTPUT VARIABLES
   !!------------------------------------
   REAL(PREC), INTENT(IN OUT) :: ERRNEWT, YP(R,10), FP(R,10), &
        &                   DN(R), F1(R,10),TP(10)
-  INTEGER, INTENT(IN OUT) :: NFCN 
+  INTEGER, INTENT(IN OUT) :: NFCN
   LOGICAL, INTENT(OUT):: TER
   !!
   !!   LOCAL VARIABLES
   !!------------------------------------
   INTEGER  :: J, IERR
   REAL(PREC) ::  ERRVJ, SUM, FAC, ZP(R)
- 
+
   EXTERNAL FCN
   !!
   !!   EXECUTABLE STATEMENTS
@@ -2914,10 +2914,10 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
   !!
   !!--------- ONE STEP OF THE ITERATION PROCEDURE
 
- 
+
   TER = .FALSE.
-  SELECT CASE(IJOB) 
-  CASE(1,2)  !! ODE 
+  SELECT CASE(IJOB)
+  CASE(1,2)  !! ODE
 
      DO J=1,R
         SUM = B911*FP(J,1)+B912*FP(J,2)+B913*FP(J,3)+B914*FP(J,4)&
@@ -2961,12 +2961,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
- 
+
      IERR  = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -2990,12 +2990,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-   
+
      IERR = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3019,12 +3019,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-   
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
      END IF
-     
+
      IERR = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3032,7 +3032,7 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
         TER = .TRUE.
         RETURN
      END IF
-   
+
      DO J=1,R
         SUM = L954*(F1(J,4)-FP(J,5))+B941*FP(J,2)+B942*FP(J,3)&
              & +B943*FP(J,4)+B944*FP(J,5)+B945*FP(J,6)+B946*FP(J,7)&
@@ -3048,12 +3048,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-    
+
      IERR = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3061,7 +3061,7 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
         TER = .TRUE.
         RETURN
      END IF
-   
+
      DO J=1,R
            SUM = L965*(F1(J,5)-FP(J,6))+B949*FP(J,2)+B948*FP(J,3)&
              & +B947*FP(J,4)+B946*FP(J,5)+B945*FP(J,6)+B944*FP(J,7)&
@@ -3077,12 +3077,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-   
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-   
+
      IERR = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3106,12 +3106,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
         TER = .TRUE.
         RETURN
      END IF
-   
+
      IERR = 0
      CALL FCN(R,TP(8),YP(1,8),F1(1,7), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3135,12 +3135,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-    
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-     
+
      IERR = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3155,7 +3155,7 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
              & +B913*FP(J,8)+B912*FP(J,9)+B911*FP(J,10)
         DN(J) =YP(J,10)-YP(J,9)-H*SUM
      END DO
-   
+
      CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
      ERRVJ = 0D0
      DO J=1,R
@@ -3165,12 +3165,12 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
      END DO
      ERRVJ = sqrt(ERRVJ/R)
      ERRNEWT = MAX( ERRNEWT, ERRVJ )
-   
+
      IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
         TER = .TRUE.
         RETURN
      END IF
-     
+
      IERR = 0
      CALL FCN(R,TP(10),YP(1,10),F1(1,9),  RPAR,IPAR)  ! removed ierr
      NFCN = NFCN + 1
@@ -3178,554 +3178,554 @@ SUBROUTINE  TERMNOT9(R,FCN,H,IT,DN, F1,FP,YP,TP,NFCN,                    &
         TER = .TRUE.
         RETURN
      END IF
-  
-  
-  CASE(3,4)  !! DAE: FMAS A BAND MATRIX 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM = B911*FP(J,1)+B912*FP(J,2)+B913*FP(J,3)+B914*FP(J,4)& 
-             &+B915*FP(J,5)+B916*FP(J,6)+B917*FP(J,7)+B918*FP(J,8)+B919*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+
+
+  CASE(3,4)  !! DAE: FMAS A BAND MATRIX
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM = B911*FP(J,1)+B912*FP(J,2)+B913*FP(J,3)+B914*FP(J,4)&
+             &+B915*FP(J,5)+B916*FP(J,6)+B917*FP(J,7)+B918*FP(J,8)+B919*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L921*(F1(J,1)-FP(J,2))+B921*FP(J,1)+B922*FP(J,2)& 
-             &   +B923*FP(J,3)+B924*FP(J,4)+B925*FP(J,5)& 
-             &   +B926*FP(J,6)+B927*FP(J,7)+B928*FP(J,8)+B929*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L921*(F1(J,1)-FP(J,2))+B921*FP(J,1)+B922*FP(J,2)&
+             &   +B923*FP(J,3)+B924*FP(J,4)+B925*FP(J,5)&
+             &   +B926*FP(J,6)+B927*FP(J,7)+B928*FP(J,8)+B929*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = L932*(F1(J,2)-FP(J,3))& 
-             &+B931*FP(J,1)+B932*FP(J,2)+B933*FP(J,3)+B934*FP(J,4)+B935*FP(J,5)& 
-             &+B936*FP(J,6)+B937*FP(J,7)+B938*FP(J,8)+B939*FP(J,9) 
-             DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = L932*(F1(J,2)-FP(J,3))&
+             &+B931*FP(J,1)+B932*FP(J,2)+B933*FP(J,3)+B934*FP(J,4)+B935*FP(J,5)&
+             &+B936*FP(J,6)+B937*FP(J,7)+B938*FP(J,8)+B939*FP(J,9)
+             DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM = L943*(F1(J,3)-FP(J,4))+B941*FP(J,1)+B942*FP(J,2)& 
-             & +B943*FP(J,3)+B944*FP(J,4)+B945*FP(J,5)+B946*FP(J,6)& 
-             & +B947*FP(J,7)+B948*FP(J,8)+B949*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM = L943*(F1(J,3)-FP(J,4))+B941*FP(J,1)+B942*FP(J,2)&
+             & +B943*FP(J,3)+B944*FP(J,4)+B945*FP(J,5)+B946*FP(J,6)&
+             & +B947*FP(J,7)+B948*FP(J,8)+B949*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5))   
-     DO J=1,R 
-        SUM = L954*(F1(J,4)-FP(J,5))+B941*FP(J,2)+B942*FP(J,3)& 
-             & +B943*FP(J,4)+B944*FP(J,5)+B945*FP(J,6)+B946*FP(J,7)& 
-             & +B947*FP(J,8)+B948*FP(J,9)+B949*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM = L954*(F1(J,4)-FP(J,5))+B941*FP(J,2)+B942*FP(J,3)&
+             & +B943*FP(J,4)+B944*FP(J,5)+B945*FP(J,6)+B946*FP(J,7)&
+             & +B947*FP(J,8)+B948*FP(J,9)+B949*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6))    
-     DO J=1,R 
-           SUM = L965*(F1(J,5)-FP(J,6))+B949*FP(J,2)+B948*FP(J,3)& 
-             & +B947*FP(J,4)+B946*FP(J,5)+B945*FP(J,6)+B944*FP(J,7)& 
-             & +B943*FP(J,8)+B942*FP(J,9)+B941*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+           SUM = L965*(F1(J,5)-FP(J,6))+B949*FP(J,2)+B948*FP(J,3)&
+             & +B947*FP(J,4)+B946*FP(J,5)+B945*FP(J,6)+B944*FP(J,7)&
+             & +B943*FP(J,8)+B942*FP(J,9)+B941*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,8)-YP(1:R,7)) 
-     DO J=1,R 
-        SUM = L976*(F1(J,6)-FP(J,7))+B939*FP(J,2)+B938*FP(J,3)& 
-             & +B937*FP(J,4)+B936*FP(J,5)+B935*FP(J,6)+B934*FP(J,7)& 
-             & +B933*FP(J,8)+B932*FP(J,9)+B931*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,8)=YP(J,8)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,8)-YP(1:R,7))
+     DO J=1,R
+        SUM = L976*(F1(J,6)-FP(J,7))+B939*FP(J,2)+B938*FP(J,3)&
+             & +B937*FP(J,4)+B936*FP(J,5)+B935*FP(J,6)+B934*FP(J,7)&
+             & +B933*FP(J,8)+B932*FP(J,9)+B931*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,8)=YP(J,8)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(8),YP(1,8),F1(1,7), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,9)-YP(1:R,8)) 
-     DO J=1,R 
-        SUM = L987*(F1(J,7)-FP(J,8))+B929*FP(J,2)+B928*FP(J,3)& 
-             & +B927*FP(J,4)+B926*FP(J,5)+B925*FP(J,6)+B924*FP(J,7)& 
-             & +B923*FP(J,8)+B922*FP(J,9)+B921*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,9)=YP(J,9)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,9)-YP(1:R,8))
+     DO J=1,R
+        SUM = L987*(F1(J,7)-FP(J,8))+B929*FP(J,2)+B928*FP(J,3)&
+             & +B927*FP(J,4)+B926*FP(J,5)+B925*FP(J,6)+B924*FP(J,7)&
+             & +B923*FP(J,8)+B922*FP(J,9)+B921*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,9)=YP(J,9)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,10)-YP(1:R,9)) 
-     DO J=1,R 
-        SUM = L998*(F1(J,8)-FP(J,9))+B919*FP(J,2)+B918*FP(J,3)& 
-             & +B917*FP(J,4)+B916*FP(J,5)+B915*FP(J,6)+B914*FP(J,7)& 
-             & +B913*FP(J,8)+B912*FP(J,9)+B911*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-    
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,10)=YP(J,10)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMULB(R,FMAS,LDMAS,MLMAS,MUMAS,YP(1:R,10)-YP(1:R,9))
+     DO J=1,R
+        SUM = L998*(F1(J,8)-FP(J,9))+B919*FP(J,2)+B918*FP(J,3)&
+             & +B917*FP(J,4)+B916*FP(J,5)+B915*FP(J,6)+B914*FP(J,7)&
+             & +B913*FP(J,8)+B912*FP(J,9)+B911*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,10)=YP(J,10)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(10),YP(1,10),F1(1,9),  RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-   
-  CASE(5)    !! DAE: FMAS A FULL MATRIX 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1)) 
-     DO J=1,R 
-        SUM = B911*FP(J,1)+B912*FP(J,2)+B913*FP(J,3)+B914*FP(J,4)& 
-             &+B915*FP(J,5)+B916*FP(J,6)+B917*FP(J,7)+B918*FP(J,8)+B919*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,2)=YP(J,2)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+  CASE(5)    !! DAE: FMAS A FULL MATRIX
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,2)-YP(1:R,1))
+     DO J=1,R
+        SUM = B911*FP(J,1)+B912*FP(J,2)+B913*FP(J,3)+B914*FP(J,4)&
+             &+B915*FP(J,5)+B916*FP(J,6)+B917*FP(J,7)+B918*FP(J,8)+B919*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,2)=YP(J,2)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(2),YP(1,2),F1(1,1), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2)) 
-     DO J=1,R 
-        SUM = L921*(F1(J,1)-FP(J,2))+B921*FP(J,1)+B922*FP(J,2)& 
-             &   +B923*FP(J,3)+B924*FP(J,4)+B925*FP(J,5)& 
-             &   +B926*FP(J,6)+B927*FP(J,7)+B928*FP(J,8)+B929*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,3)=YP(J,3)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     IERR  = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,3)-YP(1:R,2))
+     DO J=1,R
+        SUM = L921*(F1(J,1)-FP(J,2))+B921*FP(J,1)+B922*FP(J,2)&
+             &   +B923*FP(J,3)+B924*FP(J,4)+B925*FP(J,5)&
+             &   +B926*FP(J,6)+B927*FP(J,7)+B928*FP(J,8)+B929*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,3)=YP(J,3)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR  = 0
      CALL FCN(R,TP(3),YP(1,3),F1(1,2), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3)) 
-     DO J=1,R 
-        SUM = L932*(F1(J,2)-FP(J,3))& 
-             &+B931*FP(J,1)+B932*FP(J,2)+B933*FP(J,3)+B934*FP(J,4)+B935*FP(J,5)& 
-             &+B936*FP(J,6)+B937*FP(J,7)+B938*FP(J,8)+B939*FP(J,9) 
-             DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,4)=YP(J,4)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,4)-YP(1:R,3))
+     DO J=1,R
+        SUM = L932*(F1(J,2)-FP(J,3))&
+             &+B931*FP(J,1)+B932*FP(J,2)+B933*FP(J,3)+B934*FP(J,4)+B935*FP(J,5)&
+             &+B936*FP(J,6)+B937*FP(J,7)+B938*FP(J,8)+B939*FP(J,9)
+             DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,4)=YP(J,4)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(4),YP(1,4),F1(1,3), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4)) 
-     DO J=1,R 
-        SUM = L943*(F1(J,3)-FP(J,4))+B941*FP(J,1)+B942*FP(J,2)& 
-             & +B943*FP(J,3)+B944*FP(J,4)+B945*FP(J,5)+B946*FP(J,6)& 
-             & +B947*FP(J,7)+B948*FP(J,8)+B949*FP(J,9) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,5)=YP(J,5)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,5)-YP(1:R,4))
+     DO J=1,R
+        SUM = L943*(F1(J,3)-FP(J,4))+B941*FP(J,1)+B942*FP(J,2)&
+             & +B943*FP(J,3)+B944*FP(J,4)+B945*FP(J,5)+B946*FP(J,6)&
+             & +B947*FP(J,7)+B948*FP(J,8)+B949*FP(J,9)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,5)=YP(J,5)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(5),YP(1,5),F1(1,4), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-  
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5))   
-     DO J=1,R 
-        SUM = L954*(F1(J,4)-FP(J,5))+B941*FP(J,2)+B942*FP(J,3)& 
-             & +B943*FP(J,4)+B944*FP(J,5)+B945*FP(J,6)+B946*FP(J,7)& 
-             & +B947*FP(J,8)+B948*FP(J,9)+B949*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,6)=YP(J,6)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-     
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,6)-YP(1:R,5))
+     DO J=1,R
+        SUM = L954*(F1(J,4)-FP(J,5))+B941*FP(J,2)+B942*FP(J,3)&
+             & +B943*FP(J,4)+B944*FP(J,5)+B945*FP(J,6)+B946*FP(J,7)&
+             & +B947*FP(J,8)+B948*FP(J,9)+B949*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,6)=YP(J,6)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(6),YP(1,6),F1(1,5), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6))    
-     DO J=1,R 
-           SUM = L965*(F1(J,5)-FP(J,6))+B949*FP(J,2)+B948*FP(J,3)& 
-             & +B947*FP(J,4)+B946*FP(J,5)+B945*FP(J,6)+B944*FP(J,7)& 
-             & +B943*FP(J,8)+B942*FP(J,9)+B941*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,7)=YP(J,7)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,7)-YP(1:R,6))
+     DO J=1,R
+           SUM = L965*(F1(J,5)-FP(J,6))+B949*FP(J,2)+B948*FP(J,3)&
+             & +B947*FP(J,4)+B946*FP(J,5)+B945*FP(J,6)+B944*FP(J,7)&
+             & +B943*FP(J,8)+B942*FP(J,9)+B941*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,7)=YP(J,7)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(7),YP(1,7),F1(1,6), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,8)-YP(1:R,7)) 
-     DO J=1,R 
-        SUM = L976*(F1(J,6)-FP(J,7))+B939*FP(J,2)+B938*FP(J,3)& 
-             & +B937*FP(J,4)+B936*FP(J,5)+B935*FP(J,6)+B934*FP(J,7)& 
-             & +B933*FP(J,8)+B932*FP(J,9)+B931*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,8)=YP(J,8)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-    
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,8)-YP(1:R,7))
+     DO J=1,R
+        SUM = L976*(F1(J,6)-FP(J,7))+B939*FP(J,2)+B938*FP(J,3)&
+             & +B937*FP(J,4)+B936*FP(J,5)+B935*FP(J,6)+B934*FP(J,7)&
+             & +B933*FP(J,8)+B932*FP(J,9)+B931*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,8)=YP(J,8)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 ) ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(8),YP(1,8),F1(1,7), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,9)-YP(1:R,8)) 
-     DO J=1,R 
-        SUM = L987*(F1(J,7)-FP(J,8))+B929*FP(J,2)+B928*FP(J,3)& 
-             & +B927*FP(J,4)+B926*FP(J,5)+B925*FP(J,6)+B924*FP(J,7)& 
-             & +B923*FP(J,8)+B922*FP(J,9)+B921*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,9)=YP(J,9)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-     
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,9)-YP(1:R,8))
+     DO J=1,R
+        SUM = L987*(F1(J,7)-FP(J,8))+B929*FP(J,2)+B928*FP(J,3)&
+             & +B927*FP(J,4)+B926*FP(J,5)+B925*FP(J,6)+B924*FP(J,7)&
+             & +B923*FP(J,8)+B922*FP(J,9)+B921*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,9)=YP(J,9)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(9),YP(1,9),F1(1,8), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
- 
-     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,10)-YP(1:R,9)) 
-     DO J=1,R 
-        SUM = L998*(F1(J,8)-FP(J,9))+B919*FP(J,2)+B918*FP(J,3)& 
-             & +B917*FP(J,4)+B916*FP(J,5)+B915*FP(J,6)+B914*FP(J,7)& 
-             & +B913*FP(J,8)+B912*FP(J,9)+B911*FP(J,10) 
-        DN(J) = ZP(J)-H*SUM 
-     END DO 
-    
-     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB) 
-     ERRVJ = 0D0 
-     DO J=1,R 
-        YP(J,10)=YP(J,10)-DN(J) 
-        SUM = (DN(J)/SCAL(J)) 
-        ERRVJ =  ERRVJ + SUM*SUM 
-     END DO 
-     ERRVJ = sqrt(ERRVJ/R) 
-     ERRNEWT = MAX( ERRNEWT, ERRVJ ) 
-    
-     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-      
-     IERR = 0 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     ZP(1:R)=MATMUL(FMAS(1:R,1:R),YP(1:R,10)-YP(1:R,9))
+     DO J=1,R
+        SUM = L998*(F1(J,8)-FP(J,9))+B919*FP(J,2)+B918*FP(J,3)&
+             & +B917*FP(J,4)+B916*FP(J,5)+B915*FP(J,6)+B914*FP(J,7)&
+             & +B913*FP(J,8)+B912*FP(J,9)+B911*FP(J,10)
+        DN(J) = ZP(J)-H*SUM
+     END DO
+
+     CALL  SOLLU(R,LU(1,1),LDLU,DN(1),IPIV(1),IJOB)
+     ERRVJ = 0D0
+     DO J=1,R
+        YP(J,10)=YP(J,10)-DN(J)
+        SUM = (DN(J)/SCAL(J))
+        ERRVJ =  ERRVJ + SUM*SUM
+     END DO
+     ERRVJ = sqrt(ERRVJ/R)
+     ERRNEWT = MAX( ERRNEWT, ERRVJ )
+
+     IF ((it.GE.1).AND.(errnewt/errnewt0 .GT. tetak0 )  ) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+     IERR = 0
      CALL FCN(R,TP(10),YP(1,10),F1(1,9), RPAR,IPAR)  ! removed ierr
-     NFCN = NFCN + 1 
-     IF (IERR .NE.0) THEN 
-        TER = .TRUE. 
-        RETURN 
-     END IF 
-   
- 
- 
-  END SELECT 
- 
+     NFCN = NFCN + 1
+     IF (IERR .NE.0) THEN
+        TER = .TRUE.
+        RETURN
+     END IF
+
+
+
+  END SELECT
+
 
   FP(1:R,2:10) = F1(1:R,1:9)
 
@@ -3740,7 +3740,7 @@ END SUBROUTINE TERMNOT9
     !! ERRORS ESTIMATION.    ERRSAME: THE CURRENT ORDER
     !!                         ERRUP: GREATER ORDER (THAN ERRSAME)
     !!                       ERRDOWN: LOWER ORDER
-    !!         
+    !!
 
 SUBROUTINE  ESTERR(ERRV, ERRSAME, ERRUP, ERRDOWN, FP,            &
      &     R, H, ORD, DBLK, LU, LDLU, FMAS, LDMAS, MLMAS, MUMAS, &
@@ -3781,7 +3781,7 @@ SUBROUTINE  ESTERR(ERRV, ERRSAME, ERRUP, ERRDOWN, FP,            &
         F(I,3) = H*(B3531*FP1+B3532*FP2+B3533*FP3+B3534*FP4+B3535*FP5)
         F(I,4) = H*(B3541*FP1+B3542*FP2+B3543*FP3+B3544*FP4+B3545*FP5)
        END DO
-   
+
   CASE(2)
      DO J=1,R
         FP1= FP(J,1)
@@ -3918,7 +3918,7 @@ SUBROUTINE  ESTERR(ERRV, ERRSAME, ERRUP, ERRDOWN, FP,            &
 
            END DO
         CASE(3)
-     
+
            DO I = 1, R
               FP1 =  F(I,1)/CP71
               FP2 =  F(I,2)/CP72
@@ -4090,16 +4090,16 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
        &                  MAS ,IMAS,MLMAS,MUMAS, &
        &                  SOLOUT,IOUT,           &
        &                  WORK,LWORK,IWORK,LIWORK,RPAR,IPAR,IDID)
-    
+
     !!
     !!     PURPOSE: THE CODE GAMD NUMERICALLY SOLVES A (POSSIBLY STIFF)
     !!              SYSTEM OF FIRST 0RDER ORDINARY DIFFERENTIAL EQUATIONS
-    !!              IN THE FORM  Y'=F(T,Y), OR A LINEARLY IMPLICIT DAE 
-    !!              MY'=F(T,Y) WITH CONSTANT MASS (FULL OR BANDED) MATRIX M, 
-    !!              WITH A GIVEN INITIAL CONDITION. IT IS INTENDED AS AN 
-    !!              EXTENSION OF THE CODE GAM TO DAEs (SEE THE REVISION 
+    !!              IN THE FORM  Y'=F(T,Y), OR A LINEARLY IMPLICIT DAE
+    !!              MY'=F(T,Y) WITH CONSTANT MASS (FULL OR BANDED) MATRIX M,
+    !!              WITH A GIVEN INITIAL CONDITION. IT IS INTENDED AS AN
+    !!              EXTENSION OF THE CODE GAM TO DAEs (SEE THE REVISION
     !!              HISTORY FOR DETAILS)
-    !!              
+    !!
     !!     AUTHORS: F. IAVERNARO AND F. MAZZIA
     !!              UNIVERSITA' DEGLI STUDI DI BARI,
     !!              DIPARTIMENTO DI MATEMATICA
@@ -4140,28 +4140,28 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!              THE AUTHORS ARE VERY GRATEFUL TO ANYONE USES THE CODE AND
     !!              WOULD APPRECIATE ANY CRITICISM AND REMARKS ON HOW IT PERFORMS.
     !!
-    !! REVISION HISTORY (YYYY/MM/DD):                   
-    !!                      
+    !! REVISION HISTORY (YYYY/MM/DD):
+    !!
     !!                   1997/20/08
     !!                      - FIRST VERSION OF GAM
-    !!   
+    !!
     !!                   1999/11/25
     !!                      - CORRECTED OUTPUT LAST STEPSIZE
-    !!                      - CORRECTED INPUT  H  
-    !!     
-    !!                   2003/23/08  
+    !!                      - CORRECTED INPUT  H
+    !!
+    !!                   2003/23/08
     !!                      - FIRST VERSION OF GAMD
     !!                      - REWRITTEN IN FORTRAN 90
     !!                      - EXTENDED TO LINEARLY IMPLICIT DAES  MY'=F(T,Y)
     !!                        WITH CONSTANT MASS MATRIX M
     !!                      - ADDED IERR IN FCN
-    !!                     
+    !!
     !!                   2006/24/01
     !!                      - CORRECTED THE VALUE CALJAC TO AVOID
     !!                        THE COMPUTATION OF JACOBIAN MORE THEN ONE
     !!                        TIME PER STEPS
     !!                      - CHANGED THE DEFINITION OF TP AND T1 IN ALL
-    !!                        THE SUBROUTINE TP(DBLK+1) --> TP(*) 
+    !!                        THE SUBROUTINE TP(DBLK+1) --> TP(*)
     !!
     !!                   2006/15/02
     !!                      - CORRECTED ALL THE RUN TIM ERROR FOR
@@ -4265,7 +4265,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!                    IMAS=1: MASS-MATRIX  IS SUPPLIED.
     !!
     !!    MLMAS       SWITCH FOR THE BANDED STRUCTURE OF THE MASS-MATRIX:
-    !!                       MLMAS=N: THE FULL MATRIX CASE. THE LINEAR ALGEBRA 
+    !!                       MLMAS=N: THE FULL MATRIX CASE. THE LINEAR ALGEBRA
     !!                                IS DONE BY FULL-MATRIX GAUSS-ELIMINATION.
     !!                    0<=MLMAS<N: MLMAS IS THE LOWER BANDWITH OF THE MATRIX
     !!                                (>= NUMBER OF NON-ZERO DIAGONALS BELOW
@@ -4317,15 +4317,15 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!                 LWORK=21
     !!
     !!     IWORK       INTEGER WORKING SPACE OF LENGTH "LIWORK".
-    !!                 IWORK(1),IWORK(2),...,IWORK(LIWORK) SERVE 
-    !!                 AS PARAMETERS FOR THE CODE. FOR STANDARD USE, 
+    !!                 IWORK(1),IWORK(2),...,IWORK(LIWORK) SERVE
+    !!                 AS PARAMETERS FOR THE CODE. FOR STANDARD USE,
     !!                 SET IWORK(1),..,IWORK(9) TO ZERO BEFORE CALLING.
     !!                 - IWORK(10),...,IWORK(24) SERVE AS WORKING AREA.
     !!                 - IWORK(25),IWORK(26),IWORK(27) CONTAIN THE DIMENSION OF
     !!                   THE INDEX 1, INDEX2, INDEX3, VARIABLES RESPECTIVELY.
-    !!                   THEY MUST BE PASSED IN GAMD AS INPUT VARIABLES WHEN 
-    !!                   SOLVING A DAE; THEY MAY BE SET EQUAL TO ZERO WHEN 
-    !!                   SOLVING AN ODE.  
+    !!                   THEY MUST BE PASSED IN GAMD AS INPUT VARIABLES WHEN
+    !!                   SOLVING A DAE; THEY MAY BE SET EQUAL TO ZERO WHEN
+    !!                   SOLVING AN ODE.
     !!
     !!
     !!     LIWORK      DECLARED LENGTH OF ARRAY "IWORK". IN THIS VERSION SET
@@ -4364,19 +4364,19 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!
     !!    IWORK(8)  THE MAXIMUM NUMBER OF SPLITTING-NEWTON ITERATION FOR
     !!              ORDER 9, THE DEFAULT VALUE (FOR IWORK(5)=0) IS 36.
-    !!   
-    !!    IWORK(9)  NOT YET USED 
     !!
-    !!    IWORK(10:24) USED AS OUTPUT PARAMETERS (SEE BELOW)   
+    !!    IWORK(9)  NOT YET USED
+    !!
+    !!    IWORK(10:24) USED AS OUTPUT PARAMETERS (SEE BELOW)
     !!
     !!       THE FOLLOWING 3 PARAMETERS ARE IMPORTANT FOR
     !!       DIFFERENTIAL-ALGEBRAIC SYSTEMS OF INDEX > 1.
     !!       THE FUNCTION-SUBROUTINE SHOULD BE WRITTEN SUCH THAT
-    !!       THE INDEX 1,2,3 VARIABLES APPEAR IN THIS ORDER. 
+    !!       THE INDEX 1,2,3 VARIABLES APPEAR IN THIS ORDER.
     !!       IN ESTIMATING THE ERROR THE INDEX 2 VARIABLES ARE
     !!       MULTIPLIED BY H, THE INDEX 3 VARIABLES BY H**2.
     !!
-    !!    IWORK(25)  DIMENSION OF THE INDEX 1 VARIABLES (MUST BE > 0). FOR 
+    !!    IWORK(25)  DIMENSION OF THE INDEX 1 VARIABLES (MUST BE > 0). FOR
     !!               ODE'S THIS EQUALS THE DIMENSION OF THE SYSTEM.
     !!               DEFAULT IWORK(25)=N.
     !!
@@ -4394,15 +4394,15 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!    WORK(4)   FACNEWT:  stopping criterion for splitting-Newton method
     !!                 for small values of min(abs(y_i)) and min(abs(f_j)).
     !!
-    !!    WORK(5)   TETAK0(1) stopping criterium for the order 3 
+    !!    WORK(5)   TETAK0(1) stopping criterium for the order 3
     !!              splitting-Newton method:
     !!              the iterates must be decreasing by a factor tetak0(1)
     !!
-    !!    WORK(6)   TETAK0(2) stopping criterium for the order 5 
+    !!    WORK(6)   TETAK0(2) stopping criterium for the order 5
     !!              splitting-Newton method:
     !!              the iterates must be decreasing by a factor tetak0(2)
     !!
-    !!    WORK(7)   TETAK0(3) stopping criterium for the order 7 
+    !!    WORK(7)   TETAK0(3) stopping criterium for the order 7
     !!              splitting-Newton method:
     !!              the iterates must be decreasing by a factor tetak0(3)
     !!
@@ -4556,15 +4556,17 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
        SUBROUTINE SOLOUT(R,TP,YP,F1,NT1,DBLK,ORD,RPAR,IPAR,IRTRN)
          USE PRECISION
          IMPLICIT NONE
-         INTEGER, INTENT(IN) :: R, DBLK, ORD, IPAR(*), IRTRN,NT1
-         REAL(PREC), INTENT(IN) :: TP(*),YP(R,*),RPAR(*),F1(R,*)
+         INTEGER, INTENT(IN) :: R, DBLK, ORD, IPAR(*),NT1
+         INTEGER, INTENT(IN OUT) :: IRTRN
+         REAL(PREC), INTENT(IN) :: TP(*),RPAR(*),F1(R,*)
+         REAL(PREC), INTENT(OUT) :: YP(R,*)
        END SUBROUTINE solout
     END INTERFACE
     !! -------------------------------------------------------------------------
     !!     SETTING THE PARAMETERS
     !! -------------------------------------------------------------------------
 
- 
+
     ARRET   = .FALSE.
     !! -------- NMAX := THE MAXIMAL NUMBER OF STEPS -----
     IF (IWORK(2).EQ.0) THEN
@@ -4637,7 +4639,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       NIND1=IWORK(25)
       NIND2=IWORK(26)
       NIND3=IWORK(27)
-  
+
       IF (NIND1.EQ.0) NIND1=R
       IF (NIND1+NIND2+NIND3.NE.R) THEN
          WRITE(msg,*)' CURIOUS INPUT FOR IWORK(25,26,27)=',NIND1,NIND2,NIND3
@@ -4691,7 +4693,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!--------- FACNEWT: STOPPING CRITERION FOR SPLITTING-NEWTON METHOD
     !!--------           FOR SMALL VALUES OF min(abs(y_i)) and min(abs(f_j))
     IF (WORK(4).EQ.0.D0) THEN
-       FACNEWT= 1d-2 
+       FACNEWT= 1d-2
        FACNEWT=MAX(FACNEWT,EPS/RTOL(1) )
     ELSE
        FACNEWT=WORK(4)
@@ -4782,7 +4784,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!--------- TETAK0(1:4): STOPPING CRITERIUM FOR THE SPLITTING-NEWTON METHOD
     !!---------              THE ERROR IN THE ITERATES MUST BE DECREASING BY A FACTOR
     !!---------              TETAK0(I), i=1,..,4 ACCORDING TO THE SELECTED ORDER
-    IF (IMAS==0) THEN 
+    IF (IMAS==0) THEN
        TETAK0(1:4) = 0.9D0                         ! ODE CASE
     ELSE
        TETAK0(1:4) = (/ 0.9D0, 1.5d0, 20D0, 20D0 /)    ! DAE CASE
@@ -4916,7 +4918,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !! -------- CHECK  THE TOLERANCES
     IF (ITOL.EQ.0) THEN
        IF (ATOL(1).LE.0.D0.OR.RTOL(1).LE. EPS) THEN
-  
+
           WRITE (msg,*) ' TOLERANCES ARE TOO SMALL'
           CALL RPRINT(msg)
           ARRET=.TRUE.
@@ -5014,7 +5016,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
        RETURN
     END IF
 
- 
+
     !! -------------------------------------------------------------------------
     !!     CALL TO CORE INTEGRATOR
     !! -------------------------------------------------------------------------
@@ -5090,9 +5092,9 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       !!
       !!   INPUT/OUTPUT VARIABLES
       !!----
-      REAL(PREC), INTENT(IN OUT) :: T0, Y0(R), H  
+      REAL(PREC), INTENT(IN OUT) :: T0, Y0(R), H
 
-      INTEGER, INTENT(IN OUT) ::  IDID, ITMAX 
+      INTEGER, INTENT(IN OUT) ::  IDID, ITMAX
       !!
       !!   LOCAL VARIABLES
       !!------------------------------------
@@ -5126,27 +5128,27 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
 
       ALLOCATE( SCAL(R), YP(R,11), FP(R,11),                            &
-           &       F(R,11), DN(R), F1(R,11), JF0(LDJAC,R), LU(LDLU,R),  & 
+           &       F(R,11), DN(R), F1(R,11), JF0(LDJAC,R), LU(LDLU,R),  &
            &       FMAS(LDMAS,R), IPIV(R)  )
 
-      
+
       MLLU=MLJAC
       MULU=MUJAC
       MDIAG=MLLU + MULU +1
-      !! ------- CHECK THE INDEX OF THE PROBLEM ----- 
+      !! ------- CHECK THE INDEX OF THE PROBLEM -----
       INDEX1=NIND1.NE.0
       INDEX2=NIND2.NE.0
       INDEX3=NIND3.NE.0
       !! ------- COMPUTE MASS MATRIX FOR IMPLICIT CASE ----------
-   
+
       IF (IMPLCT) THEN
         CALL MAS(R,FMAS,LDMAS,RPAR,IPAR)
         MBDIAG=MUMAS+1
         MBB=MLMAS+MUMAS+1
         MDIFF=MLJAC+MUJAC-MUMAS
       END IF
-   
-   
+
+
       !!--------- DBL(1:4) := SIZE OF THE COEFFICIENT MATRICES DEFINING THE GAMs
 
       DBL(1) = 4
@@ -5162,13 +5164,13 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       NSTEP(1:4)=0
       NNEWT(1:4)=0
       NERR(1:4)=0
-     
+
 
       !!--------- STARTING VALUES FOR NEWTON ITERATION
       DBLK = DBL(ORD)
       DBLKOLD = DBLK
       H    = MIN( H, ABS(TEND-T0)/DBLK )
-      IERR = 0 
+      IERR = 0
       CALL FCN(R,T0,Y0,FP(1,1), RPAR,IPAR)  ! removed ierr
       NFCN = NFCN + 1
       IF (IERR.NE.0) THEN
@@ -5178,7 +5180,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
           CALL RPRINT(msg)
           RETURN
       ENDIF
-        
+
       !! SCALING FACTOR OF THE STEPSIZE FOR THE HIGHER INDEX PROBLEMS
       !! USED TO DEFINE THE SCALING FACTOR FOR THE COMPUTATION OF THE ERROR
 
@@ -5187,8 +5189,8 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
           CPORD(3) = 1d-2
           CPORD(4) = 1d-3
 
-      
-      
+
+
       !! -------- NUMBER OF FAILURES IN THE SPLITTING-NEWTON SCHEME
       FAILNI = 0
       !! -------- NUMBER OF FAILURES DUE TO THE ERROR TEST
@@ -5196,7 +5198,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       NSING  = 0
       ORDOLD = 2*ORD
       ORDDEC = 2*ORD
-      HOLD   = 2*H  
+      HOLD   = 2*H
       HACC   = 2*H
       HDEC   = 2*H
       CALJAC = .TRUE.
@@ -5205,7 +5207,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
       CALL FCN(R,T0,Y0,DN(1),RPAR,IPAR)  ! removed ierr
 
-    
+
       !!--------- MAIN LOOP (ADVANCING IN TIME)
       LOOP_TIME : DO
          !! 100   CONTINUE
@@ -5231,16 +5233,16 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                      DO J=MAX(1,I-MUJAC),MIN(R,I+MLJAC)
                         JF0(J-I+MUJAC+1,I) = (DN(J)-FP(J,1))/DELT
                      END DO
-                  ELSE                     
-                    JF0(1:R,I)=(DN(1:R)-FP(1:R,1))/DELT                   
+                  ELSE
+                    JF0(1:R,I)=(DN(1:R)-FP(1:R,1))/DELT
                   END IF
                   Y0(I)=YSAFE
                END DO
             ELSE
                !! -------- COMPUTE JACOBIAN MATRIX ANALYTICALLY
-               
+
                CALL JAC(R,T0,Y0(1),JF0(1,1),LDJAC,RPAR,IPAR)
-              
+
             END IF
             NJAC = NJAC + 1
             NEWJAC = .TRUE.
@@ -5261,8 +5263,8 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                   J = I
                   THN = RRN
                ENDIF
-            END DO 
-           
+            END DO
+
 
          ELSE
             DO I=1,R
@@ -5273,7 +5275,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                   THN = RRN
                ENDIF
             END DO
-           
+
          END IF
 
 
@@ -5292,7 +5294,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
          !!--------- DEFINE TP AND YP
          IER = 1
-         DO WHILE (IER .NE. 0) 
+         DO WHILE (IER .NE. 0)
           IF (EXTRAP) THEN
             T1(1) = T0+H
             DO I=2,DBLK+1
@@ -5318,11 +5320,11 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
           IF (IER .NE. 0) THEN
             H = MIN(HACC,H/2d0)
           END IF
-         END DO         
-         HEXTRAP  = H 
+         END DO
+         HEXTRAP  = H
 
          !!--------- FACTORIZE THE ITERATION MATRIX
-         IF ((ORDDEC.NE.ORD) .OR. (HDEC.NE.H).OR.(NEWJAC) ) THEN            
+         IF ((ORDDEC.NE.ORD) .OR. (HDEC.NE.H).OR.(NEWJAC) ) THEN
             IER = 1
             DO WHILE ( IER .NE. 0)
                CALL DECLU(R,JF0(1,1),H,LDJAC,LU(1,1),LDLU,IPIV,FMAS,LDMAS,MLMAS,MUMAS,ORD,IER,IJOB)
@@ -5342,13 +5344,13 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                END IF
             END DO
             HDEC = H
-            ORDDEC = ORD 
+            ORDDEC = ORD
          END IF
-         IF (H .NE. HEXTRAP) THEN 
+         IF (H .NE. HEXTRAP) THEN
 
          !!--------- DEFINE AGAIN  TP AND YP
             IER = 1
-            DO WHILE (IER .NE. 0) 
+            DO WHILE (IER .NE. 0)
             IF (EXTRAP) THEN
               T1(1) = T0+H
               DO I=2,DBLK+1
@@ -5390,7 +5392,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                 SCAL(I)=SCAL(I)/(MIN(1D0,H*H*CPORD(ORD)**2))
              END DO
           END IF
-         
+
 
          !!---------- COMPUTE THE NUMERICAL SOLUTION AT TIMES T1(1)...T1(DBLK)
          !!---------- DEFINE VARIABLES NEEDED IN THE ITERATION
@@ -5447,14 +5449,14 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
             TETAKOLD = TETAK
             TETAK    = ERRNEWT/ERRNEWT0
-       
+
             IF (IT.LT.2) THEN
                THETA=TETAK0(ORD)/2
             ELSE IF (IT .EQ. 2) THEN
                THETA = TETAK
             ELSE IF (IT .GT. 2) THEN
                THETA = SQRT(TETAK*TETAKOLD)
-            END IF  
+            END IF
             IT = IT+1
 
             JVAI = (IT .LE. ITMAX).AND.(ERRNEWT.GT.FACN) .AND. &
@@ -5467,7 +5469,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             !!
          END DO NEWT_LOOP
          !! 999   CONTINUE
-       
+
 
 
             IF (ERRNEWT.GT.FACN) THEN
@@ -5486,7 +5488,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             END IF
             !!-------- RETURN TO THE MAIN LOOP
          ELSE
-    
+
             !!--------- THE ITERATION CONVERGES
             !!--------- ERROR ESTIMATION
 
@@ -5495,8 +5497,8 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             CALL  ESTERR(ERRV, ERRSAME, ERRUP, ERRDOWN, FP, &
                  &     R, H, ORD, DBLK, LU(1,1), LDLU, FMAS(1,1), LDMAS, MLMAS, MUMAS, &
                  &     IPIV(1), F(1,1), F1(1,1), SCAL(1), ORDMAX,ORDMIN,IJOB)
-             
-            
+
+
             IF (  FAILEI > 5) THEN
                 IF ( ABS(ERRSAME-ERRSAMEOLD) < 1d-4) THEN
                    ERRSAME = 0.8d0
@@ -5504,17 +5506,17 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             END IF
 
 
-                
-            
+
+
             IF ( ERRSAME .GT. 0.8d0  ) THEN
                FAILEI = FAILEI + 1
                NERR(ORD) = NERR(ORD) + 1
-               IF (FAILEI .EQ. 1) THEN 
+               IF (FAILEI .EQ. 1) THEN
                  CALJAC = (THETA .GT. THET) .and. (.NOT. NEWJAC)
                ELSE
                  CALJAC=.FALSE.
                END IF
-               !!           IF (IT .LE. DBLK+1 ) CALJAC = .FALSE.       
+               !!           IF (IT .LE. DBLK+1 ) CALJAC = .FALSE.
                !!--------- NEW STEPSIZE SELECTION
                ORD2 = 2*ORD
                ESP = 1D0/(ORD2+1D0)
@@ -5525,19 +5527,19 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                F1(1:R,1:DBLKOLD+1) = YP(1:R,1:DBLKOLD+1)
                CALL DIFFDIV(TP,F1,R,DBLK,NT1)
                EXTRAP = .TRUE.
-               
+
                !!--------- RETURN TO THE MAIN LOOP
             ELSE
-               
+
                !!--------- THE STEPSIZE IS ACCEPTED
-               
+
                NSTEP(ORD) = NSTEP(ORD)+1
                T0 = TP(DBLK+1)
                Y0(1:R) = YP(1:R,DBLK+1)
                FP(1:R,1) = FP(1:R,DBLK+1)
                !!--------- NEW STEPSIZE SELECTION
                ORD2 = 2*ORD
-               ESP = 1D0/(ORD2+1d0)               
+               ESP = 1D0/(ORD2+1d0)
                RRN=MAX(FACL,MIN(FACR,(SFSAME*ERRSAME)**ESP))
                THN=DBL(ORD)/(CS(ORD)*RRN)
                ORDN = ORD
@@ -5545,7 +5547,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                IF  (ORD.LT.ORDMAX) THEN
                      ESP = 1D0/(ORD2+3D0)
                      RR=MAX(FACL,MIN(FACR,(SFUP*ERRUP)**ESP))
-                  
+
                      TH=DBL(ORD+1)/(CS(ORD+1)*RR )
                      IF (TH .GT. THN ) THEN
                         ORDN = ORD + 1
@@ -5556,24 +5558,24 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
                IF ( ORD.GT.ORDMIN)  THEN
                   ESP = 1D0/(ORD2-1d0)
-                  RR=MAX(FACL,MIN(FACR,(SFDOWN*ERRDOWN)**ESP))    
+                  RR=MAX(FACL,MIN(FACR,(SFDOWN*ERRDOWN)**ESP))
                   TH=DBL(ORD-1)/(CS(ORD-1)*RR )
                   IF ( (TH .GT. THN )) THEN
                      ORDN = ORD - 1
                      RRN  = RR
                   END IF
                END IF
-                
+
                HOLD = H
                HACC = H
-            
+
                IF (ORDN.GT.ORD) THEN
-                  H = MIN(H/RRN,HOLD)                
+                  H = MIN(H/RRN,HOLD)
                ELSE
                    H = H/RRN
                END IF
 
-              
+
                ORDOLD = ORD
                ORD = ORDN
                DBLKOLD = DBLK
@@ -5581,25 +5583,26 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
                CALJAC = (THETA .GT. THET)
  !               write(6,*) 'THETA ', THETA,  TETAK0(ORD)/2, THET
- 
+
                IF ((FAILNI.NE.0).OR.(FAILEI.NE.0)) THEN
                   H = MIN( H, HOLD)
                END IF
                IF  (.NOT. CALJAC) THEN
-                  IF ((H/HOLD.LE.1.1D0 ).AND.(H/HOLD.GE.0.9D0))THEN 
+                  IF ((H/HOLD.LE.1.1D0 ).AND.(H/HOLD.GE.0.9D0))THEN
                      H = HOLD
                   END IF
                END IF
                H = MIN( H, MIN(HMAX, (TEND-T0)/DBLK) )
-               
-               
-              
+
+
+
                F1(1:R,1:DBLKOLD+1) = YP(1:R,1:DBLKOLD+1)
                CALL DIFFDIV(TP,F1,R,DBLKOLD,NT1)
                EXTRAP = .TRUE.
 
                IF (IOUT.NE.0) THEN
                   !!--------- CALL SOLOUT
+                  IRTRN = 0
                   CALL SOLOUT(R,TP(1),YP(1,1),F1(1,1),NT1,DBLKOLD,ORDOLD,RPAR,IPAR,IRTRN)
                   IF (IRTRN.LT.0) GOTO 800
                END IF
@@ -5609,7 +5612,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                ELSE
                   FAILNI = MAX(FAILNI-1,0)
                   FAILEI = MAX(FAILEI-1,0)
-                 
+
                END IF
                NSING  = 0
             END IF
@@ -5618,7 +5621,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
          !!--------- END IF ERRNEWT > 1
          NSTEPS = NSTEPS + 1
          IF (0.1d0*ABS(T0-TEND)/DBLK .GT. ABS(T0)*EPS ) THEN
-           
+
             IF (0.1d0*ABS(H) .LE. ABS(T0+EPS)*EPS) THEN
                WRITE(msg,*) ' STEPSIZE TOO SMALL, H=',H
                CALL RPRINT(msg)
@@ -5647,7 +5650,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             IDID = 1
             EXIT LOOP_TIME
          END IF
-    END DO LOOP_TIME   
+    END DO LOOP_TIME
     DEALLOCATE( SCAL, YP, FP, F,DN, F1, JF0, LU, FMAS, IPIV  )
 
 900      FORMAT(' EXIT OF GAM AT T=',E18.4)
