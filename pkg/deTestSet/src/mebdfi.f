@@ -319,8 +319,9 @@ C     ..
 C     .. EXTERNAL SUBROUTINES ..
       EXTERNAL OVDRIV,pderv,resid
 C     ..
+C FM added UROUND and EPSJAC in SAVE
 C     .. SAVE STATEMENT ..
-      SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10
+      SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10, UROUND, EPSJAC
 C     ..
 
       character (len=150) MSG
@@ -354,7 +355,7 @@ c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             EPSJAC = SQRT(WORK(1))
 
 c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
-           IF (LWORK.LT.(I10+1+MBND(4)*N)) THEN 
+           IF (LWORK.LT.(I10+1+MBND(4)*N)) THEN
                IDID = -11
                WRITE (msg,9000) I10 + 1+MBND(4)*N
                call rexit(msg)
@@ -371,8 +372,9 @@ c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
          END IF
 
          IF (IDID.LT.0) RETURN
-         
+
       END IF
+
 c
 c    THE DIMENSION OF THE REAL WORKSPACE, WORK, HAS TO BE AT LEAST
 c     (32 + MBND(4))*N+2 WHILE THE DIMENSION OF THE INTEGER
@@ -670,6 +672,7 @@ C     <<<<<<<<<<<<<<<<<
           call rwarn(msg)
 
       END IF
+
 
       CALL STIFF(H,HMAX,HMIN,JSTART,KFLAG,MF,MBND,
      +    NIND1,NIND2,NIND3,T,TOUT,TEND,Y,YPRIME,N,NPD,
@@ -1106,6 +1109,7 @@ C KS:         CALL PDERV(T,Y,PWCOPY,N,YPRIME,N,CON,IPAR,RPAR,IERR)
          DO 20 I=1,N*N
             PW(I)=PWCOPY(I)
  20      CONTINUE
+
       ELSE
 C KS:         CALL PDERV(T,Y,PWCOPY,N,YPRIME,MBND(4),CON,IPAR,RPAR,IERR)
              CALL pderv (T, Y, YPRIME, PWCOPY, CON, RPAR, IPAR)
@@ -1145,7 +1149,6 @@ C
 C KS: CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
       CALL resid(T,Y,Yprime, CON, SAVE2, ierr, rpar, ipar)
 
-
       NRE=NRE+1
       DO 60 J = 1,N
          YJ = Y(J,1)
@@ -1155,11 +1158,14 @@ C KS: CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
          ELSE
             R=DMAX1(EPSJAC*DABS(YJ),R0/YMAX(J))
          ENDIF
-         R = epsjac
+
+         R = EPSJAC
          Y(J,1) = Y(J,1) + R
          YPRIME(J)=YPRIME(J)+R/CON
+
 C KS:    CALL RESID(N,T,Y,WRKSPC,YPRIME,IPAR,RPAR,IERR)
          CALL resid (T, Y, YPRIME, CON, WRKSPC, IERR, RPAR, IPAR)
+
          DO 50 I = 1,N
             JJKK = I + J1
             TEMPRY = (WRKSPC(I)-SAVE2(I))
@@ -1171,6 +1177,8 @@ C KS:    CALL RESID(N,T,Y,WRKSPC,YPRIME,IPAR,RPAR,IERR)
          J1 = J1 + N
  60   CONTINUE
       NRE = NRE + N
+
+
       GOTO 70
 C
 51    CONTINUE
@@ -1217,6 +1225,8 @@ C KS:         CALL RESID(N,T,Y,WRKSPC,YPRIME,IPAR,RPAR,IERR)
  61   CONTINUE
       NRE=NRE+MBND(3)
 C
+
+
  70   IF (MITER.GT.2) THEN
          CALL DGBFA(PW,MBND(4),N,ML,MU,IPIV,IER)
          NDEC = NDEC + 1
@@ -1258,6 +1268,7 @@ C     ..
 C     .. ARRAY ARGUMENTS ..
       DIMENSION  A(NDIM,N)
       INTEGER IP(N)
+      CHARACTER(LEN=150) msg
 C     ..
 C     .. LOCAL SCALARS ..
       INTEGER I,J,K,KP1,M,NM1
@@ -1364,7 +1375,7 @@ C------------------------- END OF SUBROUTINE SOL_mebdfi ------------------
 C
       subroutine dgbfa(abd,lda,n,ml,mu,ipvt,info)
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
-      
+
       integer lda,n,ml,mu,ipvt(*),info
       double precision abd(lda,*)
 c
@@ -2209,6 +2220,7 @@ C     ..
 
  6000 TOLD = T
       KFLAG = 0
+      CFAIL = .FALSE.
       IF (JSTART.GT.0) GO TO 60
       IF (JSTART.NE.0) GO TO 30
 C     ------------------------------------------------------------------
@@ -2488,6 +2500,7 @@ C
       JSNOLD = 0
       MQ1TMP = MEQC1
       MQ2TMP = MEQC2
+
       CALL PSET(Y,YPRIME,N,NPD,H,T,UROUND,EPSJAC,QI,MITER,MBND,
      +   NIND1,NIND2,NIND3,IER,pderv,resid,NRENEW,YMAX,SAVE1,SAVE2,
      +   SCALE,PW,PWCOPY,ERROR,IPIV,ITOL,RTOL,ATOL,NPSET,NJE,NRE,NDEC
@@ -2929,8 +2942,9 @@ C     ASSESSING THE POSSIBILITY OF INCREASING THE ORDER. IF IDOUB = 0
 C     CONTROL PASSES TO 480 WHERE AN ATTEMPT TO CHANGE THE STEPSIZE AND
 C     ORDER IS MADE.
 C ----------------------------------------------------------------------
+C FM: moved this instruction outside the loop
+      LMP4=LMAX+4
       IF (IDOUB.EQ.2.AND.L.NE.LMAX) THEN
-         LMP4=LMAX+4
          DO 390 I = 1,N
             Y(I,LMP4) = Y(I,LL)
  390     CONTINUE
@@ -2999,6 +3013,7 @@ C **********************************************************************
          ENQ2 = 0.5D+0/DBLE(FLOAT(L))
          D = ZERO
          DDOWN=ZERO
+
          DO 410 I = 1,N
             D = D + (Y(I,LL)/SCALE(I))**2
             DDOWN = DDOWN + (Y(I,LMP4)/SCALE(I))**2
