@@ -132,7 +132,7 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis, *xguess, *yguess;
   double aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2; 
-  int  liseries, *iseries, indnms, nxdim, type;
+  int  liseries, *iseries, indnms, nxdim; // type;
   int *ltol, *iwrk, *iset, ntol, iflag, nfixpnt, linear, givmesh, 
       givu, nmesh, isDll, nugdim, nmshguess, lobatto;
   int full, useC;
