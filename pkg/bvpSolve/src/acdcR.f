@@ -1394,7 +1394,7 @@ c       BY BRUGNANO & TRIGIANTE, AND HIGHAM
           sigmaold=sigma
             CALL acCONDESTIM(aleft,aright,nmsh,ncomp,N,xx,topblk,nlbc,
      *       ncomp, ajac, ncomp,2*ncomp,ninter,botblk,ncomp-nlbc,
-     *   ipvblk,isign,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
+     *       ipvblk,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
 
 
           if (iprint .ge. 0) then
@@ -4679,7 +4679,7 @@ c  end of getptq
 
        SUBROUTINE acCONDESTIM(ALEFT,ARIGHT,NMSH,NCOMP,N,XX,TOPBLK,
      *            NRWTOP,NOVRLP,ARRAY,
-     *          NRWBLK,NCLBLK,NBLOKS,BOTBLK,NRWBOT,IPVCD,ISIGN,OMG,
+     *          NRWBLK,NCLBLK,NBLOKS,BOTBLK,NRWBOT,IPVCD,OMG,
      *          C1,WORK,KPPA,GAMMA,SIGMA,CKAPPA,CKAPPA2)
 
 C     **************************************************************
@@ -4694,7 +4694,6 @@ c     cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      *          KPPAI, GAMMAI, CKAPPA,CKAPPA2,kappa1_n, kappa2_n,ckmax
         DOUBLE PRECISION BOMEGA1,BOMEGA2, SIGMA, SIGMAK,KPPAJ
         DOUBLE PRECISION ALEFT,ARIGHT,XX,  CSUM, ZNORM
-        INTEGER ISIGN(*)
         INTEGER N,NRWTOP,NOVRLP,NRWBLK,NCLBLK,NBLOKS,NRWBOT,IPVCD
         INTEGER NCOMP,NMSH,idmx,idmn,idamax,idomg,job
         DIMENSION TOPBLK(NRWTOP,*),ARRAY(NRWBLK,NCLBLK,*),OMG(*),

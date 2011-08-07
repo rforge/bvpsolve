@@ -473,6 +473,9 @@ c----------------------------------------------------------------------
       external fsub, dfsub, gsub, dgsub, guess
       dimension m(*), zeta(*), iset(*), ltol(*), tol(*),
      1     fixpnt(*), ispace(*), fspace(*), ipar(*), rpar(*), icount(*)
+
+c karline: added this "dimenioning"
+      dimension dum1(1),dum2(1),dum3(1),dum4(1)
 c karline: added counters
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
@@ -665,6 +668,7 @@ c
 c...  initialize collocation points, constants, mesh.
 c
       call sysconsts
+c karline: this is a strange call; sysnewmsh expects arrays of certain length; here dum..
       call sysnewmsh (3+iread, fspace(lxi), fspace(lxiold),
      1     fspace(lxij), dum1, dum2, dum3, dum4,
      2     nfxpnt, fixpnt)
@@ -1346,7 +1350,8 @@ c
       common /nonln/ precis,nonlin,iter,limit,icare,iprint,iguess,ifreez
       common /bsplin/ vncol(66,7), vnsave(66,5), vn(66)
       dimension d1(40), d2(40), zv(40), slope(*), accum(*), valstr(*)
-      dimension xi(*), xiold(*), xij(*), aldif(*), fixpnt(*)
+c karline: added dimension of dummy double precision 'dumm'
+      dimension xi(*), xiold(*), xij(*), aldif(*), fixpnt(*), dumm(1)
       CHARACTER(len=150) msg
 c
       nfxp1 = nfxpnt +1
@@ -1850,7 +1855,8 @@ c
       common /colloc/ rho(7),wgterr(40)
       common /nonln/ precis,nonlin,iter,limit,icare,iprint,iguess,ifreez
       common /bsplin/ vncol(66,7), vnsave(66,5), vn(66)
-      dimension xiold(*), aldif(*), valstr(*), work(mstar,*)
+C Karline: added dumm(1)	  
+      dimension xiold(*), aldif(*), valstr(*), work(mstar,*),dumm(1)
       CHARACTER(len=150) msg
 c
       ifin = 1
@@ -2007,7 +2013,8 @@ c*********************************************************************
       common /hi/   dn1, dn2, dn3
       external dfsub, dgsub
       dimension  alpho(*), xi(*), xiold(*), xij(*), alpha(*)
-      dimension aldif(*), rhs(*), a(*), ipiv(*), integs(3,*)
+C Karline: added dimension dummy(1)	  
+      dimension aldif(*), rhs(*), a(*), ipiv(*), integs(3,*),dummy(1)
       dimension z(40), f(40), df(800), dmval(20)
       dimension rpar(*), ipar(*)
       CHARACTER(len=150) msg
@@ -2457,7 +2464,8 @@ c
 c*****************************************************************
 c
       implicit real*8 (a-h,o-z)
-      dimension z(*), fspace(*), ispace(*)
+C Karline: added dumm(1)	  
+      dimension z(*), fspace(*), ispace(*), dumm(1)
       is6 = ispace(6) + 1
       is5 = ispace(1) + 2
       i = 1

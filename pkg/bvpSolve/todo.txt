@@ -1,14 +1,16 @@
-changed from version 1.2
+changed from version 1.2 - Karline
 - added bvpcol from fortran sources colnew   
 - removed "guess" as input parameter for bvptwp - added "ynames" instead.
 
-version 1.2.1
+version 1.2.1 - karline
 - added fortran code colsys; triggered from bvpcol by setting argument "bspline"=TRUE
 - added fortran codes colmod; triggered from bvpcol by arguments eps and epsini
 - added fortran codes acdc; triggered from bvptwp by arguments eps and epsini
 
+version 1.2.2 - karline and Francesca
+- added fortran code bvptwplc; triggered from bvptwp by setting argument "lobatto"=TRUE
+- added fortran code bvptwpc ; triggered from bvptwp by setting "cond = TRUE"
+- forcings and compiled code in colmod/acdc
 
 todo:
-- forcings in colmod/acdc
-- compiled code in colmod/acdc
-- bvptwpL...
+test forcings and compiled code
