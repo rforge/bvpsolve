@@ -175,8 +175,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   int  j, ii, ncomp, nlbc, nmax, lwrkfl, lwrkin, nx, *ipar, isForcing;
   double *wrk, *tol, *fixpnt, *u, *xx, *rpar, *precis, *xguess, *yguess;
   double epsmin, epsini, aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2;
-  int liseries, *iseries, nxdim, *icount;
-  int *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh;
+  int *icount, *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh;
   int full, useC, givu, giveps, nmesh, isDll, nugdim, nmshguess;
 
 /* pointers to functions passed to FORTRAN                                    */
@@ -228,8 +227,6 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   fixpnt   =(double *) R_alloc(nfixpnt, sizeof(double));
   for (j = 0; j < nfixpnt;j++) fixpnt[j] = REAL(Fixpnt)[j];
 
-  // check this - Francesca/Jeff:
-  nxdim = nmax;
   xx   =(double *) R_alloc(nmax, sizeof(double));
   for (j = 0; j < nmesh; j++) xx[j] = REAL(Xguess)[j];
   for (j = nmesh; j < nmax; j++) xx[j] = 0;
@@ -323,9 +320,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
       R_cont_jacbound_func = jacboundfunc;
     }
 
-/* Call the fortran function acdc  NOT USED:  &nxdim,  precis,                */
-  liseries = nmax;
-  iseries = (int *)    R_alloc(liseries, sizeof(int));
+/* Call the fortran function acdc               */
   nugdim = ncomp;
   nmshguess = nmesh;
 /*  Rprintf("precis %g %g %g\n",precis[0],precis[1],precis[2]);*/

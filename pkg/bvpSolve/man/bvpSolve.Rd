@@ -21,7 +21,7 @@
   \tabular{ll}{
     Package: \tab bvpSolve\cr
     Type:    \tab Package\cr
-    Version: \tab 1.2.1\cr
+    Version: \tab 1.2.2\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
