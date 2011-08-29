@@ -2824,7 +2824,8 @@ C
       IF(ITOL .EQ. 1) D = D/(RTOL(1)**2)
       T = TOLD
       HOLD = H
-      IF(NQ.GT.1) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
+C FM: (NQ.GT.1) changed with (NQ. GT.0) to avoid uninitialised value(s)
+      IF(NQ.GT.0) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
       IF(NQ.GT.2) FRFAIL = 0.5D+0/DBLE(FLOAT(NQ-1))
       EFAIL = 0.5D+0/DBLE(FLOAT(L))
       CALL CPYARY(N*L,YHOLD,Y)
@@ -2846,6 +2847,8 @@ C     PREDICTING A NEW H AFTER INSUFFICIENT ACCURACY
 C
       PRFAIL = ((D/(0.2D+0*E))**EFAIL)*1.5D+0 + 1.6D-6
       PLFAIL = ((DDOWN/(0.2D+0*EDN))**FFAIL)*1.5D+0+1.7D-6
+C FM:   added the following line to avoid  uninitialised value(s)
+      PLLFAL = PLFAIL
       IF(NQ.GT.2) PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
      +     1.5D+0+1.7d-6
       IF(PLLFAL.GT.PLFAIL) PLFAIL=PLLFAL

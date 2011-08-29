@@ -29,7 +29,7 @@ c----------------------------------------------------------------------
       DOUBLE PRECISION T, Y(N), YPRIME(N), DF(N),RPAR(*)
       INTEGER ierr, IPAR(*)
 
-      CALL twobfunc(N,T,Y,DF,RPAR,IPAR)
+      CALL twobfunc(N,T,Y,DF,IERR,RPAR,IPAR)
 C
       DO I=1, 175
          DF(I) =  YPRIME(I) - DF(I)
@@ -41,7 +41,7 @@ C
       RETURN
       END
 c-----------------------------------------------------------------------
-      SUBROUTINE twobFunc(NEQN,T,Y,DY,RPAR,IPAR)
+      SUBROUTINE twobFunc(NEQN,T,Y,DY,IERR,RPAR,IPAR)
       INTEGER NEQN, I,IPAR(*), IERR
       double precision t,y(*),dy(*),rpar(*)
       double precision x(175),res(175)
