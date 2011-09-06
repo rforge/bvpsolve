@@ -2450,6 +2450,9 @@ c
      *    rpar, ipar)
          call rhscal (ncomp, nmsh, nlbc, xx, nudim, u, defcor,
      *      fsub, gsub, rhs, rnsq, fval, ftmp, uint, rpar, ipar)
+      else
+         call rhscal (ncomp, nmsh, nlbc, xx, nudim, u, defcor,
+     *      fsub, gsub, rhs, rnsq, fval, ftmp, uint, rpar, ipar)
       endif
 
 

@@ -552,6 +552,8 @@ c Karline: use precis instead of d1mach
       ckappa     = flmax
       ckappaold  = flmax
       ckappa2    = flmax
+      sigma      = flmax
+      sigmaold   = flmax
       stiff_cond = .false.
       stab_cond  = .false.
       ill_cond   = .false.
