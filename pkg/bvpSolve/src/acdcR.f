@@ -1,4 +1,4 @@
-c Francesca: September 2011, changed again the exit strategy
+C Francesca: September 2011, changed again the exit strategy
 c francesca: add precis as argument: machine precision...
 c changed acinitu, added in input more information about xguess,uguess
 c
@@ -146,7 +146,6 @@ C.... Output Details Of The Problem
       ELSE
         iprint = -1
       ENDIF
-
 
       If (Iprint .ge. 0) Then
          If (Linear) Then
@@ -991,7 +990,7 @@ C.... Tolerances. We Alter Epsmin Accordingly.
 
          If (Iprec .eq. 2) Then
             Epsmin = One/(Max((Ep+E(3))/Two,0.9d0*Ep))
-            eps_changed=.true.
+            eps_changed = .true.
          Endif
 
 C.... Insert Details For Backtracking
@@ -1012,10 +1011,10 @@ C.... Insert Details For Backtracking
             end if
             Emin = Ep
             Iback = 1
-C            Iflbvp = 0
+C FRANCESCA deleted iflbvp=0
 C KARLINE: ADDED THE GOTO... and iflag changed and epschanged...
             eps_changed = .true.
-C            Iflbvp = -1
+C FRANCESCA deleted iflbvp=-1
             GOTO 100
 C KARLINE: CHANGES TILL HERE
          Endif
@@ -1031,13 +1030,7 @@ C KARLINE: CHANGES TILL HERE
                   Qa = Gg2
                   Qb = G1-(Phi(1)+Phi(2))*Gg2
                   Qc = E(1)-Phi(1)*(G1-Phi(2)*Gg2)-Ep
-                  Qd = Qb**2-4.d0*Qa*Qcprint("continuation bvpcol")
-
- SolCont <- bvpcol(x = x, func = swirl, order = c(2, 4),
-                  epsini = 0.1, eps = 1e-6, par = 1e-6,
-                  yini = yini, yend = yend)
- diagnostics(SolCont)
-pairs(SolCont, main = "swirling flow III, eps=1e-6, continuation")
+                  Qd = Qb**2-4.d0*Qa*Qc
                   Phiqua = (-Qb+Sqrt(Qd))/(Two*Qa)
                Endif
 
