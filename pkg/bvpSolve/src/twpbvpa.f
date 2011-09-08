@@ -221,14 +221,14 @@ c               OMG(l) = DMAX1( OMG(l),CSUM)
                idmx=idmn
            endif
            if (OMG(l).GT.OMG(l-1)) then
-               gamma1=OMG(l)* (XX(l)-XX(l-1))
+               gamma1=OMG(l)* ABS(XX(l)-XX(l-1))
            else
-               gamma1=OMG(l-1)* (XX(l)-XX(l-1))
+               gamma1=OMG(l-1)* ABS(XX(l)-XX(l-1))
            end if
            GAMMA=GAMMA + gamma1
            l=l+1
  400    continue
-      GAMMA=GAMMA/(ARIGHT-ALEFT)
+      GAMMA=GAMMA/ABS(ARIGHT-ALEFT)
 
 
 
@@ -260,9 +260,9 @@ c        OMG(I-1)  = OMG(I-1)+BOMEGA1
                   BOMEGA2 = DMAX1(BOMEGA2,ABS(C1(k,j+l-1)))
                END DO
                IF (BOMEGA1 .GT. BOMEGA2) THEN
-                  GAMMAK = GAMMAK + BOMEGA1*(XX(I)-XX(I-1))
+                  GAMMAK = GAMMAK + BOMEGA1*ABS(XX(I)-XX(I-1))
                ELSE
-                  GAMMAK = GAMMAK + BOMEGA2*(XX(I)-XX(I-1))
+                  GAMMAK = GAMMAK + BOMEGA2*ABS(XX(I)-XX(I-1))
                END IF
                IF (BOMEGA2 .GT. KPPAK) THEN
                    KPPAK=BOMEGA2
@@ -270,7 +270,7 @@ c        OMG(I-1)  = OMG(I-1)+BOMEGA1
                BOMEGA1=BOMEGA2
                I=I+1
            END DO
-           GAMMAK = GAMMAK/(ARIGHT-ALEFT)
+           GAMMAK = GAMMAK/ABS(ARIGHT-ALEFT)
            IF (GAMMAK .GT. GAMMAI) THEN
               GAMMAI = GAMMAK
            END IF
