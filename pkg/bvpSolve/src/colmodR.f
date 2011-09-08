@@ -3,11 +3,13 @@
 C.... *****************************************************************
 C November 2010. Bugs removed by Francesca Mazzia
 C
-C karline: changed the exit strategy if epsmin was changed - FRANCESCA CAN YOU CHECK?
+C karline: changed the exit strategy if epsmin was changed
 C
+C Francesca: September 2011, changed again the exit strategy, modified print format
+c
 C karline: to make this code compatible with R:
 C
-C 1. change all write statements into rprint statements and 
+C 1. change all write statements into rprint statements and
 C    clean up formats (no /h; toggle off excessive writes)
 C 3. changed interface to MFsub, Mgsub etc.. and added rpar, ipar
 C 4. added counters
@@ -26,6 +28,7 @@ C....         = -2  If The Nonlinear Iteration Has Not Converged For The
 C....               Final Continuation Problem.
 C....         = -3  If There Is An Input Data Error.
 C             = -4  maximum number of continuation steps reached
+C             = -5  iback = 1
 c
 c Francesca added statistics in icount
 c      icount(1) = total number of function evaluation
@@ -654,6 +657,8 @@ C.... For Selecting The Continuation Parameter.
 
 C.... ******************************************************************
 
+
+
 C     intialise counters
       nfunc = 0
       njac = 0
@@ -1043,7 +1048,7 @@ C.... Increase The Continuation Step Counter Ncs.
       If (Iprint .lt. 1) Then
         Write(msg,1011) Ncs, Eps
         call rprint(msg)
-      Endif 
+      Endif
       Iflag = 1
 
 C.... If We Have Reached The Maximum Number Of Continuation Steps
@@ -1053,10 +1058,11 @@ C.... Then This Will Be The Last Problem We Attempt.
          If (Iprint .lt. 1) Then
            Write(Msg,1012) Maxcon
            call rprint(msg)
-         Endif 
+         Endif
          Iback = 1
          Ifinal = 1
          eps_changed = .true.
+         Epsmin = Eps
       Endif
 
 C.... Iatt Is A Flag That Governs Whether Mesh Selection Is Performed
@@ -1090,7 +1096,10 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
               Write(msg,1013) Eps
               call rprint(msg)
             Endif
-            if (eps_changed) iflag = 2
+            if (eps_changed) then
+               iflag = 2
+               Epsmin=Eps
+            end if
 c F            If (Eps .gt. (1.00001d0*Epsmin)) iflag = -6
             Goto 340
          Endif
@@ -1284,9 +1293,10 @@ C.... Reached Our Final Problem
          If (Dele .lt. 0.01d0*E(3) .or. (N .gt. (Nmax/2))) Then
             Ep = E(3)
             Epsmin = One/Ep
+
 C KARLINE: added...
             eps_changed = .true.
-            iflag = 2
+
 
             If (Iprint .lt. 1) Then
                If (Dele .lt. 0.01d0*E(3)) Then
@@ -1309,10 +1319,9 @@ C KARLINE: ADDED THAT - NOW DIRECTLY TO 340, NOT TO 290!
                   Write(msg,1018) Eps,Iflag,Eps
                   call rprint(msg)
                Endif
-            if (ncs .eq. Maxcon) iflag = -4
-            Goto 340
+            if (ncs .eq. Maxcon)  iflag = -4
+                Goto 340
 
-C            Goto 290
 C KARLINE: CHANGES TILL HERE
          Endif
 
@@ -1481,7 +1490,7 @@ C.... Tolerances. We Alter Epsmin Accordingly.
 
 C.... Insert Details For Backtracking
 
-         If (Iprint .lt. 1) Then 
+         If (Iprint .lt. 1) Then
            Write(msg,1019)
            call rprint(msg)
          Endif
@@ -1501,9 +1510,10 @@ C.... Insert Details For Backtracking
             Iflag = 1
 C KARLINE: ADDED THE GOTO... and iflag changed and epschanged...
             eps_changed = .true.
-            iflag = 2
-            GOTO 340
-C KARLINE: CHANGES TILL HERE         
+            Iflag=2
+
+c            GOTO 340
+C KARLINE: CHANGES TILL HERE
 
          Endif
 
@@ -1640,7 +1650,7 @@ C-----------------------------------------------------------------------
  1006 Format(33h Corresponding Error Tolerances -,6x,8d10.2,
      +     4(3x,8d10.2))
  1007 Format(44h Initial Mesh(Es) And Z,Dmz Provided By User)
- 1008 Format (33h The Initial Value Of Epsilon Is ,D11.4, 
+ 1008 Format (33h The Initial Value Of Epsilon Is ,D11.4,
      +     39h The Desired Final Value Of Epsilon Is ,D11.4)
  1009 Format(44h The Maximum Number Of Subintervals Is Min (, I4,
      +     23h (Allowed From Fspace),,I4, 24h (Allowed From Ispace) ))
@@ -1674,7 +1684,7 @@ C-----------------------------------------------------------------------
       Subroutine MContrl (Xi, Xiold, Z, Dmz, Rhs, Delz, Deldmz,
      +           Dqz, Dqdmz, G, W, V, Valstr, Slope, Scale, Dscale,
      +           Accum, Ipvtg, Integs, Ipvtw, Nfxpnt, Fixpnt, Iflag,
-     +           MFsub, MDfsub, MGsub, MDgsub, MGuess, Slpold, Voldmsh, 
+     +           MFsub, MDfsub, MGsub, MDgsub, MGuess, Slpold, Voldmsh,
      +           Eps, Rpar, Ipar )
 C
 C**********************************************************************
@@ -1847,7 +1857,7 @@ C
       Rnold = Rnorm
       Call MLsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz, G,
      +     W, V, Rhs, Dummy, Integs, Ipvtg, Ipvtw, Rnorm,
-     +     3+Ifreez, MFsub, MDfsub, MGsub, MDgsub, MGuess, 
+     +     3+Ifreez, MFsub, MDfsub, MGsub, MDgsub, MGuess,
      +     Eps, Rpar, Ipar )
 C
 C.... Check For A Singular Matrix
@@ -1901,11 +1911,11 @@ C
 C
 C.... Convergence Obtained
 C
-      If ( Iprint .eq. -1 ) Then 
+      If ( Iprint .eq. -1 ) Then
         Write (msg,1004) Iter
         call rprint(msg)
       Endif
-      If ( Iprint .eq. 0 )  Then 
+      If ( Iprint .eq. 0 )  Then
         Write (msg,1016) Iter
         call rprint(msg)
       Endif
@@ -1914,14 +1924,14 @@ C
 C
 C.... Convergence Of Fixed Jacobian Iteration Failed.
 C
- 130  If ( Iprint .lt. 0 ) Then 
+ 130  If ( Iprint .lt. 0 ) Then
         Write (msg,1003) Iter, Rnorm
         call rprint(msg)
-      Endif 
-      If ( Iprint .lt. 0 ) Then 
+      Endif
+      If ( Iprint .lt. 0 ) Then
         Write (msg,1005)
         call rprint(msg)
-      Endif 
+      Endif
       Iconv = 0
       Relax = Rstart
       Do 140 I = 1, Nz
@@ -2046,14 +2056,16 @@ C
       Anfix = Sqrt(Anfix / Dfloat(Nz+Ndmz))
       If ( Icor .eq. 1 )                         Go To 280
       If (Iprint .lt. 0)  Then
-        Write (msg,1007) Iter, Relax, Anorm,
-     +     Anfix, Rnold, Rnorm
+        Write (msg,1007) Iter, Relax, Anorm, Anfix
+        call rprint(msg)
+        Write (msg,1017)   Rnold, Rnorm
         call rprint(msg)
       Endif
       Go To 290
  280  If (Iprint .lt. 0) Then
-        Write (msg,1008) Relax, Anorm, Anfix,
-     +     Rnold, Rnorm
+        Write (msg,1008) Relax, Anorm, Anfix
+        call rprint(msg)
+        Write (msg,1018) Rnold, Rnorm
         call rprint(msg)
       Endif
  290  Icor = 0
@@ -2139,7 +2151,7 @@ C
          If ( Iprint .eq. 0 ) Then
            Write (msg,1016) Iter
            call rprint(msg)
-         Endif 
+         Endif
       Endif
 
       Iconv = 1
@@ -2151,8 +2163,11 @@ C
       Do 410 J = 1, Mstar
          Write(msg,1009) J
          call rprint(msg)
-         Write(msg,1010) (Z(Lj), Lj = J, Nz, Mstar)
-         call rprint(msg)
+         DO Lj=J,Nz,Mstar
+cF            Write(msg,1010) (Z(Lj), Lj = J, Nz, Mstar)
+            Write(msg,1010) Z(Lj)
+            call rprint(msg)
+         END DO
  410  Continue
 
 C.... Check For Error Tolerance Satisfaction
@@ -2224,7 +2239,7 @@ C.... Pick A New Mesh
       Call MNewmsh (Imesh, Xi, Xiold, Z, Dmz, Valstr,
      +     Slope, Accum, Nfxpnt, Fixpnt, Slpold, Nvold, Voldmsh)
       If (Iprec .eq. 2) Then
-         If (Iprint .lt. 1) Then 
+         If (Iprint .lt. 1) Then
            Write(msg,1013)
            call rprint(msg)
          Endif
@@ -2261,12 +2276,12 @@ C     ---------------------------------------------------------------
  1005 Format(35h Switch To Damped Newton Iteration,)
  1006 Format(30h Full Damped Newton Iteration,)
  1007 Format(13h Iteration = ,I3,22h  Relaxation Factor = ,D10.2,
-     +       33h Norm Of Scaled Rhs Changes From ,D10.2,3h To,D10.2,
-     +       33h Norm   Of   Rhs  Changes  From  ,D10.2,3h To,D10.2,
+     +       33h Norm Of Scaled Rhs Changes From ,D10.2,3h To,D10.2)
+ 1017 Format(33h Norm   Of   Rhs  Changes  From  ,D10.2,3h To,D10.2,
      +       D10.2)
  1008 Format(40h Relaxation Factor Corrected To Relax = , D10.2,
-     +       33h Norm Of Scaled Rhs Changes From ,D10.2,3h To,D10.2,
-     +       33h Norm   Of   Rhs  Changes  From  ,D10.2,3h To,D10.2
+     +       33h Norm Of Scaled Rhs Changes From ,D10.2,3h To,D10.2)
+ 1018 Format(33h Norm   Of   Rhs  Changes  From  ,D10.2,3h To,D10.2
      +       ,D10.2)
  1009 Format(19h Mesh Values For Z(, I2, 2h), )
  1010 Format(1h , 8d15.7)
@@ -3245,7 +3260,7 @@ C---------------------------------------------------------------------
 C
       Subroutine MLsyslv (Msing, Xi, Xiold, Z, Dmz, Delz, Deldmz,
      +           G, W, V, Rhs, Dmzo, Integs, Ipvtg, Ipvtw, Rnorm,
-     +           Mode, MFsub, MDfsub, MGsub, MDgsub, MGuess, Eps, 
+     +           Mode, MFsub, MDfsub, MGsub, MDgsub, MGuess, Eps,
      +           Rpar, Ipar )
 C*********************************************************************
 C
@@ -3410,7 +3425,7 @@ C
 C
 C....     Build A Row Of  A  Corresponding To A Boundary Point
 C
-  120      Call MGderiv (G(Ig), Nrow, Izeta, Zval, Dgz, 1, 
+  120      Call MGderiv (G(Ig), Nrow, Izeta, Zval, Dgz, 1,
      +          MDgsub, Eps, Rpar, Ipar)
   130      Izeta = Izeta + 1
            Go To 100
@@ -3476,7 +3491,7 @@ C
 C....       Fill In Ncomp Rows Of  W And V
 C
   210        Call MVwblok (Xcol, Hrho, J, W(Iw), V(Iv), Ipvtw(Idmz), Kd,
-     +       Zval, Df, Acol(1,J), Dmzo(Idmzo), Ncomp, MDfsub, Msing, 
+     +       Zval, Df, Acol(1,J), Dmzo(Idmzo), Ncomp, MDfsub, Msing,
      +       Eps, Rpar, Ipar)
              If ( Msing .ne. 0 )                    Return
   220      Continue
@@ -3521,7 +3536,7 @@ C
 C....     Build A Row Of  A  Corresponding To A Boundary Point
 C
  260       Izm = Izeta+Mstar
-           Call MGderiv (G(Ig), Nrow, Izm, Zval, Dgz, 2, MDgsub, 
+           Call MGderiv (G(Ig), Nrow, Izm, Zval, Dgz, 2, MDgsub,
      +         Eps, Rpar, Ipar)
  270       Izeta = Izeta + 1
            Go To 240
@@ -3628,7 +3643,7 @@ C
 C
       Return
       End
-      Subroutine MGderiv ( Gi, Nrow, Irow, Zval, Dgz, Mode, MDgsub, 
+      Subroutine MGderiv ( Gi, Nrow, Irow, Zval, Dgz, Mode, MDgsub,
      +    Eps, Rpar, Ipar)
 C
 C**********************************************************************
@@ -4344,7 +4359,7 @@ C**********************************************************************
 C
       Integer Ipivot(Nrow),Ncol,Last,Info, I,J,K,L,Kp1
       Double Precision W(Nrow,Ncol),D(Nrow), Colmax,T,S
-      
+
       Intrinsic Abs
       Intrinsic Max
 C
