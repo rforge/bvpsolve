@@ -33,13 +33,14 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
 ### solve
 
    ind <- c(8,0,0)  # index of the system
-   if (method %in% c("mebdfi", "daspk"))
-    out <- mebdfi(y = yini, dy = dyini, times = times,
+   if (! is.function(method))
+     if (method %in% c("mebdfi", "daspk"))
+      return( mebdfi(y = yini, dy = dyini, times = times,
                   res = "transres", nind = ind,
                   dllname = "deTestSet",  initfunc = "transpar",
                   jactype = "bandint", banddown = 2, bandup = 1,
-                  parms = parameter, maxsteps = maxsteps)
-   else {
+                  parms = parameter, maxsteps = maxsteps) )
+
      mass <- matrix(nrow = 3, ncol = 8, data=0)
      mass[1,2] <- parameter["c1"]
      mass[1,5] <- parameter["c3"]
@@ -60,7 +61,6 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
                 dllname = "deTestSet", initfunc = "transpar",
                 parms = parameter,
                 method = method, maxsteps = maxsteps, ...)
-   }
   return(out)
 }
 

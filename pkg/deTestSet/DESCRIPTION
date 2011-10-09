@@ -5,7 +5,7 @@ Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>,
         Jeff Cash <j.cash@imperial.ac.uk>,
         Francesca Mazzia <mazzia@dm.uniba.it>
 Maintainer: Karline Soetaert <k.soetaert@nioo.knaw.nl>
-Depends: R (>= 2.01), ReacTran, deSolve
+Depends: R (>= 2.01), ReacTran
 Description: Solvers and testset for stiff and nonstiff differential equations, and 
   differential algebraic equations
 License: GPL

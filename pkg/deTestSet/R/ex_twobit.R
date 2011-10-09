@@ -28,19 +28,13 @@ twobit <- function(times = seq(0, 320, by = 0.1),
 ### solve
    ind  <- c(N,0,0)    #  index of the system
 
-   if (method %in% c("mebdfi", "daspk"))
-   twobit <- dae(y = yini, dy = dyini, times = times,
+   if (is.character(method)) 
+    if (method %in% c("mebdfi", "daspk"))
+    return( dae(y = yini, dy = dyini, times = times,
           res = "twobres", nind = ind, dllname = "deTestSet",
           initfunc = NULL, parms = NULL, method = method,
-          atol = atol, rtol = rtol, maxsteps = maxsteps,  ...)
-   else if (method == "radau")
-   twobit <- radau(y = yini, times = times,
-          func = "twobfunc", mass =  c(rep(1, 175), rep(0, 350-175)),
-          massup = 0, massdown = 0,
-          dllname = "deTestSet", initfunc = NULL,
-          parms = NULL, method = method,
-          atol = atol, rtol = rtol, maxsteps = maxsteps, ...)
-   else
+          atol = atol, rtol = rtol, maxsteps = maxsteps,  ...))
+
    twobit <- dae(y = yini, times = times, nind = ind,
           func = "twobfunc", mass =  c(rep(1, 175), rep(0, 350-175)),
           massup = 0, massdown = 0,

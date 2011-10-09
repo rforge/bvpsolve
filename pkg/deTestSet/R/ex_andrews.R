@@ -48,13 +48,14 @@ andrews <- function(times = seq(0, 0.03, by = 0.001),
 
    ind <- c(7,7,13)  # index of the system
 
+   if (! is.function(method)) 
    if (method %in% c("mebdfi", "daspk"))
-   AndOut <- dae(y = yini, dy = dyini, times = times,
+     return( dae(y = yini, dy = dyini, times = times,
                  res = "andres", nind = ind,
                  dllname = "deTestSet", jacres = "andjac", initfunc = "andpar",
                  parms = parameter, jactype = "fullusr", method = method,
-                 maxsteps = maxsteps, ...)
-   else
+                 maxsteps = maxsteps, ...))
+
    AndOut <- dae(y = yini, times = times, nind = ind,
           func = "andfunc", mass =  as.double(c(rep(1, 14), rep(0, 13))),
           massup = 0, massdown = 0, 

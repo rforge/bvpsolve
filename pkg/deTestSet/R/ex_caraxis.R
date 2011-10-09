@@ -72,16 +72,16 @@ caraxis <-   function(times = seq(0, 3, by = 0.01),
 
 ### solve
    nind  <- c(4,4,2)   # index 1, 2 and 3 variables
+   if (! is.function(method))
    if (method %in% c("mebdfi", "daspk"))
-      out   <- dae(y = yini, dy = dyini, times = times, res = "carres",
+      return( dae(y = yini, dy = dyini, times = times, res = "carres",
                    dllname = "deTestSet", initfunc = "carpar",
-                   parms = parameter, nind = nind, method = method,  ...)
-   else  {
+                   parms = parameter, nind = nind, method = method,  ...))
+
       mass <- diag(nrow = 10, x = c(rep(1, 4), rep(k, 4), rep(0.,2)))
       out   <- dae(y = yini, dy = dyini, times = times, func = "carfunc",
                    dllname = "deTestSet", initfunc = "carpar",
                    mass = mass, parms = parameter, nind = nind,  method = method,  ...)
-   }
     return(out)
 }
 

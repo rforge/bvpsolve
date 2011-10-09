@@ -32,11 +32,12 @@ ring <- function(times = seq(0, 1e-3, by = 1e-6),
     checkini(15, yini, dyini)
     
 ### solve
-   if (method %in% c("mebdfi", "daspk"))
-  out <- mebdfi(y = yini, dy = dyini, times = times, res = "ringres",
+   if (! is.function(method))
+     if (method %in% c("mebdfi", "daspk"))
+     return( mebdfi(y = yini, dy = dyini, times = times, res = "ringres",
           dllname = "deTestSet", initfunc = "ringpar",
-          parms = parameter,  maxsteps = maxsteps, ...)
-   else
+          parms = parameter,  maxsteps = maxsteps, ...))
+
    out <- dae(y = yini, times = times,
           func = "ringfunc", 
           dllname = "deTestSet", initfunc = "ringpar", parms = parameter,

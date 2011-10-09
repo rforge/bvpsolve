@@ -29,12 +29,13 @@ fekete <- function(times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
 ### solve
    ind  <- c(6*20,2*20,0)    #  index of the system
 
-   if (method %in% c("mebdfi", "daspk"))
-     fekete <- dae(y = yini, dy = dyini, times = times, res = "fekres",
+   if (! is.function(method))
+     if (method %in% c("mebdfi", "daspk"))
+       return( dae(y = yini, dy = dyini, times = times, res = "fekres",
                    nind = ind, method = method,
                    dllname = "deTestSet", initfunc = NULL,
-                   parms = NULL, maxsteps = maxsteps)
-   else
+                   parms = NULL, maxsteps = maxsteps))
+
    fekete <- dae(y = yini, times = times, nind = ind,
           func = "fekfunc", mass = c(rep(1, 120), rep(0, 40)),
           massup = 0, massdown = 0,

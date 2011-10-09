@@ -64,7 +64,7 @@ c----------------------------------------------------------------------------
       subroutine transfunc(neqn,t,y,dy,rpar,ipar)
       IMPLICIT double precision (A-H,O-Z)      
       double precision t,y(neqn),dy(neqn), rpar(*)
-	integer ipar(*)      
+	    integer ipar(*)      
 
       double precision ub,uf,alpha,beta,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,
      +                 pi,uet,fac1,fac2,c1,c2,c3,c4,c5
@@ -95,7 +95,7 @@ c----------------------------------------------------------------------
       subroutine transjac(T,y,yprime,dfdy,con,rpar,ipar)
       IMPLICIT double precision (A-H,O-Z)      
       integer n,i,ipar(*)
-	parameter(n=8, mebnd=8)
+    	parameter(n=8, mebnd=8)
       double precision t,y(n),dfdy(mebnd,n),yprime(n),rpar(*)     
 
       double precision ub,uf,alpha,beta,r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,

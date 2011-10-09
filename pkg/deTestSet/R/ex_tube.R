@@ -34,13 +34,14 @@ tube <- function(times = seq(0, 17.0*3600, by = 10),
 ### solve
     ind   <- c(38,11,0)        # index of the system
 
-   if (method %in% c("mebdfi", "daspk"))
-    tuber <- dae(y = yini, dy = dyini, times = times,
+   if (! is.function(method))
+     if (method %in% c("mebdfi", "daspk")) 
+     return(dae(y = yini, dy = dyini, times = times,
                  res = "tuberes", nind = ind,
                  dllname = "deTestSet", initfunc = "tubepar",
                  parms = parameter,
-                 maxsteps = maxsteps, method = method, ...)
-   else  {
+                 maxsteps = maxsteps, method = method, ...))
+                 
       a <- pi * parameter["d"]^2/4
       c <- parameter["b"]/(parameter["rho"]*parameter["g"])
       v <- parameter["rho"]*parameter["length"]/a
@@ -54,6 +55,5 @@ tube <- function(times = seq(0, 17.0*3600, by = 10),
           dllname = "deTestSet", initfunc = "tubepar",
           parms = parameter, method = method,
           maxsteps = maxsteps, ...)
-   }
   return(tuber)
 }

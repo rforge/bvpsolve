@@ -1,5 +1,5 @@
 dae <- function (y, times, parms, dy, res = NULL, func = NULL,
-    method = c("mebdfi", "daspk", "radau", "gamd"), ...)
+    method = c("mebdfi", "daspk", "radau", "gamd", "bimd"), ...)
 {
     if (is.null(method))
         method <- "mebdfi"
@@ -14,6 +14,7 @@ dae <- function (y, times, parms, dy, res = NULL, func = NULL,
       mebdfi = mebdfi(y=y, times=times, parms=parms, dy=dy, func=func, ...),
       daspk  = daspk (y=y, times=times, parms=parms, dy=dy, func=func, ...),
       radau  = radau (y=y, times=times, parms=parms, func=func, ...),
-      gamd   = gamd  (y=y, times=times, parms=parms, func=func, ...))
+      gamd   = gamd  (y=y, times=times, parms=parms, func=func, ...),
+      bimd   = bimd  (y=y, times=times, parms=parms, func=func, ...))
     return(out)
 }

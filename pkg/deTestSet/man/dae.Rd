@@ -44,9 +44,6 @@ around the implemented DAE solvers}
     The derivatives should be specified in the same order as the specification
     of the state variables \code{y}.
 
-    Except when using radau, it is not possible to define \code{func} as a compiled
-    function in a dynamically loaded shared library. Use \code{res}
-    instead.
     } 
   \item{res }{either an \R-function that computes the
     residual function F(t,y,y') of the DAE system (the model

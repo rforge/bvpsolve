@@ -1,17 +1,19 @@
 
 ### ============================================================================
-### gamd-- solves ordinary differential equation systems using the generalised
-### adams method
+###
+### bimd-- solves ordinary differential equation systems using the 
+### Blended Implicit Method, a block boundary value method of orders 4-6-8-10-12
 ###
 ### ============================================================================
 
-gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
+bimd <- function(y, times, func, parms, nind = c(length(y),0,0),
   rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint",
   mass = NULL, massup = NULL, massdown = NULL,
   verbose = FALSE, hmax = NULL, hini = 0,
   ynames = TRUE, minord = NULL, maxord = NULL,
   bandup = NULL, banddown = NULL,
-  maxsteps = 1e4, maxnewtit = c(10, 18, 26, 36),
+  maxsteps = 1e4, maxnewtit = c(10, 12, 14, 16, 18), 
+  wrkpars = NULL, 
   dllname = NULL, initfunc = dllname, initpar = parms,
   rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
   initforc = NULL, fcontrol = NULL, ...)
@@ -61,15 +63,15 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
   if (ijac == 1 && is.null(jacfunc)) 
     stop ("'jacfunc' NOT specified; either specify 'jacfunc' or change 'jactype'")
 
-  if (is.null (maxord)) maxord <- 9
-  if (is.null (minord)) minord <- 3
+  if (is.null (maxord)) maxord <- 12
+  if (is.null (minord)) minord <- 4
   if (maxord < minord) stop ("'maxord' cannot be smaller than 'minord'")
-  if (maxord > 9) stop ("'maxord' too large: should be <= 9")
-  if (maxord < 3) stop ("'maxord' too small: should be >= 3")
-  if (minord > 9) stop ("'minord' too large: should be <= 9")
-  if (minord < 3) stop ("'minord' too small: should be >= 3")
+  if (maxord > 12) stop ("'maxord' too large: should be <= 12")
+  if (maxord < 4) stop ("'maxord' too small: should be >= 4")
+  if (minord > 12) stop ("'minord' too large: should be <= 12")
+  if (minord < 4) stop ("'minord' too small: should be >= 4")
 
-  if (is.null(bandup  )) bandup   <-n  
+  if (is.null(bandup  )) bandup   <- n  
 
 ### model and Jacobian function  
   JacFunc   <- NULL
@@ -149,6 +151,7 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
 ### The mass matrix
    mlmas <- n
    mumas <- n
+   fullmass <- FALSE
   if (is.null(mass)) {
    imas  <- 0
    lmas  <- n
@@ -164,6 +167,7 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
      if (dimens[2] != n)
        stop ("mass matrix should have as many columns as number of variables in 'y'")
      if (dimens[1] != n) {
+      fullmass <- FALSE
        mumas <- massup
        mlmas <- massdown
        if (dimens[1] != mlmas + mumas +1)
@@ -180,30 +184,50 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
 
 
 ### work arrays iwork, rwork
-  iwork <- vector("integer",27)
-  rwork <- vector("double",21)
+  kmax <- max(3,  maxord - 2)
+  ldjac <- ifelse (full, n, banddown + bandup + 1)
+  ldlu <- ifelse (full, n, ldjac + banddown)
+  if (imas == 0) 
+    ldmas <- 1
+  else
+    ldmas <- ifelse (fullmass, n, mlmas + mumas+1)
+  lrw <- 14 + kmax + 9*n + 5*kmax*n + n*(ldjac+ldlu+ldmas)
+
+  rwork <- vector("double",14)
   rwork[] <- 0.
-  iwork[] <- 0
 
-  iwork[2] <- maxsteps
-  iwork[3] <- minord
-  iwork[4] <- maxord
-
-  if (is.null (maxnewtit)) 
-    maxnewtit <- c(10, 18, 26, 36)
-  else {
-    if (length(maxnewtit) != 4)
-      stop("'maxit' should be an integer vector of length 4")
-    ii <- which (is.na(maxnewtit))
-      if (length(ii) > 0)
-        maxnewtit[ii] <- c(10,18,26,36)[ii]
-  }
-     
-  iwork[5:8] <- maxnewtit
-  iwork[25:27] <- nind
-  
   rwork[1] <- .Machine$double.neg.eps
   rwork[2] <- hmax
+  if (is.null(wrkpars)) # use defaults (0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.05, 0.12, 0.1, 1/20,..
+    wrkpars <- rep(0, 12)
+  else {
+    if (length(wrkpars) != 12)
+      stop("'wrkpars' should be an real vector of length 12")
+    ii <- which (is.na(wrkpars))
+      if (length(ii) > 0)
+        wrkpars[ii] <- rep(0, 12)[ii]
+  }
+  rwork[3:14] <- wrkpars
+    
+  if (is.null (maxnewtit)) 
+    maxnewtit <- c(10, 12, 14, 16, 18)
+  else {
+    if (length(maxnewtit) != 5)
+      stop("'maxit' should be an integer vector of length 5")
+    ii <- which (is.na(maxnewtit))
+      if (length(ii) > 0)
+        maxnewtit[ii] <- c(10, 12, 14, 16, 18)[ii]
+  }
+     
+  iwork <- vector("integer",40)
+  iwork[] <- 0
+
+  iwork[1] <- maxsteps
+  iwork[2] <- minord
+  iwork[3] <- maxord
+  iwork[4:8] <- maxnewtit
+  iwork[9:11] <- nind
+  
   
   if(is.null(times)) times<-c(0,1e8)
 
@@ -214,7 +238,7 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
     printM("Integration method")
     printM("--------------------")
    
-    printM( "the Generalised Adams Method")  
+    printM( "the Blended Implicit Method")  
     if (jactype == "fullusr" ) 
       printM(" with a user-supplied full (NEQ by NEQ) Jacobian") 
     else if (jactype == "fullint" ) 
@@ -228,9 +252,9 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
 ### calling solver
   storage.mode(y) <- storage.mode(times) <- "double"
   tcrit <- NULL
-  out <- .Call("call_gam",y,times,Func,initpar,
+  out <- .Call("call_bim",y,times,Func,initpar,
                rtol, atol, rho, tcrit, JacFunc, ModelInit,  
-               as.integer(verbose), as.double(rwork),
+               as.integer(verbose), as.integer(lrw), as.double(rwork),
                as.integer(iwork), as.integer(ijac),as.integer(Nglobal),
                nrmas, MassFunc,
                as.integer(banddown), as.integer(bandup), as.double(hini),
@@ -241,7 +265,7 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
   out <- saveOut(out, y, n, Nglobal, Nmtot, func, Func2,
                  iin= 1:6, iout=c(1:4,10,12))
 
-  attr(out, "type") <- "gam"
+  attr(out, "type") <- "bim"
   if (verbose) diagnostics(out)
   return(out)
 }
