@@ -33,9 +33,15 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
 ### solve
 
    ind <- c(8,0,0)  # index of the system
-   if (! is.function(method))
-     if (method %in% c("mebdfi", "daspk"))
-      return( mebdfi(y = yini, dy = dyini, times = times,
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
+      return(dae(y = yini, dy = dyini, times = times,
                   res = "transres", nind = ind,
                   dllname = "deTestSet",  initfunc = "transpar",
                   jactype = "bandint", banddown = 2, bandup = 1,

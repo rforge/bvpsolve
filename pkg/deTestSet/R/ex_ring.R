@@ -9,7 +9,7 @@
 ##
 ## =============================================================================
 
-ring <- function(times = seq(0, 1e-3, by = 1e-6),
+ring <- function(times = seq(0, 1e-3, by = 5e-6),
                  yini = NULL, dyini = NULL,
                  parms = list(), method = "mebdfi", maxsteps = 1e6, ...) {
 
@@ -32,8 +32,14 @@ ring <- function(times = seq(0, 1e-3, by = 1e-6),
     checkini(15, yini, dyini)
     
 ### solve
-   if (! is.function(method))
-     if (method %in% c("mebdfi", "daspk"))
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
      return( mebdfi(y = yini, dy = dyini, times = times, res = "ringres",
           dllname = "deTestSet", initfunc = "ringpar",
           parms = parameter,  maxsteps = maxsteps, ...))

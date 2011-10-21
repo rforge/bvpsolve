@@ -37,7 +37,7 @@ pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL, ...) {
 #outR <- ode(func = pleiade, parms = NULL, y = yini, times = times, maxsteps = 1e5, atol=1e-10, rtol=1e-10)
 #))
 
-   out <- ode(func = "pleiafun", parms = NULL, dllname = "deTestSet", y = yini,
+   out <- ode(func = "pleiafunc", parms = NULL, dllname = "deTestSet", y = yini,
               jacfunc = "pleiajac", times = times, initfunc = NULL,  ...)
    return(out)
 }

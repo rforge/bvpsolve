@@ -42,7 +42,7 @@ c----------------------------------------------------------------------
       SUBROUTINE wheelres(X,Y,YPRIME,CJ,DELTA,IERR,RPAR,IPAR)
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
     	Integer M
-	 parameter (N=17)
+      parameter (N=17)
 
       DIMENSION Y(N), DELTA(N), YPRIME(N),RPAR(2),IPAR(2)
       DOUBLE PRECISION  PHI,SIP,COP
@@ -80,9 +80,9 @@ C
       RETURN
       END
 C--------------------------------------------------------------------
-      subroutine wheelfunc(NEQN,T,Y,DF,RPAR,IPAR)
+      subroutine wheelfunc(NEQN,T,Y,DF,RPAR,IOUT)
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      integer neqn,ierr,ipar(2)
+      integer neqn,ierr,iout(*), ipar(2)
       double precision t,y(neqn),df(neqn),rpar(2)
 c
 c     uses the routines
@@ -108,7 +108,7 @@ c
 c     index-2 formulation: ipar(1)=0
 c
       ipar(1)=0
-      call reswhs(t,y,y,df,ires,rpar,ipar)
+      call reswhs(t,y,y,df,ires,rpar,ip)
 c
 c we interchange y(12)-y(16) and y(13)-y(17)
 c
@@ -195,6 +195,7 @@ C
      *           E,GG,SIGMA,GM,C11,C22,C23,
      *           DELTA0,AR,RS,EPS,B1,B2
       PARAMETER( TOL   = 0.00000001d0)
+      CHARACTER (LEN = 80) MSG
 C
 C =====================================================================
 C
@@ -410,6 +411,8 @@ C     ERROR HANDLING
 C
  999  IF (IERR .LT. 0) THEN
          IRES = -1
+         WRITE(MSG, *)"AN ERROR OCCURRED in WHEELSET, at time", T
+         call rexit(MSG)
       ELSE
          IRES = 0
       END IF

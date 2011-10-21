@@ -3,10 +3,10 @@
 ###      index 1 DAE of dimension 350
 ### ============================================================================
 
-twobit <- function(times = seq(0, 320, by = 0.1),
+twobit <- function(times = seq(0, 320, by = 0.5),
    yini = NULL, dyini = NULL,
-   method = "mebdfi", atol = 1e-4, rtol = 1e-4, 
-   maxsteps = 1e5, ...) {
+   method = "radau", atol = 1e-4, rtol = 1e-4, 
+   maxsteps = 1e5, hmax = 0.1, ...) {
 
 # No parameters 
 
@@ -27,20 +27,24 @@ twobit <- function(times = seq(0, 320, by = 0.1),
 
 ### solve
    ind  <- c(N,0,0)    #  index of the system
-
-   if (is.character(method)) 
+   useres <- FALSE
+   if (is.character(method)) {
     if (method %in% c("mebdfi", "daspk"))
-    return( dae(y = yini, dy = dyini, times = times,
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+
+    if (useres)
+      return( dae(y = yini, dy = dyini, times = times,
           res = "twobres", nind = ind, dllname = "deTestSet",
           initfunc = NULL, parms = NULL, method = method,
-          atol = atol, rtol = rtol, maxsteps = maxsteps,  ...))
-
-   twobit <- dae(y = yini, times = times, nind = ind,
+          atol = atol, rtol = rtol, maxsteps = maxsteps, hmax = hmax, ...))
+    
+   twobit <- dae(y = yini, dy = dyini, times = times, nind = ind,
           func = "twobfunc", mass =  c(rep(1, 175), rep(0, 350-175)),
           massup = 0, massdown = 0,
           dllname = "deTestSet", initfunc = NULL,
           parms = NULL, method = method,
-          atol = atol, rtol = rtol, maxsteps = maxsteps, ...)
+          atol = atol, rtol = rtol, maxsteps = maxsteps, hmax = hmax, ...)
 
    return(twobit)
 }

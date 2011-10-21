@@ -8,7 +8,7 @@
 ##
 ## =============================================================================
 
-emep  <- function (times = seq(14400, 417600, by = 10), yini = NULL,
+emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
                    parms = list(), rtol = 1e-5, atol = 0.1,
                    maxsteps = 1e5, ...) {
 
@@ -31,7 +31,7 @@ emep  <- function (times = seq(14400, 417600, by = 10), yini = NULL,
        "MARO2", "MAPAN", "CH2CCH3", "ISONO3", "ISNIR", "MVKO2H", "CH2CHR", 
        "ISNO3H", "ISNIRH", "MARO2H")
    
-   out <- ode(func = "emepf", parms = NULL, dllname = "deTestSet", y = yini,
+   out <- ode(func = "emepfunc", parms = NULL, dllname = "deTestSet", y = yini,
               jacfunc = "emepjac", times = times, initfunc = NULL,
               rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
    return(out)

@@ -51,9 +51,14 @@ crank <- function(times = seq(0, 0.1, by = 0.001),
       stop("illegal value in options")
     
     nind   <- c(14,10,0)    # index of system
-   if (is.character(method))
-   if (method %in% c("mebdfi", "daspk"))
-   
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
      return( dae(y = yini, dy = dyini, times = times,
           res = "crankres", nind = nind, method = method,
           dllname = "deTestSet", initfunc = "crankpar", parms = parameter,

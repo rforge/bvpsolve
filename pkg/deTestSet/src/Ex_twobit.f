@@ -24,12 +24,13 @@ c     residual function
 c----------------------------------------------------------------------
 
       SUBROUTINE twobres(t,Y,YPRIME,CJ,DF,IERR,RPAR,IPAR)
-	    INTEGER N
+      IMPLICIT NONE
+	    INTEGER I, N
 	    parameter(N=350)
-      DOUBLE PRECISION T, Y(N), YPRIME(N), DF(N),RPAR(*)
+      DOUBLE PRECISION T,CJ,Y(N), YPRIME(N), DF(N),RPAR(*)
       INTEGER ierr, IPAR(*)
 
-      CALL twobfunc(N,T,Y,DF,IERR,RPAR,IPAR)
+      CALL twobfunc(N,T,Y,DF,RPAR,IPAR)
 C
       DO I=1, 175
          DF(I) =  YPRIME(I) - DF(I)
@@ -41,18 +42,23 @@ C
       RETURN
       END
 c-----------------------------------------------------------------------
-      SUBROUTINE twobFunc(NEQN,T,Y,DY,IERR,RPAR,IPAR)
+      SUBROUTINE twobFunc(NEQN,T,Y,DY,RPAR,IPAR)
+      IMPLICIT NONE
       INTEGER NEQN, I,IPAR(*), IERR
       double precision t,y(*),dy(*),rpar(*)
       double precision x(175),res(175)
       external FCN,GCN
+      CHARACTER(LEN=80) MSG
 
       do 10 i=1,175
  10      x(i)=y(i+175)
       CALL FCN(175,t,x,res, ierr)
 
-      IF ( IERR .EQ. -1 ) RETURN
-
+      IF ( IERR .EQ. -1 ) THEN
+         WRITE(MSG, *)"AN ERROR OCCURRED in TWOBIT, at time", T
+         call rexit(MSG)
+        RETURN
+      ENDIF
       do 20 i=1,175
  20      dy(i)=res(i)
       call GCN(175,x,res)
@@ -67,6 +73,7 @@ c     initialisation function
 c----------------------------------------------------------------------
 
       SUBROUTINE twobinit(NEQN,T,Y,YPRIME)
+      IMPLICIT NONE
       DOUBLE PRECISION Y(NEQN),T,YPRIME(NEQN), U(175)
       integer neqn,incon,i,j
       double precision RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
@@ -300,6 +307,8 @@ c     solution at default settings
 c----------------------------------------------------------------------
 
       SUBROUTINE twobsoln(NEQN,Y)
+      IMPLICIT NONE
+      INTEGER NEQN 
       DOUBLE PRECISION  Y(NEQN)
 
 C ----------------------------------------------------------------------
@@ -709,10 +718,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
       integer N,ierr
-      double precision IDS,IBS,IBD
+      double precision X,Y,F,IDS,IBS,IBD
       DIMENSION Y(N),F(N)
+      DOUBLE PRECISION CIN,CIND,V1,V1D,V2,V2D,V3,V3D,V4,V4D 
+      DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -871,7 +884,7 @@ C   VIN    Voltage of input signal at time point X
 C   VIND   Derivative of VIN at time point X
 C
 C ---------------------------------------------------------------------------
-
+      IMPLICIT NONE
       double precision X,VIN,VIND,LOW,HIGH,DELAY,T1,T2,T3,PERIOD,TIME
 
       TIME = DMOD(X,PERIOD)
@@ -922,10 +935,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I,ierr
-        double precision IDS,IBS,IBD
+        
+        double precision IDS,IBS,IBD,U1,U2,U1D,U2D,Y,F
         DIMENSION Y(N),F(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -990,10 +1007,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I,ierr
-        double precision IDS,IBS,IBD
+        double precision IDS,IBS,IBD,U1,U2,U3,U1D,U2D,U3D,Y,F
         DIMENSION Y(N),F(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
+
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1069,10 +1090,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
-        double precision IDS,IBS,IBD
+        IMPLICIT NONE !double precision (A-H,O-Z)
+        double precision IDS,IBS,IBD,U1,U2,U3,U1D,U2D,U3D,Y,F
         integer N,I,ierr
         DIMENSION Y(N),F(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
+
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1145,10 +1170,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
-        double precision IDS,IBS,IBD
+        IMPLICIT NONE !double precision (A-H,O-Z)
+        double precision IDS,IBS,IBD,U1,U2,U1D,U2D,Y,F
         integer N,I,ierr
         DIMENSION Y(N),F(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
+
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1216,10 +1245,14 @@ C IBS, IBD Currents of pn-junction
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
-        double precision IDS,IBS,IBD
+        IMPLICIT NONE !double precision (A-H,O-Z)
+        double precision IDS,IBS,IBD,U1,U2,U3,U1D,U2D,U3D,Y,F
         integer N,I,ierr
         DIMENSION Y(N),F(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
+
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1301,9 +1334,14 @@ C         in the MOS-model due to Shichman and Hodges
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I
+        DOUBLE PRECISION U, G, CBDBS
         DIMENSION U(N),G(N)
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
+
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1505,9 +1543,12 @@ C         in the MOS-model due to Shichman and Hodges
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE !double precision (A-H,O-Z)
         integer N,I
-        DIMENSION U(N),G(N)
+        DOUBLE PRECISION U(N),G(N),CBDBS
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1555,9 +1596,12 @@ C         in the MOS-model due to Shichman and Hodges
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I
-        DIMENSION U(N),G(N)
+        DOUBLE PRECISION U(N),G(N),CBDBS
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1612,9 +1656,12 @@ C         in the MOS-model due to Shichman and Hodges
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I
-        DIMENSION U(N),G(N)
+        DOUBLE PRECISION U(N),G(N),CBDBS
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1664,9 +1711,12 @@ C         in the MOS-model due to Shichman and Hodges
 C
 C ---------------------------------------------------------------------------
 
-        IMPLICIT double precision (A-H,O-Z)
+        IMPLICIT NONE !cdouble precision (A-H,O-Z)
         integer N,I
-        DIMENSION U(N),G(N)
+        DOUBLE PRECISION U(N),G(N),CBDBS
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
         COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1722,8 +1772,9 @@ C   GDSP, GDSM Drain function for VDS > 0 resp. VDS < 0
 C
 C ---------------------------------------------------------------------------
 
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
       integer NED,ierr
+      DOUBLE PRECISION VDS, VGS, VBS, VGD, VBD,GDSP,GDSM
       EXTERNAL GDSP, GDSM
 
       IF ( VDS .GT. 0.d0 ) THEN
@@ -1740,8 +1791,13 @@ C ---------------------------------------------------------------------------
       END
 
       double precision FUNCTION GDSP (NED,VDS, VGS, VBS,ierr)
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
+      DOUBLE PRECISION VDS, VGS, VBS, BETA, CGAMMA,PHI,VT0,VTE
       integer NED,ierr
+      CHARACTER(LEN=80) MSG
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
 
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
@@ -1776,6 +1832,9 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbs.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
+         WRITE(MSG, *)"Error due to Phi, vbs", phi, vbs
+         call rwarn(MSG)
+C         call rexit("Run aborted")
          return
       end if
 
@@ -1794,9 +1853,14 @@ C --- Three enhancement-type transistors in series
       END
 
       double precision FUNCTION GDSM (NED,VDS, VGD, VBD, ierr)
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
+      DOUBLE PRECISION VDS,VGD,VBD,BETA,CGAMMA,PHI,VT0,VTE
       integer NED,ierr
+      CHARACTER(LEN=80) MSG
 
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1829,6 +1893,9 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbd.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
+         WRITE(MSG, *)"Error due to Phi, vbd", phi, vbd
+         call rwarn(MSG)
+C         call rexit("Run aborted")
          return
       end if
 
@@ -1859,7 +1926,11 @@ C   VBS  Voltage between bulk and source
 C
 C ---------------------------------------------------------------------------
 
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
+      DOUBLE PRECISION VBS
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1888,11 +1959,15 @@ C
 C ---------------------------------------------------------------------------
 C
 C The input parameters are:
-C   VBS  Voltage between bulk and drain
+C   VBD  Voltage between bulk and drain
 C
 C ---------------------------------------------------------------------------
 
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
+      DOUBLE PRECISION VBD
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1923,7 +1998,11 @@ C   V    Voltage between bulk and drain resp. source
 C
 C ---------------------------------------------------------------------------
 
-      IMPLICIT double precision (A-H,O-Z)
+      IMPLICIT NONE ! double precision (A-H,O-Z)
+      DOUBLE PRECISION V,PHIB
+        DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
+     *               DELTA, CTIME, STIFF,
+     *               CURIS, VTH, VDD, VBB, CLOAD, COUT
       COMMON /CONST/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT

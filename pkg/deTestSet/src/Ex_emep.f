@@ -23,7 +23,7 @@ c----------------------------------------------------------------------
 c     derivative function
 c----------------------------------------------------------------------
 
-      subroutine emepf(neqn,time,y,dy,rpar,ipar)
+      subroutine emepfunc(neqn,time,y,dy,rpar,ipar)
       integer neqn,ierr,ipar(*)
       double precision time,y(neqn),yprime(neqn),dy(neqn),rpar(*)
 

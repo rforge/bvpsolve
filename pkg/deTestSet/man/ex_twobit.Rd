@@ -9,9 +9,9 @@ Index 1 DAE of dimension 350
 
 }
 \usage{
-twobit (times = seq(0, 320, by = 0.1), yini = NULL, dyini = NULL, 
-  method = "mebdfi",  atol = 1e-4, rtol = 1e-4, 
-  maxsteps = 1e5, ...) 
+twobit (times = seq(0, 320, by = 0.5), yini = NULL, dyini = NULL, 
+  method = "radau",  atol = 1e-4, rtol = 1e-4, 
+  maxsteps = 1e5, hmax = 0.1, ...) 
 }
 
 \arguments{
@@ -25,7 +25,7 @@ twobit (times = seq(0, 320, by = 0.1), yini = NULL, dyini = NULL,
   \item{times }{time sequence for which output is wanted; the first
     value of \code{times} must be the initial time.
   }
-  \item{method }{the solver to use; only \code{mebdfi} available for now
+  \item{method }{the solver to use
   }
   \item{rtol }{relative error tolerance, either a scalar or a vector,
     one value for each y,
@@ -35,6 +35,8 @@ twobit (times = seq(0, 320, by = 0.1), yini = NULL, dyini = NULL,
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
+  }
+  \item{hmax }{maximal size of step; if too large: will fail.
   }
   \item{... }{additional arguments passed to the solver .
   }

@@ -9,8 +9,8 @@ It is an index 2 system of 49 non-linear Differential-Algebraic Equations.
 
 }
 \usage{
-tube (times = seq(0, 17.0*3600, by = 10), yini = NULL, dyini = NULL, 
-  parms = list(), method = "mebdfi",  maxsteps = 1e+05, ...) 
+tube (times = seq(0, 17.0*3600, by = 100), yini = NULL, dyini = NULL, 
+  parms = list(), method = "radau",  maxsteps = 1e+05, ...) 
 }
 
 \arguments{
@@ -52,7 +52,7 @@ Francesca Mazzia
 }
 \examples{
 out <- tube()
-plot(out,lwd = 2)
+plot(out, lwd = 2, which = 1:9)
 plot(out, which = "phi3.4", lwd = 2, xlim = c(10000, 60000),
  ylim = c(0.000145, 0.000185))
 

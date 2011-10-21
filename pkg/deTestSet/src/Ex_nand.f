@@ -38,7 +38,7 @@ c-----------------------------------------------------------------------
 
       subroutine nandres(t,y,yprime,cj,f,ierr,rpar,ipar)
       integer neqn,ierr,ipar(*)
-	parameter (neqn=14)
+      parameter (neqn=14)
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
       integer i,j
@@ -47,7 +47,7 @@ c-----------------------------------------------------------------------
       call   CAP(14,y,AM)
       call   nandfunc(14,t,y,fy,rpar, ipar)
 
-      if(ierr.eq.-1)return
+C      if(ierr.eq.-1)return
 
       do 20 i=1,14
          dum = -fy(i)
@@ -135,10 +135,11 @@ C ---------------------------------------------------------------------
 
       double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
      *                  DELTA, CURIS, VTH, VDD, VBB, rpar(*)
-	integer ipar(*) 
+      integer ipar(*) 
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
+      CHARACTER(LEN=80) MSG
 
       CALL nandPULSE(T,V1,V1D,0.D0,5.D0,5.D0,5.D0,5.D0,5.D0,20.D0)
       CALL nandPULSE(T,V2,V2D,0.D0,5.D0,15.D0,5.D0,15.D0,5.D0,40.D0)
@@ -167,7 +168,10 @@ C ---------------------------------------------------------------------
       F(13)=-(Y(13)-VBB)/RBS + nandIBS(Y(13))
       F(14)=-(Y(14)-VBB)/RBD + nandIBD(Y(14)-Y(10))
 
-      if(ierr.eq.-1)return
+      if(ierr.eq.-1)THEN
+         WRITE(MSG, *)"AN ERROR OCCURRED in NAND, at time", T
+         call rexit(MSG)
+      ENDIF
       RETURN
       END
 

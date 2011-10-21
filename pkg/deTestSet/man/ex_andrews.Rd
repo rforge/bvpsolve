@@ -27,7 +27,7 @@ andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL,
   }
   \item{parms }{list of parameters that overrule the default parameter values
   }
-  \item{method }{the solver to use; only \code{mebdfi} available for now
+  \item{method }{the solver to use
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
@@ -53,7 +53,7 @@ Francesca Mazzia
 }
 \examples{
 out <- andrews()
-plot(out, lwd = 2)
+plot(out, lwd = 2, which = 1:9)
 
 max(abs(out[nrow(out),-1] - reference("andrews")))    
 }

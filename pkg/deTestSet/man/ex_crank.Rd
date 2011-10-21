@@ -57,7 +57,7 @@ Francesca Mazzia
 }
 \examples{
 out <- crank()
-plot(out, lwd = 2)
+plot(out, lwd = 2, which = 1:9)
 
 max(abs(out[nrow(out),-1] - reference("crank")))    
 }

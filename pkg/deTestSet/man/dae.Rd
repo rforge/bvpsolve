@@ -7,7 +7,7 @@
 around the implemented DAE solvers}
 
 \usage{dae(y, times, parms, dy, res = NULL, func = NULL,
-    method = c("mebdfi", "daspk", "radau", "gamd"), ...)
+    method = c("mebdfi", "daspk", "radau", "gamd", "bimd"), ...)
 }
 \arguments{
   \item{y }{the initial (state) values for the DAE system, a vector. If

@@ -67,8 +67,8 @@ c
 
 c----------------------------------------------------------------------
 
-      subroutine crankfunc(neqn,t,y,f,rpar,ipar)
-      integer neqn,ierr,ipar(*)
+      subroutine crankfunc(neqn,t,y,f,rpar,ip)
+      integer neqn,ierr,ip(*),iopt(2)
 
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
@@ -80,6 +80,8 @@ c     default - no damping            ipar(2) = 0
 c
 c      ipar2(1)=0
 c      ipar2(2)=0
+      iopt(1) = ip(4)
+      iopt(2) = ip(5)
       ityp  = 1
       iequa = 0
       icall = 0
@@ -94,7 +96,7 @@ c
          dy(i) = 0.d0
    10 continue
       call resmbs(ityp, iequa, icall,
-     *            t,y,dy,f,ires,rpar,ipar)
+     *            t,y,dy,f,ires,rpar,iopt)
       do i =1,24
          f(i) = -f(i)
       enddo

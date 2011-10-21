@@ -35,8 +35,8 @@ c-----------------------------------------------------------------------
 
       SUBROUTINE carres(X,Y,YPRIME,cj,DELTA,ier,RPAR,IPAR)
       IMPLICIT NONE
-	integer i, N, ipar(*), ier
-	parameter(N=10)
+      integer i, N, ipar(*), ier
+      parameter(N=10)
 
       DOUBLE PRECISION x,Y(N),DELTA(N),RPAR(*),YPRIME(N), cj
       double precision eps, m, l, l0, r,w, g, k

@@ -4,9 +4,9 @@
 ###      index 2 DAE of dimension 24
 ### ============================================================================
 
-tube <- function(times = seq(0, 17.0*3600, by = 10),
+tube <- function(times = seq(0, 17.0*3600, by = 100),
                  yini = NULL, dyini = NULL,
-                 parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
+                 parms = list(), method = "radau", maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(nu = 1.31e-6, g = 9.8, rho = 1.0e3, rcrit = 2.3e3,
@@ -33,9 +33,13 @@ tube <- function(times = seq(0, 17.0*3600, by = 10),
 
 ### solve
     ind   <- c(38,11,0)        # index of the system
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
 
-   if (! is.function(method))
-     if (method %in% c("mebdfi", "daspk")) 
+    if (useres)
      return(dae(y = yini, dy = dyini, times = times,
                  res = "tuberes", nind = ind,
                  dllname = "deTestSet", initfunc = "tubepar",
@@ -49,7 +53,7 @@ tube <- function(times = seq(0, 17.0*3600, by = 10),
       mass[1,1:18]  <- v
       mass[1,37:38] <- c
 
-   tuber <- dae(y = yini, times = times, nind = ind,
+   tuber <- dae(y = yini, dy = dyini, times = times, nind = ind,
           func = "tubefunc", mass =  mass,
           massup = 0, massdown = 0,
           dllname = "deTestSet", initfunc = "tubepar",

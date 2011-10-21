@@ -49,7 +49,7 @@ Francesca Mazzia
 }
 \examples{
 out <- caraxis()
-plot(out, lwd = 2)
+plot(out, lwd = 2, mfrow = c(3, 4))
 
 # compare with reference solution
 out[nrow(out),2:11]-reference("caraxis")

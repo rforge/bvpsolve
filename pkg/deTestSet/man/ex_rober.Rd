@@ -9,7 +9,7 @@ It is an ODE, 3 equations
 }
 \usage{
 rober  (times = 10^(seq(-5, 11, by = 0.1)), yini = NULL, 
-  parms = list(), atol = 1e-15, rtol = 1e-15, maxsteps = 1e5, ...)  
+  parms = list(), atol = 1e-10, rtol = 1e-10, maxsteps = 1e5, ...)  
 }
 
 \arguments{

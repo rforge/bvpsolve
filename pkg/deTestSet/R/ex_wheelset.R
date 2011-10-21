@@ -4,8 +4,8 @@
 ###      index 2 IDE of dimension 17
 ### ============================================================================
 
-wheelset <- function(times = seq(0,10,by=0.001), yini =NULL, dyini = NULL, 
-  parms=list(), method = "mebdfi", maxsteps = 1e5, ...) {
+wheelset <- function(times = seq(0, 10, by = 0.01), yini = NULL, dyini = NULL, 
+                     parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
 
 ### parameters
     parameter <- c(MR = 16.08, G = 9.81, V = 30., RN0 = 0.1, LI1 = 0.0605,
@@ -37,9 +37,9 @@ wheelset <- function(times = seq(0,10,by=0.001), yini =NULL, dyini = NULL,
 ### solve
    ind  <- c(15,2,0)
 
-      return( dae(y = yini, dy = dyini, times = times,
-                res = "wheelres", nind = ind,
-                dllname = "deTestSet", initfunc = "wheelpar",
-                parms = parameter,
-                maxsteps = maxsteps, method = method, ...))
+   return( dae(y = yini, dy = dyini, times = times,
+              res = "wheelres", nind = ind,
+              dllname = "deTestSet", initfunc = "wheelpar",
+              parms = parameter,
+              maxsteps = maxsteps, method = method, ...))
 }

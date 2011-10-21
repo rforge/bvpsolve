@@ -39,7 +39,7 @@ pollution <- function(times = seq(0, 10, 0.1), yini = NULL,
           "HNO3", "O1D", "SO2", "SO4", "NO3", "N2O5")
 
 ### solve
-   out <- ode(y = yini, times = times, func = "polf", jacfunc = "poljac",
+   out <- ode(y = yini, times = times, func = "polfunc", jacfunc = "poljac",
               dllname = "deTestSet", initfunc = "polpar",
               parms = parameter, ...)
 

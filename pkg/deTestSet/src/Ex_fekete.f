@@ -26,7 +26,7 @@ c----------------------------------------------------------------------
       SUBROUTINE fekres(T,Y,YPRIME,CJ,DELTA,IERR,RPAR,IPAR)
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       Parameter(nart=20, neqn=8*nart)
-      DIMENSION Y(NEQN),DELTA(NEQN),YPRIME(NEQN),IPAR(2),RPAR(2)
+      DIMENSION Y(NEQN),DELTA(NEQN),YPRIME(NEQN),IPAR(*),RPAR(*)
 C
 
       CALL fekfunc (NEQN,T,Y,DELTA,RPAR,IPAR)
@@ -111,8 +111,8 @@ c----------------------------------------------------------------------
 c     initial conditions...
 c----------------------------------------------------------------------
       SUBROUTINE fekinit(N,T,Y,YPRIME)
-      DOUBLE PRECISION Y(160),T,PI,RPAR(2),DY(160),YPRIME(160)
-      INTEGER IPAR(2), N, NART
+      DOUBLE PRECISION Y(160),T,PI,RPAR(1),DY(160),YPRIME(160)
+      INTEGER N, NART, ipar(1)
       double precision alpha,beta
 C
       pi=3.141592653589793238462643383d0

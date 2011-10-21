@@ -17,7 +17,7 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file ringmod.f available at [MM08].
 }
 \usage{
-ring (times = seq(0, 0.001, by = 1e-06), yini = NULL, dyini = NULL,  
+ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL,  
   parms = list(), method = "mebdfi", maxsteps = 1e+06, ...) 
 }
 
@@ -34,7 +34,7 @@ ring (times = seq(0, 0.001, by = 1e-06), yini = NULL, dyini = NULL,
   }
   \item{parms }{list of parameters that overrule the default parameter values
   }
-  \item{method }{the solver to use; only \code{mebdfi} available for now
+  \item{method }{the solver to use
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver

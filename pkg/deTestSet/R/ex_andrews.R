@@ -48,8 +48,14 @@ andrews <- function(times = seq(0, 0.03, by = 0.001),
 
    ind <- c(7,7,13)  # index of the system
 
-   if (! is.function(method)) 
-   if (method %in% c("mebdfi", "daspk"))
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
      return( dae(y = yini, dy = dyini, times = times,
                  res = "andres", nind = ind,
                  dllname = "deTestSet", jacres = "andjac", initfunc = "andpar",

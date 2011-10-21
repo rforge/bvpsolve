@@ -47,7 +47,7 @@ Francesca Mazzia
 }
 \examples{
 out <- pollution()
-plot(out, lwd = 2)
+plot(out, lwd = 2, which = 1:9)
 
 out1 <- pollution(times = 0:60)
 

@@ -72,8 +72,14 @@ caraxis <-   function(times = seq(0, 3, by = 0.01),
 
 ### solve
    nind  <- c(4,4,2)   # index 1, 2 and 3 variables
-   if (! is.function(method))
-   if (method %in% c("mebdfi", "daspk"))
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
       return( dae(y = yini, dy = dyini, times = times, res = "carres",
                    dllname = "deTestSet", initfunc = "carpar",
                    parms = parameter, nind = nind, method = method,  ...))

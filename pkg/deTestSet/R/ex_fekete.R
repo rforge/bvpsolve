@@ -29,8 +29,14 @@ fekete <- function(times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
 ### solve
    ind  <- c(6*20,2*20,0)    #  index of the system
 
-   if (! is.function(method))
-     if (method %in% c("mebdfi", "daspk"))
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+
+    if (useres)
        return( dae(y = yini, dy = dyini, times = times, res = "fekres",
                    nind = ind, method = method,
                    dllname = "deTestSet", initfunc = NULL,

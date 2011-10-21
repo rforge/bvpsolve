@@ -41,8 +41,10 @@ Francesca Mazzia
 }
 \examples{
 out <- beam()
-plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2)
+plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2, which = 1:16)
 mtext(side = 3, line = -1.5, "beam", cex = 1.25, outer = TRUE)
+
+image(out[,-1])
 
 # compare with reference solution
 max(abs(out[nrow(out),-1]- reference("beam")))    

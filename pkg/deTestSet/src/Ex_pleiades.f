@@ -21,7 +21,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 c     derivative function
 c-----------------------------------------------------------------------
-      subroutine pleiafun(neqn,t,y,f,rpar,ipar)
+      subroutine pleiafunc(neqn,t,y,f,rpar,ipar)
       integer neqn,ierr,ipar(*)
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
@@ -52,8 +52,8 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 c     jacobian function
 c-----------------------------------------------------------------------
-      subroutine pleiajac(neqn,t,y,dfdy,ldim,rpar,ipar)
-      integer ldim,neqn,ierr,ipar(*)
+      subroutine pleiajac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      integer ldim,neqn,ierr,ipar(*),ml,mu
       double precision t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
 
       integer i,j,mi,mj

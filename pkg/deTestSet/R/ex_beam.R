@@ -22,7 +22,7 @@ beam <- function(times = seq(0, 5, by = 0.01), yini = NULL,
     checkini(80, yini)
 
 ### solve 
-    out <- ode(func = "beamf", parms = NULL, dllname = "deTestSet", y = yini,
+    out <- ode(func = "beamfunc", parms = NULL, dllname = "deTestSet", y = yini,
            times = times, initfunc = NULL,  ...)
 
   return(out)

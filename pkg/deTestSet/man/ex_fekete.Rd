@@ -24,7 +24,7 @@ fekete (times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
   }
   \item{parms }{list of parameters that overrule the default parameter values
   }
-  \item{method }{the solver to use; only \code{mebdfi} available for now
+  \item{method }{the solver to use
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
@@ -50,7 +50,7 @@ Francesca Mazzia
 }
 \examples{
 out <- fekete()
-plot(out, lwd = 2, mfrow = c(4, 5))
+plot(out, lwd = 2, mfrow = c(4, 5), which = 1:20)
 
 # reference run compared with output at end of interval for first 7 components
 out1 <- fekete(times = c(0, 1000))

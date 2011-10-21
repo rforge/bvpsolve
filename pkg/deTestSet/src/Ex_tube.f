@@ -84,7 +84,8 @@ c-----------------------------------------------------------------------
       double precision nu,g,rho,rcrit,length,k,d,b,pi
       common/tubecom/nu, g, rho, rcrit, length, k, d, b
       parameter(pi    = 3.141592653589793238462643383d0 )            
-
+      CHARACTER(LEN = 80) MSG
+      
       a = pi*d**2/4d0
       mu = nu*rho
 
@@ -162,6 +163,8 @@ c-----------------------------------------------------------------------
          do 10 i=1,nnodes            
             if (lambda(i,j) .lt. 0d0) then
                ierr = -1
+         WRITE(MSG, *)"AN ERROR OCCURRED in TUBE, at time", T
+         call rexit(MSG)
                return
             endif
             rtla=sqrt(lambda(i,j))

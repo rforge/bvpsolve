@@ -50,7 +50,7 @@ Francesca Mazzia
 }
 \examples{
 out <- nand(method = "daspk")
-plot(out, lwd = 2)
+plot(out, lwd = 2, which = 1:9)
 
 # compare with reference solution
 max(abs(out[nrow(out),-1] - reference("nand")))    

@@ -38,7 +38,7 @@ c----------------------------------------------------------------------
 c     derivative function
 c----------------------------------------------------------------------
 
-      subroutine polf(neqn,t,y,f,rpar,ipar)
+      subroutine polfunc(neqn,t,y,f,rpar,ipar)
       integer neqn,ierr,ipar(*)
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
@@ -103,9 +103,9 @@ c----------------------------------------------------------------------
 c     jacobian function
 c----------------------------------------------------------------------
 
-      subroutine poljac(ldim,neqn,t,y,yprime,dfdy,ierr,rpar,ipar)
+      subroutine poljac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
       integer ldim,neqn,ierr,ipar(*)
-      double precision t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
+      double precision t,y(neqn),dfdy(ldim,neqn),rpar(*)
 
       integer i,j
       double precision k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,

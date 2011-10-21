@@ -9,7 +9,7 @@ The software part of the
 problem is in the file emep.f available at [MM08].
 }
 \usage{
-emep (times = seq(14400, 417600, by = 10), yini = NULL, 
+emep (times = seq(14400, 417600, by = 400), yini = NULL, 
   parms = list(), rtol = 1e-5, atol = 0.1, maxsteps = 1e5, ...)
 }
 
@@ -52,11 +52,11 @@ emep (times = seq(14400, 417600, by = 10), yini = NULL,
 Francesca Mazzia
 }
 \examples{
-out <- emep( rtol = 0.1, atol = 0.1, maxsteps = 1e5)
+out <- emep()
 plot(out, lwd = 2, col = "darkblue", 
   which = c("NO", "NO2", "SO2", "CH4", "O3", "N2O5"))
 
-plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2)
+plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2, which = 1:16)
 mtext(side = 3,line = -1.5, "emep", cex = 1.25, outer = TRUE)
 # compare with reference solution
 

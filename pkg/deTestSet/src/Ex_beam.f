@@ -23,7 +23,7 @@ c----------------------------------------------------------------------
 c     derivative function
 c----------------------------------------------------------------------
 
-      subroutine beamf(nn,t,th,df,rpar,ipar)
+      subroutine beamfunc(nn,t,th,df,rpar,ipar)
       IMPLICIT REAL*8 (A-H,O-Z)
       integer ierr,ipar(*)
       double precision rpar(*)
