@@ -5439,7 +5439,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
 
             END SELECT ORD_NEWT
 
-            IF (TER)  THEN
+            IF (TER .OR. .NOT.(ERRNEWT .GT. 0.0d0))  THEN
                ERRNEWT = (FACN + 1)
                EXIT NEWT_LOOP
             END IF
