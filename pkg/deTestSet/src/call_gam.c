@@ -3,14 +3,14 @@
 #include "de.h"
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   differential algebraic equation solver gam.
+   differential algebraic equation solvers gamd and bimd.
    
    The C-wrappers that provide the interface between FORTRAN codes and R-code 
-   are: C_deriv_func_gam: interface with R-code "func", passes derivatives  
-        C_deriv_out_gam : interface with R-code "func", passes derivatives + output variables  
-        C_jac_func_gam  : interface with R-code "jacfunc", passes jacobian (except lsodes)
+   are: C_deriv_func_gb: interface with R-code "func", passes derivatives  
+        C_deriv_out_gb : interface with R-code "func", passes derivatives + output variables  
+        C_jac_func_gb  : interface with R-code "jacfunc", passes jacobian
   
-   C_deriv_func_forc_gam provides the interface between the function specified in
+   C_deriv_func_forc_gb provides the interface between the function specified in
    a DLL and the integrator, in case there are forcing functions.
 
    karline soetaert
@@ -36,6 +36,25 @@ void F77_NAME(gamd)( int *,
 
 void F77_NAME(contout)(int *, double *, double *, double *, int *, int *, double *);
 
+/* definition of the calls to the FORTRAN subroutines in file bim.f**/
+
+void F77_NAME(bimd)( int *,
+         void (*)(int *, double *, double *, double *,
+                              double *, int *),         // func
+		     double *, double *, double *, double *,
+		     double *, double *, int *,  
+		     void (*)(int *, double *, double *, double *,  // jac
+			            int *, double*, int*),
+		     int *, int *, int *, 
+ 	       void (*)(int *, double *, int *, double *, int *),  // mas
+		     int *, int *, int *,
+ 	       void (*)(int *, int *, int *, double *,  double *,  // soloutbim
+			            double *, double *, double *, double *, int *, int *),
+		     int *, double *, int *, int *, int*, double *, int*, int*);
+
+void F77_NAME(contsolall)( double *, int *, int *, double *, double *, double *, double *);
+
+
 /* Each succesful timestep, the solver enters here. 
    Check if needs interpolating to output time */
 
@@ -44,7 +63,7 @@ void F77_NAME(contout)(int *, double *, double *, double *, int *, int *, double
 /* wrapper above the derivate function in a dll that first estimates the
 values of the forcing functions */
 
-static void C_deriv_func_forc_gam (int *neq, double *t, double *y,
+static void C_deriv_func_forc_gb (int *neq, double *t, double *y,
                          double *ydot, double *yout, int *iout)
 {
   updatedeforc(t);
@@ -52,10 +71,10 @@ static void C_deriv_func_forc_gam (int *neq, double *t, double *y,
 }
 
 /* interface between FORTRAN function call and R function
-   Fortran code calls C_deriv_func_gam(N, t, y, ydot, yout, iout) 
+   Fortran code calls C_deriv_func_gb(N, t, y, ydot, yout, iout) 
    R code called as R_deriv_func(time, y) and returns ydot */
 
-static void C_deriv_func_gam (int *neq, double *t, double *y,
+static void C_deriv_func_gb (int *neq, double *t, double *y,
                           double *ydot, double *yout, int *iout)
 {
   int i;
@@ -74,7 +93,7 @@ static void C_deriv_func_gam (int *neq, double *t, double *y,
 
 /* deriv output function - for ordinary output variables */
 
-static void C_deriv_out_gam (int *nOut, double *t, double *y, 
+static void C_deriv_out_gb (int *nOut, double *t, double *y, 
                        double *ydot, double *yout)
 {
   int i;
@@ -125,7 +144,7 @@ static void saveOut (double t, double *y) {
       if (isDll == 1)   /* output function in DLL */
         deriv_func (&n_eq, &t, y, xdytmp, out, ipar) ;
       else
-        C_deriv_out_gam(&nout, &t, y, xdytmp, out);  
+        C_deriv_out_gb(&nout, &t, y, xdytmp, out);  
       for (j = 0; j < nout; j++) 
         REAL(YOUT)[(it)*(ntot + 1) + j + n_eq + 1] = out[j];
     }                
@@ -133,7 +152,7 @@ static void saveOut (double t, double *y) {
 
 /* function called by Fortran to check for output */
 
-static void C_solout (int * neq, double * tp, double * yp, double * ff,
+static void C_solout_gam (int * neq, double * tp, double * yp, double * ff,
   int *nt, int * dblk, int * ord, double * rpar, int * ipar, int * irtrn)
 {
 
@@ -145,10 +164,23 @@ static void C_solout (int * neq, double * tp, double * yp, double * ff,
   }
 }
 
+/* function called by Fortran to check for output */
+static void C_solout_bim (int * m, int *k, int * ord,
+   double * t0, double * tstep, double * y, double * f,
+   double *dd, double * rpar, int * ipar, int * irtrn)
+{
+  while ((*t0 <= tt[it]) && (tt[it] < tstep[*k-1])) {
+ 	  F77_CALL(contsolall) (&tt[it], m, k, t0, tstep, dd, ytmp);
+    saveOut(tt[it], ytmp);	     
+	  it++;
+	  if (it >= maxt) break;
+  
+  }
+}
 
 /* interface to jacobian function */
 
-static void C_jac_func_gam (int *neq, double *t, double *y, double *pd, 
+static void C_jac_func_gb (int *neq, double *t, double *y, double *pd, 
          int *nrowpd, double *yout, int *iout)
 {
   int i;
@@ -166,35 +198,39 @@ static void C_jac_func_gam (int *neq, double *t, double *y, double *pd,
 }
 
 /* give name to data types */
-typedef void C_jac_func_type_gam  (int *, double *, double *, double *,
+typedef void C_jac_func_type_gb  (int *, double *, double *, double *,
 		                    int *, double *, int *);
 
 typedef void C_solout_type (int *, double *, double *, double *,
   int *, int *, int *, double *, int *, int *) ;
 
+typedef void C_solout_type_bim (int *, int *, int *, double *, double *, 
+                double *, double *, double *, double *, int *, int *) ;
+
 typedef void C_mas_type (int *, double *, int *, double *, int *);
 
 /* MAIN C-FUNCTION, CALLED FROM R-code */
 
-SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
+SEXP call_gambim(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP Tcrit, SEXP jacfunc, SEXP initfunc, 
-    SEXP verbose, SEXP rWork, SEXP iWork, SEXP jT, 
+    SEXP verbose, SEXP LRW, SEXP rWork, SEXP iWork, SEXP jT, 
     SEXP nOut, SEXP Nrmas, SEXP masfunc, SEXP ML, SEXP MU, SEXP Hini,
-    SEXP Rpar, SEXP Ipar, SEXP flist)
+    SEXP Rpar, SEXP Ipar, SEXP flist, SEXP Type)
 
 {
 /******************************************************************************/
 /******                   DECLARATION SECTION                            ******/
 /******************************************************************************/
 
-  int  j, nt, latol, lrtol, imas, mlmas, mumas;
-  int  isForcing;
+  int  j, nt, latol, lrtol, imas, mlmas, mumas, type;
+  int  isForcing, runOK;
   double *Atol, *Rtol, hini, sum;
   int itol, ijac, mflag,  ml, mu, iout, idid, liw, lrw;
 
   /* pointers to functions passed to FORTRAN */
-  C_jac_func_type_gam   *jac_func_gam = NULL;
+  C_jac_func_type_gb   *jac_func_gb = NULL;
   C_solout_type         *solout = NULL;
+  C_solout_type_bim     *solout_bim = NULL;
   C_mas_type            *mas_func = NULL;
 
 /******************************************************************************/
@@ -204,6 +240,7 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 /*                      #### initialisation ####                              */    
   init_N_Protect();
 
+  type  = INTEGER(Type)[0];       /* jacobian type */
   ijac  = INTEGER(jT)[0];       /* jacobian type */
   n_eq = LENGTH(y);             /* number of equations */ 
   nt   = LENGTH(times);         /* number of output times */
@@ -245,12 +282,18 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   mumas = INTEGER(Nrmas)[2];
 
   /* work vectors */
-  liw = 27;
+  if (type == 1) {
+    liw = 27;
+    lrw = 21;
+  } else if (type == 2) {
+    liw = n_eq + 40;
+    lrw = INTEGER(LRW)[0];
+ }
+  
   iwork = (int *) R_alloc(liw, sizeof(int));
   for (j=0; j<LENGTH(iWork); j++) iwork[j] = INTEGER(iWork)[j];
   for (j=LENGTH(iWork); j<liw; j++) iwork[j] = 0;
 
-  lrw = 21;
   rwork = (double *) R_alloc(lrw, sizeof(double));
   for (j=0; j<length(rWork); j++) rwork[j] = REAL(rWork)[j];
   for (j=length(rWork); j<lrw; j++) rwork[j] = 0.;
@@ -278,11 +321,11 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
  	   /* overruling deriv_func if forcing */
       if (isForcing) {
         DLL_deriv_func = deriv_func;
-        deriv_func = (C_deriv_func_type *) C_deriv_func_forc_gam;
+        deriv_func = (C_deriv_func_type *) C_deriv_func_forc_gb;
       }
   } else {
       /* interface function between FORTRAN and C/R passed to FORTRAN */
-      deriv_func = (C_deriv_func_type *) C_deriv_func_gam; 
+      deriv_func = (C_deriv_func_type *) C_deriv_func_gb; 
       /* needed to communicate with R */
       R_deriv_func = derivfunc;
       R_envir = rho;
@@ -290,10 +333,10 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 
   if (!isNull(jacfunc))   {
       if (isDll)
-	      jac_func_gam = (C_jac_func_type_gam *) R_ExternalPtrAddr(jacfunc);
+	      jac_func_gb = (C_jac_func_type_gb *) R_ExternalPtrAddr(jacfunc);
 	    else  {
 	      R_jac_func = jacfunc;
-	      jac_func_gam= C_jac_func_gam;
+	      jac_func_gb= C_jac_func_gb;
 	    }
     }
 
@@ -302,7 +345,8 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 	      mas_func= C_mas_func;
   }
 
-  solout = C_solout;              
+  solout = C_solout_gam;  
+  solout_bim = C_solout_bim;              
   iout = 1;                           /* solout used */
   idid = 0;
 
@@ -313,11 +357,17 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 
   saveOut (tin, xytmp);               /* save initial condition */ 
   it = it +1;
-  
-  F77_CALL(gamd) ( &n_eq, deriv_func, &tin, xytmp, &tout, &hini,
-		     Rtol, Atol, &itol, jac_func_gam, &ijac, &ml, &mu,
+  if (type == 1)  
+    F77_CALL(gamd) ( &n_eq, deriv_func, &tin, xytmp, &tout, &hini,
+		     Rtol, Atol, &itol, jac_func_gb, &ijac, &ml, &mu,
          mas_func, &imas, &mlmas, &mumas, solout, &iout,
 		     rwork, &lrw, iwork, &liw, out, ipar, &idid);
+  else if (type == 2)
+    F77_CALL(bimd) ( &n_eq, deriv_func, &tin, &tout, xytmp, &hini,
+		     Rtol, Atol, &itol, jac_func_gb, &ijac, &ml, &mu,
+         mas_func, &imas, &mlmas, &mumas, solout_bim, &iout,
+		     rwork, &lrw, iwork, &liw, out, ipar, &idid);
+  
   if (idid == -1)  
      warning("input is not consistent");
   else if (idid == -2)   
@@ -336,37 +386,60 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 
 /*                   ####   returning output   ####                           */    
 
-  PROTECT(ISTATE = allocVector(INTSXP, 6)); incr_N_Protect();
-  INTEGER(ISTATE)[0] = idid;  
-
-/* nsteps */  
-  sum = 0.;
-  for (j = 11; j < 23; j++) sum = sum + iwork[j];
-  INTEGER(ISTATE)[1] = sum;
-
-/* feval */  
-  INTEGER(ISTATE)[2] = iwork[9];
-  
-/* jacobian eval */  
-  INTEGER(ISTATE)[3] = iwork[10];
-
-/* LU decomp */  
-  INTEGER(ISTATE)[4] = iwork[23];
-
-/* number rejected steps */
-  sum = 0.;
-  for (j = 11; j < 15; j++) sum = sum + iwork[j];
-  INTEGER(ISTATE)[5] = INTEGER(ISTATE)[1]- sum;
-
-        
 /* feval */  
 
   PROTECT(RWORK = allocVector(REALSXP, 3)); incr_N_Protect();
   REAL(RWORK)[0] = hini;
   REAL(RWORK)[1] = hini;
   REAL(RWORK)[2] = tin;
+
+  PROTECT(ISTATE = allocVector(INTSXP, 6)); incr_N_Protect();
+  INTEGER(ISTATE)[0] = idid;  
+
+/* nsteps */  
+  sum = 0.;
+  runOK = 0;
+  if (type == 1)  {
+    for (j = 11; j < 23; j++) sum = sum + iwork[j];
+    INTEGER(ISTATE)[1] = sum;
+
+/* feval */  
+    INTEGER(ISTATE)[2] = iwork[9];
   
-  if (idid > 0) {
+/* jacobian eval */  
+    INTEGER(ISTATE)[3] = iwork[10];
+
+/* LU decomp */  
+    INTEGER(ISTATE)[4] = iwork[23];
+
+/* number rejected steps */
+    sum = 0.;
+    for (j = 11; j < 15; j++) sum = sum + iwork[j];
+    INTEGER(ISTATE)[5] = INTEGER(ISTATE)[1]- sum; 
+	if(idid > 0) runOK = 1;
+  } else {
+    for (j = 20; j < 25; j++) sum = sum + iwork[j];
+    INTEGER(ISTATE)[1] = sum;
+
+/* feval */  
+    INTEGER(ISTATE)[2] = iwork[11];
+  
+/* jacobian eval */   
+    INTEGER(ISTATE)[3] = iwork[12];
+
+/* LU decomp */  
+    INTEGER(ISTATE)[4] = iwork[13];
+
+/* number rejected steps */
+    sum = 0.;
+    for (j = 25; j < 29; j++) sum = sum + iwork[j];
+    INTEGER(ISTATE)[5] = INTEGER(ISTATE)[1]- sum;
+    if(idid >= 0)  runOK = 1;
+
+}
+        
+  
+  if (runOK) {
     setAttrib(YOUT, install("istate"), ISTATE);
     setAttrib(YOUT, install("rstate"), RWORK);
   }
@@ -377,9 +450,13 @@ SEXP call_gam(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
  
 /*                   ####     termination      ####                           */    
   unprotect_all();
-  if (idid > 0)
+  if (runOK)
     return(YOUT);
   else
     return(YOUT2);
 }
+
+
+
+
 

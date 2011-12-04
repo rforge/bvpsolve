@@ -1059,7 +1059,7 @@ C   in the dark:
 C   daytime:
          DO 110 I = 1,NDJ
             DJ(I)=A(I) * EXP( -B(I) * SEC )
-            IF( DJ(I) .LT. 0.0D0 ) STOP 'DJ'
+            IF( DJ(I) .LT. 0.0D0 ) CALL REXIT( 'DJ')
  110     CONTINUE
       ENDIF
 C

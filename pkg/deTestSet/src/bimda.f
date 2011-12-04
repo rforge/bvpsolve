@@ -1,3 +1,7 @@
+C Karline: changed call to sollu: passes only first element of ijob
+C NOW:   call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+C WAS:   call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
+
 C -----------------------------------------------------------------------------------
 C     THIS MODULE IS PART OF THE CODE BIMD.
 C     THE CODE BIMD NUMERICALLY SOLVES (STIFF) DIFFERENTIAL ODE 
@@ -167,9 +171,9 @@ c     Z=Z-h*[f0 F]*(dB)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
 c      Z=Z+[y0 Y]*(A2)'
       do i=1,m
@@ -192,9 +196,9 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       goto 30
 
@@ -231,9 +235,9 @@ c     MZ=MZ-h*[f0 F]*(dB)'
       end do
 
 c     theta*MZ=MZ
-      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob(1))
 
 c      MZ=MZ+[y0 Y]*(A2)'
       do i=1,m
@@ -262,9 +266,9 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
 30    continue
 
@@ -433,10 +437,10 @@ c     Z=Z-h*[f0 F]*(dB)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
 
 c      Z=Z+[y0 Y]*(A2)'
       do i=1,m
@@ -463,10 +467,10 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
 
       goto 30
 
@@ -509,10 +513,10 @@ c     MZ=MZ-h*[f0 F]*(dB)'
       end do
 
 c     theta*MZ=MZ
-      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob(1))
 
 c      MZ=MZ+[y0 Y]*(A2)'
       do i=1,m
@@ -546,10 +550,10 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
 
 30    continue
 
@@ -819,12 +823,12 @@ c     Z=Z-h*[f0 F]*(dB)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
 
 c      Z=Z+[y0 Y]*(A2)'
       do i=1,m
@@ -865,12 +869,12 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
 
       goto 30
 
@@ -937,12 +941,12 @@ c     MZ=MZ-h*[f0 F]*(dB)'
       end do
 
 c     theta*MZ=MZ
-      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob(1))
 
 c      MZ=MZ+[y0 Y]*(A2)'
       do i=1,m
@@ -992,12 +996,12 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
 
 30    continue
 
@@ -1405,14 +1409,14 @@ c     Z=Z-h*[f0 F]*(dB)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
 
 c      Z=Z+[y0 Y]*(A2)'
       do i=1,m
@@ -1463,14 +1467,14 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
 
       goto 30
 
@@ -1553,14 +1557,14 @@ c     MZ=MZ-h*[f0 F]*(dB)'
       end do
 
 c     theta*MZ=MZ
-      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,8),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,8),mljac,mujac,ipvt,ijob(1))
 
 c      MZ=MZ+[y0 Y]*(A2)'
       do i=1,m
@@ -1622,14 +1626,14 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
 
 30    continue
 c
@@ -2197,16 +2201,16 @@ c     Z=Z-h*[f0 F]*(dB)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob(1))
 
 c      Z= Z+[y0 Y]*(A2)'
       do i=1,m
@@ -2277,16 +2281,16 @@ c       Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob(1))
 
       goto 30
 
@@ -2406,16 +2410,16 @@ c     MZ=MZ-h*[f0 F]*(dB)'
       end do
 
 c     theta*MZ=MZ
-      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,8),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,9),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,MZ(1,10),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,MZ(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,8),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,9),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,MZ(1,10),mljac,mujac,ipvt,ijob(1))
 
 c      MZ= MZ+[y0 Y]*(A2)'
       do i=1,m
@@ -2499,16 +2503,16 @@ c     Z=Z-h*[f0 F]*(B2)'
       end do
 
 c     theta*Z=Z
-      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob)
-      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,1),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,4),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,5),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,6),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,7),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,8),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,9),mljac,mujac,ipvt,ijob(1))
+      call sollu(m,theta,ldlu,Z(1,10),mljac,mujac,ipvt,ijob(1))
 
 30    continue
 
@@ -2653,7 +2657,7 @@ c     Local variables
          Z(i,2) = Z(i,1)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
 
       goto (10,20) imas+1
 
@@ -2664,7 +2668,7 @@ c     ODE case
          Z(i,3)=Z(i,1)-Z(i,2)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       do i=1,m
            Z(i,2)=vmax(1)*Z(i,2)
@@ -2686,7 +2690,7 @@ c     DAE case
           Z(i,3)=Z(i,1)-Z(i,3)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       do i=1,index1
            Z(i,2)=vmax(1)*Z(i,2)
@@ -2741,7 +2745,7 @@ c     Local variables
          Z(i,2) = Z(i,1)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,2),mljac,mujac,ipvt,ijob(1))
 
       goto (10,20) imas+1
 
@@ -2752,13 +2756,13 @@ c     ODE case
          Z(i,3)=2d0*Z(i,1)-Z(i,2)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       do i=1,m
          Z(i,3)=Z(i,1)-Z(i,3)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       do i=1,m
            Z(i,2)=vmax(1)*Z(i,2)
@@ -2780,7 +2784,7 @@ c     DAE case
          Z(i,3)=2d0*Z(i,1)-Z(i,3)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       call MATVEC0(m,M0,ldmas,mlmas,mumas,Z(1,3),Z(1,4),ijob(2))
 
@@ -2788,7 +2792,7 @@ c     DAE case
          Z(i,3)=Z(i,1)-Z(i,4)
       end do
 
-      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob)
+      call sollu(m,theta,ldlu,Z(1,3),mljac,mujac,ipvt,ijob(1))
 
       do i=1,index1
            Z(i,2)=vmax(1)*Z(i,2)

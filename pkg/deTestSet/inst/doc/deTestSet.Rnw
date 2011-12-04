@@ -56,7 +56,7 @@ initial value problems, R}
 
 \Abstract{
   \R package \ts contains the R-version of the ODE and DAE initial value 
-  problems test set from \url{http://www.dm.uniba.it/\~testset}.  
+  problems test set from \url{http://www.dm.uniba.it/\~testset}\cite{testset}.  
 
   If the model problem is small enough, then it is implemented in
   pure \R. For larger models, the
@@ -217,7 +217,7 @@ mtext(outer = TRUE, side = 3, line = -1.5, "crank", cex = 1.5)
 out <- E5()
 @
 <<label=E5,include=FALSE>>=
-plot(out, lwd = 2, ask = FALSE, log = "xy")
+plot(out, lwd = 2, ask = FALSE)
 mtext(outer = TRUE, side = 3, line = -1.5, "E5", cex = 1.5)
 @
 \setkeys{Gin}{width=0.8\textwidth}
@@ -409,7 +409,7 @@ mtext(outer = TRUE, side = 3, line = -1.5, "ring", cex = 1.5)
 out <- rober()
 @
 <<label=rober,include=FALSE>>=
-plot(out, lwd = 2, ask = FALSE, log = "x")
+plot(out, lwd = 2, ask = FALSE, log = "x", xlim = c(1e-5,1e11))
 mtext(outer = TRUE, side = 3, line = -1.5, "rober", cex = 1.5)
 @
 \setkeys{Gin}{width=0.8\textwidth}
@@ -545,22 +545,9 @@ dimension 17 -  see text for R-code}
 \label{fig:wheel}
 \end{figure}
 \clearpage
+\bibliography{docs}
 
-\section{References}
 
-F. Mazzia and C. Magherini. Test Set for Initial Value Problem Solvers, release 2.4. Department
-of Mathematics, University of Bari and INdAM, Research Unit of Bari, February
-2008. Available at http://www.dm.uniba.it/\~testset.
-
- Karline Soetaert, Thomas Petzoldt and R. Woodrow Setzer (2009). deSolve: General
-  solvers for initial value problems of ordinary differential equations (ODE),
-  partial differential equations (PDE), differential algebraic equations (DAE),
-  and delay differential equations (DDE). R package version 1.7.
-
- 
-Karline Soetaert (2009).  rootSolve: Nonlinear root finding,
-  equilibrium and steady-state analysis of ordinary
-  differential equations.  R-package version 1.6
 
 
 \end{document}

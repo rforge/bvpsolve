@@ -151,40 +151,6 @@ SEXP getListElement(SEXP list, const char *str) {
  ipar[2]: length of ipar
 ===================================================*/
 
-/* Initialise output - output variables calculated in R-code ... */
-
-void initOutR(int isDll, int neq, SEXP nOut, SEXP Rpar, SEXP Ipar) {
-
-  int j;
-  nout = INTEGER(nOut)[0];       /* number of output variables */
-  if (isDll) {                   /* function is a dll */
-    if (nout > 0) isOut = 1;
-    ntot  = neq + nout;          /* length of yout */
-    lrpar = nout + LENGTH(Rpar); /* length of rpar; LENGTH(Rpar) is always >0 */
-    lipar = 3 + LENGTH(Ipar);    /* length of ipar */
-  } else {                       /* function is not a dll */
-    isOut = 0;
-    ntot = neq;
-    lipar = 1;
-    lrpar = 1;
-  }
-  out  = (double*) R_alloc(lrpar, sizeof(double));
-  ipar = (int*)    R_alloc(lipar, sizeof(int));
-  if (isDll ==1) {
-    ipar[0] = nout;              /* first 3 elements of ipar are special */
-    ipar[1] = lrpar;
-    ipar[2] = lipar;
-
-    /* other elements of ipar are set in R-function lsodx via argument *ipar* */
-    for (j = 0; j < LENGTH(Ipar); j++) ipar[j+3] = INTEGER(Ipar)[j];
-
-    /* first nout elements of rpar reserved for output variables
-       other elements are set in R-function lsodx via argument *rpar* */
-    for (j = 0; j < nout; j++)        out[j] = 0.;
-    for (j = 0; j < LENGTH(Rpar); j++) out[nout+j] = REAL(Rpar)[j];
-   }
-}
-
 /* Initialise output - output variables calculated in C-code ... */
 
 void initOutC(int isDll, int neq, SEXP nOut, SEXP Rpar, SEXP Ipar) {

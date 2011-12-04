@@ -4517,18 +4517,18 @@ C
                   LOG10(2) = 10000000*LOG10(2) + 5232940
                ELSE
                   WRITE(*,9000)
-                  STOP 779
+C                  STOP 779
                   END IF
             ELSE
                WRITE(*,9000)
-               STOP 779
+C               STOP 779
                END IF
             END IF
          SC = 987
          END IF
 C
 C  ***  ISSUE STOP 778 IF ALL DATA STATEMENTS ARE OBVIOUSLY WRONG...
-      IF (DMACH(4) .GE. 1.0D0) STOP 778
+C      IF (DMACH(4) .GE. 1.0D0) STOP 778
 *C/6S
 *C     IF (I .LT. 1  .OR.  I .GT. 5)
 *C    1   CALL SETERR(24HD1MACH - I OUT OF BOUNDS,24,1,2)

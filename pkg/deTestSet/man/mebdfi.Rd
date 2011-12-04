@@ -28,7 +28,7 @@
 }
 \usage{
 mebdfi(y, times, func = NULL, parms, dy = NULL, res = NULL,
-  nind=c(length(y),0,0), rtol = 1e-6, atol = 1e-8, jacfunc = NULL,
+  nind=c(length(y),0,0), rtol = 1e-6, atol = 1e-6, jacfunc = NULL,
   jacres = NULL, jactype = "fullint", mass = NULL, verbose = FALSE,
   tcrit = NULL,  hini = 0, ynames = TRUE, maxord = 7, bandup = NULL,
   banddown = NULL, maxsteps = 5000, dllname = NULL,
@@ -561,7 +561,7 @@ J.R. Cash, Stable recursions with applications to the
   \code{deSolve} package directory.
 
   The diagnostics of the integration can be printed to screen
-  by calling \code{\link{diagnostics}}. If \code{verbose} = \code{TRUE},
+  by calling \code{\link[deSolve]{diagnostics}}. If \code{verbose} = \code{TRUE},
   the diagnostics will written to the screen at the end of the integration.
 
   See vignette("deSolve") for an explanation of each element in the vectors
@@ -570,11 +570,11 @@ J.R. Cash, Stable recursions with applications to the
 }
 \seealso{
   \itemize{
-    \item \code{\link{gamd}} another DAE solver,
-    \item \code{\link{daspk}} another DAE solver from package \code{deSolve},
+    \item \code{\link{gamd}} and \code{\link{bimd}} two other DAE solvers,
+    \item \code{\link[deSolve]{daspk}} another DAE solver from package \code{deSolve},
   }
 
-  \code{\link{diagnostics}} to print diagnostic messages.
+  \code{\link[deSolve]{diagnostics}} to print diagnostic messages.
 }
 \keyword{math}
 

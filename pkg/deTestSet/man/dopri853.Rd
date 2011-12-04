@@ -130,16 +130,16 @@ dopri853 (y, times, func, parms, rtol = 1e-6, atol = 1e-6,
     [min(\code{times}), max(\code{times})] is done by taking the value at
     the closest data extreme.
 
-    See \link{forcings} or package vignette \code{"compiledCode"}.
+    See \link[deSolve]{forcings} or package vignette \code{"compiledCode"}.
   }
   \item{initforc }{if not \code{NULL}, the name of the forcing function
     initialisation function, as provided in
     \file{dllname}. It MUST be present if \code{forcings} has been given a
     value.
-    See \link{forcings} or package vignette \code{"compiledCode"}.
+    See \link[deSolve]{forcings} or package vignette \code{"compiledCode"}.
   }
   \item{fcontrol }{A list of control parameters for the forcing functions.
-    See \link{forcings} or vignette \code{compiledCode}.
+    See \link[deSolve]{forcings} or vignette \code{compiledCode}.
   }
   \item{... }{additional arguments passed to \code{func} and
     \code{jacfunc} allowing this to be a generic function.
@@ -222,7 +222,7 @@ E. Hairer, S.P. Norsett AND G. Wanner, Solving Ordinary
   local error of y(i) below rtol(i)*abs(y(i))+atol(i).  
    
   The diagnostics of the integration can be printed to screen
-  by calling \code{\link{diagnostics}}. If \code{verbose} = \code{TRUE},
+  by calling \code{\link[deSolve]{diagnostics}}. If \code{verbose} = \code{TRUE},
   the diagnostics will written to the screen at the end of the integration.
 
   See vignette("deSolve") from the \code{deSolve} package for an 
@@ -234,20 +234,20 @@ E. Hairer, S.P. Norsett AND G. Wanner, Solving Ordinary
   \code{deSolve} for details.
 
   Information about linking forcing functions to compiled code is in 
-  \link{forcings} (from package \code{deSolve}).
+  \link[deSolve]{forcings} (from package \code{deSolve}).
 
 }
 \seealso{
   \itemize{
-    \item \code{\link{ode}} for a general interface to most of the ODE solvers
+    \item \code{\link[deSolve]{ode}} for a general interface to most of the ODE solvers
       from package \code{deSolve},
-    \item \code{\link{ode.1D}} for integrating 1-D models,
-    \item \code{\link{ode.2D}} for integrating 2-D models,
-    \item \code{\link{ode.3D}} for integrating 3-D models,
+    \item \code{\link[deSolve]{ode.1D}} for integrating 1-D models,
+    \item \code{\link[deSolve]{ode.2D}} for integrating 2-D models,
+    \item \code{\link[deSolve]{ode.3D}} for integrating 3-D models,
     \item \code{\link{mebdfi}} for integrating DAE models,
     \item \code{\link{gamd}} for the generalised adams method
   }
 
-  \code{\link{diagnostics}} to print diagnostic messages.
+  \code{\link[deSolve]{diagnostics}} to print diagnostic messages.
 }
 \keyword{math}

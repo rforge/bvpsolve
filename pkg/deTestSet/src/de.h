@@ -91,9 +91,7 @@ void terminate(int, int, int, int, int);
 void initParms(SEXP Initfunc, SEXP Parms);
 void Initdeparms(int*, double*);
 void Initdeforc(int*, double*);
-void initOutR(int isDll, int neq, SEXP nOut, SEXP Rpar, SEXP Ipar);
 void initOutC(int isDll, int neq, SEXP nOut, SEXP Rpar, SEXP Ipar);
-void initOut(int isDll, int neq, SEXP nOut, SEXP Rpar, SEXP Ipar);
 
 /* not yet used in mebdfi... */
 void initglobals(int);

@@ -10,7 +10,7 @@
 ### ============================================================================
 
 mebdfi <- function(y, times, func=NULL, parms, dy=NULL, res=NULL,
-    nind=c(length(y),0,0), rtol=1e-6, atol=1e-8,
+    nind=c(length(y),0,0), rtol=1e-6, atol=1e-6,
     jacfunc=NULL, jacres=NULL,
     jactype = "fullint", mass = NULL, verbose=FALSE, tcrit = NULL,
     hini=0, ynames=TRUE, maxord =7, bandup=NULL,

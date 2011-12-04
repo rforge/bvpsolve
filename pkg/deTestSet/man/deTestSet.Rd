@@ -43,10 +43,10 @@
   Francesca Mazzia
 }
 \seealso{
-  \code{\link{ode}} for a general interface to most of the ODE solvers
+  \code{\link[deSolve]{ode}} for a general interface to most of the ODE solvers
   from package \code{deSolve}
   
-  \code{\link{ode.1D}}, \code{\link{ode.2D}}, \code{\link{ode.3D}},
+  \code{\link[deSolve]{ode.1D}}, \code{\link[deSolve]{ode.2D}}, \code{\link[deSolve]{ode.3D}},
   for integrating 1-D, 2-D and 3-D models from package \code{deSolve}
   
   \code{\link{dae}}, a general interface to the dae solvers, including

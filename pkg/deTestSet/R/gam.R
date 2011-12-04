@@ -182,6 +182,7 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
 ### work arrays iwork, rwork
   iwork <- vector("integer",27)
   rwork <- vector("double",21)
+  lrw <- 21
   rwork[] <- 0.
   iwork[] <- 0
 
@@ -228,14 +229,14 @@ gamd <- function(y, times, func, parms, nind = c(length(y),0,0),
 ### calling solver
   storage.mode(y) <- storage.mode(times) <- "double"
   tcrit <- NULL
-  out <- .Call("call_gam",y,times,Func,initpar,
+  out <- .Call("call_gambim",y,times,Func,initpar,
                rtol, atol, rho, tcrit, JacFunc, ModelInit,  
-               as.integer(verbose), as.double(rwork),
+               as.integer(verbose), as.integer(lrw), as.double(rwork),
                as.integer(iwork), as.integer(ijac),as.integer(Nglobal),
                nrmas, MassFunc,
                as.integer(banddown), as.integer(bandup), as.double(hini),
                as.double (rpar), as.integer(ipar),
-               flist, PACKAGE="deTestSet")
+               flist, as.integer(1), PACKAGE="deTestSet")
 
 ### saving results
   out <- saveOut(out, y, n, Nglobal, Nmtot, func, Func2,

@@ -101,15 +101,15 @@ around the implemented DAE solvers}
 
 \seealso{
   \itemize{
-    \item \code{\link{ode}} for a wrapper around the ode solvers,
-    \item \code{\link{ode.band}} for solving models with a banded
+    \item \code{\link[deSolve]{ode}} for a wrapper around the ode solvers,
+    \item \code{\link[deSolve]{ode.band}} for solving models with a banded
       Jacobian,
-    \item \code{\link{ode.1D}} for integrating 1-D models,
-    \item \code{\link{ode.2D}} for integrating 2-D models,
-    \item \code{\link{ode.3D}} for integrating 3-D models,
-    \item \code{\link{mebdfi}}, \code{\link{daspk}}, for the two dae solvers
+    \item \code{\link[deSolve]{ode.1D}} for integrating 1-D models,
+    \item \code{\link[deSolve]{ode.2D}} for integrating 2-D models,
+    \item \code{\link[deSolve]{ode.3D}} for integrating 3-D models,
+    \item \code{\link{mebdfi}}, \code{\link[deSolve]{daspk}}, for the two dae solvers
   }
-  \code{\link{diagnostics}} to print diagnostic messages.
+  \code{\link[deSolve]{diagnostics}} to print diagnostic messages.
 }
 \keyword{math}
 \examples{

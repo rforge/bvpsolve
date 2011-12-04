@@ -172,7 +172,7 @@ C
 C==============================================================
 C
       DOUBLE PRECISION
-     *           T, Y(1:17), DY(1:17), DELTA(1:17), RPAR
+     *           T, Y(1:17), DY(1:17), DELTA(1:17), RPAR(*)
       INTEGER    IRES, IPAR(*)
       DOUBLE PRECISION
      *           XX, YY, ZZ, XXP, YYP, ZZP, XXPP, YYPP, ZZPP,
