@@ -42,7 +42,7 @@ c----------------------------------------------------------------------
       parameter  (neqn=15)
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
-      call ringfunc(neqn,t,y,f,rpar,ipar)
+      call ringfuncierr(neqn,t,y,f,ierr, rpar,ipar)
       do i = 1,15
         f(i) = yprime(i) - f(i)
       enddo
@@ -79,7 +79,7 @@ c         return
 c      endif
 c
 c      (double precisione ieee .le. 1d304)
-c      if (delta*max(ud1,ud2,ud3,ud4).gt.300d0) then
+c      if (delta*max(ud1,ud2,ud3,ud4).gt.708d0) then
 c         ierr = -1
 c         WRITE(MSG, *)"AN ERROR OCCURRED in RING, at time", T
 c         call rexit(MSG)
@@ -110,6 +110,64 @@ c      endif
       return
       end
 
+
+      subroutine ringfuncierr(neqn,t,y,f,ierr,rpar,ipar)
+      integer neqn,ierr,ipar(*)
+      double precision t,y(neqn),f(neqn),rpar(*)
+
+      double precision c,cs,cp,r,rp,lh,ls1,ls2,ls3,rg1,rg2,rg3,ri,rc,
+     +                 gamma,delta,pi,
+     +                 uin1,uin2,ud1,ud2,ud3,ud4,qud1,qud2,qud3,qud4
+      common /ringcom/c, cs, cp, r, rp, lh, ls1, ls2, ls3,
+     +     rg1, rg2, rg3, ri, rc, gamma, delta
+      parameter (pi=3.141592653589793238462643383d0)
+      CHARACTER (LEN=80) MSG
+
+      uin1   = 0.5d0*sin(2d3*pi*t)
+      uin2   = 2d0*sin(2d4*pi*t)
+      ud1    = +y(3)-y(5)-y(7)-uin2
+      ud2    = -y(4)+y(6)-y(7)-uin2
+      ud3    = +y(4)+y(5)+y(7)+uin2
+      ud4    = -y(3)-y(6)+y(7)+uin2
+
+c     prevent overflow
+c     (native NEC SX double precision .le. 1d75)
+c      if (delta*max(ud1,ud2,ud3,ud4).gt.172d0) then
+c         ierr = -1
+c         return
+c      endif
+c
+c      (double precisione ieee .le. 1d304)
+      if (delta*max(ud1,ud2,ud3,ud4).gt. 700d0) then
+         ierr = -1
+c         WRITE(MSG, *)"AN ERROR OCCURRED in RING, at time", T
+c         call rexit(MSG)
+         return
+      endif
+
+      qud1   = gamma*(exp(delta*ud1)-1d0)
+      qud2   = gamma*(exp(delta*ud2)-1d0)
+      qud3   = gamma*(exp(delta*ud3)-1d0)
+      qud4   = gamma*(exp(delta*ud4)-1d0)
+
+      f(1)  = (y(8)-0.5d0*y(10)+0.5d0*y(11)+y(14)-y(1)/r)/c
+      f(2)  = (y(9)-0.5d0*y(12)+0.5d0*y(13)+y(15)-y(2)/r)/c
+      f(3)  = (y(10)-qud1+qud4)/cs
+      f(4)  = (-y(11)+qud2-qud3)/cs
+      f(5)  = (y(12)+qud1-qud3)/cs
+      f(6)  = (-y(13)-qud2+qud4)/cs
+      f(7)  = (-y(7)/rp+qud1+qud2-qud3-qud4)/cp
+      f(8)  = -y(1)/lh
+      f(9)  = -y(2)/lh
+      f(10) = (0.5d0*y(1)-y(3)-rg2*y(10))/ls2
+      f(11) = (-0.5d0*y(1)+y(4)-rg3*y(11))/ls3
+      f(12) = (0.5d0*y(2)-y(5)-rg2*y(12))/ls2
+      f(13) = (-0.5d0*y(2)+y(6)-rg3*y(13))/ls3
+      f(14) = (-y(1)+uin1-(ri+rg1)*y(14))/ls1
+      f(15) = (-y(2)-(rc+rg1)*y(15))/ls1
+
+      return
+      end
 c----------------------------------------------------------------------
 c     solution at default settings
 c----------------------------------------------------------------------

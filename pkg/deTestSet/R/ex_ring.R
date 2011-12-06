@@ -40,9 +40,9 @@ ring <- function(times = seq(0, 1e-3, by = 5e-6),
       useres <- TRUE
 
     if (useres)
-     return( mebdfi(y = yini, dy = dyini, times = times, res = "ringres",
+     return( dae(y = yini, dy = dyini, times = times, res = "ringres",
           dllname = "deTestSet", initfunc = "ringpar",
-          parms = parameter,  maxsteps = maxsteps, ...))
+          parms = parameter, method=method, maxsteps = maxsteps, ...))
 
    out <- dae(y = yini, times = times,
           func = "ringfunc", 
