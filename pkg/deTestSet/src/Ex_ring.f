@@ -60,10 +60,10 @@ c----------------------------------------------------------------------
      +                 gamma,delta,pi,
      +                 uin1,uin2,ud1,ud2,ud3,ud4,qud1,qud2,qud3,qud4
       common /ringcom/c, cs, cp, r, rp, lh, ls1, ls2, ls3,
-     +     rg1, rg2, rg3, ri, rc, gamma, delta  
+     +     rg1, rg2, rg3, ri, rc, gamma, delta
       parameter (pi=3.141592653589793238462643383d0)
       CHARACTER (LEN=80) MSG
-      
+
       uin1   = 0.5d0*sin(2d3*pi*t)
       uin2   = 2d0*sin(2d4*pi*t)
       ud1    = +y(3)-y(5)-y(7)-uin2
@@ -79,12 +79,12 @@ c         return
 c      endif
 c
 c      (double precisione ieee .le. 1d304)
-      if (delta*max(ud1,ud2,ud3,ud4).gt.300d0) then
-         ierr = -1
-         WRITE(MSG, *)"AN ERROR OCCURRED in RING, at time", T
-         call rexit(MSG)
-         return
-      endif
+c      if (delta*max(ud1,ud2,ud3,ud4).gt.300d0) then
+c         ierr = -1
+c         WRITE(MSG, *)"AN ERROR OCCURRED in RING, at time", T
+c         call rexit(MSG)
+c         return
+c      endif
 
       qud1   = gamma*(exp(delta*ud1)-1d0)
       qud2   = gamma*(exp(delta*ud2)-1d0)

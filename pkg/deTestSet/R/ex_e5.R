@@ -10,7 +10,7 @@
 
 
 E5 <- function(times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
-               parms = list(), atol = 1e-15, rtol = 1e-15, maxsteps = 1e5, ...) {
+               parms = list(), atol = 1e-20, rtol = 1e-5, maxsteps = 1e5, ...) {
 
 ### derivative function
   E3 <- function(t,y,parms) {

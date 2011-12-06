@@ -308,7 +308,7 @@ c----------------------------------------------------------------------
 
       SUBROUTINE twobsoln(NEQN,Y)
       IMPLICIT NONE
-      INTEGER NEQN 
+      INTEGER NEQN
       DOUBLE PRECISION  Y(NEQN)
 
 C ----------------------------------------------------------------------
@@ -722,7 +722,7 @@ C ---------------------------------------------------------------------------
       integer N,ierr
       double precision X,Y,F,IDS,IBS,IBD
       DIMENSION Y(N),F(N)
-      DOUBLE PRECISION CIN,CIND,V1,V1D,V2,V2D,V3,V3D,V4,V4D 
+      DOUBLE PRECISION CIN,CIND,V1,V1D,V2,V2D,V3,V3D,V4,V4D
       DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -937,7 +937,7 @@ C ---------------------------------------------------------------------------
 
         IMPLICIT NONE ! double precision (A-H,O-Z)
         integer N,I,ierr
-        
+
         double precision IDS,IBS,IBD,U1,U2,U1D,U2D,Y,F
         DIMENSION Y(N),F(N)
         DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
@@ -1832,9 +1832,9 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbs.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
-         WRITE(MSG, *)"Error due to Phi, vbs", phi, vbs
-         call rwarn(MSG)
-C         call rexit("Run aborted")
+         WRITE(MSG, *)"Error in  TWOBIT due to Phi, vbs", phi, vbs
+c         call rwarn(MSG)
+          call rexit("Run aborted")
          return
       end if
 
@@ -1893,9 +1893,9 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbd.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
-         WRITE(MSG, *)"Error due to Phi, vbd", phi, vbd
-         call rwarn(MSG)
-C         call rexit("Run aborted")
+         WRITE(MSG, *)"Error in TWOBIT due to Phi, vbd", phi, vbd
+C         call rwarn(MSG)
+         call rexit("Run aborted")
          return
       end if
 
