@@ -56,12 +56,12 @@ c----------------------------------------------------------------------
 C
       MR = 16.08D0
       LI1 = 0.0605D0
-      LI2 = 0.366D0      
+      LI2 = 0.366D0
       PHI = Y(5)
       SIP = DSIN(PHI)
       COP = DCOS(PHI)
-C      
-      CALL wheelfunc(N,T,Y,DELTA,RPAR,IPAR)
+C
+      CALL wheelfunc(N,T,Y,DELTA,ierr,RPAR,IPAR)
 C
       DO I=1,5
          DELTA(I) = YPRIME(I) - DELTA(I)
@@ -80,7 +80,7 @@ C
       RETURN
       END
 C--------------------------------------------------------------------
-      subroutine wheelfunc(NEQN,T,Y,DF,RPAR,IOUT)
+      subroutine wheelfunc(NEQN,T,Y,DF,ierr,RPAR,IOUT)
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       integer neqn,ierr,iout(*), ipar(2)
       double precision t,y(neqn),df(neqn),rpar(2)
@@ -121,7 +121,7 @@ c
 c
       end
 C-----------------------------------------------------------------------------
-	
+
       SUBROUTINE RESWHS ( T, Y, DY, DELTA, IRES, RPAR, IPAR )
 C====================================================================
 C
@@ -184,8 +184,8 @@ C
      *           DELTAL, DELTAR, DETER,
      *           SIT, COT, SIP, COP, SIA, COA, SISL, COSL, SISR, COSR,
      *           SIDL,CODL,SIDR,CODR,W1,W2,SE,S0,
-     *           ALPHA, S, FA, OMEGA, LA, 
-     *           FQ1, FQ2, FQ3, LM1, LM2, LM3, TOL, TG 
+     *           ALPHA, S, FA, OMEGA, LA,
+     *           FQ1, FQ2, FQ3, LM1, LM2, LM3, TOL, TG
       INTEGER    IERR, I
       DOUBLE PRECISION
      *           MR,G,V,RN0,LI1,LI2,MA,HA,MU,XL,CX,CZ,
@@ -321,10 +321,10 @@ C --------------------------------------------------------------------
 C
 C     KINEMATICS
 C
-      DELTA(1) = XXP 
-      DELTA(2) = YYP 
-      DELTA(3) = ZZP 
-      DELTA(4) = TETAP 
+      DELTA(1) = XXP
+      DELTA(2) = YYP
+      DELTA(3) = ZZP
+      DELTA(4) = TETAP
       DELTA(5) = PHIP
 C
 C     DYNAMICS: NEWTON'S LAW
@@ -411,8 +411,8 @@ C     ERROR HANDLING
 C
  999  IF (IERR .LT. 0) THEN
          IRES = -1
-         WRITE(MSG, *)"AN ERROR OCCURRED in WHEELSET, at time", T
-         call rexit(MSG)
+c         WRITE(MSG, *)"AN ERROR OCCURRED in WHEELSET, at time", T
+c         call rexit(MSG)
       ELSE
          IRES = 0
       END IF
@@ -498,7 +498,7 @@ C
 C     APPROXIMATION OF CREEPAGE FORCES DUE TO A. JASCHINSKI (DLR),
 C     IN ORDER TO GUARANTEE SMOOTHNESS OF THE FUNCTIONS.
 C     FOR THIS END SEE:
-C     A. JASCHINSKI, DLR-REPORT DLR-FB 90-06, KÖLN, 1990
+C     A. JASCHINSKI, DLR-REPORT DLR-FB 90-06, Kï¿½LN, 1990
 C
 C     FOR THE DESCRIPTION OF THE PARAMETERS SEE RESRAD.
 C
@@ -849,7 +849,7 @@ c----------------------------------------------------------------------
 
       SUBROUTINE wheelsoln(NEQN,T,Y)
       DOUBLE PRECISION  T, Y(NEQN)
-      
+
 c
 c     DASSL applied to Wheelset problem, tend = 10
 c

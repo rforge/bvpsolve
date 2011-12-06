@@ -24,12 +24,12 @@ c----------------------------------------------------------------------
 
       SUBROUTINE nandpar(daeparms)
       EXTERNAL daeparms
-      
+
       double precision parms(14)
       common / nandcom / parms
 
         CALL daeparms(14,parms)
-        
+
       END SUBROUTINE nandpar
 
 c-----------------------------------------------------------------------
@@ -43,11 +43,11 @@ c-----------------------------------------------------------------------
 
       integer i,j
       double precision am(14,14),fy(14),dum
-
+      ierr = 0
       call   CAP(14,y,AM)
-      call   nandfunc(14,t,y,fy,rpar, ipar)
+      call   nandfunc(14,t,y,fy,ierr, rpar, ipar)
 
-C      if(ierr.eq.-1)return
+      if(ierr.eq.-1)return
 
       do 20 i=1,14
          dum = -fy(i)
@@ -103,7 +103,7 @@ C CPU-time used:                         451.71 sec
       return
       end
 c-----------------------------------------------------------------------
-      SUBROUTINE nandfunc(N,T,Y,F,rpar, ipar)
+      SUBROUTINE nandfunc(N,T,Y,F,ierr, rpar, ipar)
 C ---------------------------------------------------------------------
 C
 C Right-hand side f(X,t) for the network equation
@@ -133,9 +133,9 @@ C ---------------------------------------------------------------------
       double precision T,Y(N),F(N),nandIDS,nandIBS,nandIBD,V1,V2,V1D,V2D
       EXTERNAL nandIDS, nandIBS, nandIBD, nandPULSE
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB, rpar(*)
-      integer ipar(*) 
+      integer ipar(*)
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
@@ -168,10 +168,10 @@ C ---------------------------------------------------------------------
       F(13)=-(Y(13)-VBB)/RBS + nandIBS(Y(13))
       F(14)=-(Y(14)-VBB)/RBD + nandIBD(Y(14)-Y(10))
 
-      if(ierr.eq.-1)THEN
-         WRITE(MSG, *)"AN ERROR OCCURRED in NAND, at time", T
-         call rexit(MSG)
-      ENDIF
+c      if(ierr.eq.-1)THEN
+c         WRITE(MSG, *)"AN ERROR OCCURRED in NAND, at time", T
+c         call rexit(MSG)
+c      ENDIF
       RETURN
       END
 
@@ -217,9 +217,9 @@ C ---------------------------------------------------------------------------
       integer NED,ierr
       double precision  VDS, VGS, VBS,VTE
 
-      double precision  VT0, BETA, CGAMMA, PHI 
+      double precision  VT0, BETA, CGAMMA, PHI
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
@@ -265,9 +265,9 @@ C --- Enhancement-type
       double precision VDS, VGD, VBD,VTE
 
 
-      double precision  VT0, BETA, CGAMMA, PHI 
+      double precision  VT0, BETA, CGAMMA, PHI
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
@@ -323,7 +323,7 @@ C ---------------------------------------------------------------------------
 
       double precision VBS
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
@@ -359,7 +359,7 @@ C ---------------------------------------------------------------------------
 
       double precision VBD
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
@@ -461,12 +461,12 @@ C ---------------------------------------------------------------------
       INTEGER N
       double precision Y(N), AM(N,N)
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *               DELTA, CURIS, VTH, VDD, VBB
- 
+
       EXTERNAL nandCBDBS
       integer I,J
 
@@ -521,7 +521,7 @@ C
 C ---------------------------------------------------------------------------
       double precision V,PHIB
 
-      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9, 
+      double precision  RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
      *                  DELTA, CURIS, VTH, VDD, VBB
 
       COMMON /nandcom/ RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS, C9,
