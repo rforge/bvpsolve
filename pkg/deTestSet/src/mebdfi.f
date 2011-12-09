@@ -1148,7 +1148,8 @@ C
       IF(MITER.EQ.4) GOTO 51
 C KS: CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
       CALL resid(T,Y,Yprime, CON, SAVE2, ierr, rpar, ipar)
-
+C FM: added check if ierr is OK
+      if (ierr .ne. 0) return
       NRE=NRE+1
       DO 60 J = 1,N
          YJ = Y(J,1)
@@ -1165,7 +1166,8 @@ C KS: CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
 
 C KS:    CALL RESID(N,T,Y,WRKSPC,YPRIME,IPAR,RPAR,IERR)
          CALL resid (T, Y, YPRIME, CON, WRKSPC, IERR, RPAR, IPAR)
-
+C FM: added check if ierr is OK
+         if (ierr .ne. 0) return
          DO 50 I = 1,N
             JJKK = I + J1
             TEMPRY = (WRKSPC(I)-SAVE2(I))
@@ -1184,6 +1186,8 @@ C
 51    CONTINUE
 C KS:  CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
       CALL resid (T, Y, YPRIME, CON, SAVE2, IERR, RPAR, IPAR)
+C FM: added check if ierr is OK
+      if (ierr .ne. 0) return
       NRE = NRE+1
       MBA = min0(MBND(3),N)
       DO 61 J=1,MBA
@@ -1202,6 +1206,8 @@ C KS:  CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
  161     CONTINUE
 C KS:         CALL RESID(N,T,Y,WRKSPC,YPRIME,IPAR,RPAR,IERR)
          CALL resid (T, Y, YPRIME, CON, WRKSPC, IERR, RPAR, IPAR)
+C FM: added check if ierr is OK
+         if (ierr .ne. 0) return
          DO 261 JJ=J,N,MBND(3)
             Y(JJ,1)=SAVE1(JJ)
             YPRIME(JJ)=SAVE3(JJ)
@@ -2017,6 +2023,9 @@ C
 C
 C KS:      call resid(n,t,y,save2,yprime,ipar,rpar,ierr)
       CALL resid (T, Y, YPRIME, hbeta, save2, IERR, RPAR, IPAR)
+C FM: added check if ierr is OK
+      if (ierr .ne. 0) return
+
       IF(MF.GE.23) THEN
          CALL DGBSL(PW,MBND(4),N,MBND(1),MBND(2),IPIV,SAVE2,0)
          NBSOL = NBSOL + 1
@@ -2043,6 +2052,8 @@ C KS:      call resid(n,t,y,save2,yprime,ipar,rpar,ierr)
  30   CONTINUE
 C KS:      call resid(n,t,save1,save2,yprime,ipar,rpar,ierr)
       CALL resid (T, save1, YPRIME, hbeta, save2, IERR, RPAR, IPAR)
+C FM: added check if ierr is OK
+      if (ierr .ne. 0) return
       nre=nre+1
 C
 C     IF WE ARE HERE THEN PARTIALS ARE O.K.

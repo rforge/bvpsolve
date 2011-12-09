@@ -38,11 +38,11 @@ c     residual function
 c----------------------------------------------------------------------
 
       subroutine ringres(t,y,yprime,cj,f,ires,rpar,ipar)
-      integer neqn,ierr,ipar(*)
+      integer neqn,ires,ipar(*)
       parameter  (neqn=15)
       double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
 
-      call ringfuncierr(neqn,t,y,f,ierr, rpar,ipar)
+      call ringfuncierr(neqn,t,y,f,ires, rpar,ipar)
       do i = 1,15
         f(i) = yprime(i) - f(i)
       enddo
@@ -138,7 +138,7 @@ c         return
 c      endif
 c
 c      (double precisione ieee .le. 1d304)
-      if (delta*max(ud1,ud2,ud3,ud4).gt. 700d0) then
+      if (delta*max(ud1,ud2,ud3,ud4).gt. 304d0) then
          ierr = -1
 c         WRITE(MSG, *)"AN ERROR OCCURRED in RING, at time", T
 c         call rexit(MSG)
