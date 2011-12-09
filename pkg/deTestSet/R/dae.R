@@ -2,11 +2,13 @@ dae <- function (y, times, parms, dy, res = NULL, func = NULL,
     method = c("mebdfi", "daspk", "radau", "gamd", "bimd"), ...)
 {
     if (is.null(method))
-        method <- "mebdfi"
+        method <- "mebdfi"    
     else if (is.function(method) & !is.null(res))
         out <- method(y=y, times=times, parms=parms, dy=dy, res=res, ...)
     else if (is.function(method) & !is.null(func))
         out <- method(y=y, times=times, parms=parms, func=func, ...)
+    else if (is.null(func) &  (method=="radau" | method=="gamd" | method == "bimd"))
+         stop("the selected method cannot handle implicit equations")
     else if(!is.null(res)) out <- switch(match.arg(method),
       mebdfi = mebdfi(y=y, times=times, parms=parms, dy=dy, res=res, ...),
       daspk  = daspk (y=y, times=times, parms=parms, dy=dy, res=res, ...))
