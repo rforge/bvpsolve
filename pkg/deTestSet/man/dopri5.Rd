@@ -10,13 +10,13 @@
   f(t,y)} 
   
   The \R function \code{dopri5} provides an interface to the Fortran ODE
-  solver DOPRI5, written by Hairer and Wanner.
+  solver DOPRI5, written by E. Hairer and G. Wanner.
   
   It implements the explicit Runge-Kutta method of order 4(5)  
       due to Dormand & Prince with stepsize contral and dense output
   
   The \R function \code{cashkarp} provides an interface to the Fortran ODE
-  solver CASHCARP, written by Cash.
+  solver CASHCARP, written by J. Cash and F. Mazzia.
   
   It implements the explicit Runge-Kutta method of order 4(5)  
       due to Cash-Carp, with stepsize contral and dense output

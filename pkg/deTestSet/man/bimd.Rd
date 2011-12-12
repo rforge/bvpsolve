@@ -406,9 +406,8 @@ plot(out, which = 1:4, type = "l", lwd = 2)
  Appl. Numer. Math. 42 (2002) 29-45.
 }
 \details{
-  The work is done by the FORTRAN 90 subroutine \code{bimd}, whose
-  documentation should be consulted for details. The implementation
-  is based on the Fortran 77 version from 2007.
+  The work is done by the FORTRAN 77 subroutine \code{bimd}, whose
+  documentation should be consulted for details. 
     
   There are four standard choices for the jacobian which can be specified with
   \code{jactype}.
