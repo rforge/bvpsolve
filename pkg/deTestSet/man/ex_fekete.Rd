@@ -46,11 +46,11 @@ fekete (times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- fekete()
-plot(out, lwd = 2, mfrow = c(4, 5), which = 1:20)
+plot(out, lwd = 2, which = 1:20)
 
 # reference run compared with output at end of interval for first 7 components
 out1 <- fekete(times = c(0, 1000))

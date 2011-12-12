@@ -17,8 +17,8 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file ringmod.f available at [MM08].
 }
 \usage{
-ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL,  
-  parms = list(), method = "mebdfi", maxsteps = 1e+06, ...) 
+ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL, atol=1e-8,  
+  rtol=1e-8,parms = list(), method = "mebdfi", maxsteps = 1e+06, ...) 
 }
 
 \arguments{
@@ -56,11 +56,11 @@ ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL,
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- ring()
-plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2)
+plot(out, col = "darkblue", lwd = 2)
 mtext(side = 3, line = -1.5, "RING modulator",cex = 1.25, outer = TRUE)
 
 # compare with reference solution

@@ -9,7 +9,7 @@ It is an ordinary differential equation of dimension 80.
 
 }
 \usage{
-beam (times=seq(0, 5, by = 0.01), yini = NULL,  ...) 
+beam (times=seq(0, 5, by = 0.01), yini = NULL, method=gamd, ...) 
 }
 
 \arguments{
@@ -35,19 +35,20 @@ beam (times=seq(0, 5, by = 0.01), yini = NULL,  ...)
   of the output value.
       
 }
-\author{Karline Soetaert 
+\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- beam()
-plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2, which = 1:16)
+plot(out, col = "darkblue", lwd = 2, which = 1:16)
 mtext(side = 3, line = -1.5, "beam", cex = 1.25, outer = TRUE)
 
 image(out[,-1])
 
 # compare with reference solution
-max(abs(out[nrow(out),-1]- reference("beam")))    
+refsol <- reference("beam")
+max(abs(out[nrow(out),-1] - refsol)/refsol)  
 
 }
 \references{

@@ -10,8 +10,8 @@ It is a non-stiff second order differential algebraic equation of index
 
 }
 \usage{
-andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL, 
-  parms = list(), method = "mebdfi", maxsteps = 1e+05, ...) 
+andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL, atol=1e-7, 
+  rtol=1e-7, parms = list(), method = "mebdfi", maxsteps = 1e+05, ...) 
 }
 
 \arguments{
@@ -47,15 +47,16 @@ andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL,
   of the output value.
       
 }
-\author{Karline Soetaert 
+\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia  <mazzia@dm.uniba.it>
 }
 \examples{
 out <- andrews()
 plot(out, lwd = 2, which = 1:9)
 
-max(abs(out[nrow(out),-1] - reference("andrews")))    
+refsol <- reference("andrews")
+max(abs(out[nrow(out),-1] - refsol)/refsol)    
 }
 \references{
 \url{http://www.dm.uniba.it/~testset}

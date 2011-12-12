@@ -53,13 +53,15 @@ crank (times=seq(0, 0.1, by = 0.001), yini = NULL, dyini = NULL,
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia  <mazzia@dm.uniba.it>
 }
 \examples{
 out <- crank()
 plot(out, lwd = 2, which = 1:9)
 
-max(abs(out[nrow(out),-1] - reference("crank")))    
+# compare  with reference solution (only  the first seven component)
+refsol <- reference("crank")
+max(abs(out[nrow(out),2:8] - refsol[1:7])/refsol[1:7])     
 }
 \references{
 \url{http://www.dm.uniba.it/~testset}

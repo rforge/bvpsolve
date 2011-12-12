@@ -8,7 +8,7 @@ It is an ODE, 4 equations
 }
 \usage{
 E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL, 
-  parms = list(), atol = 1e-15, rtol = 1e-15, maxsteps = 1e5, ...)
+  parms = list(), atol = 1.11e-24, rtol = 1e-6, maxsteps = 1e5, ...)
 }
 
 \arguments{
@@ -47,11 +47,12 @@ E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia  <mazzia@dm.uniba.it>
 }
 \examples{
 out <- E5()
 plot(out, lwd = 2, log = "xy")
+# compare with reference solution
 out[nrow(out),-1] - reference("E5")
 
 }

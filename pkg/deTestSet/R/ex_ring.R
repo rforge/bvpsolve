@@ -10,7 +10,7 @@
 ## =============================================================================
 
 ring <- function(times = seq(0, 1e-3, by = 5e-6),
-                 yini = NULL, dyini = NULL,
+                 yini = NULL, dyini = NULL, atol=1e-8, rtol=1e-8,
                  parms = list(), method = "mebdfi", maxsteps = 1e6, ...) {
 
 # initial conditions of state variables
@@ -41,13 +41,13 @@ ring <- function(times = seq(0, 1e-3, by = 5e-6),
 
     if (useres)
      return( dae(y = yini, dy = dyini, times = times, res = "ringres",
-          dllname = "deTestSet", initfunc = "ringpar",
+          dllname = "deTestSet", initfunc = "ringpar", atol=atol, rtol=rtol,
           parms = parameter, method=method, maxsteps = maxsteps, ...))
 
    out <- dae(y = yini, times = times,
           func = "ringfunc", 
-          dllname = "deTestSet", initfunc = "ringpar", parms = parameter,
-          method = method,  maxsteps = maxsteps, ...)
+          dllname = "deTestSet", initfunc = "ringpar", atol=atol, rtol=rtol,
+          parms = parameter,method = method,  maxsteps = maxsteps, ...)
 
   return(out)
 }

@@ -47,20 +47,22 @@ emep (times = seq(14400, 417600, by = 400), yini = NULL,
   of the output value.
       
 }
-\author{Karline Soetaert  
+\author{Karline Soetaert <k.soetaert@nioo.knaw.nl> 
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- emep()
 plot(out, lwd = 2, col = "darkblue", 
   which = c("NO", "NO2", "SO2", "CH4", "O3", "N2O5"))
 
-plot(out, mfrow = c(4, 4), col = "darkblue", lwd = 2, which = 1:16)
+plot(out, col = "darkblue", lwd = 2, which = 1:16)
 mtext(side = 3,line = -1.5, "emep", cex = 1.25, outer = TRUE)
-# compare with reference solution
 
-max(abs(out[nrow(out),-1] - reference("emep")))    
+# compare with reference solution (component 36 adn 38 not included)       
+refsol <- reference("emep")
+inderr <- c(1:35,37,39:66)
+max(abs(out[nrow(out),inderr+1] - refsol[inderr])/refsol[inderr])     
 
 }
 \references{

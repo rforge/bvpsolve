@@ -10,7 +10,7 @@
 ## =============================================================================
 
 
-beam <- function(times = seq(0, 5, by = 0.01), yini = NULL,
+beam <- function(times = seq(0, 5, by = 0.01), yini = NULL, method=gamd,
     ...) {
 
 ### check input 
@@ -23,7 +23,7 @@ beam <- function(times = seq(0, 5, by = 0.01), yini = NULL,
 
 ### solve 
     out <- ode(func = "beamfunc", parms = NULL, dllname = "deTestSet", y = yini,
-           times = times, initfunc = NULL,  ...)
+           times = times, initfunc = NULL, method=method, ...)
 
   return(out)
 }

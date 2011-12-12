@@ -45,7 +45,7 @@ caraxis (times = seq(0, 3, by = 0.01), yini = NULL, dyini = NULL,
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- caraxis()

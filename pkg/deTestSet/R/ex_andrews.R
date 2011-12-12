@@ -7,7 +7,7 @@
 ### ============================================================================
 
 andrews <- function(times = seq(0, 0.03, by = 0.001),
-                    yini = NULL, dyini = NULL,
+                    yini = NULL, dyini = NULL, atol=1e-7,rtol=1e-7,
                     parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
 
 ### check input 
@@ -60,13 +60,13 @@ andrews <- function(times = seq(0, 0.03, by = 0.001),
                  res = "andres", nind = ind,
                  dllname = "deTestSet", jacres = "andjac", initfunc = "andpar",
                  parms = parameter, jactype = "fullusr", method = method,
-                 maxsteps = maxsteps, ...))
+                 maxsteps = maxsteps, atol=atol, rtol=rtol,...))
 
    AndOut <- dae(y = yini, times = times, nind = ind,
           func = "andfunc", mass =  as.double(c(rep(1, 14), rep(0, 13))),
           massup = 0, massdown = 0, 
           dllname = "deTestSet", initfunc = "andpar", parms = parameter,
-          method = method, maxsteps = maxsteps, ...)
+          method = method, maxsteps = maxsteps, atol=atol, rtol=rtol, ...)
 
   return(AndOut)
 }
