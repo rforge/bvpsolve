@@ -8,7 +8,8 @@
 ##
 ## =============================================================================
 
-pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL, ...) {
+pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL, 
+                        method = lsoda, ...) {
 
 ### check input 
    pleiade <- function (t, Y, pars) {
@@ -32,20 +33,19 @@ pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL, ...) {
 
    checkini(28, yini)
 
-#
-#print(system.time(
-#outR <- ode(func = pleiade, parms = NULL, y = yini, times = times, maxsteps = 1e5, atol=1e-10, rtol=1e-10)
-#))
+   useres <- FALSE
+   if (is.character(method)) {
+    if (method %in% c("mebdfi", "daspk"))
+      useres <- TRUE
+   } else  if("res" %in% names(formals(method)))
+      useres <- TRUE
+    if (useres)
+   out <- ode(func = "pleiafunc", parms = NULL, dllname = "deTestSet", y = yini,
+                times = times, initfunc = NULL,  ...)
 
+    else 
    out <- ode(func = "pleiafunc", parms = NULL, dllname = "deTestSet", y = yini,
               jacfunc = "pleiajac", times = times, initfunc = NULL,  ...)
    return(out)
 }
 
-# if this is done for t=[0,30] then cashkarp is totally different!
-#out <- pleiades(atol = 1e-10, rtol = 1e-10, times = seq(0,30,0.1))
-#out2 <- pleiades(atol = 1e-10, rtol = 1e-10, method = cashkarp, times = seq(0,30,0.1))
-#out3 <- pleiades(atol = 1e-10, rtol = 1e-10, method = dopri853, times = seq(0,30,0.1))
-
-
-#outR2 <- cashkarp(func = pleiade, parms = NULL, y = yini, times = times, maxsteps = 1e5, atol=1e-10, rtol=1e-10)
