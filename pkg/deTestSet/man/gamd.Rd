@@ -442,7 +442,8 @@ Appl. Num. Math. 28 (2-4) (1998) 107-126.
 
 }
 \seealso{
-  \itemize{
+  \itemize{ 
+    \item \code{\link{bimd}} another DAE solver from package \code{deTestSet},
     \item \code{\link{mebdfi}} another DAE solver from package \code{deTestSet},
     \item \code{\link[deSolve]{daspk}} another DAE solver from package \code{deSolve},
     \item \code{\link[deSolve]{ode}} for a general interface to most of the ODE solvers

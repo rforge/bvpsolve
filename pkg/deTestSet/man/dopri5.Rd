@@ -267,6 +267,7 @@ E. Hairer, S.P. Norsett AND G. Wanner, Solving Ordinary
     \item \code{\link[deSolve]{ode.2D}} for integrating 2-D models,
     \item \code{\link[deSolve]{ode.3D}} for integrating 3-D models,
     \item \code{\link{mebdfi}} for integrating DAE models,
+    \item \code{\link{bimd}} for blended implicit methods,
     \item \code{\link{gamd}} for the generalised adams method
   }
 
