@@ -13,7 +13,7 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file pollu.f available at [MM08].
 }
 \usage{
-pollution (times = seq(0, 10, 0.1), yini = NULL, parms = list(), ...)   
+pollution (times = seq(0, 10, 0.1), yini = NULL, method = mebdfi, parms = list(),  ...)   
 }
 
 \arguments{

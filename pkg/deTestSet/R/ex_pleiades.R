@@ -41,11 +41,11 @@ pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL,
       useres <- TRUE
     if (useres)
    out <- ode(func = "pleiafunc", parms = NULL, dllname = "deTestSet", y = yini,
-                times = times, initfunc = NULL,  ...)
+                times = times,  initfunc = NULL,  method=method, ...)
 
     else 
    out <- ode(func = "pleiafunc", parms = NULL, dllname = "deTestSet", y = yini,
-              jacfunc = "pleiajac", times = times, initfunc = NULL,  ...)
+              jacfunc = "pleiajac", times = times, initfunc = NULL,  method=method, ...)
    return(out)
 }
 

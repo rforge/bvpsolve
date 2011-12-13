@@ -8,7 +8,7 @@
 ##
 ## =============================================================================
 
-pollution <- function(times = seq(0, 10, 0.1), yini = NULL,
+pollution <- function(times = seq(0, 10, 0.1), yini = NULL, method = mebdfi,
   parms = list(),  ...) {
 
 ### check input 
@@ -39,8 +39,19 @@ pollution <- function(times = seq(0, 10, 0.1), yini = NULL,
           "HNO3", "O1D", "SO2", "SO4", "NO3", "N2O5")
 
 ### solve
-   out <- ode(y = yini, times = times, func = "polfunc", jacfunc = "poljac",
-              dllname = "deTestSet", initfunc = "polpar",
+    useres <- FALSE
+    if (is.character(method)) {
+   	   if (method %in% c("mebdfi", "daspk"))
+	    	useres <- TRUE
+    } else  if("res" %in% names(formals(method)))
+	       useres <- TRUE
+    if (useres)
+    out <- ode(y = yini, times = times, func = "polfunc",
+		dllname = "deTestSet", initfunc = "polpar", method=method,
+		parms = parameter, ...)
+    else 
+    out <- ode(y = yini, times = times, func = "polfunc", jacfunc = "poljac",
+              dllname = "deTestSet", initfunc = "polpar", method=method,
               parms = parameter, ...)
 
   return(out)
