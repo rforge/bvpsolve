@@ -10,8 +10,9 @@ It is a non-stiff second order differential algebraic equation of index
 
 }
 \usage{
-andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL, atol=1e-7, 
-  rtol=1e-7, parms = list(), method = "mebdfi", maxsteps = 1e+05, ...) 
+andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, 
+         dyini = NULL, parms = list(), method = "mebdfi", 
+         atol = 1e-7, rtol = 1e-7, maxsteps = 1e+05, ...) 
 }
 
 \arguments{
@@ -21,6 +22,12 @@ andrews (times = seq(0, 0.03, by = 0.001), yini = NULL, dyini = NULL, atol=1e-7,
   }
   \item{dyini }{the initial derivatives of the state variables of the DE
     system.  
+  }
+  \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
   }
   \item{times }{time sequence for which output is wanted; the first
     value of \code{times} must be the initial time.

@@ -10,7 +10,7 @@
 ## =============================================================================
 
 
-beam <- function(times = seq(0, 5, by = 0.01), yini = NULL, method=gamd,
+beam <- function(times = seq(0, 5, by = 0.01), yini = NULL, method = gamd,
     ...) {
 
 ### check input 

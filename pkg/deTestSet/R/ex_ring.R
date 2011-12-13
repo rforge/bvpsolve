@@ -10,8 +10,9 @@
 ## =============================================================================
 
 ring <- function(times = seq(0, 1e-3, by = 5e-6),
-                 yini = NULL, dyini = NULL, atol=1e-8, rtol=1e-8,
-                 parms = list(), method = "mebdfi", maxsteps = 1e6, ...) {
+                 yini = NULL, dyini = NULL,
+                 parms = list(), method = "mebdfi", 
+                 atol = 1e-8, rtol = 1e-8, maxsteps = 1e6, ...) {
 
 # initial conditions of state variables
 

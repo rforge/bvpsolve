@@ -27,11 +27,11 @@ twobit (times = seq(0, 320, by = 0.5), yini = NULL, dyini = NULL,
   }
   \item{method }{the solver to use
   }
-  \item{rtol }{relative error tolerance, either a scalar or a vector,
-    one value for each y,
-  }
   \item{atol }{absolute error tolerance, either a scalar or a vector,
     one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver

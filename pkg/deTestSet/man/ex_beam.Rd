@@ -9,7 +9,7 @@ It is an ordinary differential equation of dimension 80.
 
 }
 \usage{
-beam (times=seq(0, 5, by = 0.01), yini = NULL, method=gamd, ...) 
+beam (times=seq(0, 5, by = 0.01), yini = NULL, method = gamd, ...) 
 }
 
 \arguments{
@@ -19,6 +19,8 @@ beam (times=seq(0, 5, by = 0.01), yini = NULL, method=gamd, ...)
   }
   \item{times }{time sequence for which output is wanted; the first
     value of \code{times} must be the initial time.
+  }
+  \item{method }{the solver to use
   }
   \item{... }{additional arguments passed to the solver .
   }

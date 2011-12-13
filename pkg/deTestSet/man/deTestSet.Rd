@@ -70,9 +70,6 @@ browseURL(paste(system.file(package = "deTestSet"), "/doc/examples/dynload", sep
 ## + source code of the vignette
 vignette("deTestSet")
 edit(vignette("deTestSet"))
-
-vignette("DAE")
-edit(vignette("DAE"))
 }
 }
 

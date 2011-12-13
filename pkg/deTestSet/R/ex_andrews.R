@@ -7,8 +7,9 @@
 ### ============================================================================
 
 andrews <- function(times = seq(0, 0.03, by = 0.001),
-                    yini = NULL, dyini = NULL, atol=1e-7,rtol=1e-7,
-                    parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
+                    yini = NULL, dyini = NULL, 
+                    parms = list(), method = "mebdfi", 
+                    atol = 1e-7, rtol = 1e-7, maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(m1=.04325, m2=.00365, m3=.02373 ,m4=.00706 ,

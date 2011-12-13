@@ -8,7 +8,7 @@ It is an index 1 IDE, 14 equations
 }
 \usage{
 nand  (times = 0:80, yini =NULL, dyini = NULL,
-  parms=list(), method = "mebdfi", maxsteps = 1e5, ...) 
+  parms = list(), method = "mebdfi", maxsteps = 1e5, ...) 
 }
 
 \arguments{

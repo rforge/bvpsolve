@@ -21,11 +21,11 @@ E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
   }
   \item{parms }{list of parameters that overrule the default parameter values
   }
-  \item{rtol }{relative error tolerance, either a scalar or a vector,
-    one value for each y,
-  }
   \item{atol }{absolute error tolerance, either a scalar or a vector,
     one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver

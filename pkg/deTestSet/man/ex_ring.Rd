@@ -17,8 +17,9 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file ringmod.f available at [MM08].
 }
 \usage{
-ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL, atol=1e-8,  
-  rtol=1e-8,parms = list(), method = "mebdfi", maxsteps = 1e+06, ...) 
+ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, 
+      dyini = NULL, parms = list(), method = "mebdfi", 
+       atol = 1e-8, rtol = 1e-8, maxsteps = 1e+06, ...) 
 }
 
 \arguments{
@@ -35,6 +36,12 @@ ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL, atol=1e-8,
   \item{parms }{list of parameters that overrule the default parameter values
   }
   \item{method }{the solver to use
+  }
+  \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
