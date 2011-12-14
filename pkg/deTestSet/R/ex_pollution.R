@@ -8,8 +8,8 @@
 ##
 ## =============================================================================
 
-pollution <- function(times = seq(0, 10, 0.1), yini = NULL, method = mebdfi,
-  parms = list(),  ...) {
+pollution <- function(times = seq(0, 10, 0.1), yini = NULL, 
+  parms = list(), method = mebdfi, ...) {
 
 ### check input 
     parameter <- c(

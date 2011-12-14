@@ -13,7 +13,7 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file pollu.f available at [MM08].
 }
 \usage{
-pollution (times = seq(0, 10, 0.1), yini = NULL, method = mebdfi, parms = list(),  ...)   
+pollution (times = seq(0, 10, 0.1), yini = NULL, parms = list(), method = mebdfi,  ...)   
 }
 
 \arguments{
@@ -25,6 +25,8 @@ pollution (times = seq(0, 10, 0.1), yini = NULL, method = mebdfi, parms = list()
     value of \code{times} must be the initial time.
   }
   \item{parms }{list of parameters that overrule the default parameter values
+  }
+  \item{method }{the solver to use
   }
   \item{... }{additional arguments passed to the solver .
   }
