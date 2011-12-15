@@ -37,9 +37,8 @@ initial value problems, R}
 
 
 \author{Karline Soetaert\\
-  CEME\\
-  Netherlands Institute of Ecology\\
-  The Netherlands
+  Netherlands Institute of Sea Research (NIOZ)\\
+  Yerseke, The Netherlands
   \And
   Jeff Cash\\
   Department of mathematics\\
@@ -75,8 +74,7 @@ initial value problems, R}
 %% in the following format:
 \Address{
   Karline Soetaert\\
-  Centre for Estuarine and Marine Ecology (CEME)\\
-  Netherlands Institute of Ecology (NIOO)\\
+  Netherlands Institute of Sea Research (NIOZ)\\
   4401 NT Yerseke, Netherlands \\
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
   URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
