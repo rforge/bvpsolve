@@ -108,7 +108,7 @@ c
 c     index-2 formulation: ipar(1)=0
 c
       ipar(1)=0
-      call reswhs(t,y,y,df,ires,rpar,ip)
+      call reswhs(t,y,y,df,ires,rpar,ipar)
 c
 c we interchange y(12)-y(16) and y(13)-y(17)
 c

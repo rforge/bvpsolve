@@ -2,6 +2,7 @@ C*********************************************************************
 C       MAIN mebdfi DRIVER
 C*********************************************************************
 
+
       SUBROUTINE mebdfi(N,T0,HO,Y0,YPRIME,TOUT,TEND,MF,IDID,LWORK,
      +     WORK,LIWORK,IWORK,MBND,MAXDER,ITOL,RTOL,ATOL,RPAR,IPAR,
      +     pderv,resid,IERR)
@@ -3197,15 +3198,15 @@ C
             RETURN
          ENDIF
          T= TOLD
-         IF ((T-TOUT)*H.GE.0.0D+0) THEN
+c         IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
 
-            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
-            HO = H
-            T0 = TOUT
-            IDID = -5
-            RETURN
-         ENDIF
+c            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
+c            HO = H
+c            T0 = TOUT
+c            IDID = -5
+c            RETURN
+c         ENDIF
          IERR = 0
          jstart = -1
          goto 30
