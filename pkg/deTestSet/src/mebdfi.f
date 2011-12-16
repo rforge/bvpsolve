@@ -3198,6 +3198,8 @@ C
             RETURN
          ENDIF
          T= TOLD
+C FRANCESCA MAZZIA commented the following IF block
+C   y0 H0 and T0 are not used in the function stiff
 c         IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
 

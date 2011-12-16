@@ -525,7 +525,7 @@ cF initial stepsize for the computation of etave
 
 C removed ierr
          IERR = 0
-         CALL FCN(N,X,Y,K1,RPAR,IPAR)  
+         CALL FCN(N,X,Y,K1,RPAR,IPAR)
          IF (IERR .NE. 0 ) GOTO 333
 
          DO 220 I=1,N
@@ -622,7 +622,7 @@ C --- ERROR ESTIMATION
 
        HMAX=ABS(HMAX)
        IORD=5
-       H=HINITCKSTIFF(N,FCN,X,Y,XEND,POSNEG,K1,K2,Y1,IORD,
+       H=HINITCKSTIFF(N,X,Y,XEND,POSNEG,K1,K2,Y1,IORD,
      &                HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL,RPAR,IPAR)
 
 
@@ -1275,7 +1275,7 @@ cF initialization of the conditioning parameters
 C Karline: always print if nwarn1=0
 C              IF ( (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1)
 C     &          .AND. (NWARN1 .EQ. 0) ) THEN
-               IF (NWARN1 .EQ. 0) THEN  
+               IF (NWARN1 .EQ. 0) THEN
                  WRITE(msg,*)
      &            'THE PROBLEM SEEMS TO BECOME STIFF AT  X = ', X,
      &            'SIGMA = ', SIGMATOT
@@ -1430,6 +1430,7 @@ C ----------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DIMENSION Y(N),Y1(N),F0(N),F1(N),ATOL(*),RTOL(*)
       DIMENSION RPAR(*),IPAR(*)
+      EXTERNAL FCN
 C ---- COMPUTE A FIRST GUESS FOR EXPLICIT EULER AS
 C ----   H = 0.01 * NORM (Y0) / NORM (F0)
 C ---- THE INCREMENT FOR EXPLICIT EULER IS SMALL
@@ -1492,7 +1493,7 @@ C ----  H**IORD * MAX ( NORM (F0), NORM (DER2)) = 0.01
       END
 
 
-      FUNCTION HINITCKSTIFF(N,FCN,X,Y,XEND,POSNEG,F0,F1,Y1,IORD,
+      FUNCTION HINITCKSTIFF(N,X,Y,XEND,POSNEG,F0,F1,Y1,IORD,
      &                 HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL,RPAR,IPAR)
 C ----------------------------------------------------------
 C ----  COMPUTATION OF AN INITIAL STEP SIZE  USING THE
@@ -1653,7 +1654,7 @@ C     THIS FUNCTION CAN BE USED FOR CONTINUOUS OUTPUT IN CONNECTION
 C     WITH THE OUTPUT-SUBROUTINE FOR DOPRI5. IT PROVIDES AN
 C     APPROXIMATION TO THE SOLUTION AT X.
 C ----------------------------------------------------------
- 
+
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION b1,b3,b4,b5,b6,b7,Val(NEQ)
       DIMENSION CON(*),ICOMP(ND)
