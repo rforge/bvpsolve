@@ -575,18 +575,30 @@ c  two norm of etave
          DO I=1,N
           ENORMVE = MAX(ENORMVE,ABS(ETAVE(I)))
          END DO
-         IF (ENORMVE .GT. 0.0d0) THEN
+
+cF         if (iprint .gt. 0) then
+cF           write(msg,*) 'enormve', enormve, 'hst',hst
+cF           call rprint(msg)
+cF            write(msg,*) 'enormve >', enormve .GT. 1d300
+cF           call rprint(msg)
+cF         end if
+
+         IF ( ENORMVE .GT. 0.0d0 .AND.
+     +         (.NOT. (.NOT. ENORMVE .GT. 0.0d0))
+     +     .AND.  (.NOT. ENORMVE .GT. 1d300)  ) THEN
            DO I=1,N
             ETAVE(I) = ETAVE(I)/ENORMVE
            END DO
            IFLAGST = 0
-         ELSE
+         ELSE IF  (.NOT. (.NOT. ENORMVE .GT. 0.0d0 )) THEN
 cF we try with a bigger stepsize
            HST = 2*HST
          ENDIF
 cF errors in function evaluation we reduce the stepsize
- 333     IF (IERR .NE.0) HST = HST/10.0d0
-         NFCN=NFCN+6
+  333    IF (IERR .NE.0  .OR. .NOT. (ENORMVE .GT. 0.0d0)
+     +                .OR. ENORMVE .GT. 1d300 )
+     +             HST = HST/10.0d0
+          NFCN=NFCN+6
        END DO
 c ERROR ESTIMATION FOR THE COMPUTATION OF THE INITIAL STEPSIZE
 
@@ -613,19 +625,24 @@ C --- ERROR ESTIMATION
           END DO
         END IF
         ERR=SQRT(ERR/N)
-        if (iprint .gt. 0 ) then
-           write(msg,477) err
-           call rprint(msg)
-        end if
+cF        if (iprint .gt. 0 ) then
+cF           write(msg,*) 'ERROR ESTIMATION', err, 'STEP', HST
+cF           call rprint(msg)
+cF        end if
       ENDIF
 
 
        HMAX=ABS(HMAX)
        IORD=5
-       H=HINITCKSTIFF(N,X,Y,XEND,POSNEG,K1,K2,Y1,IORD,
+
+       IF (H.EQ.0.D0) H=HINITCKSTIFF(N,X,Y,XEND,POSNEG,K1,K2,Y1,IORD,
      &                HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL,RPAR,IPAR)
 
 
+      if (iprint .gt. 0 ) then
+           write(msg,*)  'INITIAL STEP H', H
+           call rprint(msg)
+        end if
 cF end computation of eta for stiffness detection
 
 c       WRITE(6,*) 'ETAVE', (ETAVE(I),I=1,N)
@@ -683,53 +700,55 @@ C removed ierr
        IERR = 0
        CALL FCN(N,X,YS,K1S,RPAR,IPAR)
        NFCN=NFCN+1
-       IF (IERR .NE. 0 ) THEN
+       IF (IERR .NE. 0  .OR.
+     *             (.NOT. ENORMVE .GT. 0.0d0)  ) THEN
           write(msg,*) 'Stiffness detection based on conditioning
      * cannot start, we do not use it'
           CALL RPRINT(MSG)
           NSTIFFCOND = 0
-       END IF
 
-
+       ELSE
 cf  computation of the relative difference y-ys
-       ERRZ = 0.0d0
-       IF (ITOL.EQ.0) THEN
-        DO I=1,N
+        ERRZ = 0.0d0
+        IF (ITOL.EQ.0) THEN
+         DO I=1,N
           SK = ATOLI*SCAL_ATOL+RTOLI*ABS(Y(I))
           ERRZ = ERRZ + (ABS(Y(I)-YS(I))/SK)**2.0d0
-        END DO
-       ELSE
-        DO I=1,N
+         END DO
+        ELSE
+         DO I=1,N
           SK=ATOL(I)*SCAL_ATOL+RTOL(I)*(ABS(Y(I)))
           ERRZ = ERRZ + (abs(Y(I)-YS(I))/SK)**2.0d0
-        END DO
-       END IF
-       ERRZ = SQRT(ERRZ/N)
+         END DO
+        END IF
+        ERRZ = SQRT(ERRZ/N)
 c       write(*,*) 'ERRZ ', ERRZ
 cf end of computation of the relative difference y-ys
 cf initialization of conditioning parameters
-       KAPPA   = ENORMVE
-       ENORMZ1 = ENORMVE
-       GAMMA   = 0d0
-       SIGMA   = 0d0
-       SIGMATOT = 0.0d0
-       XST = X
-       NRESTART = 0
-CF Parameter for tesing stiffness
-       NST   = 0
-       NEST  = 0
-       NNST  = 0
-       NNEST = 0
-       MAXnst = 15
-       MAXIaSti = 15
-       sigmamMAX = 50d0
-       sigmaMAX = 100d0
-       nwarn1 = 0
-       nwarn2 = 0
-       nwarn3 = 0
-       nwarn4 = 0
-
-      ELSE
+        KAPPA   = ENORMVE
+        ENORMZ1 = ENORMVE
+        GAMMA   = 0d0
+        SIGMA   = 0d0
+        SIGMATOT = 0.0d0
+        XST = X
+        NRESTART = 0
+CF Parameter for testing stiffness
+        NST   = 0
+        NEST  = 0
+        NNST  = 0
+        NNEST = 0
+        MAXnst = 20
+        MAXIaSti = 15
+        sigmamMAX = 50d0
+        sigmaMAX = 100d0
+        nwarn1 = 0
+        nwarn2 = 0
+        nwarn3 = 0
+        nwarn4 = 0
+      END IF
+cF end if id nstiffcond .gt. 0
+      END IF
+      IF (.NOT. NSTIFFCOND .GT. 0 ) THEN
 cF stiffness is not used
 C removed ierr
        IERR = 0
@@ -816,12 +835,12 @@ C removed ierr
      +  +a75*k5(i)+a76*k6(i))
  277   continue
 
-      IF (NSTIFFERR .GT. 0) THEN
+c      IF (NSTIFFERR .GT. 0) THEN
        do 704 i=1,n
         vsti(i)=h*(ad1*k1(i)+ad2*k2(i)+ad3*k3(i)+ad4*k4(i)
      +   +ad5*k5(i)+ad6*k6(i))
  704   continue
-      END IF
+c      END IF
 
       XPH=X+h
 C removed ierr
@@ -922,12 +941,12 @@ C ------- STIFFNESS DETECTION  based on approximation of eigenvalues
                STDEN=STDEN+(Y1(I)-YSTI(I))**2
  64         CONTINUE
             IF (STDEN.GT.0.D0) HLAMB=H*SQRT(STNUM/STDEN)
-            if (iprint .gt. 0) then
-              write(msg,188) hlamb,stden,stnum
-              call rprint(msg)
-            end if
- 188   format(1x,'the first est',3g22.10)
-            IF (HLAMB.GT.3.25D0) THEN
+cF            if (iprint .gt. 0) then
+cF              write(msg,188) iasti,hlamb,stden,stnum
+cF              call rprint(msg)
+cF            end if
+ 188   format(1x,'the first est',i5,3g22.10)
+            IF (HLAMB.GT.3.25D0 .OR. .NOT.(HLAMB .GT. 0.0d0) ) THEN
                NONSTI=0
                IASTI=IASTI+1
                IF (IASTI.EQ.15) THEN
@@ -955,12 +974,13 @@ cF approximation of the eiganvalues using ys
                STDEN=STDEN+(Y1(I)-YSTI(I)-Y1S(I)+YSTIS(I))**2
             END DO
             IF (STDEN.GT.0.D0) HLAMB=H*SQRT(STNUM/STDEN)
-            if (iprint .gt. 0) then
-               write(msg,189) hlamb,stden,stnum
-               CALL RPRINT(MSG)
-            end if
- 189       format(1x,'the first est using cond',3g22.10)
-            IF (HLAMB .GT. 2.8D0  .AND. HLAMB .LT. 4.2d0) THEN
+cF            if (iprint .gt. 0) then
+cF               write(msg,189) iastis,hlamb,stden,stnum
+cF               CALL RPRINT(MSG)
+cF            end if
+ 189       format(1x,'the first est using cond',i5,3g22.10)
+            IF ((HLAMB .GT. 2.8D0  .AND. HLAMB .LT. 4.2d0)
+     +               .OR. .NOT.(HLAMB .GT. 0.0d0) ) THEN
                NONSTIS=0
                IASTIS=IASTIS+1
                IF (IASTIS.EQ.15) THEN
@@ -1021,11 +1041,45 @@ C --- ERROR ESTIMATION
         errta=sqrt(errta/n)
         ERR = ERRy
 
-        if (iprint .gt. 0 ) then
-          write(msg,477) x, erry,errta
-          call rprint(msg)
+
+       if (iprint .gt. 0 .AND.  NSTIFFERR .GT. 0) then
+
+cF          write(msg,477) x, erry,errta
+cF          call rprint(msg)
+cF          write(msg,*) 'nerrta = ', nerrta
+cF          call rprint(msg)
         end if
- 477   format(1x,'time ', g22.10, 'the two error estimates',2g22.10)
+ 477   format(1x,'Stiffness detection based on two error estimators:
+     +        time ', g22.10, 'erry',g22.10, 'errta',g22.10)
+
+        IF (NSTIFFERR .GT. 0) THEN
+          IF (ERRta .LT. 0.1d0*ERRY) THEN
+            Nerrta = Nerrta+1
+            NNerrta = 0
+          ELSE
+            NNerrta = NNerrta+1
+            IF (NNerrta .EQ. 6) THEN
+               Nerrta = 0
+            END IF
+          END IF
+          IF (Nerrta .EQ. 15) THEN
+C            IF (iprint .GT. 0) THEN
+C               write(msg,*) 'Stiffness  based on error estimation'
+C               call rprint(msg)
+               write(msg,*)
+     &               'THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X,
+     &               ' USING STIFFNESS DETECTION BASED ON ERROR',
+     &               ' ESTIMATION'
+              call rprint(msg)
+C            END IF
+            IF (NSTIFFERR .EQ. 2) THEN
+               IDID = -5
+               GOTO 760
+            END IF
+          END IF
+        END IF
+
+
 C --- ERROR ESTIMATION USING  YS
        IF (NSTIFFCOND .GT. 0 ) THEN
          ERRys=0.D0
@@ -1034,7 +1088,7 @@ C --- ERROR ESTIMATION USING  YS
            DO  I=1,N
             SK=ATOLI+RTOLI*max(abs(ys(i)),abs(y1s(i)))
             errys=errys+(YSTI(I)/sk)**2.0d0
-            SK=ATOLI*SCAL_ATOL+
+            SK=ATOLI*SCAL_ATOL +
      &           RTOLI*max(ABS(Y(I)-YS(I)),ABS(Y1(I)-Y1S(I)))
             ERRyys=ERRyys+(YSTIS(I)/SK)**2.0d0
            END DO
@@ -1042,7 +1096,7 @@ C --- ERROR ESTIMATION USING  YS
           DO  I=1,N
            SK=ATOL(I)+RTOL(I)*MAX(ABS(YS(I)),ABS(Y1S(I)))
            errys=errys+(YSTI(I)/sk)**2.0d0
-           SK=ATOL(I)*SCAL_ATOL+
+           SK=SCAL_ATOL+
      &         RTOL(I)*max(ABS(Y(I)-YS(I)),ABS(Y1(I)-Y1S(I)))
            ERRyys=ERRyys+(YSTIS(I)/SK)**2.0d0
           END DO
@@ -1055,12 +1109,14 @@ c the error is the maximum of the three error estimation
          ELSE
             ERR = ERRy
          END IF
-         if (iprint .gt. 0 ) then
-           write(msg, 478) x, errys, erryys, ERR
-           call rprint(msg)
- 478       format(1x,'time ', g12.5,
-     &    '  the 3 error estimates based on ys',3g22.10)
-         end if
+cF         if (iprint .gt. 0 .AND. NSTIFFCOND .GT. 0) then
+cF           write(msg, 478) x, errys, erryys, ERRy
+cF                      call rprint(msg)
+cF 478       format(1x,'time ', g12.5,
+cF     &    '  the three error estimates based on ys',3g22.10)
+cF           write(msg,*) 'nst', nst, 'nest', nest
+cF               call rprint(msg)
+cF         end if
 
        END IF
 cF end if 444
@@ -1093,32 +1149,9 @@ C          call rprint(msg)
 C        end if
 C 488    format(1x,'naccpt ',i8,'iasti ',i8)
 c        This is the end of the second stiffness detector.
-        IF (NSTIFFERR .GT. 0) THEN
-          IF (ERRta .LT. 0.1d0*ERRY) THEN
-            Nerrta = Nerrta+1
-            NNerrta = 0
-          ELSE
-            NNerrta = NNerrta+1
-            IF (NNerrta .EQ. 6) THEN
-               Nerrta = 0
-            END IF
-          END IF
-          IF (Nerrta .EQ. 15) THEN
-C            IF (iprint .GT. 0) THEN
-C               write(msg,*) 'Stiffness  based on error estimation'
-C               call rprint(msg)
-               write(msg,*)
-     &               'THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X,
-     &               'USING STIFFNESS DETECTION BASED ON ERROR',
-     &               'ESTIMATION'
-C            END IF
-            IF (NSTIFFERR .EQ. 2) THEN
-               IDID = -5
-               GOTO 760
-            END IF
-          END IF
-        END IF
 
+
+c        This is the end of the second stiffness detector
 c        This is the end of the second stiffness detector
 c set up continuous output
           IF (IOUT.GE.2 .AND. HERMITE) THEN
@@ -1136,7 +1169,7 @@ c set up continuous output
 c initialize the variables for the next step
           DO 44 I=1,N
             k1(i)=k2(i)
-  44       Y(I)=Y1(I)
+  44        Y(I)=Y1(I)
 
 c initialize the variables related to ys for the next step
       IF (NSTIFFCOND .GT. 0) THEN
@@ -1158,13 +1191,13 @@ c computation of kappa gamma and sigma
 
          sigma = (kappa/gamma)*(XPH-XST)
 
-         IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME',XPH, 'KAPPA',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'gamma',(gamma/ENORMVE)/(XPH-XST),
-     &     'sigma',sigma,'sigmatot',sigmatot
-            CALL rprint(msg)
-         END IF
+cF         IF (IPRINT .GT. 0) THEN
+cF            write(msg,*) 'TIME = ',XPH, 'KAPPA = ',kappa/ENORMVE
+cF            CALL rprint(msg)
+cF            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+cF     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+cF            CALL rprint(msg)
+cF         END IF
 
 cf relation between erry and errys
          IF (ERRY .LT. 0.1d0*ERRYYS) THEN
@@ -1172,7 +1205,7 @@ cf relation between erry and errys
             NEST = 0
          ELSE
             NEST = NEST+1
-            IF (NEST .EQ.6) THEN
+            IF (NEST .EQ. 3) THEN
                NST = 0
             END IF
          END IF
@@ -1238,6 +1271,11 @@ cF new starting vector for YS
              YS(I) = Y(I) + YS(I)
            END DO
 cF computation of the new value of ERRZ
+           IERR = 0
+           CALL FCN(N,XPH,YS,K1S,RPAR,IPAR)
+           NFCN=NFCN+1
+           NST = 0
+           NNST = 0
             ERRZ = 0.0d0
             IF (ITOL.EQ.0) THEN
              DO  I=1,N
@@ -1250,19 +1288,22 @@ cF computation of the new value of ERRZ
                ERRZ = ERRZ + (abs(Y(I)-YS(I))/SK)**2.0d0
              END DO
             END IF
+
             ERRZ = SQRT(ERRZ/N)
+
 cF initialization of the conditioning parameters
             ENORMZ1=ENORMVE
             KAPPA = ENORMVE
             GAMMA = 0d0
-            XTS = XPH
+            XST = XPH
             SIGMATOT = MAX(SIGMA,SIGMATOT)
-            if (IPRINT .GT. 0 ) THEN
-               WRITE(msg,*) 'RESTART'
-               CALL RPRINT(MSG)
-               WRITE(msg,*) 'SIGMATOT', SIGMATOT,'SIGMA',SIGMA,'XTS',XTS
-               CALL RPRINT(MSG)
-            END IF
+cF            if (IPRINT .GT. 0 ) THEN
+cF               WRITE(msg,*) '-- RESTART -- '
+cF               CALL RPRINT(MSG)
+cF               WRITE(msg,*) 'SIGMATOT = ', SIGMATOT,'SIGMA =',
+cF     +          SIGMA,'XST = ',XST
+cF               CALL RPRINT(MSG)
+cF            END IF
          END IF
          IF (NRESTART .EQ. 0) SIGMATOT=SIGMA
 
@@ -1283,43 +1324,45 @@ C     &          .AND. (NWARN1 .EQ. 0) ) THEN
                  nwarn1 = 1
               END IF
                IDID=-6
+               IF (NSTIFFCOND .EQ. 2)  GOTO 760
             endif
             IF ( (NST .GT. MAXnst .OR. IaStiS .GT. MAXIaSti)
      &          .AND. (NWARN2 .EQ. 0) ) THEN
 
-              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 ) THEN
-               WRITE(msg,*)'THE STEPSIZE IS RESTRICTED BY STABILITY
-     &    AT  X= ', X
+c              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 ) THEN
+               WRITE(msg,*)'THE STEPSIZE IS RESTRICTED ONLY',
+     &          ' BY STABILITY REASON AT  X= ', X
                CALL RPRINT(MSG)
-              END IF
+c              END IF
               nwarn2=1
               IDID=-7
+              IF (NSTIFFCOND .EQ. 2)  GOTO 760
             endif
 
             if ((nst .GT. MAXnst .AND. kappa/ENORMVE .GT. 1.01)
      &          .AND. (NWARN3 .EQ. 0) ) THEN
-               IF (IPRINT .GT. 0  .OR. NSTIFFCOND.EQ.1 ) THEN
-                WRITE(msg,*) 'THE STEPSIZE IS RESTRICTED ONLY BY
-     & STABILITY REASON AND  KAPPA > 1 AT X = ', X,
+c               IF (IPRINT .GT. 0  .OR. NSTIFFCOND.EQ.1 ) THEN
+                WRITE(msg,*) '  KAPPA > 1 AT X = ', X,
      &  'KAPPA = ',KAPPA/ENORMVE
                 CALL RPRINT(MSG)
-               END IF
+c               END IF
                NWARN3=1
                IDID=-8
+               IF (NSTIFFCOND .EQ. 2)  GOTO 760
              endif
-            if ( kappa/ENORMVE .GT. 1d20) THEN
-              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 )  THEN
-                WRITE(msg,*) 'THE NUMERICAL SOLUTION IS UNSTABLE',
-     &   'KAPPA  = ', KAPPA
+            if ( kappa/ENORMVE .GT. 1d20 .AND. (NWARN4.EQ.0)) THEN
+c              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 )  THEN
+                WRITE(msg,*) 'THE NUMERICAL SOLUTION IS UNSTABLE,',
+     &   ' KAPPA  = ', KAPPA
                 CALL RPRINT(MSG)
-               END IF
+c               END IF
                NWARN4  = 1
              IDID=-9
+             IF (NSTIFFCOND .EQ. 2)  GOTO 760
+
             endif
 
-           IF (NSTIFFCOND .EQ. 2) THEN
-              GOTO 760
-           END IF
+
         endif
 
       END IF
@@ -1339,6 +1382,13 @@ C ------- NORMAL EXIT
              kappa = kappa/ENORMVE
              gamma =gamma/ENORMVE
              sigmatot=max(sigma,sigmatot)
+             IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+         END IF
             END IF
             IDID=1
             RETURN
@@ -1361,6 +1411,13 @@ C --- FAIL EXIT
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
+             IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+         END IF
       END IF
       IDID=-4
       RETURN
@@ -1370,8 +1427,15 @@ C --- FAIL EXIT
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
+            IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+         END IF
       END IF
-      IDID = -4
+
       RETURN
   77  CONTINUE
       IF (IPRINT.GT.0) THEN
@@ -1387,6 +1451,13 @@ C --- FAIL EXIT
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
+          IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+         END IF
       END IF
       RETURN
   78  CONTINUE
@@ -1404,6 +1475,13 @@ C --- FAIL EXIT
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
+            IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+            END IF
       END IF
       RETURN
   79  CONTINUE
@@ -1412,6 +1490,13 @@ C --- FAIL EXIT
             kappa = kappa/ENORMVE
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
+            IF (IPRINT .GT. 0) THEN
+            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
+            CALL rprint(msg)
+            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
+     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
+            CALL rprint(msg)
+            END IF
       END IF
       IF (IPRINT.GT.0) THEN
          WRITE(msg,979)X
@@ -1502,6 +1587,7 @@ C ----------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DIMENSION Y(N),Y1(N),F0(N),F1(N),ATOL(*),RTOL(*)
       DIMENSION RPAR(*),IPAR(*)
+
 C ---- COMPUTE A FIRST GUESS
 C ----   H = 0.01 * NORM (Y0) / NORM (F0)
       DNF=0.0D0
@@ -1555,8 +1641,8 @@ C ----  H**IORD * MAX ( NORM (F0), NORM (DER2)) = 0.01
          H1=(0.01D0/DER12)**(1.D0/IORD)
       END IF
 
-C --- THE STEPSIZE MUST BE GREATER THE 1.d-15
-      IF (H1 .GT. 1.D-15) THEN
+C --- THE STEPSIZE MUST BE GREATER THE 1.d-10
+      IF (H1 .GT. 1.D-10) THEN
          H=MIN(100*ABS(H),H1,HMAX)
       ELSE
          H=MIN(  100*ABS(H),ABS(HST),HMAX)
@@ -1564,12 +1650,16 @@ C --- THE STEPSIZE MUST BE GREATER THE 1.d-15
 
 
 C --- WE USE THE ERROR ESTIMATION TO COMPUTE ANOTHER STEPSIZE
-      FAC=ERR**EXPO1
-      FAC11 = FAC*10
-      H2=ABS(HST)/FAC11
+C      IF ERR .NE. NAN
+      IF ( .NOT. ERR .GT. 0.0d0) THEN
+        FAC=ERR**EXPO1
+        FAC11 = FAC*10
+        H2=ABS(HST)/FAC11
 
-C --- THE FINAL STEP IS THE MINIMUM
-      H=MIN(H,H2,HMAX)
+C --- THE FINAL STEP IS THE MINIMUM IF H2 > 1e-10
+        IF (H2 .GT. 1e-10) H=MIN(H,H2,HMAX)
+      END IF
+
       HINITCKSTIFF=SIGN(H,POSNEG)
       RETURN
       END
