@@ -6,13 +6,13 @@ dopri5 <- function(y, times, func, parms, rtol = 1e-6, atol = 1e-6,
   verbose = FALSE, hmax = NULL, hini = hmax, ynames = TRUE, maxsteps = 10000,
   dllname = NULL, initfunc = dllname, initpar = parms,
   rpar = NULL, ipar = NULL, nout = 0, outnames = NULL, forcings = NULL,
-  initforc = NULL, fcontrol = NULL,stiffness=0, ...) {
+  initforc = NULL, fcontrol = NULL, ...) {
 
    rk5 (y, times, func, parms, rtol, atol,
   verbose, hmax, hini, ynames, maxsteps, 
   dllname, initfunc, initpar, 
   rpar, ipar, nout, outnames, forcings,
-  initforc, fcontrol, type=2, stiffness = stiffness, ...)
+  initforc, fcontrol, type=2,  ...)
 
 }
 
