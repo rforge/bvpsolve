@@ -1,10 +1,10 @@
 Package: bvpSolve
-Version: 1.2.2
+Version: 1.2.3
 Title: Solvers for boundary value problems of ordinary differential equations
-Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>,
+Author: Karline Soetaert <karline.soetaert@nioz.nl>,
         Jeff Cash <j.cash@imperial.ac.uk>,
         Francesca Mazzia <mazzia@dm.uniba.it>
-Maintainer: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), rootSolve, deSolve
 Description: Functions that solve boundary value problems (BVP) of systems of ordinary
              differential equations (ODE).
