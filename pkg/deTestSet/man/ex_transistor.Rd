@@ -46,7 +46,7 @@ transistor (times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
   of the output value.
       
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia
 }

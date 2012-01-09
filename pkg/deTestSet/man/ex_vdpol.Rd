@@ -37,7 +37,7 @@ vdpol  (times = 0:2000, yini = NULL,  parms = list(), ...)
   of the output value.
       
 }
-\author{Karline Soetaert  
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia
 }

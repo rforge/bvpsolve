@@ -47,7 +47,7 @@ emep (times = seq(14400, 417600, by = 400), yini = NULL,
   of the output value.
       
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl> 
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia <mazzia@dm.uniba.it>
 }

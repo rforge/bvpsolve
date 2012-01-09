@@ -43,7 +43,7 @@ hires (times = seq(0, 5, by = 0.01), yini = NULL, parms = list(),  ...)
   of the output value.
       
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia
 }

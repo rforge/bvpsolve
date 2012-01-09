@@ -45,7 +45,7 @@ E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
   of the output value.
       
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia  <mazzia@dm.uniba.it>
 }

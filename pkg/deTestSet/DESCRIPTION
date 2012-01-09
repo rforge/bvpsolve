@@ -1,10 +1,10 @@
 Package: deTestSet
-Version: 1.0
+Version: 1.01
 Title: Testset for differential equations
-Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>,
+Author: Karline Soetaert <karline.soetaert@nioz.nl>,
         Jeff Cash <j.cash@imperial.ac.uk>,
         Francesca Mazzia <mazzia@dm.uniba.it>
-Maintainer: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), ReacTran
 Description: Solvers and testset for stiff and nonstiff differential equations, and 
   differential algebraic equations

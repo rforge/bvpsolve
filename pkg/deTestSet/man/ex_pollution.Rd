@@ -43,7 +43,7 @@ pollution (times = seq(0, 10, 0.1), yini = NULL, parms = list(), method = mebdfi
   of the output value.
       
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia
 }

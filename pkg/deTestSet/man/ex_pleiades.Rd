@@ -38,7 +38,7 @@ pleiades (times = seq(0, 3.0, by = 0.01), yini = NULL, method = lsoda, ...)
   of the output value.
       
 }
-\author{Karline Soetaert 
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
 
 Francesca Mazzia
 }
