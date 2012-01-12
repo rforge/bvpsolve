@@ -2,14 +2,14 @@ C karline: all write statements -> rprint and removed / from formats
 C karline: removed argument ierr from call to func, jac and mas
 
 C -----------------------------------------------------------------------------------
-C     THE CODE BIMD NUMERICALLY SOLVES (STIFF) DIFFERENTIAL ODE 
-C     PROBLEMS OR LINEARLY IMPLICIT DAE PROBLEMS OF INDEX UP TO 3 
+C     THE CODE BIMD NUMERICALLY SOLVES (STIFF) DIFFERENTIAL ODE
+C     PROBLEMS OR LINEARLY IMPLICIT DAE PROBLEMS OF INDEX UP TO 3
 C     WITH CONSTANT MASS MATRIX
 C
-C     Copyright (C)2005-2007   
+C     Copyright (C)2005-2007
 C
 C     Authors: CECILIA MAGHERINI (cecilia.magherini@ing.unipi.it)
-C              LUIGI   BRUGNANO  (brugnano@math.unifi.it) 
+C              LUIGI   BRUGNANO  (brugnano@math.unifi.it)
 C
 C
 C     This program is free software; you can redistribute it and/or
@@ -67,9 +67,9 @@ C                 IMPLEMENTATION DETAILS ARE IN REFERENCES [1-5].
 C
 C
 C
-C     AUTHORS:    C.MAGHERINI, 
+C     AUTHORS:    C.MAGHERINI,
 C     --------    DIPARTIMENTO DI MATEMATICA APPLICATA "U.DINI"
-C                 VIA BUONARROTI, 1/C 
+C                 VIA BUONARROTI, 1/C
 C                 56127 PISA
 C                 ITALY
 C                 E-MAIL: CECILIA.MAGHERINI@ING.UNIPI.IT
@@ -95,14 +95,14 @@ C     ----------------
 C
 C     RELEASE HISTORY:   1.0,  October, 2005
 C     ---------------    - first version released;
-C                        
+C
 C                        1.1,  July, 2006
 C                        Main features (wrt 1.0):
-C                        - improved definition of the 
+C                        - improved definition of the
 C                          coefficients of the methods
 C                        - the results described
 C                          in reference [1], have been better
-C                          exploited for the definition of 
+C                          exploited for the definition of
 C                          the stopping criterion for
 C                          the splitting Newton blended iteration
 C                        - improved choice of the initial profile
@@ -114,11 +114,11 @@ C                        - new function CONTSOL, to be used when
 C                          continuous output is desired
 C                        - minor changes concerning the
 C                          order variation strategy.
-C 
+C
 C                        1.1.1, September, 2006
 C                        - some minor bugs fixed
-C                          
-C                             
+C
+C
 C
 C     REFERENCES:
 C     -----------
@@ -158,11 +158,11 @@ C
 C
 C
 C    REMARK:   The code BiMD has been written using a style very similar to the one
-C    -------   used in the codes RADAU and GAM. Indeed, some subroutines and comments 
+C    -------   used in the codes RADAU and GAM. Indeed, some subroutines and comments
 C              have been imported from such codes. Moreover, the name and the meaning
-C              of a number of input parameters and variables have been fully inherited 
+C              of a number of input parameters and variables have been fully inherited
 C              from them.
-C               
+C
 C -----------------------------------------------------------------------------------
 C -----------------------------------------------------------------------------------
 C
@@ -215,27 +215,27 @@ C Y0            INITIAL CONDITION
 C
 C H             INITIAL STEPSIZE
 C
-C RTOL-ATOL     RELATIVE AND ABSOLUTE TOLERANCES. 
-C               ATOL CAN BE EITHER SCALAR OR A 
+C RTOL-ATOL     RELATIVE AND ABSOLUTE TOLERANCES.
+C               ATOL CAN BE EITHER SCALAR OR A
 C               VECTOR OF LENGTH M.
-C 
+C
 C ITOL          SWITCH FOR ATOL:
-C               
-C               ITOL = 0 --> ATOL IS SCALAR. 
-C                            THE CODE PROVIDES A NUMERICAL SOLUTION 
-C                            WITH THE LOCAL ERROR OF Y(I) ROUGHLY SMALLER 
-C                            THAN ATOL + RTOL*ABS(Y(I))   
-C                        
-C               ITOL = 1 --> ATOL IS AN ARRAY OF LENGTH M 
+C
+C               ITOL = 0 --> ATOL IS SCALAR.
+C                            THE CODE PROVIDES A NUMERICAL SOLUTION
+C                            WITH THE LOCAL ERROR OF Y(I) ROUGHLY SMALLER
+C                            THAN ATOL + RTOL*ABS(Y(I))
+C
+C               ITOL = 1 --> ATOL IS AN ARRAY OF LENGTH M
 C                            THE LOCAL ERROR OF Y(I) IS KEPT
-C                            BELOW ATOL(I) + RTOL*ABS(Y(I))   
+C                            BELOW ATOL(I) + RTOL*ABS(Y(I))
 C
 C JAC           SUBROUTINE EVALUATING THE JACOBIAN OF F (DUMMY, IF IJAC=0)
 C karline: removed ierr from call
-C
-C      subroutine jac(m,t,y,jac,ldjac,rpar,ipar)
+C francesca: added mu, ml
+C      subroutine jac(m,t,y,ml,mu,jac,ldjac,rpar,ipar)
 C      double precision t,y,jac,rpar(*)
-C      integer m,ldjac,ierr,ipar(*)
+C      integer m,ldjac,ierr,ipar(*),ml,mu
 C      dimension y(m),jac(ldjac,m)
 CC     m      size of the continuous problem
 CC     t,y      is the point where the Jacobian is evaluated
@@ -366,8 +366,8 @@ C            CAN BE USED FOR COMMUNICATION BETWEEN YOUR CALLING
 C            PROGRAM AND THE FCN, JAC, MAS AND SOLOUT SUBROUTINES.
 C
 C SOLOUT     NAME (EXTERNAL) OF SUBROUTINE PROVIDING THE NUMERICAL
-C            SOLUTION DURING INTEGRATION. 
-C            IF IOUT = 1, IT IS CALLED AFTER EACH SUCCESSFUL STEP.  
+C            SOLUTION DURING INTEGRATION.
+C            IF IOUT = 1, IT IS CALLED AFTER EACH SUCCESSFUL STEP.
 C            SUPPLY A DUMMY SUBROUTINE IF IOUT = 0.
 C            IT MUST HAVE THE FOLLOWING FORM:
 C
@@ -380,13 +380,13 @@ CC     m                is the size of the problem
 CC     k                is the block-size of the method
 CC     ord              is the order of the method
 CC     t0               is the starting time point of the step
-CC     t                contains the (internal) mesh points of 
+CC     t                contains the (internal) mesh points of
 CC                      the step
 CC     y                is the current numerical solution
 CC     f                contains the values of fcn(t,y)
-CC     dd               contains the divided differences of y 
+CC     dd               contains the divided differences of y
 CC                      over the internal mesh points of the step
-CC                      (to be used, for example, if continuous 
+CC                      (to be used, for example, if continuous
 CC                      output is desired, see below)
 CC     rpar             possible external real parameters
 CC     ipar             possible external integer parameters
@@ -401,7 +401,7 @@ C
 C           CONTINUOUS OUTPUT:
 C           ------------------
 C
-C           DURING CALLS TO SOLOUT, A CONTINUOUS SOLUTION 
+C           DURING CALLS TO SOLOUT, A CONTINUOUS SOLUTION
 C           FOR THE INTERVAL [t0,t(k)] IS AVAILABLE THROUGH
 C           THE FUNCTION
 C
@@ -412,10 +412,10 @@ C           COMPONENT OF THE SOLUTION AT THE TIME POINT T.
 C
 C
 C IOUT      SWITCH FOR CALLING THE SUBROUTINE SOLOUT.
-C          
+C
 C           IOUT = 0, SOLOUT IS NEVER CALLED
-C           IOUT = 1, SOLOUT IS CALLED AFTER EACH 
-C                     SUCCESSFULL STEP         
+C           IOUT = 1, SOLOUT IS CALLED AFTER EACH
+C                     SUCCESSFULL STEP
 C
 C
 C
@@ -899,7 +899,7 @@ C--------------------------------------------------
           END IF
       END IF
 
-      IF ((IMAS.NE.0).AND.((MLMAS.GT.MLJAC).OR.(MUMAS.GT.MUJAC))) 
+      IF ((IMAS.NE.0).AND.((MLMAS.GT.MLJAC).OR.(MUMAS.GT.MUJAC)))
      &THEN
         WRITE (MSG,*)
      &   'BANDWITH OF "MAS" NOT SMALLER THAN BANDWITH OF "JAC"'
@@ -1188,7 +1188,7 @@ C---------------------------------------------------------
             WORK(INDTOLEXT+I-1) = DMIN1(1D-2,1D2*ATOL(I))
          END DO
       END IF
-         
+
       CALL  BIM0(M,FCN,JAC,NMETH,STEP_ORD(indord),Y0,WORK(INDF0),
      &           T0,TEND,H,RTOL,ATOL,ITOL,
      &           MAXSTEP,ORDMIN,ORDMAX,ITMAX,UROUND,HMAX,FACNEWTV,
@@ -1489,7 +1489,7 @@ C     OTHER INITIALIZATIONS
          INDEXD = 2
       ELSE
          INDEXD = 3
-      ENDIF   
+      ENDIF
 
       IF (JBAND) THEN
          CSIS  = DBLE(2*M*(MLJAC+MUJAC))
@@ -1542,7 +1542,7 @@ C -------------------------------------------------------
       CALFACT0 = .TRUE.
       LINEAR   = .FALSE.
       QINF     = .FALSE.
-      
+
       NJ0     = 0D0
       NERRLOC = 0D0
       H0      = 0D0
@@ -1557,11 +1557,11 @@ C -------------------------------------------------------
 
       IERR = 0
       IF (IMAS.NE.0) THEN
-C Karline: changed	  
+C Karline: changed
           CALL MAS(M,M0,LDMAS,RPAR,IPAR)
           IF (IERR.NE.0) THEN
              WRITE(MSG,1010) IERR
- 1010        FORMAT('ERROR CODE IERR = ', I3, 
+ 1010        FORMAT('ERROR CODE IERR = ', I3,
      &               'RETURNED BY THE SUBROUTINE MAS')
              CALL rprint(MSG)
              WRITE(MSG,900) T0
@@ -1571,13 +1571,13 @@ C Karline: changed
           END IF
       END IF
 C Karline: changed
-      IERR = 0 
+      IERR = 0
       CALL FCN(M,T0,Y0,F0,RPAR,IPAR)
 C      CALL FCN(M,T0,Y0,F0,IERR,RPAR,IPAR)
 
       IF (IERR.NE.0) THEN
           WRITE(MSG,1020) IERR
- 1020     FORMAT('ERROR CODE IERR = ', I3, 
+ 1020     FORMAT('ERROR CODE IERR = ', I3,
      &               'RETURNED BY THE SUBROUTINE FCN')
           CALL rprint(MSG)
           WRITE(MSG,900) T0
@@ -1601,7 +1601,7 @@ c     MAIN LOOP
 100   CONTINUE
 
       IF (K .EQ. KOLD) GOTO 140
-      
+
 C     THE ORDER OF THE METHOD HAS BEEN CHANGED
       ESP = 1D0/DBLE(K+1)
       IF (ORD .LT. ORDMAX)
@@ -1753,7 +1753,7 @@ C     JACOBIAN EVALUATION
         END DO
         IERR=0
 C Karline: changed
-      IERR = 0 
+      IERR = 0
         CALL FCN(M,T0,DELJ0,FJ0,RPAR,IPAR)
         NFEVAL = NFEVAL + 1
         NODJ0 = (IERR.NE.0)
@@ -1811,12 +1811,12 @@ C     NUMERICAL JACOBIAN
                  Y0(I) = YSAFE+DELT
                  IERR = 0
 C Karline: changed
-      IERR = 0 
+      IERR = 0
                  CALL FCN(M,T0,Y0,FJ0,RPAR,IPAR)
                  IF (IERR.NE.0) THEN
                      WRITE(MSG,1030) IERR
                      CALL rprint(MSG)
- 1030                FORMAT('ERROR CODE IERR = ', I3, 
+ 1030                FORMAT('ERROR CODE IERR = ', I3,
      &               'RETURNED BY THE SUBROUTINE FCN DURING',
      &               'THE NUMERICAL EVALUATION OF THE JACOBIAN')
                     WRITE(MSG,900) T0
@@ -1838,12 +1838,12 @@ C Karline: changed
 C     ANALYTICAL JACOBIAN
               IERR = 0
 C karline: changed
-              CALL JAC(M,T0,Y0,J0,LDJAC,RPAR,IPAR)
+              CALL JAC(M,T0,Y0,MLJAC,MUJAC,J0,LDJAC,RPAR,IPAR)
               IF (IERR.NE.0) THEN
                  WRITE(MSG,1040) IERR
                  CALL rprint(MSG)
 
- 1040            FORMAT('ERROR CODE IERR = ', I3, 
+ 1040            FORMAT('ERROR CODE IERR = ', I3,
      &           'RETURNED BY THE SUBROUTINE JAC')
                  WRITE(MSG,900) T0
                  CALL rprint(MSG)
@@ -1857,7 +1857,7 @@ C karline: changed
               DO I=1,M
                 DELJ00(I) = DELJ0(I)
               END DO
-           ENDIF   
+           ENDIF
            NJ00   = NJ0
            NODJ00 = NODJ0
 
@@ -2130,7 +2130,7 @@ C     NEWTON ITERATION
 200   CONTINUE
       IERR0=0
       DO I=1,K
-C karline: changed	  
+C karline: changed
         IERR = 0
         CALL FCN(M,T(I),Y(1,I),F(1,I),RPAR,IPAR)
         IERR0 = IERR0+IERR
@@ -2208,7 +2208,7 @@ C-------------------------------------------------------------------------------
 
       IERR0 = 0
       DO I=1,K
-C karline:changed	  
+C karline:changed
         IERR = 0
         CALL FCN(M,T(I),Y(1,I),F(1,I),RPAR,IPAR)
         IERR0 = IERR0 + IERR
@@ -2243,8 +2243,8 @@ C     NEWTON HAS FAILED
           CALJAC   = .NOT.TRUEJAC
           TRUEJAC  = .TRUE.
 
-          IF (NFAILCONV.EQ.1) 
-     &       EXTRAPS = EXTRAP0.AND.(IT.GT.MAXIT).AND.(RHO.LT.RHOBAD)       
+          IF (NFAILCONV.EQ.1)
+     &       EXTRAPS = EXTRAP0.AND.(IT.GT.MAXIT).AND.(RHO.LT.RHOBAD)
 
           EXTRAP   = EXTRAPS
           RESTRICT = .FALSE.
@@ -2349,7 +2349,7 @@ C     STEP ACCEPTED
       IF (IOUT.EQ.1) THEN
         CALL SOLOUT(M,K,ORD,T0,T,Y,F,DD,RPAR,IPAR,IRTRN)
         IF (IRTRN.LT.0) GOTO 800
-      END IF  
+      END IF
 
       IF (LAST) GOTO 600
 
@@ -2505,7 +2505,7 @@ C ORDER REDUCTION RECOVERY
 C ---------------------------------------------------------------
       STAGNA = (RATH .GT. rath1).AND. (RATH .LT. rath2)
       IF ( (INDEXD.LE.1).OR.
-     &     (IT.GT.INDEXD+1).OR.(IT0.GT.INDEXD+1) ) 
+     &     (IT.GT.INDEXD+1).OR.(IT0.GT.INDEXD+1) )
      &THEN
          STAGNA= STAGNA.AND.
      &       (RATRHO .GT. ratrho1).AND.(RATRHO.LT.ratrho2)
@@ -2560,7 +2560,7 @@ c IN THIS CASE, THE SPECTRAL RADIUS DOESN'T BEHAVES LIKE rho=rhoti/q.
      &       GOTO 500
 
              NU1    = DMAX1((DBLE(IT)*DLOG(RHO))/DLOG(RHO/RATH),
-     &                       DBLE(INDEXD))        
+     &                       DBLE(INDEXD))
              NUUP1  = DMAX1(DBLE(INDEXD),(DBLE(IT)*DLOG(RHO))/
      &                DLOG(RHO*(H/HNUP1)*(RHOIUP/RHOI)) )
 

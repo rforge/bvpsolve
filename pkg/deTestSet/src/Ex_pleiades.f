@@ -54,7 +54,7 @@ c     jacobian function
 c-----------------------------------------------------------------------
       subroutine pleiajac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
       integer ldim,neqn,ierr,ipar(*),ml,mu
-      double precision t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
+      double precision t,y(neqn),dfdy(ldim,neqn),rpar(*)
 
       integer i,j,mi,mj
       double precision rij,rij32,rij52,fjh,sumxx,sumxy,sumyy

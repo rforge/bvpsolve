@@ -24,12 +24,12 @@ c----------------------------------------------------------------------
 
       SUBROUTINE andpar(daeparms)
       EXTERNAL daeparms
-      
+
       double precision parms(42)
       common / andcom/ parms
 
         CALL daeparms(42,parms)
-        
+
       END SUBROUTINE andpar
 
 c-----------------------------------------------------------------------
@@ -37,7 +37,7 @@ c     residual function
 c-----------------------------------------------------------------------
 
       SUBROUTINE andres(T,Y,YPRIME,CJ,DELTA,IERR,RPAR,IPAR)
-      
+
       implicit none
       DOUBLE PRECISION T, Y(27), DELTA(27), YPRIME(27),RPAR(*), CJ
       INTEGER I, J, IERR, N, IPAR(*)
@@ -203,10 +203,11 @@ c----------------------------------------------------------------------
 c     jacobian function
 c----------------------------------------------------------------------
 
-      SUBROUTINE andjac(T,Y,YPRIME,DFDY,CON,RPAR,IPAR)
-      INTEGER NEQN,MN
-      PARAMETER (NEQN=27, MN = 27)
-      DOUBLE PRECISION T, Y(NEQN), DFDY(MN,NEQN),CON
+
+      subroutine andjac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      INTEGER NEQN,MN, ipar(*),ml,mu
+c      PARAMETER (NEQN=27, MN = 27)
+      DOUBLE PRECISION T, Y(NEQN), DFDY(LDIM,NEQN), rpar(*)
 
 
 c-----------------------------------------------------------------------

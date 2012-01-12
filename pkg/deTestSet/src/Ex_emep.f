@@ -288,9 +288,10 @@ c----------------------------------------------------------------------
 c     jacobian function
 c----------------------------------------------------------------------
 
-      subroutine emepjac(ldim,neqn,time,y,yprime,jac,ierr,rpar,ipar)
-      integer ldim,neqn,ierr,ipar(*)
-      double precision time,y(neqn),yprime(neqn),jac(ldim,neqn),rpar(*)
+
+      subroutine emepjac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      integer ldim,neqn,ierr,ipar(*), ml, mu
+      double precision time,y(neqn),jac(ldim,neqn),rpar(*)
 
       INTEGER I, J
       DOUBLE PRECISION M, O2, XN2, RPATH3, RPATH4

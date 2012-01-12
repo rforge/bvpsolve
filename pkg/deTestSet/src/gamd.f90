@@ -4208,12 +4208,13 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!                     THE CODE KEEPS THE LOCAL ERROR OF Y(I) BELOW
     !!                     RTOL(I)*ABS(Y(I))+ATOL(I).
     !!
+    !! Modified to be used in R
     !!     JAC         NAME (EXTERNAL) OF THE SUBROUTINE WHICH COMPUTES
     !!                 THE PARTIAL DERIVATIVES OF F(T,Y) WITH RESPECT TO Y
     !!                 (THIS ROUTINE IS ONLY CALLED IF IJAC=1; SUPPLY
     !!                 A DUMMY SUBROUTINE IN THE CASE IJAC=0).
     !!                 FOR IJAC=1, THIS SUBROUTINE MUST HAVE THE FORM
-    !!                    SUBROUTINE JAC(R,T,Y,DFY,LDFY,RPAR,IPAR)
+    !!                    SUBROUTINE JAC(R,T,ML,MU,Y,DFY,LDFY,RPAR,IPAR)
     !!                    DOUBLE PRECISION T,Y(R),DFY(LDFY,R)
     !!                    DFY(1,1)= ...
     !!                 LDFY, THE COLUMN-LENGTH OF THE ARRAY, IS
@@ -4537,10 +4538,10 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
          REAL(PREC), INTENT(OUT) :: dy(neqn)
        END SUBROUTINE fcn
        !!-----------------------------------------------------------------------
-       SUBROUTINE jac(neqn,t,y,jacob,ldim,rpar,ipar)
+       SUBROUTINE jac(neqn,t,y,mu,ml,jacob,ldim,rpar,ipar)
          USE PRECISION
          IMPLICIT NONE
-         INTEGER, INTENT(IN) :: neqn,ldim,ipar(*)
+         INTEGER, INTENT(IN) :: neqn,ldim,ipar(*),mu,ml
          REAL(PREC), INTENT(IN) :: t,y(neqn),rpar(*)
          REAL(PREC), INTENT(OUT) :: jacob(ldim,neqn)
        END SUBROUTINE jac
@@ -5241,7 +5242,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             ELSE
                !! -------- COMPUTE JACOBIAN MATRIX ANALYTICALLY
 
-               CALL JAC(R,T0,Y0(1),JF0(1,1),LDJAC,RPAR,IPAR)
+               CALL JAC(R,T0,Y0(1),MLJAC,MUJAC,JF0(1,1),LDJAC,RPAR,IPAR)
 
             END IF
             NJAC = NJAC + 1
