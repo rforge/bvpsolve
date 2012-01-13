@@ -25,7 +25,7 @@ void F77_NAME(gamd)( int *,
                               double *, int *),         // func
 		     double *, double *, double *, double *,
 		     double *, double *, int *,
-		     void (*)(int *, double *, double *, double *,  // jac
+		     void (*)(int *, double *, double *, int *, int*, double *,  // jac
 			            int *, double*, int*),
 		     int *, int *, int *,
  	       void (*)(int *, double *, int *, double *, int *),              // mas
@@ -43,7 +43,7 @@ void F77_NAME(bimd)( int *,
                               double *, int *),         // func
 		     double *, double *, double *, double *,
 		     double *, double *, int *,
-		     void (*)(int *, double *, double *, double *,  // jac
+		     void (*)(int *, double *, double *, int *, int*, double *,  // jac
 			            int *, double*, int*),
 		     int *, int *, int *,
  	       void (*)(int *, double *, int *, double *, int *),  // mas
