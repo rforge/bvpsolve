@@ -203,11 +203,34 @@ c----------------------------------------------------------------------
 c     jacobian function
 c----------------------------------------------------------------------
 
-
-      subroutine andjac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      subroutine andjac(t,y,yprime,dfdy,con,rpar,ipar)
       INTEGER NEQN,MN, ipar(*),ml,mu
+      PARAMETER (NEQN=27, MN = 27)
+      DOUBLE PRECISION T, Y(NEQN), CON,DFDY(MN,NEQN), rpar(*)
+      ml = 0
+      mu = 0
+
+      call andjacdae(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+
+       do i=1,neqn
+         do  j=1,neqn
+            dfdy(i,j) = -dfdy(i,j)
+         enddo
+      enddo
+c compute pd = -df/dy + con*M
+      do j=1,14
+         dfdy(j,j) = 1.0d0/con+dfdy(j,j)
+      enddo
+c
+
+      return
+      end
+
+
+      subroutine andjacdae(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      INTEGER NEQN,MN, ipar(*),ml,mu, ldim
 c      PARAMETER (NEQN=27, MN = 27)
-      DOUBLE PRECISION T, Y(NEQN), DFDY(LDIM,NEQN), rpar(*)
+      DOUBLE PRECISION T, Y(27), DFDY(27,27), rpar(*)
 
 
 c-----------------------------------------------------------------------
@@ -326,16 +349,7 @@ c
  140     continue
  150  continue
 C
-      do i=1,neqn
-         do  j=1,neqn
-            dfdy(i,j) = -dfdy(i,j)
-         enddo
-      enddo
-c compute pd = -df/dy + con*M
-      do j=1,14
-         dfdy(j,j) = 1.0d0/con+dfdy(j,j)
-      enddo
-c
+
       return
       end
 c-----------------------------------------------------------------------
