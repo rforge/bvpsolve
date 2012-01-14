@@ -45,10 +45,18 @@ pollution <- function(times = seq(0, 10, 0.1), yini = NULL,
 	    	useres <- TRUE
     } else  if("res" %in% names(formals(method)))
 	       useres <- TRUE
-    if (useres)
-    out <- ode(y = yini, times = times, func = "polfunc",
-		dllname = "deTestSet", initfunc = "polpar", method=method,
-		parms = parameter, ...)
+    if (useres){
+    
+    #  out <- ode(y = yini, times = times, func = "polfunc",
+	  # 	dllname = "deTestSet", initfunc = "polpar", method=method,
+	 # 	parms = parameter, ...)
+	    dyini <- rep(0,20)
+
+      checkini(20, yini, dyini)
+	  	out <-dae(y = yini, dy = dyini, times = times, res = "polres",
+          dllname = "deTestSet", jacres = "poljacres",initfunc = "polpar", 
+          parms = parameter, method=method,  ...)
+                 }
     else 
     out <- ode(y = yini, times = times, func = "polfunc", jacfunc = "poljac",
               dllname = "deTestSet", initfunc = "polpar", method=method,
