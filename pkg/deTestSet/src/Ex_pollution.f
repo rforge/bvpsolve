@@ -149,10 +149,8 @@ c
       end
 
 
-      RETURN
-      END
 c----------------------------------------------------------------------
-c     jacobiqan function
+c     jacobian function
 c----------------------------------------------------------------------
 
       subroutine poljac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)

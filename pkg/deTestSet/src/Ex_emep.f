@@ -19,6 +19,29 @@ c
 c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 
+
+
+c----------------------------------------------------------------------
+c     residual function
+c----------------------------------------------------------------------
+      SUBROUTINE emepres(T,Y,YPRIME,CJ,DELTA,IERR,RPAR,IPAR)
+
+      implicit none
+      DOUBLE PRECISION T, Y(66), DELTA(66), YPRIME(66),RPAR(*), CJ
+      INTEGER I, J, IERR, N, IPAR(*)
+C
+      IERR = 0
+      N = 66
+      CALL  emepfunc(N, T, Y, DELTA, rpar, ipar)
+C
+      DO J = 1,N
+         DELTA(J) = YPRIME(J)-DELTA(J)
+      ENDDO
+
+C
+      RETURN
+      END
+
 c----------------------------------------------------------------------
 c     derivative function
 c----------------------------------------------------------------------
@@ -283,6 +306,37 @@ C
       DY(66) = RC(85)*Y(15)*Y(57)-(RC(149)*Y(37)+RC(52))*Y(66)
       RETURN
       END
+
+
+c----------------------------------------------------------------------
+c     jacobian function for residual function
+c----------------------------------------------------------------------
+
+      SUBROUTINE emepjacres(T,Y,YPRIME,DFDY,CON,RPAR,IPAR)
+      INTEGER NEQN,MN, ml, mu,  IPAR(*)
+      PARAMETER (NEQN=66, MN = 66)
+      DOUBLE PRECISION T,Y(NEQN),YPRIME(NEQN),DFDY(MN,NEQN),CON,RPAR(*)
+      ml = 0
+      mu = 0
+
+
+      call emepjac(neqn,t,y,ml,mu,dfdy,mn,rpar,ipar)
+
+       do i=1,neqn
+         do  j=1,neqn
+            dfdy(i,j) = -dfdy(i,j)
+         enddo
+      enddo
+c compute pd = -df/dy + con*M
+      do j=1,neqn
+         dfdy(j,j) = 1.0d0/con+ dfdy(j,j)
+      enddo
+c
+
+      return
+      end
+
+
 
 c----------------------------------------------------------------------
 c     jacobian function

@@ -2863,7 +2863,8 @@ C FM:   added the following line to avoid  uninitialised value(s)
       PLLFAL = PLFAIL
       IF(NQ.GT.2) PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
      +     1.5D+0+1.7d-6
-      IF(PLLFAL.GT.PLFAIL) PLFAIL=PLLFAL
+C FM added NQ.GT.2 in the if     
+      IF(PLLFAL.GT.PLFAIL.AND.NQ.GT.2) PLFAIL=PLLFAL
       IF(PLFAIL.LT.PRFAIL.AND.NQ.NE.1) THEN
          NEWQ=NQ-1
          NQ=NEWQ
