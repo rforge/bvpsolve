@@ -30,28 +30,28 @@ emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
        "ETRO2H", "PRRO2H", "MEKO2H", "MALO2H", "MACR", "ISNI", "ISRO2H", 
        "MARO2", "MAPAN", "CH2CCH3", "ISONO3", "ISNIR", "MVKO2H", "CH2CHR", 
        "ISNO3H", "ISNIRH", "MARO2H")
-   
-   
-    useres <- FALSE
+  useres <- FALSE
     if (is.character(method)) {
    	   if (method %in% c("mebdfi", "daspk"))
 	    	useres <- TRUE
     } else  if("res" %in% names(formals(method)))
-	       useres <- TRUE
-    if (useres)  {
+	       useres <- TRUE   
+  
+      if (useres) {
       #out <- ode(func = "emepfunc", parms = NULL,dllname = "deTestSet",y = yini,
       #        times = times, initfunc = NULL,  method=method,
       #        rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
-            dyini <- rep(0,66)
-
+      dyini <- rep(0,66)
       checkini(66, yini, dyini)
 	  	out <-dae(y = yini, dy = dyini, times = times, res = "emepres",parms=NULL,
           dllname = "deTestSet", jacres = "emepjacres",initfunc = NULL, 
           method=method,rtol=rtol,atol=atol,maxsteps = maxsteps,  ...)
-                 }
+           }
     else
-   out <- ode(func = "emepfunc", parms = NULL, dllname = "deTestSet", y = yini,
+      out <- ode(func = "emepfunc", parms = NULL, dllname = "deTestSet", y = yini,
               jacfunc = "emepjac", times = times,initfunc = NULL, method=method,
               rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
+                    
+              
    return(out)
 }

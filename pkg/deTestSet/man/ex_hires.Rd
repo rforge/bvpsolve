@@ -15,7 +15,8 @@ set. The software part of the problem is in the file hires.f available at [MM08]
 
 }
 \usage{
-hires (times = seq(0, 5, by = 0.01), yini = NULL, parms = list(),  ...)
+hires (yini = NULL, times = seq(0,321.8122,by= 321.8122/500),  atol=1e-6, rtol=1e-6,
+                   method = mebdfi, printmescd = TRUE,  parms = list(), ...) 
 }
 
 \arguments{
@@ -26,8 +27,18 @@ hires (times = seq(0, 5, by = 0.01), yini = NULL, parms = list(),  ...)
   \item{times }{time sequence for which output is wanted; the first
     value of \code{times} must be the initial time.
   }
+   \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{method }{the solver to use
+  }
   \item{parms }{list of parameters that overrule the default parameter values
   }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 321.8122 are printed}
   \item{... }{additional arguments passed to the solver .
   }
 }
@@ -45,7 +56,7 @@ hires (times = seq(0, 5, by = 0.01), yini = NULL, parms = list(),  ...)
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>
 
-Francesca Mazzia
+Francesca Mazzia <mazzia@dm.uniba.it>
 }
 \examples{
 out <- hires()

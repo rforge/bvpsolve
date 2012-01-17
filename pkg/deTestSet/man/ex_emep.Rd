@@ -9,7 +9,7 @@ The software part of the
 problem is in the file emep.f available at [MM08].
 }
 \usage{
-emep (times = seq(14400, 417600, by = 400), yini = NULL, 
+emep (times = seq(14400, 417600, by = 400), yini = NULL, method=bimd,
   parms = list(), rtol = 1e-5, atol = 0.1, maxsteps = 1e5, ...)
 }
 
@@ -28,6 +28,8 @@ emep (times = seq(14400, 417600, by = 400), yini = NULL,
   }
   \item{atol }{absolute error tolerance, either a scalar or a vector,
     one value for each y.
+  }
+   \item{method }{the solver to use
   }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
@@ -59,7 +61,7 @@ plot(out, lwd = 2, col = "darkblue",
 plot(out, col = "darkblue", lwd = 2, which = 1:16)
 mtext(side = 3,line = -1.5, "emep", cex = 1.25, outer = TRUE)
 
-# compare with reference solution (component 36 adn 38 not included)       
+# compare with reference solution (component 36 and 38 not included)       
 refsol <- reference("emep")
 inderr <- c(1:35,37,39:66)
 max(abs(out[nrow(out),inderr+1] - refsol[inderr])/refsol[inderr])     

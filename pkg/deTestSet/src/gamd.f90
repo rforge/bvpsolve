@@ -5678,7 +5678,7 @@ SUBROUTINE contout(R,T,TP,FF,DBLK,NT1, CONTR)
   !!   INPUT VARIABLES
   !!------------------------------------
   INTEGER, INTENT(IN) ::  R, DBLK, NT1
-  REAL(PREC) :: CONTR(R)
+  REAL(PREC), INTENT(OUT) :: CONTR(R)
   REAL(PREC), INTENT(IN) ::  T, TP(DBLK+1), FF(R,DBLK+1)
   !!
   !!   LOCAL VARIABLES

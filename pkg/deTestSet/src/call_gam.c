@@ -357,6 +357,7 @@ SEXP call_gambim(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 
   saveOut (tin, xytmp);               /* save initial condition */
   it = it +1;
+
   if (type == 1)
     F77_CALL(gamd) ( &n_eq, deriv_func, &tin, xytmp, &tout, &hini,
 		     Rtol, Atol, &itol, jac_func_gb, &ijac, &ml, &mu,
@@ -367,6 +368,7 @@ SEXP call_gambim(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 		     Rtol, Atol, &itol, jac_func_gb, &ijac, &ml, &mu,
          mas_func, &imas, &mlmas, &mumas, solout_bim, &iout,
 		     rwork, &lrw, iwork, &liw, out, ipar, &idid);
+
 
   if (idid == -1)
      warning("input is not consistent");

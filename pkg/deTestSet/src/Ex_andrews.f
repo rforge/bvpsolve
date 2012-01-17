@@ -203,14 +203,14 @@ c----------------------------------------------------------------------
 c     jacobian function
 c----------------------------------------------------------------------
 
-      subroutine andjac(t,y,yprime,dfdy,con,rpar,ipar)
+      subroutine andjacres(t,y,yprime,dfdy,con,rpar,ipar)
       INTEGER NEQN,MN, ipar(*),ml,mu
       PARAMETER (NEQN=27, MN = 27)
       DOUBLE PRECISION T, Y(NEQN), CON,DFDY(MN,NEQN), rpar(*)
       ml = 0
       mu = 0
 
-      call andjacdae(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      call andjac(neqn,t,y,ml,mu,dfdy,MN,rpar,ipar)
 
        do i=1,neqn
          do  j=1,neqn
@@ -227,7 +227,7 @@ c
       end
 
 
-      subroutine andjacdae(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      subroutine andjac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
       INTEGER NEQN,MN, ipar(*),ml,mu, ldim
 c      PARAMETER (NEQN=27, MN = 27)
       DOUBLE PRECISION T, Y(27), DFDY(27,27), rpar(*)

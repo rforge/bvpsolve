@@ -25,7 +25,7 @@ checkInput <- function(y, times, func, rtol, atol,
   if (!is.numeric(hmin))   stop("`hmin' must be numeric")
   if (hmin < 0)            stop("`hmin' must be a non-negative value")
   if (is.null(hmax))
-    hmax <- if (is.null(times)) 0 else max(abs(diff(times)))
+    hmax <- if (is.null(times)) 0 else max(abs(times[length(times)]-times[1]))
   if (!is.numeric(hmax))   stop("`hmax' must be numeric")
   if (hmax < 0)            stop("`hmax' must be a non-negative value")
   if (hmax == Inf)  hmax <- 0
