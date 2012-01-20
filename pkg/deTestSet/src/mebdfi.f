@@ -314,7 +314,7 @@ C     .. ARRAY ARGUMENTS ..
       INTEGER IWORK(LIWORK), MBND(4)
 C     ..
 C     .. LOCAL SCALARS ..
-      INTEGER I1,I2,I3,I4,I5,I6,I7,I8,I9,I10
+      INTEGER I1,I2,I3,I4,I5,I6,I7,I8,I9,I10, I11
 C     COMMON BLOCKS
 C     ..
 C     .. EXTERNAL SUBROUTINES ..
@@ -322,7 +322,7 @@ C     .. EXTERNAL SUBROUTINES ..
 C     ..
 C FM added UROUND and EPSJAC in SAVE
 C     .. SAVE STATEMENT ..
-      SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10, UROUND, EPSJAC
+      SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10, I11, UROUND, EPSJAC
 C     ..
 
       character (len=150) MSG
@@ -349,6 +349,7 @@ C KS: hard-coded LOUT = 0 (never used anymore...)
             I8 = I7 + N
             I9 = I8 + N
             I10 = I9 + MBND(4)*N
+            I11 = I10 + MBND(4)*N
 c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             UROUND = d1mach(3)
 
@@ -356,9 +357,9 @@ c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             EPSJAC = SQRT(WORK(1))
 
 c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
-           IF (LWORK.LT.(I10+1+MBND(4)*N)) THEN
+           IF (LWORK.LT.(I11-1)) THEN
                IDID = -11
-               WRITE (msg,9000) I10 + 1+MBND(4)*N
+               WRITE (msg,9000) I11 -1
                call rexit(msg)
 
             ENDIF
@@ -448,7 +449,7 @@ C     ..
 C        I.E. NORMAL CONTINUATION OF INTEGRATION
          T0=T
 CKS: hmax should become a parameter !
-         HMAX = DABS(TEND-T0)*10.0D+0
+         HMAX = DABS(TEND-T0)/10.0D+0
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT THE OUTPUT POINT, SO INTERPOLATE
             CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
@@ -710,6 +711,20 @@ C        COULD NOT ACHIEVE CONVERGENCE WITH HMIN
 
          GO TO 60
 
+      ELSE IF (KGO.EQ.6) THEN
+C        PASSED TOUT
+          WRITE (msg,9016) T,H
+         call rwarn(msg)
+
+         GO TO 70
+
+      ELSE IF (KGO.EQ.8) THEN
+C        STEPSIZE TOO SMALL
+         WRITE (msg,9015) T,H
+         call rwarn(msg)
+
+         GO TO 70
+
       END IF
 
  30   CONTINUE
@@ -840,6 +855,12 @@ C -------------------------- END OF SUBROUTINE OVDRIV -----------------
  9010 FORMAT (' KFLAG = -2 FROM INTEGRATOR AT T = ',E16.8,'  H =',
      +       E16.8,
      +       '  THE REQUESTED ERROR IS SMALLER THAN CAN BE HANDLED')
+ 9015 FORMAT (' KFLAG = -7 FROM INTEGRATOR AT T = ',E16.8,'  H =',
+     +       E16.8,
+     +       '  STEPSIZE TOO SMALL')
+ 9016 FORMAT (' KFLAG = -5 FROM INTEGRATOR AT T = ',E16.8,'  H =',
+     +       E16.8,
+     +       '  OVERSHOOT TOUT')
  9020 FORMAT (' INTEGRATION HALTED AT T = ',E16.8,
      +     '  ERROR TOO SMALL TO BE ATTAINED FOR THE MACHINE PRECISION')
  9030 FORMAT (' KFLAG = -3 FROM INTEGRATOR AT T = ',E16.8,
@@ -1101,6 +1122,14 @@ C     .. COMMON BLOCKS ..
          GO TO 70
       ENDIF
 C
+
+C
+C     PWCOPY IS INIZIALISED
+C
+      DO 19 I=1,N*N
+        PWCOPY(I) = 0.0d0
+ 19   CONTINUE
+C
       IF (MITER.EQ.2.OR.MITER.EQ.4) GO TO 30
 C
       NJE = NJE + 1
@@ -1230,7 +1259,7 @@ C FM: added check if ierr is OK
  540        CONTINUE
  261     CONTINUE
  61   CONTINUE
-      NRE=NRE+MBND(3)
+      NRE=NRE+MIN(MBND(3),N)
 C
 
 
@@ -2207,7 +2236,8 @@ C     .. INTRINSIC FUNCTIONS ..
       INTRINSIC DABS,DMAX1,DMIN1
 C     ..
 C     .. COMMON BLOCKS ..
-      SAVE HSTPSZ
+c      SAVE HSTPSZ
+      COMMON / STPSZE / HSTPSZ
       INTEGER IDOUB,ISAMP,IWEVAL,JCHANG,JSINUP,JSNOLD,L,M1,M2,MAXORD,
      +        MEQC1,MEQC2,MQ1TMP,MQ2TMP,NBSOL,NCOSET,NDEC,NEWPAR,
      +        NRE,NJE,NPSET,NQ,NQUSED,NRENEW,NSTEP,NT
@@ -2222,6 +2252,8 @@ C     .. SAVE STATEMENT ..
      + TCRAT1,TCRAT2,AVNEW2,AVOLD2,AVNEWJ,AVOLDJ,UPBND,
      + RC,VTOL,OLDLO,OVRIDE
       SAVE CFAIL,SAMPLE
+
+
 C     ..
 C     .. DATA STATEMENTS ..
 
@@ -2283,8 +2315,8 @@ C     ------------------------------------------------------------------
       CFAIL = .TRUE.
       AVNEWJ = ZERO
       AVOLDJ = ZERO
-      AVNEW2 = ZERO
-      AVOLD2 = ZERO
+c      AVNEW2 = ZERO
+c      AVOLD2 = ZERO
       SAMPLE = .FALSE.
       ISAMP = 0
       IEMB=0
@@ -2456,11 +2488,11 @@ C -------------------------------------------------------------------
       IF (JNEWIM) THEN
          IF (JSNOLD.GE.3) THEN
             AVNEWJ = TCRAT1/DBLE(FLOAT(IITER))
-            AVNEW2 = TCRAT2/DBLE(FLOAT(IITER2))
+C FM            AVNEW2 = TCRAT2/DBLE(FLOAT(IITER2))
 
          ELSE
             AVNEWJ = ONE
-            AVNEW2 = ONE
+c FM            AVNEW2 = ONE
          END IF
 
       ELSE
@@ -2469,7 +2501,7 @@ C          MATRIX P WAS FORMED WITH A COPY OF J
 C
          IF (JSNOLD.GE.3) THEN
             AVOLDJ = TCRAT1/DBLE(FLOAT(IITER))
-            AVOLD2 = TCRAT2/DBLE(FLOAT(IITER2))
+c            AVOLD2 = TCRAT2/DBLE(FLOAT(IITER2))
             IF (AVOLDJ.LT.AVNEWJ) THEN
                AVNEWJ = AVOLDJ
 
@@ -2836,8 +2868,9 @@ C
       IF(ITOL .EQ. 1) D = D/(RTOL(1)**2)
       T = TOLD
       HOLD = H
-C FM: (NQ.GT.1) changed with (NQ. GT.0) to avoid uninitialised value(s)
-      IF(NQ.GT.0) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
+C FM: added FFAIL=0.0d0 to avoid uninitialised value(s)
+      FFAIL = 0.0d0
+      IF(NQ.GT.1) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
       IF(NQ.GT.2) FRFAIL = 0.5D+0/DBLE(FLOAT(NQ-1))
       EFAIL = 0.5D+0/DBLE(FLOAT(L))
       CALL CPYARY(N*L,YHOLD,Y)
@@ -2860,11 +2893,16 @@ C
       PRFAIL = ((D/(0.2D+0*E))**EFAIL)*1.5D+0 + 1.6D-6
       PLFAIL = ((DDOWN/(0.2D+0*EDN))**FFAIL)*1.5D+0+1.7D-6
 C FM:   added the following line to avoid  uninitialised value(s)
-      PLLFAL = PLFAIL
-      IF(NQ.GT.2) PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
+      IF(NQ.GT.2) THEN
+         PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
      +     1.5D+0+1.7d-6
+         IF(PLLFAL.GT.PLFAIL) PLFAIL=PLLFAL
+      ENDIF
+c      PLLFAL = PLFAIL
+c      IF(NQ.GT.2) PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
+c     +     1.5D+0+1.7d-6
 C FM added NQ.GT.2 in the if     
-      IF(PLLFAL.GT.PLFAIL.AND.NQ.GT.2) PLFAIL=PLLFAL
+c      IF(PLLFAL.GT.PLFAIL) PLFAIL=PLLFAL
       IF(PLFAIL.LT.PRFAIL.AND.NQ.NE.1) THEN
          NEWQ=NQ-1
          NQ=NEWQ
@@ -2903,6 +2941,8 @@ C     *********************************
       H = H*RH
       DO 350 I = 1,N
          Y(I,1) = YHOLD(I,1)
+C FM added this line to be equal to the testset code
+         YHOLD(I,2) = YHOLD(I,2)*RH
          Y(I,2) = YHOLD(I,2)
  350  CONTINUE
       IWEVAL = MITER
@@ -3195,21 +3235,22 @@ C
             call rwarn(msg)
 
  9161       FORMAT ('STEPSIZE IS TOO SMALL')
-            IDID = -7
+            KFLAG = -7
             RETURN
          ENDIF
          T= TOLD
 C FRANCESCA MAZZIA commented the following IF block
 C   y0 H0 and T0 are not used in the function stiff
-c         IF ((T-TOUT)*H.GE.0.0D+0) THEN
+c    added in input
+         IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
 
-c            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
-c            HO = H
-c            T0 = TOUT
-c            IDID = -5
-c            RETURN
-c         ENDIF
+            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
+            HO = H
+            T0 = TOUT
+            KFLAG = -5
+            RETURN
+         ENDIF
          IERR = 0
          jstart = -1
          goto 30

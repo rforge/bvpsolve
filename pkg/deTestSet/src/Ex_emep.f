@@ -35,7 +35,7 @@ C
       CALL  emepfunc(N, T, Y, DELTA, rpar, ipar)
 C
       DO J = 1,N
-         DELTA(J) = YPRIME(J)-DELTA(J)
+         DELTA(J) = DELTA(J)-YPRIME(J)
       ENDDO
 
 C
@@ -322,14 +322,14 @@ c----------------------------------------------------------------------
 
       call emepjac(neqn,t,y,ml,mu,dfdy,mn,rpar,ipar)
 
-       do i=1,neqn
-         do  j=1,neqn
-            dfdy(i,j) = -dfdy(i,j)
-         enddo
-      enddo
+c       do i=1,neqn
+c         do  j=1,neqn
+c            dfdy(i,j) = -dfdy(i,j)
+c         enddo
+c      enddo
 c compute pd = -df/dy + con*M
       do j=1,neqn
-         dfdy(j,j) = 1.0d0/con+ dfdy(j,j)
+         dfdy(j,j) = dfdy(j,j)-1.0d0/con
       enddo
 c
 
