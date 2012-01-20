@@ -3245,9 +3245,9 @@ c    added in input
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
 
-            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
-            HO = H
-            T0 = TOUT
+c            CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
+c            HO = H
+c            T0 = TOUT
             KFLAG = -5
             RETURN
          ENDIF
