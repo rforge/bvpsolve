@@ -407,8 +407,8 @@ image(OUT, main = "Laplace")
 
 \section{The Time-dependent 2-D Sine-Gordon Equation}
 <<>>=
-Nx  <- 100
-Ny  <- 100
+Nx  <- 80
+Ny  <- 80
 
 xgrid <- setup.grid.1D(-7, 7, N=Nx)
 ygrid <- setup.grid.1D(-7, 7, N=Ny)
