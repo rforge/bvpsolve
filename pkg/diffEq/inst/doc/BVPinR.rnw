@@ -24,7 +24,7 @@
 
 
 \author{Karline Soetaert\\
-Netherlands Institute of Sea Research (NIOZ)\\
+Royal Netherlands Institute of Sea Research (NIOZ)\\
 Yerseke, The Netherlands
 }
 
@@ -45,10 +45,10 @@ Of course, much more information about each problem can be found in the book.
 %% in the following format:
 \Address{
   Karline Soetaert\\
-  Netherlands Institute of Sea Research (NIOZ)\\
+  Royal Netherlands Institute of Sea Research (NIOZ)\\
   4401 NT Yerseke, Netherlands
-  E-mail: \email{k.soetaert@nioo.knaw.nl}\\
-  URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
+  E-mail: \email{karline.soetaert@nioz.nl}\\
+  URL: \url{http://www.nioz.nl}\\
 }
 
 
