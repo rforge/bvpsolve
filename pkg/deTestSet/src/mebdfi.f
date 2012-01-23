@@ -352,14 +352,16 @@ C KS: hard-coded LOUT = 0 (never used anymore...)
             I11 = I10 + MBND(4)*N
 c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             UROUND = d1mach(3)
-
+            write(msg,*) 'UROUND',UROUND
+            call rprint(msg)
             WORK(1) = UROUND
             EPSJAC = SQRT(WORK(1))
 
 c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
-           IF (LWORK.LT.(I11-1)) THEN
+c Francesca added I11
+           IF (LWORK.LT.(I11+1)) THEN
                IDID = -11
-               WRITE (msg,9000) I11 -1
+               WRITE (msg,9000) I11 +1
                call rexit(msg)
 
             ENDIF
@@ -379,9 +381,13 @@ c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
 
 c
 c    THE DIMENSION OF THE REAL WORKSPACE, WORK, HAS TO BE AT LEAST
-c     (32 + MBND(4))*N+2 WHILE THE DIMENSION OF THE INTEGER
+c     (32 + 2*MBND(4))*N+2 WHILE THE DIMENSION OF THE INTEGER
 c    WORKSPACE HAS TO BE AT LEAST N+14.
 c
+
+      IERR = 0
+c
+c     THE ERROR FLAG IS INITIALISED
       CALL OVDRIV(N,MBND(4),T0,HO,Y0,YPRIME,TOUT,TEND,MF,IDID,LOUT,
      +    WORK(3),WORK(I1),WORK(I2),WORK(I3),WORK(I4),WORK(I5),WORK(I6),
      +     WORK(I7),WORK(I8),WORK(I9),WORK(I10),IWORK(15),
@@ -1212,8 +1218,10 @@ C FM: added check if ierr is OK
 
 
       GOTO 70
+
 C
 51    CONTINUE
+
 C KS:  CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
       CALL resid (T, Y, YPRIME, CON, SAVE2, IERR, RPAR, IPAR)
 C FM: added check if ierr is OK
@@ -1225,7 +1233,7 @@ C FM: added check if ierr is OK
             SAVE1(I) = Y(I,1)
             SAVE3(I)=YPRIME(I)
             YI=Y(I,1)
-            YP=YPRIME(I)
+c            YP=YPRIME(I)
             IF(ITOL.EQ.1) THEN
                R=DMAX1(EPSJAC*DABS(YI),R0/(YMAX(I)*RTOL(1)))
             ELSE
@@ -1242,13 +1250,13 @@ C FM: added check if ierr is OK
             Y(JJ,1)=SAVE1(JJ)
             YPRIME(JJ)=SAVE3(JJ)
             YJJ=Y(JJ,1)
-            YJP=YPRIME(JJ)
+c            YJP=YPRIME(JJ)
             IF (ITOL.EQ.1) THEN
                R=DMAX1(EPSJAC*DABS(YJJ),R0/(YMAX(JJ)*RTOL(1)))
             ELSE
                R=DMAX1(EPSJAC*DABS(YJJ),R0/YMAX(JJ))
             ENDIF
-            D=CON/R
+c           D=CON/R
             I1 = MAX0(JJ-MU,1)
             I2 = MIN0(JJ+ML,N)
             II = JJ*(MBND(4)-1)-ML
@@ -2869,7 +2877,7 @@ C
       T = TOLD
       HOLD = H
 C FM: added FFAIL=0.0d0 to avoid uninitialised value(s)
-      FFAIL = 0.0d0
+      FFAIL = 0.5d0
       IF(NQ.GT.1) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
       IF(NQ.GT.2) FRFAIL = 0.5D+0/DBLE(FLOAT(NQ-1))
       EFAIL = 0.5D+0/DBLE(FLOAT(L))
@@ -2901,7 +2909,7 @@ C FM:   added the following line to avoid  uninitialised value(s)
 c      PLLFAL = PLFAIL
 c      IF(NQ.GT.2) PLLFAL =((TWODWN/(0.2D+0*EDDN))**FRFAIL)*
 c     +     1.5D+0+1.7d-6
-C FM added NQ.GT.2 in the if     
+C FM added NQ.GT.2 in the if
 c      IF(PLLFAL.GT.PLFAIL) PLFAIL=PLLFAL
       IF(PLFAIL.LT.PRFAIL.AND.NQ.NE.1) THEN
          NEWQ=NQ-1
@@ -3406,7 +3414,8 @@ C----------------------------------------------------------------------------
 
       SUBROUTINE HCHOSE(RH,H,OVRIDE)
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
-      COMMON / STPSZE / HSTPSZ(2,14)
+      DIMENSION HSTPSZ(2,14)
+      COMMON / STPSZE / HSTPSZ
       LOGICAL OVRIDE
 C
 C     FIRST MOVE ALL ELEMENTS DOWN ONE PLACE
