@@ -48,7 +48,7 @@ c----------------------------------------------------------------------
 
       subroutine emepfunc(neqn,time,y,dy,rpar,ipar)
       integer neqn,ierr,ipar(*)
-      double precision time,y(neqn),yprime(neqn),dy(neqn),rpar(*)
+      double precision time,y(neqn),dy(neqn),rpar(*)
 
       DOUBLE PRECISION M, O2, XN2, RPATH3, RPATH4
       DOUBLE PRECISION S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11
@@ -343,7 +343,7 @@ c     jacobian function
 c----------------------------------------------------------------------
 
 
-      subroutine emepjac(neqn,t,y,ml,mu,dfdy,ldim,rpar,ipar)
+      subroutine emepjac(neqn,time,y,ml,mu,jac,ldim,rpar,ipar)
       integer ldim,neqn,ierr,ipar(*), ml, mu
       double precision time,y(neqn),jac(ldim,neqn),rpar(*)
 

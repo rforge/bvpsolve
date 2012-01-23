@@ -352,8 +352,6 @@ C KS: hard-coded LOUT = 0 (never used anymore...)
             I11 = I10 + MBND(4)*N
 c            UROUND = DLAMCH('Epsilon')     DID NOT WORK...
             UROUND = d1mach(3)
-            write(msg,*) 'UROUND',UROUND
-            call rprint(msg)
             WORK(1) = UROUND
             EPSJAC = SQRT(WORK(1))
 
@@ -1132,7 +1130,7 @@ C
 C
 C     PWCOPY IS INIZIALISED
 C
-      DO 19 I=1,N*N
+      DO 19 I=1,NPD*N
         PWCOPY(I) = 0.0d0
  19   CONTINUE
 C
