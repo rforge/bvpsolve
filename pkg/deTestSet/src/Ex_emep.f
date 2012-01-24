@@ -35,7 +35,7 @@ C
       CALL  emepfunc(N, T, Y, DELTA, rpar, ipar)
 C
       DO J = 1,N
-         DELTA(J) = DELTA(J)-YPRIME(J)
+         DELTA(J) = YPRIME(J)-DELTA(J)
       ENDDO
 
 C
@@ -47,7 +47,7 @@ c     derivative function
 c----------------------------------------------------------------------
 
       subroutine emepfunc(neqn,time,y,dy,rpar,ipar)
-      integer neqn,ierr,ipar(*)
+      integer neqn,ipar(*)
       double precision time,y(neqn),dy(neqn),rpar(*)
 
       DOUBLE PRECISION M, O2, XN2, RPATH3, RPATH4
@@ -322,14 +322,14 @@ c----------------------------------------------------------------------
 
       call emepjac(neqn,t,y,ml,mu,dfdy,mn,rpar,ipar)
 
-c       do i=1,neqn
-c         do  j=1,neqn
-c            dfdy(i,j) = -dfdy(i,j)
-c         enddo
-c      enddo
+       do i=1,neqn
+         do  j=1,neqn
+            dfdy(i,j) = -dfdy(i,j)
+         enddo
+      enddo
 c compute pd = -df/dy + con*M
       do j=1,neqn
-         dfdy(j,j) = dfdy(j,j)-1.0d0/con
+         dfdy(j,j) = dfdy(j,j)+1.0d0/con
       enddo
 c
 

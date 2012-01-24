@@ -40,7 +40,7 @@ c----------------------------------------------------------------------
       subroutine ringres(t,y,yprime,cj,f,ires,rpar,ipar)
       integer neqn,ires,ipar(*)
       parameter  (neqn=15)
-      double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
+      double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*),cj
 
       call ringfuncierr(neqn,t,y,f,ires, rpar,ipar)
       do i = 1,15

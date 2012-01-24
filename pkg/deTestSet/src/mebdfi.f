@@ -453,7 +453,7 @@ C     ..
 C        I.E. NORMAL CONTINUATION OF INTEGRATION
          T0=T
 CKS: hmax should become a parameter !
-         HMAX = DABS(TEND-T0)/10.0D+0
+         HMAX = DABS(TEND-T0)*10.0D+0
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT THE OUTPUT POINT, SO INTERPOLATE
             CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
@@ -568,6 +568,9 @@ C           ILLEGAL ERROR TOLERANCE
 
             IDID = -4
          ENDIF
+
+
+
          IF(ITOL.NE.1) THEN
             VHOLD = 0.0D+0
             DO 3 I=1,N
@@ -752,7 +755,7 @@ C     REMOVED AND CONTROL TRANSFERRED TO STATEMENT 500 INSTEAD OF 520.
 C --------------------------------------------------------------------
       IF(NSTEP.GT.MAXSTP) THEN
          KGO=5
-         KLAG=4
+         KFLAG=-6
 c   TOO MUCH WORK
          WRITE(msg,9130)
          call rwarn(msg)
@@ -1067,6 +1070,7 @@ C --------------------- END OF SUBROUTINE COSET ---------------------
      +     SAVE3,PW,PWCOPY,WRKSPC,IPIV,ITOL,RTOL,ATOL,NPSET,NJE,NRE,
      +     NDEC,IPAR,RPAR,IERR)
 
+
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
 C -------------------------------------------------------------------
 C     PSET IS CALLED BY STIFF TO COMPUTE AND PROCESS THE MATRIX
@@ -1218,7 +1222,7 @@ C FM: added check if ierr is OK
       GOTO 70
 
 C
-51    CONTINUE
+ 51    CONTINUE
 
 C KS:  CALL RESID(N,T,Y,SAVE2,YPRIME,IPAR,RPAR,IERR)
       CALL resid (T, Y, YPRIME, CON, SAVE2, IERR, RPAR, IPAR)
@@ -2242,8 +2246,8 @@ C     .. INTRINSIC FUNCTIONS ..
       INTRINSIC DABS,DMAX1,DMIN1
 C     ..
 C     .. COMMON BLOCKS ..
-c      SAVE HSTPSZ
-      COMMON / STPSZE / HSTPSZ
+      SAVE HSTPSZ
+c      COMMON / STPSZE / HSTPSZ
       INTEGER IDOUB,ISAMP,IWEVAL,JCHANG,JSINUP,JSNOLD,L,M1,M2,MAXORD,
      +        MEQC1,MEQC2,MQ1TMP,MQ2TMP,NBSOL,NCOSET,NDEC,NEWPAR,
      +        NRE,NJE,NPSET,NQ,NQUSED,NRENEW,NSTEP,NT
@@ -2270,7 +2274,7 @@ C     ..
 
  6000 TOLD = T
       KFLAG = 0
-      CFAIL = .FALSE.
+      CFAIL = .TRUE.
       IF (JSTART.GT.0) GO TO 60
       IF (JSTART.NE.0) GO TO 30
 C     ------------------------------------------------------------------
@@ -2550,6 +2554,7 @@ C
       JSNOLD = 0
       MQ1TMP = MEQC1
       MQ2TMP = MEQC2
+
 
       CALL PSET(Y,YPRIME,N,NPD,H,T,UROUND,EPSJAC,QI,MITER,MBND,
      +   NIND1,NIND2,NIND3,IER,pderv,resid,NRENEW,YMAX,SAVE1,SAVE2,
@@ -2943,7 +2948,7 @@ C     START FROM ORDER 1 AGAIN    *
 C     *********************************
       JCHANG = 1
       RH = DMAX1(HMIN/DABS(H),0.1D+0)
-      CALL HCHOSE(RH,H,OVRIDE)
+      CALL HCHOSE(RH,H,OVRIDE,HSTPSZ)
       H = H*RH
       DO 350 I = 1,N
          Y(I,1) = YHOLD(I,1)
@@ -3133,7 +3138,7 @@ C **********************************************************************
             GOTO 440
          ENDIF
          RH = DMIN1(RH,RMAX)
-         CALL HCHOSE(RH,H,OVRIDE)
+         CALL HCHOSE(RH,H,OVRIDE,HSTPSZ)
          IF ((JSINUP.LE.20).AND.(KFLAG.EQ.0).AND.(RH.LT.1.1D+0)) THEN
 C           WE HAVE RUN INTO PROBLEMS
             IDOUB = 10
@@ -3262,7 +3267,7 @@ c            T0 = TOUT
          goto 30
       endif
 c
-      IF(IJUS.EQ.0) CALL HCHOSE(RH,H,OVRIDE)
+      IF(IJUS.EQ.0) CALL HCHOSE(RH,H,OVRIDE,HSTPSZ)
       IF(.NOT.FINISH) THEN
          GO TO 40
       ELSE
@@ -3410,10 +3415,10 @@ C     ..
       END
 C----------------------------------------------------------------------------
 
-      SUBROUTINE HCHOSE(RH,H,OVRIDE)
+      SUBROUTINE HCHOSE(RH,H,OVRIDE,HSTPSZ)
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
       DIMENSION HSTPSZ(2,14)
-      COMMON / STPSZE / HSTPSZ
+c      COMMON / STPSZE / HSTPSZ
       LOGICAL OVRIDE
 C
 C     FIRST MOVE ALL ELEMENTS DOWN ONE PLACE
