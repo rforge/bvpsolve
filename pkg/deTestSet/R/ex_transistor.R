@@ -45,7 +45,7 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
                   res = "transres", nind = ind,
                   dllname = "deTestSet",  initfunc = "transpar",
                   jactype = "bandint", banddown = 2, bandup = 1,
-                  parms = parameter, maxsteps = maxsteps) )
+                  parms = parameter, maxsteps = maxsteps, ...) )
 
      mass <- matrix(nrow = 3, ncol = 8, data=0)
      mass[1,2] <- parameter["c1"]

@@ -498,7 +498,7 @@ c             write(MSG,188) hlamb,stden
 c188          format(1x,'the first stiffness estimate',2g22.10)
 c             CALL RPRINT(MSG) 
 c            ENDIF
-            IF (HLAMB.GT.3.25D0) THEN
+            IF (HLAMB.GT.3.25D0 .OR. .NOT.(HLAMB .GT. 0.0d0) ) THEN
                NONSTI=0
                IASTI=IASTI+1  
                IF (IASTI.EQ.15) THEN

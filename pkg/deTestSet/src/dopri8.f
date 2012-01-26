@@ -211,11 +211,11 @@ C *** *** *** *** *** *** ***
       NREJCT=0
       ARRET=.FALSE.
 C -------- IPRINT FOR MONITORING THE PRINTING
-      IF(IWORK(3).EQ.0)THEN
+c      IF(IWORK(3).EQ.0)THEN
          IPRINT=6
-      ELSE
+c      ELSE
          IPRINT=IWORK(3)
-      END IF
+c      END IF
 C -------- NMAX , THE MAXIMAL NUMBER OF STEPS ----- 
       IF(IWORK(1).EQ.0)THEN
          NMAX=100000
