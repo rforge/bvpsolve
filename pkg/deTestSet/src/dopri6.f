@@ -236,7 +236,7 @@ C -------- METH   COEFFICIENTS OF THE METHOD
          END IF
       END IF  
 C -------- NSTIFF   PARAMETER FOR STIFFNESS DETECTION  
-      IWORK(4)=1
+C      IWORK(4)=1
       NSTIFF=IWORK(4) 
       IF (NSTIFF.EQ.0) NSTIFF=1000
       IF (NSTIFF.LT.0) NSTIFF=NMAX+10
@@ -503,7 +503,7 @@ c            ENDIF
                IASTI=IASTI+1  
                IF (IASTI.EQ.15) THEN
                   IF (IPRINT.GT.0) THEN
-                               WRITE (MSG,*) 
+                      WRITE (MSG,*)
      &               ' THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X   
                       CALL RPRINT(MSG) 
                   ENDIF

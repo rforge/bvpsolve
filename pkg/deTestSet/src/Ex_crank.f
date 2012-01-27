@@ -70,7 +70,7 @@ c----------------------------------------------------------------------
       subroutine crankfunc(neqn,t,y,f,rpar,ip)
       integer neqn,ierr,ip(*),iopt(2)
 
-      double precision t,y(neqn),yprime(neqn),f(neqn),rpar(*)
+      double precision t,y(neqn),f(neqn),rpar(*)
 
       integer i,ires, ityp, iequa, icall 
       double precision dy(24)
