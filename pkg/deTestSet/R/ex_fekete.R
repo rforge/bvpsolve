@@ -40,7 +40,7 @@ fekete <- function(times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
        return( dae(y = yini, dy = dyini, times = times, res = "fekres",
                    nind = ind, method = method,
                    dllname = "deTestSet", initfunc = NULL,
-                   parms = NULL, maxsteps = maxsteps))
+                   parms = NULL, maxsteps = maxsteps, ...))
 
    fekete <- dae(y = yini, times = times, nind = ind,
           func = "fekfunc", mass = c(rep(1, 120), rep(0, 40)),
