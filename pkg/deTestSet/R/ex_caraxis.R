@@ -91,3 +91,25 @@ caraxis <-   function(times = seq(0, 3, by = 0.01),
     return(out)
 }
 
+
+
+caraxisprob <- function(){
+	fullnm <- "Car Axis problem"
+	problm <- 'caraxis'
+	type <- 'DAE'
+	neqn <- 10
+	ndisc <- 0
+	t <- matrix(1,2)
+	t[1] <- 0
+	t[2] <- 3
+	numjac <- TRUE
+	mljac <- neqn
+	mujac <- neqn
+	mlmas <- 0
+	mumas <- 0
+	ind <- c(4,4,2)
+    mass <- diag(nrow = 10, x = c(rep(1, 4), rep(k, 4), rep(0.,2)))
+	return(list(fullnm=fullnm, problm=problm,type=type,neqn=neqn,
+					t=t,numjac=numjac,mljac=mljac,mujac=mujac,
+					mlmas=mlmas,mumas=mumas,nind=ind, mass=mass))
+}
