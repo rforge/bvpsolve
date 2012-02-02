@@ -89,12 +89,18 @@ andrews <- function(times = seq(0,0.03, by=0.03/100) ,
           jacfunc ="andjac", jactype = jactype, ...)
       }
    }   
-   if (printmescd & (times[length(times)] == prob$t[2] )) { 
+   if (printmescd & (AndOut[nrow(AndOut),1]  == prob$t[2] )) { 
     	ref = reference("andrews")
-		  mescd = -log10(abs(AndOut[nrow(AndOut),-1] - ref)/(atol/rtol+abs(ref)))
+		  mescd = min(-log10(abs(AndOut[nrow(AndOut),-1] - ref)/(atol/rtol+abs(ref))))
 		  printM(prob$fullnm)
-      printM("Mixed error significant digits")
-	  	print(mescd)
+		  cat('Solved with ')
+		  printM(attributes(AndOut)$type)
+		  cat('Using rtol = ')
+		  cat(rtol)
+		  cat(', atol=')
+		  printM(atol)
+          printM("Mixed error significant digits")
+	   	print(mescd)
     }
                            
   return(AndOut)

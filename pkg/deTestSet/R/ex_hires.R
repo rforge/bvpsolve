@@ -75,12 +75,16 @@ hires <- function( yini = NULL, times = seq(0,321.8122,by= 321.8122/500), atol=1
    
 	
    
-	if (printmescd & (times[length(times)] == prob$t[2] )) { 
+	if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
     	ref = reference("hires")
-		mescd = -log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref)))
+		mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
 	    printM(prob$fullnm)
 	    cat('Solved with ')
 	    printM(attributes(out)$type)
+		cat('Using rtol = ')
+		cat(rtol)
+		cat(', atol=')
+		printM(atol)
         printM("Mixed error significant digits:")
 	    printM(mescd)}
   
