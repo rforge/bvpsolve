@@ -9,7 +9,7 @@
 ## =============================================================================
 
 emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
-                    method = bimd, parms = list(), rtol = 1e-5, atol = 0.1,
+                    method = bimd, parms = list(), rtol = 1e-5, atol = 0.1,printmescd = TRUE, 
                    maxsteps = 1e5, ...) {
 
 ### check input 
@@ -30,7 +30,10 @@ emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
        "ETRO2H", "PRRO2H", "MEKO2H", "MALO2H", "MACR", "ISNI", "ISRO2H", 
        "MARO2", "MAPAN", "CH2CCH3", "ISONO3", "ISNIR", "MVKO2H", "CH2CHR", 
        "ISNO3H", "ISNIRH", "MARO2H")
-  useres <- FALSE
+
+    prob <- emepprob()
+
+	useres <- FALSE
     if (is.character(method)) {
    	   if (method %in% c("mebdfi", "daspk"))
 	    	useres <- TRUE
@@ -51,7 +54,36 @@ emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
       out <- ode(func = "emepfunc", parms = NULL, dllname = "deTestSet", y = yini,
               jacfunc = "emepjac", times = times,initfunc = NULL, method=method,
               rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
-                    
+                
+  
+   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
+	  ref = reference("emep")
+	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
+	  printM(prob$fullnm)
+	  cat('Solved with ')
+	  printM(attributes(out)$type)
+	  cat('Using rtol = ')
+	  cat(rtol)
+	  cat(', atol=')
+	  printM(atol)
+	  printM("Mixed error significant digits:")
+	  printM(mescd)}
+  
               
    return(out)
+}
+
+emepprob <- function(){ 
+	fullnm <- 'EMEP problem'
+	problm <- 'EMEP'
+	type   <- 'ODE'
+	neqn   <- 66
+	t <- matrix(1,2)
+	t[1]   <- 14400
+	t[2]   <- 417600
+	numjac <- FALSE
+	mljac  <- neqn
+	mujac  <- neqn
+	return(list(fullnm=fullnm, problm=problm,type=type,neqn=neqn,
+					t=t,numjac=numjac,mljac=mljac,mujac=mujac))
 }

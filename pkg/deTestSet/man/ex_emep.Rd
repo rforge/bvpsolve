@@ -10,7 +10,7 @@ problem is in the file emep.f available at [MM08].
 }
 \usage{
 emep (times = seq(14400, 417600, by = 400), yini = NULL, method=bimd,
-  parms = list(), rtol = 1e-5, atol = 0.1, maxsteps = 1e5, ...)
+  parms = list(), rtol = 1e-5, atol = 0.1,printmescd = TRUE,  maxsteps = 1e5, ...)
 }
 
 \arguments{
@@ -31,6 +31,9 @@ emep (times = seq(14400, 417600, by = 400), yini = NULL, method=bimd,
   }
    \item{method }{the solver to use
   }
+   \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time   417600 are printed
+    }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }  
