@@ -7,8 +7,9 @@ The fekete problem computes the elliptic Fekete points.
  
 }
 \usage{
-fekete (times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL, 
-  parms=list(), method = "mebdfi", maxsteps = 1e+05, ...) 
+fekete (times = seq(0, 1e3, by = 10 ), yini = NULL, dyini = NULL, 
+       parms=list(), method = "mebdfi", atol=1e-6, rtol=1e-6, 
+	   printmescd = TRUE, maxsteps = 1e+05, ...) 
 }
 
 \arguments{
@@ -26,6 +27,15 @@ fekete (times = seq(0, 20, by = 0.1), yini = NULL, dyini = NULL,
   }
   \item{method }{the solver to use
   }
+   \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+   \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 0.1  are printed
+    }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }
