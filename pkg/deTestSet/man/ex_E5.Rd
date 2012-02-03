@@ -7,8 +7,8 @@ It is an ODE, 4 equations
 
 }
 \usage{
-E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL, 
-  parms = list(), atol = 1.11e-24, rtol = 1e-6, maxsteps = 1e5, ...)
+E5 (times = c(0, 10^(seq(-5, 13, by = 0.1))), yini = NULL, 
+  parms = list(), atol = 1.11e-24, rtol = 1e-6, printmescd = TRUE,  maxsteps = 1e5, ...)
 }
 
 \arguments{
@@ -27,6 +27,9 @@ E5 (times = c(0, 10^(seq(-5, 12, by = 0.1))), yini = NULL,
   \item{rtol }{relative error tolerance, either a scalar or a vector,
     one value for each y,
   }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 1e13  are printed
+    }
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }

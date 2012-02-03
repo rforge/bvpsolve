@@ -10,7 +10,7 @@ It is a differential algebraic equation of index 3
 }
 \usage{
 caraxis (times = seq(0, 3, by = 0.01), yini = NULL, dyini = NULL,
-   method = "mebdfi", parms = list(), ...)  
+   method = "mebdfi",  atol=1e-6, rtol=1e-6,  printmescd = TRUE, parms = list(), ...)  
 }
 
 \arguments{
@@ -24,9 +24,19 @@ caraxis (times = seq(0, 3, by = 0.01), yini = NULL, dyini = NULL,
   \item{times }{time sequence for which output is wanted; the first
     value of \code{times} must be the initial time.
   }
-  \item{parms }{list of parameters that overrule the default parameter values
-  }
+ 
   \item{method }{the solver to use; only \code{mebdfi} available for now
+  }
+   \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 3 are printed
+    }
+   \item{parms }{list of parameters that overrule the default parameter values
   }
   \item{... }{additional arguments passed to the solver .
   }
