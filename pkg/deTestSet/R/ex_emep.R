@@ -55,7 +55,7 @@ emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
               jacfunc = "emepjac", times = times,initfunc = NULL, method=method,
               rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
                 
-  
+   if (nrow(out) > 0) 
    if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 	  ref = reference("emep")
 	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

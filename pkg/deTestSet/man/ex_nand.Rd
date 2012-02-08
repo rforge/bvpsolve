@@ -8,7 +8,8 @@ It is an index 1 IDE, 14 equations
 }
 \usage{
 nand  (times = 0:80, yini =NULL, dyini = NULL,
-  parms = list(), method = "mebdfi", maxsteps = 1e5, ...) 
+  parms = list(), method = "mebdfi", maxsteps = 1e5,
+  rtol=1e-6,atol=1e-6, printmescd = TRUE, ...) 
 }
 
 \arguments{
@@ -29,6 +30,15 @@ nand  (times = 0:80, yini =NULL, dyini = NULL,
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }
+   \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+   \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time   417600 are printed
+    }
   \item{... }{additional arguments passed to the solver .
   }
 }
