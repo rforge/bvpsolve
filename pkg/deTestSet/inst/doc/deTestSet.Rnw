@@ -99,8 +99,8 @@ initial value problems, R}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{Solving Differential Algebraic Equations in R}
-%\VignetteKeywords{differential algebraic equations, initial value problems, R}
+%\VignetteIndexEntry{Test Set Problems in R}
+%\VignetteKeywords{differential algebraic equations, initial value problems, testset, R}
 %\VignettePackage{deTestSet}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
