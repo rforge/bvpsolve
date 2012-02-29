@@ -298,7 +298,7 @@ legend("bottomright", col = c("black", "grey"), lwd = 2,
 \clearpage
 \subsection{A stiff Chemical Example}
 <<>>=
-load(file = "Light.rda")
+load(file = "light.rda")
 head(Light, n = 4)
 
 irradiance <- approxfun(Light)
