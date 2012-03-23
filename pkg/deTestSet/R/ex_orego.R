@@ -29,7 +29,7 @@ orego <- function(times = 0:360, yini =NULL,
    
    prob <- oregoprob()
 ### solve
-   out <- ode(func = orego, parms = parameter, y = yini, times = times,
+   out <- ode(func = orego, parms = parameter, y = yini, times = times,atol=atol, rtol=rtol,
    ...)
 
   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
