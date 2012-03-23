@@ -9,7 +9,7 @@
 ## =============================================================================
 
 orego <- function(times = 0:360, yini =NULL,
-                  parms = list(),  ...) {
+                  parms = list(), printmescd = TRUE, atol = 1e-6, rtol = 1e-6, ...) {
 
 ### derivative function
   orego <- function(t,y,parms) {
@@ -26,11 +26,44 @@ orego <- function(times = 0:360, yini =NULL,
 
    if (is.null(yini)) yini <- 1:3
    checkini(3, yini)
-
-
+   
+   prob <- oregoprob()
 ### solve
    out <- ode(func = orego, parms = parameter, y = yini, times = times,
    ...)
 
+  if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
+	ref = reference("orego")
+	mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
+	printM(prob$fullnm)
+	cat('Solved with ')
+	printM(attributes(out)$type)
+	cat('Using rtol = ')
+	cat(rtol)
+	cat(', atol=')
+	printM(atol)
+	printM("Mixed error significant digits:")
+	printM(mescd)}
+
+
    return(out)
 }
+
+
+oregoprob <- function(){ 
+	fullnm <- 'Problem OREGONATOR'
+	problm <- 'orego'
+	type   <- 'ODE'
+	neqn   <- 3
+	t <- matrix(1,2)
+	t[1]   <- 0
+	t[2]   <- 360
+	numjac <- FALSE
+	mljac  <- neqn
+	mujac  <- neqn	
+	return(list(fullnm=fullnm, problm=problm,type=type,neqn=neqn,
+					t=t,numjac=numjac,mljac=mljac,mujac=mujac))
+}
+
+
+

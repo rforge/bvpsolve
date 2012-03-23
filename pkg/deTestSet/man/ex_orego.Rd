@@ -8,7 +8,7 @@ It is an ODE, 3 equations
 
 }
 \usage{
-orego (times = 0:360, yini = NULL, parms = list(),  ...) 
+orego (times = 0:360, yini = NULL, parms = list(),  printmescd = TRUE, atol = 1e-6, rtol = 1e-6, ...) 
 }
 
 \arguments{
@@ -21,6 +21,15 @@ orego (times = 0:360, yini = NULL, parms = list(),  ...)
   }
   \item{parms }{list of parameters that overrule the default parameter values
   }
+  \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 1e13  are printed
+    }
   \item{... }{additional arguments passed to the solver .
   }
 }
