@@ -19,7 +19,7 @@ The software part of the problem is in the file ringmod.f available at [MM08].
 \usage{
 ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, 
       dyini = NULL, parms = list(), method = "mebdfi", 
-       atol = 1e-8, rtol = 1e-8, maxsteps = 1e+06, ...) 
+       atol = 1e-8, rtol = 1e-8, maxsteps = 1e+06, printmescd = TRUE, ...) 
 }
 
 \arguments{
@@ -46,6 +46,9 @@ ring (times = seq(0, 0.001, by = 5e-06), yini = NULL,
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }
+   \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 1e13  are printed
+    }
   \item{... }{additional arguments passed to the solver .
   }
 }
