@@ -13,7 +13,8 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file pollu.f available at [MM08].
 }
 \usage{
-pollution (times = seq(0, 10, 0.1), yini = NULL, parms = list(), method = mebdfi,  ...)   
+pollution (times = seq(0, 60, 1), yini = NULL, parms = list(), method = mebdfi,
+           printmescd = TRUE, atol = 1e-6, rtol = 1e-6,  ...)   
 }
 
 \arguments{
@@ -28,6 +29,15 @@ pollution (times = seq(0, 10, 0.1), yini = NULL, parms = list(), method = mebdfi
   }
   \item{method }{the solver to use
   }
+   \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 1e13  are printed
+    }
   \item{... }{additional arguments passed to the solver .
   }
 }
