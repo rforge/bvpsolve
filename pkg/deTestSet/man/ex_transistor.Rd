@@ -10,7 +10,7 @@ It is an index 1 DAE, 8 equations
 }
 \usage{
 transistor (times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
-  parms = list(), method = "mebdfi", maxsteps = 1e5, ...) 
+  parms = list(), method = "mebdfi", maxsteps = 1e5, atol = 1e-6, rtol = 1e-6,  printmescd = TRUE, ...) 
 }
 
 \arguments{
@@ -31,6 +31,15 @@ transistor (times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
   \item{maxsteps }{maximal number of steps per output interval taken by 
     the solver
   }
+   \item{atol }{absolute error tolerance, either a scalar or a vector,
+    one value for each y.
+  }
+  \item{rtol }{relative error tolerance, either a scalar or a vector,
+    one value for each y,
+  }
+  \item{printmescd }{if TRUE  the mixed error significant digits computed using
+    the  reference solution at time 1e13  are printed
+    }
   \item{... }{additional arguments passed to the solver .
   }
 }
