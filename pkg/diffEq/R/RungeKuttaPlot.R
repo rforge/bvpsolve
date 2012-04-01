@@ -93,9 +93,9 @@ rkMethodPlot <-  function (rk, ...) {
 
 
   axis(side = 2, at = yini*exp(mu*c(0,10)), 
-       label =c(expression(y[0]), expression(y[1])))
+       labels =c(expression(y[0]), expression(y[1])))
   axis(side = 1, at = c(0,10), 
-       label =c(expression(x[0]), expression(x[1])))
+       labels =c(expression(x[0]), expression(x[1])))
 
   points(YY$xn, YY$yn)
   points(YY$xx, YY$yy)
