@@ -50,7 +50,8 @@ ring <- function(times = seq(0, 1e-3, by = 5e-6),
           func = "ringfunc", 
           dllname = "deTestSet", initfunc = "ringpar", atol=atol, rtol=rtol,
           parms = parameter,method = method,  maxsteps = maxsteps, ...)
-     
+ 
+if (nrow(out) > 0) 
 if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 	ref = reference("ring")
 	mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

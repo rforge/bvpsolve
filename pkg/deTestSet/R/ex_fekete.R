@@ -52,6 +52,8 @@ fekete <- function(times = seq(0, 1e3, by = 10), yini = NULL, dyini = NULL,
           parms = NULL, method = method, atol=atol,rtol=rtol,
           maxsteps = maxsteps, ...)
     }
+	
+if (nrow(out) > 0) 
   if (printmescd & ( fekete[nrow(fekete),1] == prob$t[2] )) { 
 	  ref = reference("fekete")
 	  mescd = min(-log10(abs(fekete[nrow(fekete),-1] - ref)/(atol/rtol+abs(ref))))

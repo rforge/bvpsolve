@@ -38,7 +38,7 @@ E5 <- function(times = c(0, 10^(seq(-5, 13, by = 0.1))), yini = NULL,
               times = times, atol = atol, rtol = rtol,
               maxsteps = maxsteps, ...)
 	  
-	  
+	 if (nrow(out) > 0) 
 	  if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 		  ref = reference("E5")
 		  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

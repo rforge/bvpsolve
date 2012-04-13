@@ -65,7 +65,7 @@ tube <- function(times = seq(0, 17.0*3600, by = 100),
           maxsteps = maxsteps, atol= atol, rtol=rtol,...)
         }
 	
-
+  if (nrow(tuber) > 0) 
     if (printmescd & ( tuber[nrow(tuber),1] == prob$t[2] )) { 
 	  ref = reference("tube")
 	  mescd = min(-log10(abs(tuber[nrow(tuber),-1] - ref)/(atol/rtol+abs(ref))))

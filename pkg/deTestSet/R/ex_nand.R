@@ -67,7 +67,7 @@ nand <- function(times = 0:80, yini = NULL, dyini = NULL,
 nandprob <- function(){ 
 	fullnm <- 'NAND gate'
 	problm <- 'nand'
-	type   <- 'ODE'
+	type   <- 'IDE'
 	neqn   <- 14
 	t <- matrix(1,2)
 	t[1]   <- 0

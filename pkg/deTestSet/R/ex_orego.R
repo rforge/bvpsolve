@@ -32,6 +32,7 @@ orego <- function(times = 0:360, yini =NULL,
    out <- ode(func = orego, parms = parameter, y = yini, times = times,atol=atol, rtol=rtol,
    ...)
 
+if (nrow(out) > 0) 
   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 	ref = reference("orego")
 	mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

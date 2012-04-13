@@ -5,7 +5,8 @@
 ### ============================================================================
 
 wheelset <- function(times = seq(0, 10, by = 0.01), yini = NULL, dyini = NULL, 
-                     parms = list(), method = "mebdfi", maxsteps = 1e5, ...) {
+                     parms = list(), method = "mebdfi", maxsteps = 1e5, 
+					 atol=1e-6, rtol=1e-6, printmescd=TRUE, ...) {
 
 ### parameters
     parameter <- c(MR = 16.08, G = 9.81, V = 30., RN0 = 0.1, LI1 = 0.0605,
@@ -34,12 +35,47 @@ wheelset <- function(times = seq(0, 10, by = 0.01), yini = NULL, dyini = NULL,
       names(yini) <- c("x","y","z","theta","phi",
          paste("v",1:5,sep=""),"beta",
          paste("q",1:4,sep=""),paste("lam",1:2,sep=""))
+
+    prob <- wheelprob()
 ### solve
    ind  <- c(15,2,0)
 
-   return( dae(y = yini, dy = dyini, times = times,
+    out <- dae(y = yini, dy = dyini, times = times,
               res = "wheelres", nind = ind,
               dllname = "deTestSet", initfunc = "wheelpar",
               parms = parameter,
-              maxsteps = maxsteps, method = method, ...))
+              maxsteps = maxsteps, method = method, atol=atol,rtol=rtol, ...)
+	  
+	  if (nrow(out) > 0) 
+		  if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
+			  ref = reference("wheelset")
+			  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
+			  printM(prob$fullnm)
+			  cat('Solved with ')
+			  printM(attributes(out)$type)
+			  cat('Using rtol = ')
+			  cat(rtol)
+			  cat(', atol=')
+			  printM(atol)
+			  printM("Mixed error significant digits:")
+			  printM(mescd)}
+	  
+	  return(out) 
 }
+
+
+wheelprob <- function(){ 
+	fullnm <- 'Wheelset'
+	problm <- 'wheel'
+	type   <- 'IDE'
+	neqn   <- 17
+	t <- matrix(1,2)
+	t[1]   <- 0
+	t[2]   <- 10
+	numjac <- TRUE
+	mljac  <- neqn
+	mujac  <- neqn	
+	return(list(fullnm=fullnm, problm=problm,type=type,neqn=neqn,
+					t=t,numjac=numjac,mljac=mljac,mujac=mujac))
+}
+

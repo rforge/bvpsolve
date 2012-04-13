@@ -50,6 +50,8 @@ pleiades  <- function (times = seq(0, 3.0, by = 0.01), yini = NULL,
               jacfunc = "pleiajac", times = times, initfunc = NULL,  method=method, 
 			  atol=atol, rtol=rtol, ...)
   
+  
+  if (nrow(out) > 0) 
     if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 	  ref = reference("pleiades")
 	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

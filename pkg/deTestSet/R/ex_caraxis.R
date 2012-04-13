@@ -93,6 +93,8 @@ caraxis <-   function(times = seq(0, 3, by = 0.01),
                    dllname = "deTestSet", initfunc = "carpar",
                    mass = mass, parms = parameter, nind = nind,  method = method,  atol=atol,rtol=rtol, ...)
 	   }  
+	   
+	   if (nrow(out) > 0) 
 		   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 			   ref = reference("caraxis")
 			   mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

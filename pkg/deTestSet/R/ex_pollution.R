@@ -64,7 +64,7 @@ pollution <- function(times = seq(0, 60, 1), yini = NULL,
               dllname = "deTestSet", initfunc = "polpar", method=method,
               parms = parameter,atol=atol, rtol=rtol, ...)
   
-  
+  if (nrow(out) > 0) 
     if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
 	  ref = reference("pollution")
 	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))

@@ -75,6 +75,8 @@ crank <- function(times = seq(0, 0.1, by = 0.001),
           parms = parameter, method = method,
           ipar = ipar, maxsteps = maxsteps, ...)
      }
+	 
+ if (nrow(crank) > 0) 
   if (printmescd & ( crank[nrow(crank),1] == prob$t[2] )) { 
 	  ref = reference("crank")
 	  mescd = min(-log10(abs(crank[nrow(crank),2:8] - ref[1:7])/(atol/rtol+abs(ref[1:7]))))
