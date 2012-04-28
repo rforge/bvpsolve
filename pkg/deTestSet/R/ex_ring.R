@@ -11,8 +11,8 @@
 
 ring <- function(times = seq(0, 1e-3, by = 5e-6),
                  yini = NULL, dyini = NULL,
-                 parms = list(), method = "mebdfi", 
-                 atol = 1e-8, rtol = 1e-8, maxsteps = 1e6, printmescd = TRUE, ...) {
+                 parms = list(), printmescd = TRUE, method = mebdfi, 
+                 atol = 1e-8, rtol = 1e-8, maxsteps = 1e6, ...) {
 
 # initial conditions of state variables
 
@@ -50,21 +50,9 @@ ring <- function(times = seq(0, 1e-3, by = 5e-6),
           func = "ringfunc", 
           dllname = "deTestSet", initfunc = "ringpar", atol=atol, rtol=rtol,
           parms = parameter,method = method,  maxsteps = maxsteps, ...)
- 
-if (nrow(out) > 0) 
-if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	ref = reference("ring")
-	mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	printM(prob$fullnm)
-	cat('Solved with ')
-	printM(attributes(out)$type)
-	cat('Using rtol = ')
-	cat(rtol)
-	cat(', atol=')
-	printM(atol)
-	printM("Mixed error significant digits:")
-	printM(mescd)}
-  return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "ring", rtol, atol)	
+   return(out)
 }
 
 # -------------------------------------------------------

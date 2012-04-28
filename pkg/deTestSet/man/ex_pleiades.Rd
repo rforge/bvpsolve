@@ -10,7 +10,9 @@ It is a set of nonstiff ordinary differential equations of dimension 28.
 
 }
 \usage{
-pleiades (times = seq(0, 3.0, by = 0.01), yini = NULL, method = lsoda, atol = 1e-6, rtol = 1e-6, printmescd = TRUE, ...)
+pleiades (times = seq(0, 3.0, by = 0.01), yini = NULL, 
+          printmescd = TRUE, method = lsoda,
+          atol = 1e-6, rtol = 1e-6, ...)
 }
 
 \arguments{

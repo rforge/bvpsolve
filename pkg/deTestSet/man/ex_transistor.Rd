@@ -10,7 +10,8 @@ It is an index 1 DAE, 8 equations
 }
 \usage{
 transistor (times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
-  parms = list(), method = "mebdfi", maxsteps = 1e5, atol = 1e-6, rtol = 1e-6,  printmescd = TRUE, ...) 
+            parms = list(), printmescd = TRUE, method = mebdfi,
+            atol = 1e-6, rtol = 1e-6, maxsteps = 1e5, ...) 
 }
 
 \arguments{

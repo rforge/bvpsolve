@@ -8,7 +8,9 @@ It is an ODE, 3 equations
 
 }
 \usage{
-orego (times = 0:360, yini = NULL, parms = list(),  printmescd = TRUE, atol = 1e-6, rtol = 1e-6, ...) 
+orego (times = 0:360, yini = NULL, 
+       parms = list(), printmescd = TRUE, 
+       atol = 1e-6, rtol = 1e-6, ...) 
 }
 
 \arguments{

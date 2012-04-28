@@ -10,8 +10,8 @@ Index 1 DAE of dimension 350
 }
 \usage{
 twobit (times = seq(0, 320, by = 0.5), yini = NULL, dyini = NULL, 
-  method = "radau",  atol = 1e-4, rtol = 1e-4, 
-  maxsteps = 1e5, hmax = 0.1,printmescd = TRUE, ...) 
+        printmescd = TRUE, method = radau,  
+        atol = 1e-4, rtol = 1e-4, maxsteps = 1e5, hmax = 0.1, ...) 
 }
 
 \arguments{

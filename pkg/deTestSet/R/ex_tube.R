@@ -6,8 +6,8 @@
 
 tube <- function(times = seq(0, 17.0*3600, by = 100),
                  yini = NULL, dyini = NULL, parms = list(),
-                 method = "radau", maxsteps = 1e5, 
-				 atol=1e-6, rtol=1e-6, printmescd = TRUE, ...) {
+                 printmescd = TRUE, method = radau, 
+				         atol = 1e-6, rtol = 1e-6, maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(nu = 1.31e-6, g = 9.8, rho = 1.0e3, rcrit = 2.3e3,
@@ -64,21 +64,8 @@ tube <- function(times = seq(0, 17.0*3600, by = 100),
           parms = parameter, method = method,
           maxsteps = maxsteps, atol= atol, rtol=rtol,...)
         }
-	
-  if (nrow(tuber) > 0) 
-    if (printmescd & ( tuber[nrow(tuber),1] == prob$t[2] )) { 
-	  ref = reference("tube")
-	  mescd = min(-log10(abs(tuber[nrow(tuber),-1] - ref)/(atol/rtol+abs(ref))))
-	  printM(prob$fullnm)
-	  cat('Solved with ')
-	  printM(attributes(tuber)$type)
-	  cat('Using rtol = ')
-	  cat(rtol)
-	  cat(', atol=')
-	  printM(atol)
-	  printM("Mixed error significant digits:")
-	  printM(mescd)}
-    
+  if(printmescd) 
+    tuber <- printpr (tuber, prob, "tube", rtol, atol)	
   return(tuber)
 }
 

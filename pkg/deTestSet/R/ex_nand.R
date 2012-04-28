@@ -15,8 +15,8 @@
 # 
 # ---------------------------------------------------------------------
 nand <- function(times = 0:80, yini = NULL, dyini = NULL,
-                 parms=list(), method = "mebdfi", maxsteps = 1e5,
-                 rtol=1e-6,atol=1e-6, printmescd = TRUE, ...) {
+                 parms=list(), printmescd = TRUE, method = mebdfi,
+                 atol = 1e-6, rtol = 1e-6, maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(RGS = 4, RGD = 4, RBS = 10, RBD = 10,
@@ -46,21 +46,9 @@ nand <- function(times = 0:80, yini = NULL, dyini = NULL,
           parms = parameter, maxsteps = maxsteps, rtol=rtol, atol=atol, ...)
 
                         
-   if (nrow(out) > 0) 
-   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	  ref = reference("nand")
-	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	  printM(prob$fullnm)
-	  cat('Solved with ')
-	  printM(attributes(out)$type)
-	  cat('Using rtol = ')
-	  cat(rtol)
-	  cat(', atol=')
-	  printM(atol)
-	  printM("Mixed error significant digits:")
-	  printM(mescd)}
-  
-  return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "nand", rtol, atol)	
+   return(out)
 }
 
   

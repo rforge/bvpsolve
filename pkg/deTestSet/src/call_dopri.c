@@ -161,7 +161,7 @@ SEXP call_dop(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
 
   int  j, nt, latol, lrtol, lrw, liw;
   int  isForcing;
-  double *Atol, *Rtol, hini=0, *ww;
+  double *Atol, *Rtol, *ww;
   int itol, iout, idid, mflag;
 
   /* pointers to functions passed to FORTRAN */

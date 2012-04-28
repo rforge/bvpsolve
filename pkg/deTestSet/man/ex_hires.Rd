@@ -15,8 +15,9 @@ set. The software part of the problem is in the file hires.f available at [MM08]
 
 }
 \usage{
-hires (yini = NULL, times = seq(0,321.8122,by= 321.8122/500),  atol=1e-6, rtol=1e-6,
-                   method = mebdfi, printmescd = TRUE,  parms = list(), ...) 
+hires (yini = NULL, times = seq(0, 321.8122, by = 321.8122/500), 
+       parms = list(), printmescd = TRUE, method = mebdfi, 
+       atol = 1e-6, rtol = 1e-6, ...) 
 }
 
 \arguments{

@@ -11,8 +11,9 @@
 ##
 ## =============================================================================
 
-hires <- function( yini = NULL, times = seq(0,321.8122,by= 321.8122/500), atol=1e-6, rtol=1e-6,
-                   method = mebdfi, printmescd = TRUE,  parms = list(), ...) {
+hires <- function( yini = NULL, times = seq(0, 321.8122, by = 321.8122/500), 
+                   parms = list(), printmescd = TRUE,   
+                   method = mebdfi, atol = 1e-6, rtol = 1e-6, ...) {
 
 ### derivative function
   hires <- function(t,y,parms) {
@@ -73,24 +74,9 @@ hires <- function( yini = NULL, times = seq(0,321.8122,by= 321.8122/500), atol=1
 			   y = yini, times = times,jacfunc ="hiresjac", jactype = jactype,...)
     }}   
    
-	
-if (nrow(out) > 0) 
-	if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-    	ref = reference("hires")
-		mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	    printM(prob$fullnm)
-	    cat('Solved with ')
-	    printM(attributes(out)$type)
-		cat('Using rtol = ')
-		cat(rtol)
-		cat(', atol=')
-		printM(atol)
-        printM("Mixed error significant digits:")
-	    printM(mescd)}
-  
-	
-	 
-    return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "hires", rtol, atol)	
+   return(out)
 }
 
 hiresprob <- function(){ 

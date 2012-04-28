@@ -13,8 +13,9 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file pollu.f available at [MM08].
 }
 \usage{
-pollution (times = seq(0, 60, 1), yini = NULL, parms = list(), method = mebdfi,
-           printmescd = TRUE, atol = 1e-6, rtol = 1e-6,  ...)   
+pollution (times = seq(0, 60, 1), yini = NULL, 
+           parms = list(), printmescd = TRUE, method = mebdfi, 
+           atol = 1e-6, rtol = 1e-6,  ...)   
 }
 
 \arguments{

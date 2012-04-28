@@ -17,9 +17,9 @@ The parallel-IVP-algorithm group of CWI contributed this problem to the test set
 The software part of the problem is in the file ringmod.f available at [MM08].
 }
 \usage{
-ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, 
-      dyini = NULL, parms = list(), method = "mebdfi", 
-       atol = 1e-8, rtol = 1e-8, maxsteps = 1e+06, printmescd = TRUE, ...) 
+ring (times = seq(0, 0.001, by = 5e-06), yini = NULL, dyini = NULL, 
+      parms = list(), printmescd = TRUE, method = mebdfi,
+      atol = 1e-8, rtol = 1e-8, maxsteps = 1e+06, ...) 
 }
 
 \arguments{

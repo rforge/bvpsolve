@@ -9,8 +9,8 @@
 ## =============================================================================
 
 rober <- function(times = 10^(seq(-5, 11, by = 0.1)), yini = NULL,
-                  parms = list(), atol = 1e-14, rtol = 1e-10,
-                  maxsteps = 1e5,printmescd = TRUE, ...) {
+                  parms = list(), printmescd = TRUE, 
+                  atol = 1e-14, rtol = 1e-10, maxsteps = 1e5, ...) {
 
 ### derivative function
   Rober <- function(t,y,parms) {
@@ -37,22 +37,9 @@ rober <- function(times = 10^(seq(-5, 11, by = 0.1)), yini = NULL,
       atol=atol, rtol=rtol, maxsteps=maxsteps, ...)
 
 ### print mescd
-if (nrow(out) > 0) 
-if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	ref = reference("rober")
-	mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	printM(prob$fullnm)
-	cat('Solved with ')
-	printM(attributes(out)$type)
-	cat('Using rtol = ')
-	cat(rtol)
-	cat(', atol=')
-	printM(atol)
-	printM("Mixed error significant digits:")
-	printM(mescd)}
-
-
-    return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "rober", rtol, atol)	
+   return(out)
 }
 
 

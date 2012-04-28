@@ -258,3 +258,27 @@ saveOutrk <- function(out, y, n, Nglobal, Nmtot, iin, iout)  {
   return(out)
 }
 
+
+## =============================================================================
+## Print mescd output
+## =============================================================================
+
+printpr <- function (out, prob, name, rtol, atol) {
+   mescd <- NULL 
+   if (nrow(out) > 0) 
+    if ( out[nrow(out),1] == prob$t[2] ) { 
+ 	   ref = reference(name)
+	   mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
+	   printM(prob$fullnm)
+	   cat('Solved with ')
+	   printM(attributes(out)$type)
+	   cat('Using rtol = ')
+	   cat(rtol)
+	   cat(', atol=')
+	   printM(atol)
+	   printM("Mixed error significant digits:")
+	   printM(mescd)
+    }
+  attr(out, "mescd") <- mescd
+  return(out)  
+}

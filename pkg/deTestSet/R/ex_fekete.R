@@ -5,8 +5,8 @@
 ### ============================================================================
 
 fekete <- function(times = seq(0, 1e3, by = 10), yini = NULL, dyini = NULL,
-                   parms = list(), method = "mebdfi", atol=1e-6, rtol=1e-6, 
-				   printmescd = TRUE,  maxsteps = 1e5, ...) {
+                   parms = list(), printmescd = TRUE, method = mebdfi, 
+                   atol=1e-6, rtol=1e-6, maxsteps = 1e5, ...) {
 
 # No parameters 
 
@@ -52,23 +52,8 @@ fekete <- function(times = seq(0, 1e3, by = 10), yini = NULL, dyini = NULL,
           parms = NULL, method = method, atol=atol,rtol=rtol,
           maxsteps = maxsteps, ...)
     }
-	
-if (nrow(out) > 0) 
-  if (printmescd & ( fekete[nrow(fekete),1] == prob$t[2] )) { 
-	  ref = reference("fekete")
-	  mescd = min(-log10(abs(fekete[nrow(fekete),-1] - ref)/(atol/rtol+abs(ref))))
-	  printM(prob$fullnm)
-	  cat('Solved with ')
-	  printM(attributes(fekete)$type)
-	  cat('Using rtol = ')
-	  cat(rtol)
-	  cat(', atol=')
-	  printM(atol)
-	  printM("Mixed error significant digits:")
-	  printM(mescd)}
-  
-  
-  
+   if(printmescd) 
+     fekete <- printpr (fekete, prob, "fekete", rtol, atol)	
    return(fekete)
 }
 

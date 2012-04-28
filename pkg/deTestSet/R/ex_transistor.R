@@ -9,7 +9,8 @@
 ## =============================================================================
 
 transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
-  parms=list(), method = "mebdfi", maxsteps = 1e5, atol = 1e-6, rtol = 1e-6,  printmescd = TRUE, ...) {
+                       parms=list(), printmescd = TRUE, method = mebdfi, 
+                       atol = 1e-6, rtol = 1e-6, maxsteps = 1e5, ...) {
 
 ### check input 
     parameter <- c(ub=6, uf=0.026, alpha=0.99, beta=1e-6,
@@ -69,23 +70,9 @@ transistor <- function(times = seq(0, 0.2, 0.001), yini = NULL, dyini = NULL,
                 parms = parameter,
                 method = method, maxsteps = maxsteps,atol=atol, rtol=rtol, ...)
 	}
-	
-	if (nrow(out) > 0) 
-		if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-			ref = reference("transistor")
-			mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-			printM(prob$fullnm)
-			cat('Solved with ')
-			printM(attributes(out)$type)
-			cat('Using rtol = ')
-			cat(rtol)
-			cat(', atol=')
-			printM(atol)
-			printM("Mixed error significant digits:")
-			printM(mescd)}
-		
-		
-  return(out)
+  if(printmescd) 
+    out <- printpr (out, prob, "transistor", rtol, atol)	
+	return(out)
 }
 
 

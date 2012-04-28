@@ -8,7 +8,8 @@ It is an ODE, 4 equations
 }
 \usage{
 E5 (times = c(0, 10^(seq(-5, 13, by = 0.1))), yini = NULL, 
-  parms = list(), atol = 1.11e-24, rtol = 1e-6, printmescd = TRUE,  maxsteps = 1e5, ...)
+    parms = list(), printmescd = TRUE, 
+    atol = 1.11e-24, rtol = 1e-6,  maxsteps = 1e5, ...)
 }
 
 \arguments{

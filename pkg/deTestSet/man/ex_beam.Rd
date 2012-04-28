@@ -9,7 +9,9 @@ It is an ordinary differential equation of dimension 80.
 
 }
 \usage{
-beam (times=seq(0, 5, by = 0.05), yini = NULL, method = gamd, printmescd = TRUE, atol=1e-6, rtol=1e-6, ...) 
+beam (times=seq(0, 5, by = 0.05), yini = NULL, 
+      printmescd = TRUE, method = gamd, 
+      atol = 1e-6, rtol = 1e-6, ...) 
 }
 
 \arguments{

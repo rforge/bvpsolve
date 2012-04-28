@@ -10,8 +10,9 @@
 ## =============================================================================
 
 
-beam <- function(times = seq(0, 5, by = 0.05), yini = NULL, method = gamd, 
-		printmescd = TRUE,atol=1e-6,rtol=1e-6, ...) {
+beam <- function(times = seq(0, 5, by = 0.05), yini = NULL, 
+                 printmescd = TRUE, method = gamd, 
+	             	 atol = 1e-6, rtol = 1e-6, ...) {
 
 ### check input 
 
@@ -26,20 +27,8 @@ beam <- function(times = seq(0, 5, by = 0.05), yini = NULL, method = gamd,
     out <- ode(func = "beamfunc", parms = NULL, dllname = "deTestSet", y = yini,
            times = times, initfunc = NULL, method=method, atol=atol,rtol=rtol,...)
    
-   if (nrow(out) > 0) 
-   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	   ref = reference("beam")
-	   mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	   printM(prob$fullnm)
-	   cat('Solved with ')
-	   printM(attributes(out)$type)
-	   cat('Using rtol = ')
-	   cat(rtol)
-	   cat(', atol=')
-	   printM(atol)
-	   printM("Mixed error significant digits:")
-	   printM(mescd)}
-   
+    if (printmescd)
+      out <- printpr (out, prob, "beam", rtol, atol)
     return(out)
 }
 

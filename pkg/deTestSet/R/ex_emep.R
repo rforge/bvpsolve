@@ -9,8 +9,8 @@
 ## =============================================================================
 
 emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
-                    method = bimd, parms = list(), rtol = 1e-5, atol = 0.1,printmescd = TRUE, 
-                   maxsteps = 1e5, ...) {
+                    parms = list(), printmescd = TRUE, method = bimd, 
+                    atol = 0.1, rtol = 1e-5, maxsteps = 1e5, ...) {
 
 ### check input 
 
@@ -55,21 +55,8 @@ emep  <- function (times = seq(14400, 417600, by = 400), yini = NULL,
               jacfunc = "emepjac", times = times,initfunc = NULL, method=method,
               rtol = rtol, atol = atol, maxsteps = maxsteps, ...)
                 
-   if (nrow(out) > 0) 
-   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	  ref = reference("emep")
-	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	  printM(prob$fullnm)
-	  cat('Solved with ')
-	  printM(attributes(out)$type)
-	  cat('Using rtol = ')
-	  cat(rtol)
-	  cat(', atol=')
-	  printM(atol)
-	  printM("Mixed error significant digits:")
-	  printM(mescd)}
-  
-              
+   if(printmescd) 
+     out <- printpr (out, prob, "emep", rtol, atol)	
    return(out)
 }
 

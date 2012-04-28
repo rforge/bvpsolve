@@ -10,8 +10,8 @@ It is a non-stiff second order differential algebraic equation of index
 
 }
 \usage{
-andrews (times = seq(0, 0.03, by = 0.03/100), yini = NULL,dyini = NULL, 
-         parms = list(), printmescd = TRUE, method = "mebdfi", 
+andrews (times = seq(0, 0.03, by = 0.03/100), yini = NULL, dyini = NULL, 
+         parms = list(), printmescd = TRUE, method = mebdfi, 
          atol = 1e-7, rtol = 1e-7, maxsteps = 1e+05, ...) 
 }
 

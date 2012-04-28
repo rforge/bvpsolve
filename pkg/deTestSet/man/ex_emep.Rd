@@ -9,8 +9,9 @@ The software part of the
 problem is in the file emep.f available at [MM08].
 }
 \usage{
-emep (times = seq(14400, 417600, by = 400), yini = NULL, method=bimd,
-  parms = list(), rtol = 1e-5, atol = 0.1,printmescd = TRUE,  maxsteps = 1e5, ...)
+emep (times = seq(14400, 417600, by = 400), yini = NULL, 
+      parms = list(), printmescd = TRUE, method = bimd, 
+      atol = 0.1, rtol = 1e-5, maxsteps = 1e5, ...)
 }
 
 \arguments{

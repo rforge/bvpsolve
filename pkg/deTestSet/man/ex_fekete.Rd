@@ -8,8 +8,8 @@ The fekete problem computes the elliptic Fekete points.
 }
 \usage{
 fekete (times = seq(0, 1e3, by = 10 ), yini = NULL, dyini = NULL, 
-       parms=list(), method = "mebdfi", atol=1e-6, rtol=1e-6, 
-	   printmescd = TRUE, maxsteps = 1e+05, ...) 
+       parms=list(), printmescd = TRUE, method = mebdfi, 
+       atol = 1e-6, rtol = 1e-6, maxsteps = 1e+05, ...) 
 }
 
 \arguments{

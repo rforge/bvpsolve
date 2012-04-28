@@ -8,7 +8,7 @@
 
 andrews <- function(times = seq(0,0.03, by=0.03/100) ,
                     yini = NULL, dyini = NULL, parms = list(),  
-                    printmescd = TRUE, method = "mebdfi", 
+                    printmescd = TRUE, method = mebdfi, 
                     atol = 1e-7, rtol = 1e-7, maxsteps = 1e5, ...) {
 
 ### check input 
@@ -89,21 +89,8 @@ andrews <- function(times = seq(0,0.03, by=0.03/100) ,
           jacfunc ="andjac", jactype = jactype, ...)
       }
    }   
-   if (printmescd & (AndOut[nrow(AndOut),1]  == prob$t[2] )) { 
-    	ref = reference("andrews")
-		  mescd = min(-log10(abs(AndOut[nrow(AndOut),-1] - ref)/(atol/rtol+abs(ref))))
-		  printM(prob$fullnm)
-		  cat('Solved with ')
-		  printM(attributes(AndOut)$type)
-		  cat('Using rtol = ')
-		  cat(rtol)
-		  cat(', atol=')
-		  printM(atol)
-          printM("Mixed error significant digits")
-	   	print(mescd)
-    }
-                           
-  return(AndOut)
+   if (printmescd) AndOut <- printpr (AndOut, prob, "andrews", rtol, atol)	
+   return(AndOut)
 }
 
 

@@ -9,8 +9,8 @@ It is a differential algebraic equation of index 2, 17 equations.
 }
 \usage{
 wheelset (times = seq(0, 10, by = 0.01), yini = NULL, dyini = NULL, 
-  parms = list(), method = "mebdfi", maxsteps = 1e5,atol=1e-6, rtol=1e-6, 
-   printmescd = TRUE, ...) 
+          parms = list(), printmescd = TRUE, method = mebdfi, 
+          atol = 1e-6, rtol = 1e-6, maxsteps = 1e5, ...) 
 }
 
 \arguments{

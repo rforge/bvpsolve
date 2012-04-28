@@ -10,8 +10,8 @@ It is an index 2 system of 49 non-linear Differential-Algebraic Equations.
 }
 \usage{
 tube (times = seq(0, 17.0*3600, by = 100), yini = NULL, dyini = NULL, 
-  parms = list(), method = "radau",  maxsteps = 1e+05, 
-  atol=1e-6, rtol=1e-6, printmescd = TRUE, ...) 
+      parms = list(), printmescd = TRUE, method = radau,   
+      atol = 1e-6, rtol = 1e-6, maxsteps = 1e+05, ...) 
 }
 
 \arguments{

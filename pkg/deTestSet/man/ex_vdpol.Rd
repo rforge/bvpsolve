@@ -9,8 +9,9 @@ nonlinear vacuum tube circuots.
 It is an ODE, 2 equations. 
 }
 \usage{
-vdpol  (times = 0:2000, yini = NULL,  parms = list(),
-         atol = 1e-6, rtol = 1e-6, printmescd = TRUE, ...)
+vdpol  (times = 0:2000, yini = NULL,  
+        parms = list(), printmescd = TRUE,
+        atol = 1e-6, rtol = 1e-6, ...)
 }
 
 \arguments{

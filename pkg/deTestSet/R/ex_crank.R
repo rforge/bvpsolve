@@ -6,9 +6,9 @@
 
 crank <- function(times = seq(0, 0.1, by = 0.001),
                   yini = NULL, dyini = NULL,
-                  parms=list(), method = "mebdfi",
-                  maxsteps = 1e6,atol=1e-6, rtol=1e-6,  printmescd = TRUE,
-				  options = list(),  ...) {
+                  parms=list(), printmescd = TRUE, method = mebdfi,  
+                  atol = 1e-6, rtol = 1e-6, maxsteps = 1e6,  
+                  options = list(),  ...) {
 
 ### check input 
     parameter <- c(M1 = 0.36, M2 = 0.151104, M3 = 0.075552, 
@@ -89,10 +89,9 @@ crank <- function(times = seq(0, 0.1, by = 0.001),
 	  printM(atol)
 	  printM("Mixed error significant digits (first seven components):")
 	  printM(mescd)}
-  
-  
-
-    return(crank)
+   else mescd <- NULL
+   attr(crank, "mescd") <- mescd
+   return(crank)
 }
 
 

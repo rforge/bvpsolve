@@ -4,9 +4,10 @@
 ### ============================================================================
 
 twobit <- function(times = seq(0, 320, by = 0.5),
-   yini = NULL, dyini = NULL,
-   method = "radau", atol = 1e-4, rtol = 1e-4, 
-   maxsteps = 1e5, hmax = 0.1, printmescd = TRUE, ...) {
+                   yini = NULL, dyini = NULL,
+                   printmescd = TRUE, method = radau, 
+                   atol = 1e-4, rtol = 1e-4, 
+                   maxsteps = 1e5, hmax = 0.1, ...) {
 
 # No parameters 
 
@@ -48,20 +49,8 @@ twobit <- function(times = seq(0, 320, by = 0.5),
           parms = NULL, method = method,
           atol = atol, rtol = rtol, maxsteps = maxsteps, hmax = hmax, ...)
 
-if (nrow(twobit) > 0) 
-if (printmescd & ( twobit[nrow(twobit),1] == prob$t[2] )) { 
-	ref = reference("twobit")
-	mescd = min(-log10(abs(twobit[nrow(twobit),-1] - ref)/(atol/rtol+abs(ref))))
-	printM(prob$fullnm)
-	cat('Solved with ')
-	printM(attributes(twobit)$type)
-	cat('Using rtol = ')
-	cat(rtol)
-	cat(', atol=')
-	printM(atol)
-	printM("Mixed error significant digits:")
-	printM(mescd)}
-
+   if(printmescd) 
+     twobit <- printpr (twobit, prob, "twobit", rtol, atol)	
    return(twobit)
 }
 

@@ -10,7 +10,8 @@
 
 
 E5 <- function(times = c(0, 10^(seq(-5, 13, by = 0.1))), yini = NULL,
-               parms = list(), atol = 1.11e-24, rtol = 1e-6, printmescd = TRUE, maxsteps = 1e5, ...) {
+               parms = list(), printmescd = TRUE, 
+               atol = 1.11e-24, rtol = 1e-6, maxsteps = 1e5, ...) {
 
 ### derivative function
   E3 <- function(t,y,parms) {
@@ -37,23 +38,9 @@ E5 <- function(times = c(0, 10^(seq(-5, 13, by = 0.1))), yini = NULL,
    out <- ode(func = E3, parms = parameter, y = yini,
               times = times, atol = atol, rtol = rtol,
               maxsteps = maxsteps, ...)
-	  
-	 if (nrow(out) > 0) 
-	  if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-		  ref = reference("E5")
-		  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-		  printM(prob$fullnm)
-		  cat('Solved with ')
-		  printM(attributes(out)$type)
-		  cat('Using rtol = ')
-		  cat(rtol)
-		  cat(', atol=')
-		  printM(atol)
-		  printM("Mixed error significant digits:")
-		  printM(mescd)}
-	  
-
-    return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "E5", rtol, atol)	
+   return(out)
 }
 
 

@@ -10,7 +10,8 @@ It is a differential algebraic equation of index 3
 }
 \usage{
 caraxis (times = seq(0, 3, by = 0.01), yini = NULL, dyini = NULL,
-   method = "mebdfi",  atol=1e-6, rtol=1e-6,  printmescd = TRUE, parms = list(), ...)  
+         parms = list(), printmescd = TRUE, method = mebdfi,  
+         atol=1e-6, rtol=1e-6,  ...)  
 }
 
 \arguments{

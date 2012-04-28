@@ -11,7 +11,8 @@
 
 caraxis <-   function(times = seq(0, 3, by = 0.01),
                       yini = NULL, dyini = NULL,
-                      method = "mebdfi", atol=1e-6, rtol=1e-6,  printmescd = TRUE, parms = list(),  ...) {
+                      parms = list(), printmescd = TRUE, method = mebdfi, 
+                      atol = 1e-6, rtol = 1e-6,  ...) {
   
 ### residual function
   car <- function(t, y, dy, parms) {
@@ -93,20 +94,8 @@ caraxis <-   function(times = seq(0, 3, by = 0.01),
                    dllname = "deTestSet", initfunc = "carpar",
                    mass = mass, parms = parameter, nind = nind,  method = method,  atol=atol,rtol=rtol, ...)
 	   }  
-	   
-	   if (nrow(out) > 0) 
-		   if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-			   ref = reference("caraxis")
-			   mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-			   printM(prob$fullnm)
-			   cat('Solved with ')
-			   printM(attributes(out)$type)
-			   cat('Using rtol = ')
-			   cat(rtol)
-			   cat(', atol=')
-			   printM(atol)
-			   printM("Mixed error significant digits:")
-			   printM(mescd)}
+    if(printmescd) 
+      out <- printpr (out, prob, "caraxis", rtol, atol)	
     return(out)
 }
 

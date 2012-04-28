@@ -9,7 +9,8 @@
 ## =============================================================================
 
 pollution <- function(times = seq(0, 60, 1), yini = NULL, 
-  parms = list(), method = mebdfi, printmescd = TRUE, atol = 1e-6, rtol = 1e-6,  ...) {
+                      parms = list(), printmescd = TRUE, 
+                      method = mebdfi, atol = 1e-6, rtol = 1e-6,  ...) {
 
 ### check input 
     parameter <- c(
@@ -63,23 +64,9 @@ pollution <- function(times = seq(0, 60, 1), yini = NULL,
     out <- ode(y = yini, times = times, func = "polfunc", jacfunc = "poljac",
               dllname = "deTestSet", initfunc = "polpar", method=method,
               parms = parameter,atol=atol, rtol=rtol, ...)
-  
-  if (nrow(out) > 0) 
-    if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-	  ref = reference("pollution")
-	  mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-	  printM(prob$fullnm)
-	  cat('Solved with ')
-	  printM(attributes(out)$type)
-	  cat('Using rtol = ')
-	  cat(rtol)
-	  cat(', atol=')
-	  printM(atol)
-	  printM("Mixed error significant digits:")
-	  printM(mescd)}
-  
-  
-  return(out)
+    if(printmescd) 
+      out <- printpr (out, prob, "pollution", rtol, atol)	
+    return(out)
 }
 
 

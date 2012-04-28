@@ -10,8 +10,9 @@ It is a differential algebraic equation of index 2, 24 equations.
 }
 \usage{
 crank (times=seq(0, 0.1, by = 0.001), yini = NULL, dyini = NULL, 
-  parms = list(), method = "mebdfi", maxsteps = 1e+06, atol=1e-6, rtol=1e-6, 
-   printmescd = TRUE, options = list(), ...) 
+       parms = list(), printmescd = TRUE, method = mebdfi, 
+       atol = 1e-6, rtol = 1e-6, maxsteps = 1e+06, 
+       options = list(), ...) 
 }
 
 \arguments{

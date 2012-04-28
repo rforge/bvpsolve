@@ -9,7 +9,7 @@
 ## =============================================================================
 
 vdpol <- function(times = 0:2000, yini = NULL, parms = list(), 
-		  atol = 1e-6, rtol = 1e-6, printmescd = TRUE, ...) {
+		              printmescd = TRUE, atol = 1e-6, rtol = 1e-6, ...) {
 
 ### derivative function
   Vdpol <- function(t,y,mu) {
@@ -31,23 +31,9 @@ vdpol <- function(times = 0:2000, yini = NULL, parms = list(),
 ### solve
     out <- ode(func = Vdpol, parms = parameter, y = yini, times = times,
 			atol=atol,rtol=rtol, ...)
-	
-	if (nrow(out) > 0) 
-	if (printmescd & ( out[nrow(out),1] == prob$t[2] )) { 
-		ref = reference("vdpol")
-		mescd = min(-log10(abs(out[nrow(out),-1] - ref)/(atol/rtol+abs(ref))))
-		printM(prob$fullnm)
-		cat('Solved with ')
-		printM(attributes(out)$type)
-		cat('Using rtol = ')
-		cat(rtol)
-		cat(', atol=')
-		printM(atol)
-		printM("Mixed error significant digits:")
-		printM(mescd)}
-	
-
-    return(out)
+   if(printmescd) 
+     out <- printpr (out, prob, "vdpol", rtol, atol)	
+   return(out)
 }
 
 
