@@ -5,6 +5,7 @@ c
 c ===================================================================================
 c karline: some subroutines renamed by adding ac in front
 C karline: changed the exit strategy if epsmin was changed
+C karline: formats in front of write statements (1st step in removing them)
 c ===================================================================================
 
 
@@ -146,24 +147,7 @@ C.... Output Details Of The Problem
       ELSE
         iprint = -1
       ENDIF
-
-      If (Iprint .ge. 0) Then
-         If (Linear) Then
-            Write (msg,1000) Ncomp
-            call rprint(msg)
-         Else
-            Write (msg,1001) Ncomp
-            call rprint(msg)
-         Endif
-         Write (msg,1002) Aleft, Aright
-         call rprint(msg)
-c         If (Nfxpnt .gt. 0 .and. Iprint .ge. 2)
-c     +        Write (6,1003) Nfxpnt, (Fixpnt(I), I=1,Nfxpnt)
-         Write (msg,1004) (Ltol(Ip), Ip = 1,Ntol)
-         call rprint(msg)
-         Write (msg,1005) (Tol(Ip), Ip = 1,Ntol)
-         call rprint(msg)
-      Endif
+C karline: Removed a lot of unnecessary printing
 
 C.... Check For Invalid Input Parameters.  If Any Parameters Are
 C.... Invalid, Exit With The Flag Iflbvp Set To 4
@@ -205,6 +189,8 @@ C.... Invalid, Exit With The Flag Iflbvp Set To 4
       If (Eps .le. Zero .or. Eps .ge. One) Return
       If (Epsmin .gt. Eps .or. Epsmin .le. Zero) Return
       If (Iprint .ge. 0) then
+ 1006 Format (' The Initial Value Of Epsilon Is ',D11.4,' ',
+     +     ' The Desired Final Value Of Epsilon Is ',D11.4)
          Write (msg,1006) Eps, Epsmin
          call rprint(msg)
       end if
@@ -224,11 +210,13 @@ C.... Given Floating-Point And Integer Workspace.
       nmax = min(nmax, nucol)
 * nmax from size of u and xx
       If (Iprint .eq. 1) then
+ 1007 Format(1h ,'The Largest Mesh Size From Workspace, Nmax =',I8)
          Write(msg,1007) Nmax
          call rprint(msg)
       end if
       Nmax = Min(Nmax, Nucol)
       If (Iprint .eq. 1 .and. Nmax .eq. Nucol) then
+ 1008 Format(1h ,'Nmax = Nucol =', I8)
          Write(msg,1008) Nmax
          call rprint(msg)
       end if
@@ -534,6 +522,8 @@ C.... Increase The Continuation Step Counter Nc.
 
       Nc = Nc+1
       If (Iprint .ge. 0) then
+ 1010 Format (1x,' Continuation Step ',I2,
+     +        ', Epsilon = ',D9.4)
          Write(msg,1010) Nc, Eps
          call rprint(msg)
       end if
@@ -543,6 +533,8 @@ C.... Then This Will Be The Last Problem We Attempt.
 
       If (Nc .eq. Maxcon) Then
          If (Iprint .ge. 0) then
+ 1011 Format (1x,'This Is The Final Continuation Step Since ',
+     +        'Maxcon =',I4)
              Write(msg,1011) Maxcon
              call rprint(msg)
          end if
@@ -596,26 +588,15 @@ C.... We May Finish. Ifinal = 1 When Eps = Epsmin.
 
          If (Ifinal .eq. 1) Then
             If (Iprint .ge. 0) Then
-               Write(msg,1010) Nc, Eps
+ 1050 Format (1x,' Continuation Step ',I2,
+     +        ', Epsilon = ',D9.4)
+               Write(msg,1050) Nc, Eps
                call rprint(msg)
+ 1012 Format (1x,' Tolerances Satisfied For Final Problem',
+     +        ' Epsilon = ',D9.4)
                Write(msg,1012) Eps
                call rprint(msg)
-C Karline: removed these print statements
-C               Write(msg,*)'The Final Mesh And Solution Components:'
-C               call rprint(msg)
-C               Write(msg,1018) ('U',Ltol(J), J=1,Ntol)
-C               call rprint(msg)
-C               Write(msg,*)
-C               call rprint(msg)
-C               Jstep = Max(Nmsh/30,1)
-C               Do 55 I = 1, Nmsh-1, Jstep
-C                  Write(msg,1019) I,Xx(I),(U(Ltol(J),I),J=1,Ntol)
-C                  call rprint(msg)
-C 55            Continue
-C               Write(msg,1019) Nmsh,Xx(Nmsh),(U(Ltol(J),Nmsh),J=1,Ntol)
-C               call rprint(msg)
-C               Write(msg,1020)
-C               call rprint(msg)
+C Karline: removed lot of print statements
             Endif
 
             if (eps_changed) iflbvp = -1
@@ -656,6 +637,8 @@ C.... The User Is Warned Of This Possibility.
 
          If (Iprec .eq. 0 .and. Phit .gt. Phimax) Then
             If (Iprint .ge. 0) then
+ 1013 Format(' ** Machine Precision (Possibly) Not Sufficient For',
+     +        ' Epsilon Less Than ',D9.4)
                Write(msg,1013) Eps
                call rprint(msg)
             end if
@@ -808,6 +791,8 @@ C.... Reached Our Final Problem
                   Write(msg,1021) Epsmin
                   call rprint(msg)
                Else
+ 1022 Format (' Storage Limit Being Approached, Change Eps To ',
+     +     D9.4)
                   Write(msg,1022) Epsmin
                   call rprint(msg)
                Endif
@@ -972,9 +957,16 @@ C.... In This Case We Stop.
          If (Iback .eq. 1) Then
 C            If (Iprint .ge. 0) Then          Karline: toggled this off
                If (Epsp .ne. Zero) Then
+ 1014 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
+     +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
+     +      ' With Eps Greater Than ',D9.4,' ', ' Machine Precision',
+     +      ' (Possibly) Not Sufficient For Eps Less Than ',D9.4)
                   Write(msg,1014) Eps,Iflbvp,Eps,Epsp
                   call rprint(msg)
                Else
+ 1015 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
+     +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
+     +        ' With Eps Greater Than ',D9.4)
                   Write(msg,1015) Eps,Iflbvp,Eps
                   call rprint(msg)
                Endif
@@ -996,8 +988,8 @@ C.... Tolerances. We Alter Epsmin Accordingly.
 C.... Insert Details For Backtracking
 
          If (Iprint .ge. 0) then
-            Write(msg,1016)
-            call rprint(msg)
+           CALL rprint(' Failed Step - Backtracking For Larger Value ',
+     +          'Of Epsilon')
          end if
          Ifinal = 0
          Ep = (Ep+E(3))/Two
@@ -1006,6 +998,7 @@ C.... Insert Details For Backtracking
             Ep = E(3)
             Epsmin = One/Ep
             If (Iprint .ge. 0) then
+ 1021 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
                Write(msg,1021) Epsmin
                call rprint(msg)
             end if
@@ -1091,43 +1084,9 @@ C KARLINE: ADDED THAT...
       Return
 
 C-----------------------------------------------------------------------
- 1000 Format(' The Number Of (Linear) Differential Equations Is ',I3)
- 1001 Format(' The Number Of (Nonlinear) Differential Equations Is ',
-     +     I3)
- 1002 Format(' Left Boundary Point =',D12.4,', Right Boundary Point =',
-     +     D12.4)
- 1003 Format(' There Are',I5,' Fixed Points In The Mesh - ',10(6d10.4))
- 1004 Format(' Components Of U Requiring Tolerances -',8(7x,I2,1x),
-     +     4(38x,8i10))
- 1005 Format(' Corresponding Error Tolerances -',6x,8d10.2,
-     +     4(39x,8d10.2))
- 1006 Format (' The Initial Value Of Epsilon Is ',D11.4,' ',
-     +     ' The Desired Final Value Of Epsilon Is ',D11.4)
- 1007 Format(1h ,'The Largest Mesh Size From Workspace, Nmax =',I8)
- 1008 Format(1h ,'Nmax = Nucol =', I8)
- 1010 Format (1x,' Continuation Step ',I2,
-     +        ', Epsilon = ',D9.4)
- 1011 Format (1x,'This Is The Final Continuation Step Since ',
-     +        'Maxcon =',I4)
- 1012 Format (1x,' Tolerances Satisfied For Final Problem',
-     +        ' Epsilon = ',D9.4)
- 1013 Format(' ** Machine Precision (Possibly) Not Sufficient For',
-     +        ' Epsilon Less Than ',D9.4)
- 1014 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
-     +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
-     +      ' With Eps Greater Than ',D9.4,' ', ' Machine Precision',
-     +      ' (Possibly) Not Sufficient For Eps Less Than ',D9.4)
- 1015 Format (1x,' Final Problem Epsilon = ',D10.4,' ',
-     +      ' Not Solved, Iflag =',I3,' ', ' Try Running Problem Again',
-     +        ' With Eps Greater Than ',D9.4)
- 1016 Format (' ** Failed Step - Bactracking For Larger Value ',
-     +          'Of Epsilon')
 C 1018 Format(' 5x,'I',10x,'X(I) ',40(14x,A,'(',I2,')'))
 C 1019 Format(I6,41d19.8)
 C 1020 Format(1x,72('$'))
- 1021 Format (' Continuation Steps Too Small, Change Eps To ',D9.4)
- 1022 Format (' Storage Limit Being Approached, Change Eps To ',
-     +     D9.4)
 C-----------------------------------------------------------------------
       End
 
@@ -1327,6 +1286,7 @@ c      endif
 
   400 Continue
       If (Iprint .ge. 0) then
+ 903  Format(1h ,'The New Mesh Contains',I6,' Points.')
          Write(msg,903) Nmsh
          call rprint(msg)
       end if
@@ -1374,6 +1334,7 @@ c      endif
      *        acfsub,acdfsub,acgsub,acdgsub,Itnwt,Iflnwt,Eps,rpar,ipar)
          If (Iatt .eq. -1) Nits = Max(1,Itnwt)
          If (Iprint .eq. 0) then
+ 999  Format(1h ,'Newton Converged After',I3,' Iterations.')
             Write(msg,999) Itnwt
             call rprint(msg)
          end if
@@ -1400,17 +1361,21 @@ c       BY BRUGNANO & TRIGIANTE, AND HIGHAM
 
 
           if (iprint .ge. 0) then
+ 1001 format(1h ,'stiffness = ',1pe11.3)
             write(msg,1001) sigma
                call rprint(msg)
+ 1002 format(1h ,'gamma1    = ',1pe11.3)
             write(msg,1002) gamma1
                call rprint(msg)
+ 1003 format(1h ,'kappa1    = ',1pe11.3)
             write(msg,1003) ckappa1
                call rprint(msg)
+ 1004 format(1h ,'kappa     = ',1pe11.3)
             write(msg,1004) ckappa
                call rprint(msg)
+ 1009 format(1h ,'kappa2    = ',1pe11.3)
             write(msg,1009) ckappa2
                call rprint(msg)
-c            write(6,*) 'amg',( amg(i),i=1,nmsh)
           end if
 
           stab_sigma = abs(sigmaold-sigma)/(sigma).lt.5d-2
@@ -1472,8 +1437,7 @@ c endif if (comp_c)
 **** Logic For 6th Order ****
 
       If (Iprint .eq. 1) then
-          Write(msg,905)
-          call rprint(msg)
+        CALL rprint('Start 6th Order')
       end if
 
 *  Save The 4th Order Solution On This Mesh In Uold.
@@ -1538,8 +1502,7 @@ c endif if (comp_c)
 ***** Logic For Trying To Calculate 8th Order Solution *****
 
       If (Iprint .eq. 1) then
-         Write(msg,906)
-         call rprint(msg)
+         CALL rprint('Start 8th Order')
       end if
 
       Call Matcop(Nudim, Ncomp, Ncomp, Nmsh, U, Uold)
@@ -1633,8 +1596,8 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
 
          If (Iprec .eq. 2) Then
             If (Iprint .ge. 0) then
-              Write(msg,1013)
-              call rprint(msg)
+        CALL rprint('Mesh Cannot Be Defined Within The Bounds Imposed')
+        CALL rprint(' By The Machine Precision')
             end if
             Iflbvp = 1
             Return
@@ -1686,36 +1649,14 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
 * Error exit -- ill_cond
          iflbvp = 3
          if (linear .and. iprint .ge. 0) then
-            write(msg,1006)
-            call rprint(msg)
+          CALL rprint('The problem is ill-conditioned, ')
+          CALL rprint('try with a less stringent tolerance')
          else
-            write(msg,1007)
-            call rprint(msg)
+          CALL rprint('The problem is ill-conditioned, ')
+          CALL rprint('try with a less stringent tolerance ')
+          CALL rprint(' or with a different initial guess' )
          end if
          return
-
- 903  Format(1h ,'The New Mesh Contains',I6,' Points.')
- 904  Format(1h ,'Do Not Go On To 6th')
- 905  Format(1h ,'Start 6th Order')
- 906  Format(1h ,'Start 8th Order')
- 999  Format(1h ,'Newton Converged After',I3,' Iterations.')
- 1001 format(1h ,'stiffness = ',1pe11.3)
- 1002 format(1h ,'gamma1    = ',1pe11.3)
- 1003 format(1h ,'kappa1    = ',1pe11.3)
- 1004 format(1h ,'kappa     = ',1pe11.3)
- 1009 format(1h ,'kappa2    = ',1pe11.3)
- 1005 format(1h ,'The problem is ill-conditioned, ',
-     *     'the solution could be inaccurate')
- 1006 format(1h ,'The problem is ill-conditioned, ',
-     *     'try with a less stringent tolerance')
- 1007 format(1h ,'The problem is ill-conditioned, ',
-     *     'try with a less stringent tolerance ',
-     *     ' or with a different initial guess' )
- 1008 format(1h ,'Terminated too many meshes, nmsh',i5)
- 1010 format(1h ,'The conditioning parameters do not stabilised, ',
-     *       'the solution could be inaccurate')
- 1013 Format(1x,'** Mesh Cannot Be Defined Within The Bounds Imposed',
-     +       ' By The Machine Precision')
       End
 
 
@@ -1759,8 +1700,7 @@ c     *              Double, Nmold, Xxold, Maxmsh, Succes)
 *  The Newton Iteration Converged For The 8th Order Solution.
 
       If (Iprint .eq. 1) then
-        Write(msg,901)
-       call rprint(msg)
+        CALL rprint('Conv8')
       end if
 
       Succes = .false.
@@ -1853,7 +1793,6 @@ c              Call Initu(Ncomp, Nmsh, Nudim, U)
 
       Return
 
-  901 Format(1h ,'Conv8')
       End
 
 * File Defs.f
@@ -1993,14 +1932,14 @@ c
 
 
          if (iprint.eq.1) then
-            write(msg,75)
-            call rprint(msg)
+          CALL rprint('no convergence of corrections')
          end if
- 75      format(1x,'no convergence of corrections')
 
 
          If (Iprec .eq. 0) Then
             If (Iprint .ge. 0) then
+ 900  Format('** Warning - Possibly Approaching Machine Precision ',
+     *         'Beyond Epsilon  = ',D10.3)
                Write(msg,900) Eps
                call rprint(msg)
             end if
@@ -2029,8 +1968,6 @@ c      end do
 
       Return
 
- 900  Format('** Warning - Possibly Approaching Machine Precision ',
-     *         'Beyond Epsilon  = ',D10.3)
 
       End
 
@@ -2189,15 +2126,15 @@ c      St4 --> Tmp(ncomp,16)
  80         Continue
 
          if (iprint.eq.1) then
-            write(msg,8930)
-            call rprint(msg)
-          end if
- 8930    format(1x,'no convergence of 8th order defcors')
+          CALL rprint('no convergence of 8th order defcors')
+         end if
 
 
 
          If (Iprec .eq. 0) Then
             If (Iprint .ge. 0)  then
+ 900  Format('** Warning - Possibly Approaching Machine Precision ',
+     *         'Beyond Epsilon  = ',D10.3)
                Write(msg,900) Eps
                call rprint(msg)
              end if
@@ -2216,9 +2153,6 @@ c      St4 --> Tmp(ncomp,16)
  110     Continue
 
       Return
-
- 900  Format('** Warning - Possibly Approaching Machine Precision ',
-     *         'Beyond Epsilon  = ',D10.3)
 
       End
 
@@ -2373,8 +2307,7 @@ c      St4 --> Tmp(ncomp,16)
 *  their calculation.
 
       if (iprint .eq. 1) then
-        write(msg,901)
-        call rprint(msg)
+        CALL rprint('fixed Jacobian iterations')
       end if
       ninter = nmsh - 1
       rnold = flmax
@@ -2405,6 +2338,7 @@ c      St4 --> Tmp(ncomp,16)
       if (rnsq.gt.huge .or.
      *      (iorder.eq. 8 .and. rnsq.gt.xlarge)) then
          if (iprint .eq. 1) then
+ 902  format(1h ,'Large residual, rnsq =',1pe12.4)
             write (msg,902) rnsq
             call rprint(msg)
          end if
@@ -2420,6 +2354,7 @@ c      St4 --> Tmp(ncomp,16)
 *  If rnsq is sufficiently small, terminate immediately.
 
       if (iprint .eq. 1) then
+ 903  format(1h ,'iter, rnsq',i5,1pe11.3)
         write(msg,903) iter, rnsq
          call rprint(msg)
       end if
@@ -2483,6 +2418,7 @@ c      St4 --> Tmp(ncomp,16)
             iflag = -2
          endif
          if (iprint .eq. 1) then
+ 904  format(1h ,'failure of fixed Jacobian, iflag =',i5)
             write(msg,904) iflag
             call rprint(msg)
          end if
@@ -2507,16 +2443,12 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
 *  been passed.
 
       if (iprint .ge. 0) then
+ 905  format(1h ,'fixed Jacobian convergence',i5,1pe11.3)
          write(msg,905) iter, rnsq
          call rprint(msg)
       end if
       iflag = 0
       return
- 901  format(1h ,'fixed Jacobian iterations')
- 902  format(1h ,'Large residual, rnsq =',1pe12.4)
- 903  format(1h ,'iter, rnsq',i5,1pe11.3)
- 904  format(1h ,'failure of fixed Jacobian, iflag =',i5)
- 905  format(1h ,'fixed Jacobian convergence',i5,1pe11.3)
       end
 
 ************************************************************************
@@ -2635,7 +2567,6 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
 c      iflag = 0
       return
 
- 901   format(1h ,'Singular matrix')
       end
 
 
@@ -2726,8 +2657,7 @@ c
       ninter = nmsh - 1
 
       if (iprint .eq. 1) then
-        write(msg,901)
-        call rprint(msg)
+        CALL rprint('start Newton iterations')
       end if
 *  A Newton method with line search and watchdog safeguarding
 *  is used to try to solve the nonlinear equations.
@@ -2760,6 +2690,8 @@ c
       rnprev = flmax
       rnbest = flmax
       if ( iprint .ge. 0) then
+ 902  format(1h ,' iter',
+     *              7x,'alfa',6x,'merit',7x,'rnsq')
         write (msg,902)
          call rprint(msg)
       end if
@@ -2774,6 +2706,7 @@ c
       iter = iter + 1
 
       if (iprint .eq. 1) then
+ 910  format(1h ,'Newton iteration',i5)
         write(msg,910) iter
            call rprint(msg)
       end if
@@ -2781,8 +2714,7 @@ c
 
       if (iter .ge. lmtnwt) then
          if (iprint .ge. 0) then
-           write(msg,903)
-           call rprint(msg)
+          CALL rprint('Too many Newton iterations')
          end if
          iflag = -2
          return
@@ -2802,6 +2734,7 @@ c
 
       if (iflwat .ne. 0) then
          if (iprint .ge. 0) then
+ 904  format(1h ,'Watchdog tests fail, iter =', i5)
            write(msg,904) iter
            call rprint(msg)
          end if
@@ -2822,6 +2755,7 @@ c
 
       if (rnsq .le. epsmch) then
          if (iprint .ge. 0)  then
+ 906  format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
            write(msg,906) iter, rnsq
            call rprint(msg)
          end if
@@ -2848,6 +2782,7 @@ c
      +   ninter,botblk,ncomp-nlbc,ipivot,delu,iflag,job)
 
       if (iprint .ge. 0 .and. iflag.ne.0) then
+ 905  format(1h ,'Singular Jacobian, iter=',i5)
          write(msg,905) iter
          call rprint(msg)
       end if
@@ -2880,6 +2815,7 @@ c  at the initial point of the line search.
       oldg = -two*fa
       alfa = zero
       if (iprint .eq. 1) then
+ 908  format(1h ,'alfa, merit, rnsq',3(1pe11.3))
          write (msg,908) alfa, fmtry, rnsq
             call rprint(msg)
       end if
@@ -2929,6 +2865,7 @@ c  at the initial point of the line search.
 *  number)
 
       if (iprint.eq.1) then
+ 907  format(1h ,'inform, alfa after getptq',i5,3x, 1pe11.3)
         write(msg,907) inform, alfa
         call rprint(msg)
       end if
@@ -2985,7 +2922,8 @@ c  at the initial point of the line search.
             fmtry = rnsqtr
          end if
          if (iprint .eq. 1) then
-           write (msg,908) alfa, fmtry, rnsqtr
+ 918  format(1h ,'alfa, merit, rnsq',3(1pe11.3))
+           write (msg,918) alfa, fmtry, rnsqtr
             call rprint(msg)
          end if
          go to 150
@@ -3003,6 +2941,7 @@ c  at the initial point of the line search.
       call matcop (ncomp, nudim, ncomp, nmsh, utrial, u)
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
       if (iprint .ge. 0) then
+ 909  format(1h ,i5,3(1pe11.3))
         write(msg,909) iter, alfa, fmtry, rnsq
          call rprint(msg)
       end if
@@ -3020,7 +2959,8 @@ c  at the initial point of the line search.
 
 
       if (iprint .ge. 0) then
-        write(msg, 906) iter+1, rnsq
+ 916  format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
+        write(msg, 916) iter+1, rnsq
          call rprint(msg)
       end if
       iflag = 0
@@ -3033,17 +2973,6 @@ c  at the initial point of the line search.
 
       return
 
- 901  format(1h ,'start Newton iterations')
- 902  format(1h ,' iter',
-     *              7x,'alfa',6x,'merit',7x,'rnsq')
- 903  format(1h ,'Too many Newton iterations')
- 904  format(1h ,'Watchdog tests fail, iter =', i5)
- 905  format(1h ,'Singular Jacobian, iter=',i5)
- 906  format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
- 907  format(1h ,'inform, alfa after getptq',i5,3x, 1pe11.3)
- 908  format(1h ,'alfa, merit, rnsq',3(1pe11.3))
- 909  format(1h ,i5,3(1pe11.3))
- 910  format(1h ,'Newton iteration',i5)
       end
 
 
@@ -3249,12 +3178,6 @@ c  at the initial point of the line search.
 
       return
 
- 901  format(1h ,'jaccal')
- 902  format(1h ,'topblk')
- 903  format(1h ,i5,6(1pe11.3))
- 904  format(1h ,'ajac')
- 905  format(1h ,2i5,5(1pe11.3))
- 906  format(1h ,'botblk')
       end
 
 
@@ -3407,17 +3330,8 @@ c  at the initial point of the line search.
       rnsq = (sscale**2)*sumsq
 *f
 
-c      if (pdebug) then
-c         write (6,902) rnsq
-c         write(6,903)
-c         write(6,904) (rhs(i), i=1,ncomp*nmsh)
-c      endif
       return
 
- 901   format(1h ,'rhscal')
- 902    format(1h ,'rnsq',1pe11.3)
- 903     format(1h ,'rhs vector')
- 904      format(1h ,(7(1pe11.3)))
       end
 
 
@@ -3460,6 +3374,7 @@ c      endif
       Nmnew = Ninnew + 1
       If(Nmnew .ge. Nmax) Then
          If (Iprint .ge. 0)  then
+  901 Format (1h , ' Dblmsh.  Maximum Mesh Exceeded, Nmnew  = ', I8)
            Write(msg,901) Nmnew
            call rprint(msg)
          end if
@@ -3490,7 +3405,6 @@ c      endif
       Endif
       Nmsh = Nmnew
       Return
-  901 Format (1h , ' Dblmsh.  Maximum Mesh Exceeded, Nmnew  = ', I8)
       End
 
 
@@ -3811,8 +3725,6 @@ C
       Endif
       Return
 
-  904 Format(1h ,'Nmest, Irefin',(10i5))
-  910 Format(1h ,'Ihcomp',(10i5))
       End
 
 
@@ -4216,8 +4128,6 @@ c
       factor = five
       tol    = tolabs
       xtry   = alfa
-c      if (debug) write (nout, 1000) alfmax, oldf, oldg, tolabs,
-c     *   alfuzz, epsaf, epsag, tolrel, crampd
       go to 800
 c
 c  ---------------------------------------------------------------------
@@ -4587,26 +4497,9 @@ c
 c
 c  exit.
 c
- 990    if (debug) write (nout, 3000)
-      return
+c 990    if (debug) write (nout, 3000)
+ 990  return
 c
- 1000 format(31h alfmax  oldf    oldg    tolabs, 1p2e22.14, 1p2e16.8,
-     *       31h alfuzz  epsaf   epsag   tolrel, 1p2e22.14, 1p2e16.8,
-     *       31h crampd                        ,  l6)
- 1100 format(31h alfa    ftry    ctry          , 1p2e22.14, 1pe16.8)
- 1200 format(31h a       b       b - a   tol   , 1p2e22.14, 1p2e16.8,
-     *       31h nsamea  nsameb  braktd  closef, 2i3, 2l6,
-     *       31h imprvd  convrg  extrap        ,  l6, 3x, 3l1, l6,
-     *       31h alfbst  fbest   cbest         , 1p2e22.14, 1pe16.8,
-     *       31h alfaw   fw                    , 1p2e22.14)
- 1300 format(  31h alfav   fv                    , 1p2e22.14 )
-
- 2100 format(30h parabolic fit,    two points.)
- 2200 format(30h parabolic fit,  three points.)
- 2400 format(31h exponent reduced.  trial point, 1p1e22.14)
- 2500 format(31h geo. bisection. xtry,daux,dtry, 1p3e22.14)
- 2600 format(31h polynomial fit accepted.  xtry, 1p1e22.14)
- 3000 format(53h ----------------------------------------------------)
 c
 c  end of getptq
       end
@@ -5374,10 +5267,6 @@ C
          Maxmsh = .true.
       Endif
       Return
-
-
-  904 Format(1h ,'Nmest, Irefin',(10i5))
-  910 Format(1h ,'Ihcomp',(10i5))
       End
 
 
@@ -5475,9 +5364,6 @@ c         r4(i) = r4(i)+(xx(i+1)-xx(i))*(r2/(xx(nmsh)-xx(1)))*cfac
       else
          nptcond=2
       endif
-
-  901 format(1h ,'moncondmsh_l.', (1pe11.3), 2(1pe11.3), 3i10)
-
       end
 
 

@@ -8,16 +8,6 @@ c  modified external and intrinsic instructions
 c karline: got rid of pdebug (common algprs)
 
 c ===================================================================================
-c print R-messages
-c ===================================================================================
-
-      subroutine rprint(msg)
-      character (len=150) msg
-
-            call dblepr(msg, 150, 0, 0)
-      end subroutine
-
-c ===================================================================================
 c initu resets u after re-meshing for linear problems or for nonlinear problems
 c when interpolation of the old solution is not used.
 c it interpolates between (Xguess,Yguess), if these are inputted
@@ -45,8 +35,7 @@ c ==============================================================================
 
       IF (giv_u) THEN
        if (iprint .ne. -1) then
-        write(msg,99) 0.0d0
-        call Rprint(msg)
+             CALL rprint("initu = 0.d0")
        endif
 
        call interp(ncomp, nmsh, xx, nudim, u,
@@ -510,8 +499,7 @@ c ==============================================================================
 *  The Newton iteration converged for a 4th order solution.
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('conv4')
       ENDIF
 
 
@@ -701,7 +689,6 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
 
       return
 
-  901 format(1h ,'conv4')
 
       end
 
@@ -732,8 +719,7 @@ c ==============================================================================
 *  The Newton procedure failed to obtain a 4th order solution.
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL Rprint(msg)
+             CALL rprint('fail4')
       ENDIF
 
 
@@ -784,7 +770,6 @@ c ==============================================================================
       endif
 
       return
- 901   format(1h ,'fail4')
       end
 
       subroutine conv6(ncomp, nmsh, ntol, ltol, tol,
@@ -808,8 +793,7 @@ c ==============================================================================
 *  The Newton iteration converged for a 6th-order solution.
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('conv6')
       ENDIF
 
 
@@ -832,7 +816,6 @@ c ==============================================================================
       endif
 
       return
-  901 format(1h ,'conv6')
       end
 
 c ===================================================================================
@@ -873,8 +856,7 @@ c ==============================================================================
 *  Non-convergence of 6th order.
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('fail6')
       ENDIF
 
       succes = .false.
@@ -889,26 +871,18 @@ c ==============================================================================
       call matcop(ncomp, nudim, ncomp, nmold, uold, u)
 
       if (reaft6 .and. iprint .ge. 0) THEN
-        write(msg,9999)
-        CALL rprint(msg)
+         CALL rprint('in fail6, reaft6is true')
       ENDIF
- 9999 format(1h ,'in fail6, reaft6is true')
       if (.not.reaft6 .and. iprint .ge. 0) THEN
-        write(msg,9998)
-        CALL rprint(msg)
+         CALL rprint('in fail6, not reaft6')
       ENDIF
- 9998 format(1h ,'in fail6, not reaft6')
       if (ddouble.and. iprint .ge. 0) THEN
-        write(msg,9997)
-        CALL rprint(msg)
+         CALL rprint('in fail6, ddouble  is true')
       ENDIF
- 9997 format(1h ,'in fail6, ddouble  is true')
       if (.not.ddouble.and. iprint.ge.0 ) THEN
-        write(msg,9996)
-        CALL rprint(msg)
+         CALL rprint('in fail6, not double')
       ENDIF
 
- 9996 format(1h ,'in fail6, not double')
 
       if (.not. reaft6 .or. .not. ddouble ) then
 
@@ -958,17 +932,15 @@ c ==============================================================================
          call rerrvl( ncomp, nmsh, nudim, u, usave, ntol, ltol,
      *          rerr, remax, itlmx, adjrer )
          if (iprint.eq.1) THEN
-           write(msg,9994)
-           CALL rprint(msg)
+             CALL rprint('***in fail6')
          ENDIF
 
- 9994    format(1h ,'***in fail6')
          if (iprint.eq.1) THEN
+ 9993    format(1h ,'remax',1pe14.4,5x,'8*tol',1pe14.4)
            write(msg,9993) remax, eight*tol(itlmx)
            CALL rprint(msg)
          ENDIF
 
- 9993    format(1h ,'remax',1pe14.4,5x,'8*tol',1pe14.4)
          if (remax .lt. eight*tol(itlmx)) then
             succes = .true.
          else
@@ -1057,7 +1029,6 @@ cf of the old mesh we take the values using incx = 2
       endif
 
       return
-  901 format(1h ,'fail6')
       end
 
 c ===================================================================================
@@ -1103,8 +1074,7 @@ c ==============================================================================
 
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('conv8')
       ENDIF
 
 
@@ -1290,7 +1260,6 @@ c               call matcop(nudim, ncomp, ncomp, nmold, u, uold)
 
       return
 
-  901 format(1h ,'conv8')
       end
 
 c ===================================================================================
@@ -2080,8 +2049,7 @@ c ==============================================================================
 *  their calculation.
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('fixed Jacobian iterations')
       ENDIF
 
       ninter = nmsh - 1
@@ -2113,6 +2081,7 @@ c ==============================================================================
       if (rnsq.gt.huge .or.
      *      (iorder.eq. 8 .and. rnsq.gt.xlarge)) then
          if (iprint .eq. 1) THEN
+  902 format(1h ,'Large residual, rnsq =',1pe12.4)
            write (msg,902) rnsq
            CALL rprint(msg)
          ENDIF
@@ -2129,6 +2098,7 @@ c ==============================================================================
 *  If rnsq is sufficiently small, terminate immediately.
 
       if (iprint .eq. 1) THEN
+  903 format(1h ,'iter, rnsq',i5,1pe11.3)
         write(msg,903) iter, rnsq
         CALL rprint(msg)
       ENDIF
@@ -2192,6 +2162,7 @@ c ==============================================================================
             iflag = -2
          endif
          if (iprint .eq. 1) THEN
+  904 format(1h ,'failure of fixed Jacobian, iflag =',i5)
            write(msg,904) iflag
            CALL rprint(msg)
          ENDIF
@@ -2212,6 +2183,7 @@ c ==============================================================================
 *  been passed.
 
       if (iprint .ge. 0) THEN
+  905 format(1h ,'fixed Jacobian convergence',i5,1pe11.3)
         write(msg,905) iter, rnsq
         CALL rprint(msg)
       ENDIF
@@ -2219,11 +2191,6 @@ c ==============================================================================
 
       iflag = 0
       return
-  901 format(1h ,'fixed Jacobian iterations')
-  902 format(1h ,'Large residual, rnsq =',1pe12.4)
-  903 format(1h ,'iter, rnsq',i5,1pe11.3)
-  904 format(1h ,'failure of fixed Jacobian, iflag =',i5)
-  905 format(1h ,'fixed Jacobian convergence',i5,1pe11.3)
       end
 
 c ===================================================================================
@@ -2427,8 +2394,7 @@ c
       ninter = nmsh - 1
 
       if (iprint .eq. 1) THEN
-        write(msg,901)
-        CALL rprint(msg)
+             CALL rprint('start Newton iterations')
       ENDIF
 
 
@@ -2462,8 +2428,7 @@ c
       rnprev = flmax
       rnbest = flmax
       if (iprint .ge. 0) THEN
-        write (msg,902)
-        CALL rprint(msg)
+        CALL rprint(' iterations  alfa  merit and rnsq:')
       ENDIF
 
 
@@ -2478,6 +2443,7 @@ c
       iter = iter + 1
 
       if (iprint .eq. 1) THEN
+  910 format(1h ,'Newton iteration',i5)
         write(msg,910) iter
         CALL rprint(msg)
       ENDIF
@@ -2487,8 +2453,7 @@ c
 
       if (iter .ge. lmtnwt) then
          if (iprint .ge. 0) THEN
-           write(msg,903)
-           CALL rprint(msg)
+             CALL rprint('Too many Newton iterations')
          ENDIF
 
          iflag = -2
@@ -2509,6 +2474,7 @@ c
 
       if (iflwat .ne. 0) then
          if (iprint .ge. 0) THEN
+  904 format(1h ,'Watchdog tests fail, iter =', i5)
            write(msg,904) iter
            CALL rprint(msg)
          ENDIF
@@ -2529,6 +2495,7 @@ c
 
       if (rnsq .le. epsmch .and. .not. comp_c ) then
          if (iprint .ge. 0) THEN
+  906 format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
            write(msg,906) iter, rnsq
            CALL rprint(msg)
          ENDIF
@@ -2556,6 +2523,7 @@ c
      +   ninter,botblk,ncomp-nlbc,ipivot,delu,iflag,job)
 
       if (iprint .ge. 0 .and. iflag.ne.0) THEN
+  905 format(1h ,'Singular Jacobian, iter=',i5)
         write(msg,905) iter
         CALL rprint(msg)
       ENDIF
@@ -2590,6 +2558,7 @@ c  at the initial point of the line search.
       oldg = -two*fa
       alfa = zero
       if (iprint .eq. 1) THEN
+  908 format(1h ,'alfa, merit, rnsq',3(1pe11.3))
         write (msg,908) alfa, fmtry, rnsq
         CALL rprint(msg)
       ENDIF
@@ -2692,7 +2661,8 @@ c  at the initial point of the line search.
             fmtry = rnsqtr
          end if
          if (iprint .eq. 1) THEN
-           write (msg,908) alfa, fmtry, rnsqtr
+  918 format(1h ,'alfa, merit, rnsq',3(1pe11.3))
+           write (msg,918) alfa, fmtry, rnsqtr
            CALL rprint(msg)
          ENDIF
 
@@ -2709,6 +2679,7 @@ c  at the initial point of the line search.
       call matcop (ncomp, nudim, ncomp, nmsh, utrial, u)
       call dcopy(ncomp*nmsh, rhstri, 1, rhs, 1)
       if (iprint .ge. 0) THEN
+  909 format(1h ,i5,3(1pe11.3))
         write(msg,909) iter, alfa, fmtry, rnsq
         CALL rprint(msg)
       ENDIF
@@ -2728,7 +2699,8 @@ c  at the initial point of the line search.
 
 
       if (iprint .ge. 0) THEN
-        write(msg, 906) iter+1, rnsq
+  916 format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
+        write(msg, 916) iter+1, rnsq
         CALL rprint(msg)
       ENDIF
 
@@ -2742,16 +2714,6 @@ c  at the initial point of the line search.
 
       return
 
-  901 format(1h ,'start Newton iterations')
-  902 format(1h ,' iter',
-     *              7x,'alfa',6x,'merit',7x,'rnsq')
-  903 format(1h ,'Too many Newton iterations')
-  904 format(1h ,'Watchdog tests fail, iter =', i5)
-  905 format(1h ,'Singular Jacobian, iter=',i5)
-  906 format(1h ,'Convergence, iter =',i5,4x,'rnsq =',1pe12.3)
-  908 format(1h ,'alfa, merit, rnsq',3(1pe11.3))
-  909 format(1h ,i5,3(1pe11.3))
-  910 format(1h ,'Newton iteration',i5)
       end
 
 c ===================================================================================
@@ -3149,6 +3111,7 @@ c ==============================================================================
       nmnew = ninnew + 1
       if(nmnew .ge. nmax) then
          if (iprint .ge. 0) THEN
+  901 format (1h , ' dblmsh.  maximum mesh exceeded, nmnew =', i8)
            write(msg,901) nmnew
            CALL rprint(msg)
          ENDIF
@@ -3173,13 +3136,12 @@ c ==============================================================================
       xx(2) = half*(xx(3) + xx(1))
       nmsh = nmnew
       if(iprint .ge. 0) THEN
+  902 format (1h , ' dblmsh.  the doubled mesh has ', i8,' points.')
         write(msg,902) nmsh
         CALL rprint(msg)
       ENDIF
 
       return
-  901 format (1h , ' dblmsh.  maximum mesh exceeded, nmnew =', i8)
-  902 format (1h , ' dblmsh.  the doubled mesh has ', i8,' points.')
       end
 
 c ===================================================================================
@@ -3460,6 +3422,7 @@ c ==============================================================================
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
+  905 format(1h ,'selmsh.  new nmsh =',i8)
         write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
@@ -3500,10 +3463,6 @@ c         nmsh = 2*nmsh - 1
       endif
       return
 
-  902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
-  903 format(1h ,'errmax',1pe11.3)
-  905 format(1h ,'selmsh.  new nmsh =',i8)
-  910 format(1h ,'ihcomp',(10i5))
       end
 c       selmsh
 
@@ -3548,6 +3507,7 @@ c ==============================================================================
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
+  903 format(1h , ' smpmsh.  maximum points exceeded, nmnew =',i6)
               write(msg,903) nmnew
               CALL rprint(msg)
             ENDIF
@@ -3573,7 +3533,8 @@ c ==============================================================================
          nmnew = nmsh + numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
-               write(msg,903) nmnew
+  913 format(1h , ' smpmsh.  maximum points exceeded, nmnew =',i6)
+               write(msg,913) nmnew
                CALL rprint(msg)
             ENDIF
 
@@ -3597,7 +3558,8 @@ c ==============================================================================
          nmnew = nmsh + 3*numadd
          if (nmnew .gt. nmax) then
             if (iprint .ge. 0) THEN
-              write(msg,903) nmnew
+  923 format(1h , ' smpmsh.  maximum points exceeded, nmnew =',i6)
+              write(msg,923) nmnew
               CALL rprint(msg)
             ENDIF
             maxmsh = .true.
@@ -3640,13 +3602,12 @@ c ==============================================================================
       nmsh = nmnew
 
       if(iprint .ge. 0) THEN
+  904 format(1h ,'smpmsh, new nmsh =',i7)
         write(msg,904) nmsh
         CALL rprint(msg)
       ENDIF
 
       return
-  903 format(1h , ' smpmsh.  maximum points exceeded, nmnew =',i6)
-  904 format(1h ,'smpmsh, new nmsh =',i7)
       end
 
 c ===================================================================================
@@ -3683,6 +3644,7 @@ c ==============================================================================
 *  The array xx (of dimension nmsh) contains the mesh points.
 
       if (iprint .ge. 0) THEN
+  901 format (1h ,'unimsh.  nmsh =',i5)
         write(msg,901) nmsh
         CALL rprint(msg)
       ENDIF
@@ -3748,7 +3710,6 @@ c ==============================================================================
 
       return
 c
-  901 format (1h ,'unimsh.  nmsh =',i5)
       end
 
 c ===================================================================================
@@ -4311,11 +4272,6 @@ c
       factor = five
       tol    = tolabs
       xtry   = alfa
-c     if (debug) THEN
-c  write (msg, 1000) alfmax, oldf, oldg, tolabs,
-c    *   alfuzz, epsaf, epsag, tolrel, crampd
-c       CALL rprint(msg)
-c     ENDIF
 
       go to 800
 c
@@ -4343,10 +4299,6 @@ c
       if (alfa .gt. alfuzz) sigdec = ctry   .le.    epsaf
       imprvd = sigdec  .and.  ( ftry - fbest ) .le. (- epsaf)
 c
-c     if (debug) THEN
-c  write (msg, 1100) alfa, ftry, ctry
-c       CALL rprint(msg)
-c     ENDIF
 
       if (.not. imprvd) go to 130
 c
@@ -4456,14 +4408,7 @@ c
       btrue  = alfbst + b
       alfaw  = alfbst + xw
       gap    = b - a
-c     if (debug) write (nout, 1200) atrue, btrue, gap, tol,
-c    *   nsamea, nsameb, braktd, closef, imprvd, conv1, conv2, conv3,
-c    *   extrap, alfbst, fbest, cbest, alfaw, fw
       if (vset) alfav  = alfbst + xv
-c     if (debug  .and.  vset) THEN
-c     write (msg, 1300) alfav, fv
-c       CALL rprint(msg)
-c     ENDIF
 
       if (convrg  .and.  moved) go to 910
 c
@@ -4514,10 +4459,6 @@ c
       if (.not. moved) s = oldg
       if (      moved) s = oldg - two*gw
       q = two*(oldg - gw)
-c     if (debug) THEN
-c  write (msg, 2100)
-c       CALL rprint(msg)
-c     ENDIF
 
       go to 600
 c
@@ -4526,10 +4467,6 @@ c
   450 gv = (fv - fbest)/xv
       s  = gv - (xv/xw)*gw
       q  = two*(gv - gw)
-c     if (debug) THEN
-c  write (msg, 2200)
-c       CALL rprint(msg)
-c     ENDIF
 
 c
 c  ---------------------------------------------------------------------
@@ -4561,10 +4498,6 @@ c  polynomial fit, the default  xtry  is one tenth of  xw.
 c
   610 if (vset  .and.  moved) go to 620
       xtry   = xw/ten
-c     if (debug) THEN
-c  write (msg, 2400) xtry
-c       CALL rprint(msg)
-c     ENDIF
 
       go to 700
 c
@@ -4608,10 +4541,6 @@ c
       if (daux .ge. dtry)   xtry = five*dtry*(point1 + dtry/daux)/eleven
       if (daux .lt. dtry)   xtry = half*sqrt( daux )*sqrt( dtry )
       if (endpnt .lt. zero) xtry = - xtry
-c     if (debug) THEN
-c  write (msg, 2500) xtry, daux, dtry
-c       CALL rprint(msg)
-c     ENDIF
 
 c
 c  if the points are configured for an extrapolation set the artificial
@@ -4635,10 +4564,6 @@ c  accept the polynomial fit.
 c
       xtry = zero
       if (abs( s*xw ) .ge. q*tol) xtry = (s/q)*xw
-c     if (debug) THEN
-c  write (msg, 2600) xtry
-c       CALL rprint(msg)
-c     ENDIF
 
 c
 c  ---------------------------------------------------------------------
@@ -4715,32 +4640,8 @@ c
 c  exit.
 c
   990 continue
-c 990 if (debug) THEN
-c       write (msg, 3000)
-c       CALL rprint(msg)
-c     ENDIF
 
       return
-c KSKSKS:
-c1000 format(/ 31h alfmax  oldf    oldg    tolabs, 1p2e22.14, 1p2e16.8
-c    *       / 31h alfuzz  epsaf   epsag   tolrel, 1p2e22.14, 1p2e16.8
-c    *       / 31h crampd                        ,  l6)
-c1100 format(/ 31h alfa    ftry    ctry          , 1p2e22.14, 1pe16.8)
-c1200 format(/ 31h a       b       b - a   tol   , 1p2e22.14, 1p2e16.8
-c    *       / 31h nsamea  nsameb  braktd  closef, 2i3, 2l6
-c    *       / 31h imprvd  convrg  extrap        ,  l6, 3x, 3l1, l6
-c    *       / 31h alfbst  fbest   cbest         , 1p2e22.14, 1pe16.8
-c    *       / 31h alfaw   fw                    , 1p2e22.14)
-c1300 format(  31h alfav   fv                    , 1p2e22.14 /)
-
-c2100 format(30h parabolic fit,    two points.)
-c2200 format(30h parabolic fit,  three points.)
-c2400 format(31h exponent reduced.  trial point, 1p1e22.14)
-c2500 format(31h geo. bisection. xtry,daux,dtry, 1p3e22.14)
-c2600 format(31h polynomial fit accepted.  xtry, 1p1e22.14)
-c3000 format(53h ---------------------------------------------------- /)
-c
-c  end of getptq
       end
 
 c ===================================================================================
@@ -5251,6 +5152,7 @@ c        end if
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
+  905 format(1h ,'selconderrmsh.  new nmsh =',i8)
         write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
@@ -5294,8 +5196,6 @@ c         nmsh = 2*nmsh - 1
 c   endif use the conditioning and the error
       return
 
-  905 format(1h ,'selconderrmsh.  new nmsh =',i8)
-  910 format(1h ,'ihcomp',(10i5))
       end
 
 c ===================================================================================
@@ -5546,6 +5446,7 @@ c  220 continue
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
+  905 format(1h ,'selcondmsh.  new nmsh =',i8)
         write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
@@ -5563,14 +5464,6 @@ c  220 continue
 
 
       return
-
-
-
-  902 format(1h ,'im, jcomp, ermeas, normalized er',2i5,2(1pe11.3))
-  903 format(1h ,'errmax',1pe11.3)
-  904 format(1h ,'nmest, irefin',(10i5))
-  905 format(1h ,'selcondmsh.  new nmsh =',i8)
-  910 format(1h ,'ihcomp',(10i5))
       end
 
 c ===================================================================================
@@ -5811,8 +5704,7 @@ c ==============================================================================
 *  but has more than 3 times as many intervals as the old mesh.
 *  Try doubling the mesh if possible.
             if (iprint .eq. 1) THEN
-              write(msg,*) 'smpselcondmsh'
-              CALL rprint(msg)
+             CALL rprint('smpselcondmsh')
             ENDIF
 
             nmsh = nmold
@@ -5838,6 +5730,7 @@ c ==============================================================================
       nmsh = new
       maxmsh = .false.
       if (iprint .ge. 0) THEN
+  905 format(1h ,'smpselcondmsh.  new nmsh =',i8)
         write(msg,905) nmsh
         CALL rprint(msg)
       ENDIF
@@ -5855,11 +5748,6 @@ c ==============================================================================
 
 
       return
-
-
-
-  905 format(1h ,'smpselcondmsh.  new nmsh =',i8)
-  910 format(1h ,'ihcomp',(10i5))
       end
 
 c ===================================================================================
@@ -5953,14 +5841,10 @@ c vecchio 0.5 nuovo 0.65
 
 
        if (iprint .eq. 1) THEN
+  901 format(1h ,'moncondmsh.', (1pe11.3), 2(1pe11.3), 3i10)
          write(msg,901)r1,r3,fatt_r1r3,nptcond,nptm,nptr
          CALL rprint(msg)
        ENDIF
-
-
-
-  901 format(1h ,'moncondmsh.', (1pe11.3), 2(1pe11.3), 3i10)
-
       end
 
 c ===================================================================================

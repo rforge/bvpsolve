@@ -649,31 +649,8 @@ C
 C
 C...  print the input data for checking.
 C
-C Karline toggled this off : too much output
-C      IF ( IPRINT .GT. -1 )                         GO TO 80
-C      IF ( NONLIN .EQ. 0 ) THEN
-C      WRITE (IOUT,260) NCOMP, (M(IP), IP=1,NCOMP)
-C      ELSE
-C      WRITE (IOUT,270) NCOMP, (M(IP), IP=1,NCOMP)
-C      END IF
-C      WRITE (IOUT,275) NY
-C      IF (NY .GT. 0 .AND. INDEX .EQ. 0) THEN
-C      WRITE (IOUT,276)
-C      ELSE
-C      WRITE (IOUT,278) INDEX
-C      END IF
-C      WRITE (IOUT,279)
-C      WRITE (IOUT,280) (ZETA(IP), IP=1,MSTAR)
-C      IF ( NFXPNT .GT. 0 )
-C     1   WRITE (IOUT,340) NFXPNT, (FIXPNT(IP), IP=1,NFXPNT)
-C      WRITE (IOUT,290) K
-C      WRITE (IOUT,299)
-C      WRITE (IOUT,300) (LTOL(IP), IP=1,NTOL)
-C      WRITE (IOUT,309)
-C      WRITE (IOUT,310) (TOL(IP), IP=1,NTOL)
-C      IF (IGUESS .GE. 2) WRITE (IOUT,320)
-C      IF (IREAD .EQ. 2) WRITE (IOUT,330)
-C   80 CONTINUE
+C Karline toggled a lot of printing off
+C ...
 C
 C...  check for correctness of data
 C
@@ -725,8 +702,11 @@ C
       NMAXF = (NDIMF - NFIXF) / NSIZEF
       NMAXI = (NDIMI - NFIXI) / NSIZEI
       IF ( IPRINT .LT. 1 )  THEN
+  350 FORMAT(35H THE MAXIMUM NUMBER OF SUBINTERVALS)
        WRITE(msg,350)
        CALL RPRINT(msg)
+  351 FORMAT(9H IS MIN (, I4,23H (ALLOWED FROM FSPACE),,I4,
+     1       24H (ALLOWED FROM ISPACE) ))
        WRITE(msg,351) NMAXF, NMAXI
        CALL RPRINT(msg)
       ENDIF
@@ -734,8 +714,8 @@ C
       IF ( NMAX .LT. N )                            RETURN
       IF ( NMAX .LT. NFXPNT+1 )                     RETURN
       IF (NMAX .LT. 2*NFXPNT+2 .AND. IPRINT .LT. 1) THEN
-        WRITE(msg,360)
-        CALL RPRINT(msg)
+        CALL rprint("Insufficient space to double mesh for 
+     1		error estimate")
       ENDIF
 C
 C...  generate pointers to break up  fspace  and  ispace .
@@ -854,28 +834,6 @@ C
   
       RETURN
 C----------------------------------------------------------------------
-  260 FORMAT(' THE NUMBER OF (LINEAR) DIFF EQNS IS' , I3, 1X,
-     1       16HTHEIR ORDERS ARE, 20I3)
-  270 FORMAT(40H THE NUMBER OF (NONLINEAR) DIFF EQNS IS , I3, 1X,
-     1       16HTHEIR ORDERS ARE, 20I3)
-  275 FORMAT( ' THERE ARE',I3,' ALGEBRAIC CONSTRAINTS')
-  276 FORMAT( ' THE PROBLEM HAS MIXED INDEX CONSTRAINTS')
-  278 FORMAT( ' THE INDEX IS', I2)
-  279 FORMAT(27H SIDE CONDITION POINTS ZETA )
-  280 FORMAT(8F10.6, 4( 8F10.6))
-  290 FORMAT(37H NUMBER OF COLLOC PTS PER INTERVAL IS, I3)
-  299 FORMAT(40H COMPONENTS OF Z REQUIRING TOLERANCES - )
-  300 FORMAT(100(8I10))
-  309 FORMAT(33H CORRESPONDING ERROR TOLERANCES -)
-  310 FORMAT(8D10.2)
-  320 FORMAT(44H INITIAL MESH(ES) AND Z,DMZ PROVIDED BY USER)
-  330 FORMAT(27H NO ADAPTIVE MESH SELECTION)
-  340 FORMAT(10H THERE ARE ,I5,27H FIXED POINTS IN THE MESH - ,
-     1       10(6F10.6))
-  350 FORMAT(35H THE MAXIMUM NUMBER OF SUBINTERVALS)
-  351 FORMAT(9H IS MIN (, I4,23H (ALLOWED FROM FSPACE),,I4,
-     1       24H (ALLOWED FROM ISPACE) ))
-  360 FORMAT(53H INSUFFICIENT SPACE TO DOUBLE MESH FOR ERROR ESTIMATE)
       END
       SUBROUTINE CONTRL_DAE(XI, XIOLD, Z, DMZ, DMV, RHS, DELZ, DELDMZ,
      1           DQZ, DQDMZ, G, W, V, FC, VALSTR, SLOPE, SCALE, DSCALE,
@@ -991,8 +949,7 @@ C...       check for a singular matrix
 C
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 )  THEN
-           WRITE (msg,497)
-           CALL RPRINT(msg)
+          CALL rprint('Singular projection matrix due to index > 2')
          ENDIF
            IFLAG = 0
          RETURN
@@ -1000,13 +957,11 @@ C
        IF ( MSING .EQ. 0 )                      GO TO 400
    30      IF ( MSING .LT. 0 )                      GO TO 40
        IF ( IPRINT .LT. 1 )  THEN
-         WRITE (msg,495)
-         CALL RPRINT(msg)
+        CALL rprint("A LOCAL ELIMINATION MATRIX IS SINGULAR")
        ENDIF 
           GO TO 460
    40      IF ( IPRINT .LT. 1 ) THEN
-             WRITE (msg,490)
-             CALL RPRINT(msg)
+            CALL rprint("The global BVP-matrix is singular")
            ENDIF 
        IFLAG = 0
        RETURN
@@ -1037,8 +992,8 @@ C
      2          FSUB, DFSUB, GSUB, DGSUB, GUESS, ISING,RPAR,IPAR)
 C
        IF ( IPRINT .LT. 0 )  THEN
-          WRITE(msg,530)
-          CALL RPRINT(msg)
+        CALL rprint("Fixed Jacobian iterations")
+  510 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
           WRITE (msg,510) ITER, RNOLD
           CALL RPRINT(msg)
        ENDIF 
@@ -1050,7 +1005,8 @@ C...       the value of ifreez determines whether this is a full
 C...       newton step (=0) or a fixed jacobian iteration (=1).
 C
    60      IF ( IPRINT .LT. 0 )  THEN
-              WRITE (msg,510) ITER, RNORM
+  710 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
+              WRITE (msg,710) ITER, RNORM
               CALL RPRINT(msg)
            ENDIF   
        RNOLD = RNORM
@@ -1063,8 +1019,7 @@ C
    70      IF ( MSING .NE. 0 )                      GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-           WRITE (msg,497)
-           CALL RPRINT(msg)
+        CALL rprint('Singular projection matrix due to index > 2')
          ENDIF 
            
          IFLAG = 0
@@ -1119,6 +1074,7 @@ C
 C...       convergence obtained
 C
        IF ( IPRINT .LT. 1 ) THEN
+  560 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
          WRITE (msg,560) ITER
          CALL RPRINT(msg)
        ENDIF 
@@ -1127,10 +1083,10 @@ C
 C...      convergence of fixed jacobian iteration failed.
 C
   130      IF ( IPRINT .LT. 0 ) THEN
-              WRITE (msg,510) ITER, RNORM
+  810 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
+              WRITE (msg,810) ITER, RNORM
               CALL RPRINT(msg)
-              WRITE (msg,540)
-              CALL RPRINT(msg)
+              CALL rprint("Switch to damped Newton iteration")
            ENDIF 
               
        ICONV = 0
@@ -1156,8 +1112,7 @@ C...       with the damped newton method.
 C...       evaluate rhs and find the first newton correction.
 C
   160      IF(IPRINT .LT. 0)  THEN
-             WRITE (msg,500)
-             CALL RPRINT(msg)
+            CALL rprint("Full damped Newton iteration")
            ENDIF 
 
              CALL LSYSLV_DAE (MSING, XI, XIOLD, Z, DMZ, DELZ, DELDMZ, G,
@@ -1169,8 +1124,7 @@ C
        IF ( MSING .NE. 0 )                       GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-            WRITE (msg,497)
-            CALL RPRINT(msg)
+          CALL rprint('Singular projection matrix due to index > 2')
          ENDIF 
          IFLAG = 0
          RETURN
@@ -1218,8 +1172,7 @@ C
        IF ( MSING .NE. 0 )                      GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-           WRITE (msg,497)
-           CALL RPRINT(msg)
+          CALL rprint('Singular projection matrix due to index > 2' )
          ENDIF 
          IFLAG = 0
          RETURN
@@ -1277,12 +1230,20 @@ C
        ANFIX = DSQRT(ANFIX / FLOAT(NZ+NDMZ))
        IF ( ICOR .EQ. 1 )                         GO TO 280
        IF (IPRINT .LT. 0) THEN
+  520 FORMAT(13H ITERATION = ,I3,22H  RELAXATION FACTOR = ,D10.2
+     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
+     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2,
+     2       D10.2)
          WRITE (msg,520) ITER, RELAX, ANORM,
      1           ANFIX, RNOLD, RNORM
          CALL RPRINT(msg)
        ENDIF 
        GO TO 290
   280      IF (IPRINT .LT. 0) THEN
+  550 FORMAT(40H RELAXATION FACTOR CORRECTED TO RELAX = , D10.2
+     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
+     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2
+     2       ,D10.2)
             WRITE (msg,550) RELAX, ANORM, ANFIX,
      1           RNOLD, RNORM
             CALL RPRINT(msg)
@@ -1345,7 +1306,8 @@ C
 C...       convergence obtained
 C
        IF ( IPRINT .LT. 1 ) THEN 
-         WRITE (msg,560) ITER
+  960 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
+         WRITE (msg,960) ITER
          CALL RPRINT(msg)
        ENDIF 
 C
@@ -1360,7 +1322,8 @@ C
   380      CONTINUE
   390      IF ( (ANFIX .LT. PRECIS .OR. RNORM .LT. PRECIS)
      1          .AND. IPRINT .LT. 1 ) THEN
-             WRITE (msg,560) ITER
+ 1060 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
+             WRITE (msg,1060) ITER
              CALL RPRINT(msg)
            ENDIF 
        ICONV = 1
@@ -1369,18 +1332,9 @@ C
 C...       if full output has been requested, print values of the
 C...       solution components   z  at the meshpoints and  y  at
 C...       collocation points.
-C karline: toggled off
-  400      IF ( IPRINT .GE. 0 )                     GO TO 420
-C       DO 410 J = 1, MSTAR
-C         WRITE(msg,610) J
-C  410        WRITE(IOUT,620) (Z(LJ), LJ = J, NZ, MSTAR)
-C       DO 415 J = 1, NY
-C         WRITE(IOUT,630) J
-C  415        WRITE(IOUT,620) (DMZ(LJ), LJ = J+NCOMP, NDMZ, KDY)
-C
 C...       check for error tolerance satisfaction
 C
-  420      IFIN = 1
+  400      IFIN = 1
        IF (IMESH .EQ. 2) CALL ERRCHK_DAE (XI, Z, DMZ, VALSTR, IFIN)
        IF ( IMESH .EQ. 1 .OR.
      1          IFIN .EQ. 0 .AND. ICARE .NE. 2)     GO TO 460
@@ -1390,13 +1344,17 @@ C
 C...       diagnostics for failure of nonlinear iteration.
 C
   430      IF ( IPRINT .LT. 1 ) THEN
+  570 FORMAT(22H NO CONVERGENCE AFTER , I3, 11H ITERATIONS)
              WRITE (msg,570) ITER
              CALL RPRINT(msg)
            ENDIF 
        GO TO 450
   440       IF( IPRINT .LT. 1 )    THEN
+  580 FORMAT(37H NO CONVERGENCE.  RELAXATION FACTOR =,D10.3
+     1         ,13H IS TOO SMALL )
            WRITE(msg,580) RELAX
            CALL RPRINT(msg)
+  581 FORMAT(10H(LESS THAN, D10.3, 1H))
            WRITE(msg,581) RELMIN
            CALL RPRINT(msg)
        ENDIF
@@ -1436,44 +1394,17 @@ C
        N = N / 2
        IFLAG = -1
        IF ( ICONV .EQ. 0 .AND. IPRINT .LT. 1 ) THEN
-         WRITE (msg,590)
-         CALL RPRINT(msg)
+        CALL rprint("NO CONVERGENCE")
        ENDIF 
        IF ( ICONV .EQ. 1 .AND. IPRINT .LT. 1 ) THEN 
-         WRITE (msg,600)
-         CALL RPRINT(msg)
+        CALL rprint("Probably tolerances too stringent or nmax too
+     1     small")
        ENDIF 
        RETURN
   480      IF ( ICONV .EQ. 0 )  IMESH = 1
 C          IF ( ICARE .EQ. 1 )  ICONV = 0
       GO TO 20
 C     ---------------------------------------------------------------
-  490 FORMAT(35H THE GLOBAL BVP-MATRIX IS SINGULAR )
-  495 FORMAT(40H A LOCAL ELIMINATION MATRIX IS SINGULAR )
-  497 FORMAT( 'SINGULAR PROJECTION MATRIX DUE TO INDEX &gt; 2' )
-  500 FORMAT(30H FULL DAMPED NEWTON ITERATION,)
-  510 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
-  520 FORMAT(13H ITERATION = ,I3,22H  RELAXATION FACTOR = ,D10.2
-     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
-     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2,
-     2       D10.2)
-  530 FORMAT(27H FIXED JACOBIAN ITERATIONS,)
-  540 FORMAT(35H SWITCH TO DAMPED NEWTON ITERATION,)
-  550 FORMAT(40H RELAXATION FACTOR CORRECTED TO RELAX = , D10.2
-     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
-     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2
-     2       ,D10.2)
-  560 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
-  570 FORMAT(22H NO CONVERGENCE AFTER , I3, 11H ITERATIONS)
-  580 FORMAT(37H NO CONVERGENCE.  RELAXATION FACTOR =,D10.3
-     1         ,13H IS TOO SMALL )
-  581 FORMAT(10H(LESS THAN, D10.3, 1H))
-  590 FORMAT(18H  (NO CONVERGENCE) )
-  600 FORMAT(50H  (PROBABLY TOLERANCES TOO STRINGENT, OR NMAX TOO
-     1       ,6HSMALL) )
-  610 FORMAT( 19H MESH VALUES FOR Z(, I2, 2H), )
-  620 FORMAT(1H , 5D15.7)
-  630 FORMAT( ' VALUES AT 1st COLLOCATION POINTS FOR Y(', I2, 2H), )
       END
 
       SUBROUTINE SKALE_DAE(N, MSTAR, KDY, Z, DMZ, XI, SCALE, DSCALE)
@@ -1650,10 +1581,6 @@ C
 C...  iguess=2, 3 or 4.
 C
       NOLDP1 = NOLD + 1
-      IF (IPRINT .LT. 1) THEN 
-        WRITE(msg,360) NOLD, (XIOLD(I), I=1,NOLDP1)
-        CALL RPRINT(msg)
-       ENDIF 
       IF ( IGUESS .NE. 3 )                          GO TO 40
 C
 C...  if iread ( ISET(8) ) .ge. 1 and iguess ( ISET(9) ) .eq. 3
@@ -1724,8 +1651,7 @@ C
       N = NMAX / 2
       GO TO 220
   110 IF ( IPRINT .LT. 1 ) THEN 
-         WRITE(msg,370)
-         CALL RPRINT(msg)
+        CALL rprint("Expected N too large")
        ENDIF 
       N = N2
       RETURN
@@ -1948,6 +1874,8 @@ C...  naccum=expected n to achieve .1x user requested tolerances
 C
       NACCUM = ACCUM(NOLD+1) + 1.D0
       IF ( IPRINT .LT. 0 ) THEN 
+  350 FORMAT(21H MESH SELECTION INFO,30H DEGREE OF EQUIDISTRIBUTION =
+     1       , F8.5, 28H PREDICTION FOR REQUIRED N = , I8)
         WRITE(msg,350) DEGEQU, NACCUM
         CALL RPRINT(msg)
        ENDIF 
@@ -2037,13 +1965,6 @@ C      ENDIF
       NDMZ = KDY * N
       RETURN
 C----------------------------------------------------------------
-  340 FORMAT(17H THE NEW MESH (OF,I5,14H SUBINTERVALS) )
-  341 FORMAT(100(6F12.6))
-  350 FORMAT(21H MESH SELECTION INFO,30H DEGREE OF EQUIDISTRIBUTION =
-     1       , F8.5, 28H PREDICTION FOR REQUIRED N = , I8)
-  360 FORMAT(20H THE FORMER MESH (OF,I5,15H SUBINTERVALS),,
-     1         100(6F12.6))
-  370 FORMAT (23H  EXPECTED N TOO LARGE  )
       END
 
       SUBROUTINE CONSTS_DAE (K, RHO, COEF)
@@ -2308,8 +2229,6 @@ C       LJ = MJ + 1
 C   70 CONTINUE
       RETURN
 C--------------------------------------------------------------
-  120 FORMAT (3H U(, I2, 3H) -,4D12.4)
-  130 FORMAT (26H THE ESTIMATED ERRORS ARE,)
       END
 C---------------------------------------------------------------------
 C                            p a r t  3
@@ -3471,6 +3390,9 @@ C
       IF ( X .GE. XI(1)-PRECIS .AND. X .LE. XI(N+1)+PRECIS )
      1                                              GO TO 40
       IF (IPRINT .LT. 1) THEN 
+  900 FORMAT(37H ****** DOMAIN ERROR IN APPROX ******
+     1       ,4H X =,D20.10, 10H   ALEFT =,D20.10,
+     2       11H   ARIGHT =,D20.10)
         WRITE(IOUT,900) X, XI(1), XI(N+1)
        ENDIF 
 
@@ -3555,9 +3477,6 @@ C
   200 CONTINUE
       RETURN
 C--------------------------------------------------------------------
-  900 FORMAT(37H ****** DOMAIN ERROR IN APPROX ******
-     1       ,4H X =,D20.10, 10H   ALEFT =,D20.10,
-     2       11H   ARIGHT =,D20.10)
       END
 C
       SUBROUTINE HORDER_DAE(I, UHIGH, HI, DMZ, NCOMP, NCY, K)
