@@ -558,7 +558,6 @@ C
       COMMON /DAEEST/ TTL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTTOL(40), NTOL
 C
-      CHARACTER (LEN = 150) MSG 
       EXTERNAL FSUB, DFSUB, GSUB, DGSUB, GUESS
 
       integer nfunc, njac, nstep, nbound, njacbound
@@ -586,9 +585,6 @@ C     intialise counters
 C
 C...  specify machine dependent output unit  iout  and compute machine
 C...  dependent constant  precis = 100 * machine unit roundoff
-C
-      IF ( ISET(7) .LE. 0 )  WRITE(6,99)
-  99  FORMAT(' VERSION *1* OF COLDAE .'    )
 C
       IOUT = 6
       PRECIS = 1.D0
@@ -702,20 +698,14 @@ C
       NMAXF = (NDIMF - NFIXF) / NSIZEF
       NMAXI = (NDIMI - NFIXI) / NSIZEI
       IF ( IPRINT .LT. 1 )  THEN
-  350 FORMAT(35H THE MAXIMUM NUMBER OF SUBINTERVALS)
-       WRITE(msg,350)
-       CALL RPRINT(msg)
-  351 FORMAT(9H IS MIN (, I4,23H (ALLOWED FROM FSPACE),,I4,
-     1       24H (ALLOWED FROM ISPACE) ))
-       WRITE(msg,351) NMAXF, NMAXI
-       CALL RPRINT(msg)
+       CALL Rprinti1('The maximum number of subintervals is min',nmaxF)
+       CALL Rprinti1('The maximum number allowed from ispace', NMAXI)
       ENDIF
       NMAX = MIN0( NMAXF, NMAXI )
       IF ( NMAX .LT. N )                            RETURN
       IF ( NMAX .LT. NFXPNT+1 )                     RETURN
       IF (NMAX .LT. 2*NFXPNT+2 .AND. IPRINT .LT. 1) THEN
-        CALL rprint("Insufficient space to double mesh for 
-     1		error estimate")
+      CALL Rprint('Insufficient space to double mesh for err. estimate')
       ENDIF
 C
 C...  generate pointers to break up  fspace  and  ispace .
@@ -905,7 +895,6 @@ C
       COMMON /DAEEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
 C
-      CHARACTER (LEN = 150) MSG 
       EXTERNAL FSUB, DFSUB, GSUB, DGSUB, GUESS
 C
 C...  constants for control of nonlinear iteration
@@ -949,7 +938,7 @@ C...       check for a singular matrix
 C
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 )  THEN
-          CALL rprint('Singular projection matrix due to index > 2')
+          CALL Rprint('Singular projection matrix due to index > 2')
          ENDIF
            IFLAG = 0
          RETURN
@@ -957,11 +946,11 @@ C
        IF ( MSING .EQ. 0 )                      GO TO 400
    30      IF ( MSING .LT. 0 )                      GO TO 40
        IF ( IPRINT .LT. 1 )  THEN
-        CALL rprint("A LOCAL ELIMINATION MATRIX IS SINGULAR")
+        CALL Rprint('A local elimination matrix is singular')
        ENDIF 
           GO TO 460
    40      IF ( IPRINT .LT. 1 ) THEN
-            CALL rprint("The global BVP-matrix is singular")
+            CALL Rprint('The global BVP-matrix is singular')
            ENDIF 
        IFLAG = 0
        RETURN
@@ -992,10 +981,8 @@ C
      2          FSUB, DFSUB, GSUB, DGSUB, GUESS, ISING,RPAR,IPAR)
 C
        IF ( IPRINT .LT. 0 )  THEN
-        CALL rprint("Fixed Jacobian iterations")
-  510 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
-          WRITE (msg,510) ITER, RNOLD
-          CALL RPRINT(msg)
+        CALL Rprinti1('Fixed Jacobian iteration ', ITER)
+        CALL Rprintd1('Norm (RHS) = ', RNOLD)
        ENDIF 
           
        GO TO 70
@@ -1005,9 +992,8 @@ C...       the value of ifreez determines whether this is a full
 C...       newton step (=0) or a fixed jacobian iteration (=1).
 C
    60      IF ( IPRINT .LT. 0 )  THEN
-  710 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
-              WRITE (msg,710) ITER, RNORM
-              CALL RPRINT(msg)
+        CALL Rprinti1('Fixed Jacobian iteration ', ITER)
+        CALL Rprintd1('Norm (RHS) = ', RNOLD)
            ENDIF   
        RNOLD = RNORM
        CALL LSYSLV_DAE (MSING, XI, XIOLD, Z, DMZ, DELZ, DELDMZ, G,
@@ -1019,7 +1005,7 @@ C
    70      IF ( MSING .NE. 0 )                      GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-        CALL rprint('Singular projection matrix due to index > 2')
+        CALL Rprint('Singular projection matrix due to index > 2')
          ENDIF 
            
          IFLAG = 0
@@ -1074,19 +1060,16 @@ C
 C...       convergence obtained
 C
        IF ( IPRINT .LT. 1 ) THEN
-  560 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
-         WRITE (msg,560) ITER
-         CALL RPRINT(msg)
+        CALL Rprinti1('Convergence after iteration: ', ITER)
        ENDIF 
        GO TO 400
 C
 C...      convergence of fixed jacobian iteration failed.
 C
   130      IF ( IPRINT .LT. 0 ) THEN
-  810 FORMAT(13H ITERATION = , I3, 15H  NORM (RHS) = , D10.2)
-              WRITE (msg,810) ITER, RNORM
-              CALL RPRINT(msg)
-              CALL rprint("Switch to damped Newton iteration")
+        CALL Rprinti1('Fixed Jacobian iteration ', ITER)
+        CALL Rprintd1('Norm (RHS) = ', RNOLD)
+        CALL Rprint('Switch to damped Newton iteration')
            ENDIF 
               
        ICONV = 0
@@ -1112,7 +1095,7 @@ C...       with the damped newton method.
 C...       evaluate rhs and find the first newton correction.
 C
   160      IF(IPRINT .LT. 0)  THEN
-            CALL rprint("Full damped Newton iteration")
+            CALL Rprint('Full damped Newton iteration')
            ENDIF 
 
              CALL LSYSLV_DAE (MSING, XI, XIOLD, Z, DMZ, DELZ, DELDMZ, G,
@@ -1124,7 +1107,7 @@ C
        IF ( MSING .NE. 0 )                       GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-          CALL rprint('Singular projection matrix due to index > 2')
+          CALL Rprint('Singular projection matrix due to index > 2')
          ENDIF 
          IFLAG = 0
          RETURN
@@ -1172,7 +1155,7 @@ C
        IF ( MSING .NE. 0 )                      GO TO 30
        IF (ISING .NE. 0) THEN
          IF ( IPRINT .LT. 1 ) THEN
-          CALL rprint('Singular projection matrix due to index > 2' )
+          CALL Rprint('Singular projection matrix due to index > 2' )
          ENDIF 
          IFLAG = 0
          RETURN
@@ -1230,23 +1213,15 @@ C
        ANFIX = DSQRT(ANFIX / FLOAT(NZ+NDMZ))
        IF ( ICOR .EQ. 1 )                         GO TO 280
        IF (IPRINT .LT. 0) THEN
-  520 FORMAT(13H ITERATION = ,I3,22H  RELAXATION FACTOR = ,D10.2
-     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
-     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2,
-     2       D10.2)
-         WRITE (msg,520) ITER, RELAX, ANORM,
-     1           ANFIX, RNOLD, RNORM
-         CALL RPRINT(msg)
+       CALL Rprintid('Iteration = , Relaxation factor = ',ITER, RELAX)
+       CALL Rprintd2('Norm of scaled RHS changes from, to',ANORM,ANFIX)
+       CALL Rprintd2('Norm OF RHS changes from, to', RNOLD, RNORM)
        ENDIF 
        GO TO 290
   280      IF (IPRINT .LT. 0) THEN
-  550 FORMAT(40H RELAXATION FACTOR CORRECTED TO RELAX = , D10.2
-     1       ,33H NORM OF SCALED RHS CHANGES FROM ,D10.2,3H TO,D10.2
-     2       ,33H NORM   OF   RHS  CHANGES  FROM  ,D10.2,3H TO,D10.2
-     2       ,D10.2)
-            WRITE (msg,550) RELAX, ANORM, ANFIX,
-     1           RNOLD, RNORM
-            CALL RPRINT(msg)
+       CALL Rprintd1('Relaxation factor corrected to  ', RELAX)
+       CALL Rprintd2('Norm of scaled RHS changes from, to',ANORM,ANFIX)
+       CALL Rprintd2('Norm or RHS changes from, to', RNOLD, RNORM)
            ENDIF 
 
   290      ICOR = 0
@@ -1306,9 +1281,7 @@ C
 C...       convergence obtained
 C
        IF ( IPRINT .LT. 1 ) THEN 
-  960 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
-         WRITE (msg,960) ITER
-         CALL RPRINT(msg)
+       CALL Rprinti1('Convergence after iteration ',ITER)
        ENDIF 
 C
 C...       since convergence obtained, update  z and dmz  with term
@@ -1322,9 +1295,7 @@ C
   380      CONTINUE
   390      IF ( (ANFIX .LT. PRECIS .OR. RNORM .LT. PRECIS)
      1          .AND. IPRINT .LT. 1 ) THEN
- 1060 FORMAT(18H CONVERGENCE AFTER , I3,11H ITERATIONS )
-             WRITE (msg,1060) ITER
-             CALL RPRINT(msg)
+       CALL Rprinti1('Convergence after iteration ',ITER)
            ENDIF 
        ICONV = 1
        IF ( ICARE .EQ. (-1) )  ICARE = 0
@@ -1344,19 +1315,12 @@ C
 C...       diagnostics for failure of nonlinear iteration.
 C
   430      IF ( IPRINT .LT. 1 ) THEN
-  570 FORMAT(22H NO CONVERGENCE AFTER , I3, 11H ITERATIONS)
-             WRITE (msg,570) ITER
-             CALL RPRINT(msg)
+       CALL Rprinti1('NO convergence after iteration ',ITER)
            ENDIF 
        GO TO 450
   440       IF( IPRINT .LT. 1 )    THEN
-  580 FORMAT(37H NO CONVERGENCE.  RELAXATION FACTOR =,D10.3
-     1         ,13H IS TOO SMALL )
-           WRITE(msg,580) RELAX
-           CALL RPRINT(msg)
-  581 FORMAT(10H(LESS THAN, D10.3, 1H))
-           WRITE(msg,581) RELMIN
-           CALL RPRINT(msg)
+      CALL Rprintd1('NO convergence, relaxation factor too small',RELAX)
+      CALL Rprintd1('Should not be less than', RELMIN)
        ENDIF
   450      IFLAG = -2
        NOCONV = NOCONV + 1
@@ -1394,11 +1358,10 @@ C
        N = N / 2
        IFLAG = -1
        IF ( ICONV .EQ. 0 .AND. IPRINT .LT. 1 ) THEN
-        CALL rprint("NO CONVERGENCE")
+        CALL Rprint('NO convergence')
        ENDIF 
        IF ( ICONV .EQ. 1 .AND. IPRINT .LT. 1 ) THEN 
-        CALL rprint("Probably tolerances too stringent or nmax too
-     1     small")
+       CALL Rprint('Probably tolerance too stringent or nmax too small')
        ENDIF 
        RETURN
   480      IF ( ICONV .EQ. 0 )  IMESH = 1
@@ -1432,7 +1395,6 @@ C
       DIMENSION Z(MSTAR,*), SCALE(MSTAR,*), DMZ(KDY,N), DSCALE(KDY,N)
       DIMENSION XI(*), BASM(5)
 C
-      CHARACTER (LEN = 150) MSG 
       COMMON /DAEORD/ K, NCOMP, NY, NCY, ID1, KD, ID3, MMAX, M(20)
 C
       BASM(1) = 1.D0
@@ -1565,7 +1527,6 @@ C
       COMMON /DAEBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /DAEEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (LEN = 150) MSG 
 C
       NFXP1 = NFXPNT +1
       GO TO (180, 100, 50, 20, 10), MODE
@@ -1651,7 +1612,7 @@ C
       N = NMAX / 2
       GO TO 220
   110 IF ( IPRINT .LT. 1 ) THEN 
-        CALL rprint("Expected N too large")
+        CALL Rprint('Expected N too large')
        ENDIF 
       N = N2
       RETURN
@@ -1874,10 +1835,8 @@ C...  naccum=expected n to achieve .1x user requested tolerances
 C
       NACCUM = ACCUM(NOLD+1) + 1.D0
       IF ( IPRINT .LT. 0 ) THEN 
-  350 FORMAT(21H MESH SELECTION INFO,30H DEGREE OF EQUIDISTRIBUTION =
-     1       , F8.5, 28H PREDICTION FOR REQUIRED N = , I8)
-        WRITE(msg,350) DEGEQU, NACCUM
-        CALL RPRINT(msg)
+      CALL Rprintd1('Mesh degree of equidistribution =',DEGEQU)
+      CALL Rprinti1('Prediction for required N = ', NACCUM)
        ENDIF 
 
 C
@@ -1957,10 +1916,7 @@ C
       MODE = 1
   320 CONTINUE
       NP1 = N + 1
-C      IF ( IPRINT .LT. 1 )  THEN
-C       WRITE(IOUT,340) N
-C       WRITE(IOUT,341) (XI(I),I=1,NP1)
-C      ENDIF
+
       NZ   = MSTAR * (N + 1)
       NDMZ = KDY * N
       RETURN
@@ -2008,7 +1964,6 @@ C
       COMMON /DAEBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /DAEEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (LEN = 150) MSG 
 C
       DATA CNSTS1 /    .25D0,     .625D-1,  7.2169D-2, 1.8342D-2,
      1     1.9065D-2, 5.8190D-2, 5.4658D-3, 5.3370D-3, 1.8890D-2,
@@ -2153,7 +2108,6 @@ C
       COMMON /DAEBAS/ B(28), ACOL(28,7), ASAVE(28,4)
       COMMON /DAEEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (LEN = 150) MSG 
 C
 C...  error estimates are to be generated and tested
 C...  to see if the tolerance requirements are satisfied.
@@ -2218,15 +2172,7 @@ C
      1          TOLIN(J) * (DABS(Z(LTJZ))+1.D0) )  IFIN = 0
    50      CONTINUE
    60 CONTINUE
-      IF ( IPRINT .GE. 0 )                          RETURN
-C      WRITE(IOUT,130)
 
-C      LJ = 1
-C      DO 70 J = 1,NCOMP
-C       MJ = LJ - 1 + M(J)
-C       WRITE(IOUT,120) J, (ERREST(L), L= LJ, MJ)
-C       LJ = MJ + 1
-C   70 CONTINUE
       RETURN
 C--------------------------------------------------------------
       END
@@ -2313,7 +2259,6 @@ C
       COMMON /DAEAPR/ N, NOLD, NMAX, NZ, NDMZ
       COMMON /DAENLN/ NONLIN, ITER, LIMIT, ICARE, IGUESS, INDEX
       COMMON /DAEBAS/ B(28), ACOL(28,7), ASAVE(28,4)
-      CHARACTER (LEN = 150) MSG 
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 C
@@ -2732,7 +2677,6 @@ C
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 	  
-      CHARACTER (LEN = 150) MSG 
 C
 C...  zero jacobian dg
 C
@@ -2806,7 +2750,6 @@ C**********************************************************************
       DIMENSION RPAR(*),IPAR(*)
       COMMON /DAEORD/ K, NCOMP, NY, NDM, MSTAR, KD, KDYM, MMAX, M(20)
       COMMON /DAENLN/ NONLIN, ITER, LIMIT, ICARE, IGUESS, INDEX
-      CHARACTER (LEN = 150) MSG 
       integer nfunc, njac, nstep, nbound, njacbound
       common/coldiag/nfunc, njac, nstep, nbound, njacbound
 	  
@@ -2964,7 +2907,6 @@ C
       COMMON /DAEORD/  K, NCD, NY, NCYD, MSTAR, KD, KDUM, MMAX, M(20)
       COMMON /DAEBAS/ B(7,4), ACOL(28,7), ASAVE(28,4)
       COMMON /DAENLN/ NONLIN, ITER, LIMIT, ICARE, IGUESS, INDEX
-      CHARACTER (LEN = 150) MSG 
 C
 C...  compute local basis
 C
@@ -3173,7 +3115,6 @@ C**********************************************************************
       COMMON /DAEOUT/ PRECIS, IOUT, IPRINT
       COMMON /DAEEST/ TOL(40), WGTMSH(40), WGTERR(40), TOLIN(40),
      1                ROOT(40), JTOL(40), LTOL(40), NTOL
-      CHARACTER (LEN = 150) MSG 
 c
 C...  compute the maximum tolerance
 C
@@ -3368,7 +3309,6 @@ C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DIMENSION ZVAL(*), DMVAL(*), XI(*), M(*), A(7,*), DM(7)
       DIMENSION Z(*), DMZ(*), BM(4), COEF(*), YVAL(*)
-      CHARACTER (LEN = 150) MSG 
 C
       COMMON /DAEOUT/ PRECIS, IOUT, IPRINT
 C
@@ -3390,10 +3330,8 @@ C
       IF ( X .GE. XI(1)-PRECIS .AND. X .LE. XI(N+1)+PRECIS )
      1                                              GO TO 40
       IF (IPRINT .LT. 1) THEN 
-  900 FORMAT(37H ****** DOMAIN ERROR IN APPROX ******
-     1       ,4H X =,D20.10, 10H   ALEFT =,D20.10,
-     2       11H   ARIGHT =,D20.10)
-        WRITE(IOUT,900) X, XI(1), XI(N+1)
+      CALL Rprintd3('Domain Error In Approx, X, Aleft, Aright ',
+     +  X, Xi(1), Xi(N+1))
        ENDIF 
 
       IF ( X .LT. XI(1) )  X = XI(1)

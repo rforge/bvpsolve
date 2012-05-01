@@ -102,7 +102,6 @@ c ==============================================================================
       external dfsub
       external  gsub
       external  dgsub
-      character(len=150) msg
 
       integer nminit, iprint, idum
       logical  use_c, comp_c, giv_u
@@ -202,10 +201,8 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
 * nmax from size of u and xx
 
       if (iprint .ge. 0) then
-           write(msg,901) nmax
-           call rprint(msg)
+       CALL Rprinti1('Nmax from workspace =',nmax)
       end if
- 901   format(1h ,'nmax from workspace =',i8)
 
       if (nmax .le. 1) return
 
@@ -335,13 +332,6 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       ilast = idhold +  ldhold
 
 
-      if (iprint .eq. 1) then
-        write(msg,903) ilast
-        call rprint(msg)
-      end if
- 903     format(1h ,'ilast',i10)
-
-
 *  Partition integer workspace.
 
       iiref = 1
@@ -360,8 +350,7 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       lisign = ncomp*nmax
 
       if (iprint .eq. 1) then
-        write(msg,*) 'integer workspace', iisign+lisign
-        call rprint(msg)
+        CALL Rprinti1('Integer workspace', iisign+lisign)
       end if
 
       call bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
@@ -466,8 +455,6 @@ c ==============================================================================
       save mchset
       logical frscal
 c      save frscal
-
-      character(len=150) msg
 
 
       logical stab_kappa, stab_gamma, stab_cond, stiff_cond, ill_cond
@@ -588,7 +575,7 @@ c Karline: use precis instead of d1mach
            if (nmsh .ge. nmax ) then
             maxmsh = .true.
             if (iprint .eq. 1) THEN
-             CALL rprint('Initial mesh greater than nmax')
+             CALL Rprint('Initial mesh greater than nmax')
             ENDIF
 
             goto 900
@@ -600,7 +587,7 @@ c Karline: use precis instead of d1mach
             maxmsh = .true.
 
             if (iprint .eq. 1) THEN
-             CALL rprint('Initial mesh greater than nmax')
+             CALL Rprint('Initial mesh greater than nmax')
             ENDIF
 
             goto 900
@@ -626,9 +613,7 @@ c Karline: use precis instead of d1mach
       If(Maxmsh) goto 900
 
       if (iprint .eq. 1) THEN
- 903  format(1h ,'start 4th order, nmsh',i5)
-        write(msg,903) nmsh
-        CALL rprint(msg)
+       CALL Rprinti1('Start 4th order, nmsh', nmsh)
       ENDIF
 
 *  Set the def (deferred correction) array to zero.
@@ -700,22 +685,12 @@ c       BY BRUGNANO & TRIGIANTE, AND HIGHAM
 
 
            if (iprint .ge. 0) then
- 1001 format(1h ,'stiffness = ',1pe11.3)
-            write(msg,1001) sigma
-            CALL rprint(msg)
- 1002 format(1h ,'gamma1    = ',1pe11.3)
-            write(msg,1002) gamma1
-            CALL rprint(msg)
- 1003 format(1h ,'kappa1    = ',1pe11.3)
-            write(msg,1003) ckappa1
-            CALL rprint(msg)
- 1004 format(1h ,'kappa     = ',1pe11.3)
-            write(msg,1004) ckappa
-            CALL rprint(msg)
- 1009 format(1h ,'kappa2    = ',1pe11.3)
-            write(msg,1009) ckappa2
-            CALL rprint(msg)
-          end if
+            CALL Rprintd1('stiffness = ', sigma)
+            CALL Rprintd1('gamma1    = ', gamma1)
+            CALL Rprintd1('kappa1    = ', ckappa1)
+            CALL Rprintd1('kappa     = ', ckappa)           
+            CALL Rprintd1('kappa2    = ', ckappa2)
+           end if
 
           stab_sigma = abs(sigmaold-sigma)/(sigma).lt.5d-2
      *      .and. sigma .lt. flmax
@@ -742,18 +717,12 @@ c          stab_cond = stab_kappa1 .and. stab_gamma
           if (ill_cond .and. use_c) goto 2000
 
            if (iprint .eq. 1) then
-             write(msg,*) 'stab_sigma = ',stab_sigma
-             CALL rprint(msg)
-             write(msg,*) 'stab_kappa = ', stab_kappa
-             CALL rprint(msg)
-             write(msg,*) 'stab_kappa1 = ', stab_kappa1
-             CALL rprint(msg)
-             write(msg,*) 'stab_gamma = ', stab_gamma
-             CALL rprint(msg)
-             write(msg,*) 'stiff_cond = ', stiff_cond
-             CALL rprint(msg)
-             write(msg,*) 'ill_cond   = ', ill_cond
-             CALL rprint(msg)
+             CALL Rprintd1('stab_sigma = ',stab_sigma)
+             CALL Rprintd1('stab_kappa = ', stab_kappa)
+             CALL Rprintd1('stab_kappa1 = ', stab_kappa1)
+             CALL Rprintd1('stab_gamma = ', stab_gamma)
+             CALL Rprintd1('stiff_cond = ', stiff_cond)
+             CALL Rprinti1('ill_cond   = ', ill_cond)
            end if
         end if
 c endif if (comp_c)
@@ -786,22 +755,12 @@ c
 
 
            if (iprint .ge. 0) then
- 1101 format(1h ,'stiffness = ',1pe11.3)
-            write(msg,1101) sigma
-            CALL rprint(msg)
- 1102 format(1h ,'gamma1    = ',1pe11.3)
-            write(msg,1102) gamma1
-            CALL rprint(msg)
- 1103 format(1h ,'kappa1    = ',1pe11.3)
-            write(msg,1103) ckappa1
-            CALL rprint(msg)
- 1104 format(1h ,'kappa     = ',1pe11.3)
-            write(msg,1104) ckappa
-            CALL rprint(msg)
- 1109 format(1h ,'kappa2    = ',1pe11.3)
-            write(msg,1009) ckappa2
-            CALL rprint(msg)
-          end if
+            CALL Rprintd1('stiffness = ', sigma)
+            CALL Rprintd1('gamma1    = ', gamma1)
+            CALL Rprintd1('kappa1    = ', ckappa1)
+            CALL Rprintd1('kappa     = ', ckappa)           
+            CALL Rprintd1('kappa2    = ', ckappa2)
+           end if
 
           stab_sigma = abs(sigmaold-sigma)/(sigma).lt.5d-2
      *      .and. sigma .lt. flmax
@@ -827,18 +786,12 @@ c         stab_cond = stab_kappa1 .and. stab_gamma
 
 
            if (iprint .eq. 1) then
-             write(msg,*) 'stab_sigma = ',stab_sigma
-             CALL rprint(msg)
-             write(msg,*) 'stab_kappa = ', stab_kappa
-             CALL rprint(msg)
-             write(msg,*) 'stab_kappa1 = ', stab_kappa1
-             CALL rprint(msg)
-             write(msg,*) 'stab_gamma = ', stab_gamma
-             CALL rprint(msg)
-             write(msg,*) 'stiff_cond = ', stiff_cond
-             CALL rprint(msg)
-             write(msg,*) 'ill_cond   = ', ill_cond
-             CALL rprint(msg)
+             CALL Rprintd1('stab_sigma = ',stab_sigma)
+             CALL Rprintd1('stab_kappa = ', stab_kappa)
+             CALL Rprintd1('stab_kappa1 = ', stab_kappa1)
+             CALL Rprintd1('stab_gamma = ', stab_gamma)
+             CALL Rprintd1('stiff_cond = ', stiff_cond)
+             CALL Rprinti1('ill_cond   = ', ill_cond)
            end if
         end if
        end if
@@ -922,11 +875,8 @@ c   Now compute an explicit deferred correction for this.
 
            Ix=Ixx
            siz=abs(dgtm(Icmph))
-c           write(6,*) 'siz=',siz
            rat=siz/bigdef
-c           write(6,*) 'rat=',rat
-c           write(6,*) ' bigdef=',bigdef,' > ',dsqrt(tol(Icmph))
-c           write(6,*) ' dsq=', dsqrt(tol(Icmph))
+
           If(Rat.gt.50.0D+0.and.bigdef.gt.dsqrt(tol(Icmph)).and.
      +      siz.gt.1.0D+0) Then
 
@@ -944,8 +894,7 @@ c            numadd = drat**power
          else
              drat = bigdef/
      *               (max(one, abs(u(icmph,Ix)))*tol(intol))
-C KARLINE REMOVED THIS
-c           if(iprint .ne. -1) write(6,913) drat, u(icmph,Ix), tol(intol)
+
 c            numadd = drat**power
              numadd = 15
                 call smpmsh (nmsh, nmax, xx, ix, numadd,
@@ -959,8 +908,8 @@ c            numadd = drat**power
             call smpmsh (nmsh, nmax, xx, Ix, numadd,
      *             nmold, xxold, maxmsh)
        end if
-C 913     format(1h ,'drat,u,tol',3(1pe11.3))
-cf the solution is  intepolated, using the new  solution
+
+cf the solution is  interpolated, using the new  solution
          Call Matcop(Nudim, Ncomp, Ncomp, Nmold, U, Uold)
          Call Interp(Ncomp, Nmsh, Xx, Nudim,U,Ncomp,Nmold, Xxold, Uold)
          If(Maxmsh) goto 900
@@ -992,9 +941,6 @@ c       endif
       Call Matcop(Ncomp, Ncomp, Ncomp, Nmsh-1, Def, Def6)
 
 c      if (succes) then
-c          if (iprint .ne. -1 .and. comp_c ) then
-c            if (ckappa .ge. tolmin/epsmch) write(6,1005)
-c          end if
 c          iflbvp = 0
 c          return
       if (maxmsh) then
@@ -1008,7 +954,6 @@ c          return
 **** logic for 6th order ****
 
 c karline removed
-C      if (iprint .eq. 1) write(6,905)
 
 *  Save the 4th order solution on this mesh in uold.
 
@@ -1060,7 +1005,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
       if (iflnwt .eq. 0) then
 
-C karline: what about "linear" -> rmoved
+C karline: what about 'linear' -> rmoved
 c         call conv6(ncomp, nmsh, ntol, ltol, tol,
 c     *             nudim, u, uold, etest6, err6,
 c     *             trst6, onto8, reaft6, linear, succes)
@@ -1090,8 +1035,8 @@ c     *             trst6, onto8, reaft6, linear, succes)
 
          if (iprint .ne. -1 .and. comp_c .and. use_c) then
            if (ill_cond) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('the solution could be inaccurate')
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('The solution could be inaccurate')
            end if
          end if
          iflbvp = 0
@@ -1099,8 +1044,8 @@ c     *             trst6, onto8, reaft6, linear, succes)
             if (.not. stab_kappa .and. indnms .gt. 1) then
                  iflbvp = -1
                 if  (iprint .ne. -1) then
-        CALL rprint('The conditioning parameters did not stabilise, ')
-        CALL rprint('the solution could be inaccurate')
+        CALL Rprint('The conditioning parameters did not stabilise, ')
+        CALL Rprint('The solution could be inaccurate')
                 end if
             end if
             if (ill_cond) iflbvp = -2
@@ -1113,7 +1058,7 @@ c     *             trst6, onto8, reaft6, linear, succes)
 ***** logic for trying to calculate 8th order solution *****
 
       if (iprint .eq. 1)  then
-             CALL rprint('start 8th order')
+             CALL Rprint('Start 8th order')
       end if
 
       call matcop(nudim, ncomp, ncomp, nmsh, u, uold)
@@ -1148,8 +1093,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
       forcedouble = .false.
 
        if (iprint .eq. 1) then
-         write(msg,*) 'forcedouble', nodouble, itcond
-         call rprint(msg)
+         CALL Rprinti2('Forcedouble, itcond', nodouble, itcond)
        end if
 
        if (use_c .and.  itcond .eq. itcondmax) then
@@ -1264,8 +1208,8 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
       if (iprint .ne. -1 .and. comp_c .and. use_c ) then
         if ( ill_cond ) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('the solution could be inaccurate')
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('The solution could be inaccurate')
         end if
       end if
        iflbvp = 0
@@ -1273,8 +1217,8 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
             if (.not. stab_kappa .and. indnms.gt.1) then
                 iflbvp = -1
                 if  (iprint .ne. -1) then
-       CALL rprint('The conditioning parameters did not stabilise, ')
-       CALL rprint('the solution could be inaccurate')
+       CALL Rprint('The conditioning parameters did not stabilise, ')
+       CALL Rprint('The solution could be inaccurate')
                 end if
              end if
              if (ill_cond) iflbvp=-2
@@ -1299,20 +1243,20 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
       iflbvp = 1
       if (iprint .ge. 0   ) then
-             CALL rprint('Terminated, too many mesh points')
+             CALL Rprint('Terminated, too many mesh points')
       end if
       if (nmsh .gt. nmold .and. use_c .and.
      *    abs(ckappaold-ckappa)/(ckappa) .lt. nmsh*1d-16 ) then
-      	 CALL rprint('Try with a less stringent tolerance ')
+      	 CALL Rprint('Try with a less stringent tolerance ')
       end if
         if (linear .and. ill_cond .and. use_c) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance')
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance')
         end if
         if (.not.linear .and. ill_cond .and. use_c ) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance ')
-             CALL rprint(' or with a different initial guess' )
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance ')
+             CALL Rprint(' or with a different initial guess' )
          end if
 
       return
@@ -1322,20 +1266,18 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
       iflbvp = 2
       if (iprint .ne.-1) then
- 1008 format(1h ,'Terminated too many meshes, nmsh',i5)
-        write(msg,1008) indnms
-        call rprint(msg)
+       CALL Rprinti1('Terminated too many meshes, nmsh ',indnms)
       end if
 
       if (iprint .ne. -1 .and. use_c ) then
         if (linear .and. ill_cond ) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance')
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance')
         end if
         if (.not.linear .and. ill_cond )then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance ')
-             CALL rprint(' or with a different initial guess' )
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance ')
+             CALL Rprint(' or with a different initial guess' )
          end if
       end if
         return
@@ -1345,12 +1287,12 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
          iflbvp = 3
          if (iprint .ne. -1) then
           if (linear) then
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance')
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance')
           else
-             CALL rprint('The problem is ill-conditioned, ')
-             CALL rprint('try with a less stringent tolerance ')
-             CALL rprint(' or with a different initial guess' )
+             CALL Rprint('The problem is ill-conditioned, ')
+             CALL Rprint('Try with a less stringent tolerance ')
+             CALL Rprint(' or with a different initial guess' )
           end if
          end if
          return
@@ -1384,8 +1326,6 @@ C Karline: moved this statement upward
       Common /Flags/ Ifinal,Iback,Iprec
       integer nfunc, njac, nstep, nbound, njacbound
       common/diagnost/nfunc, njac, nstep, nbound, njacbound
-
-      character(len=150) msg
 
 
 c       St1 --> Tmp(ncomp,10)
@@ -1487,7 +1427,7 @@ c
  60      Continue
 
          if (iprint.eq.1) then
-             CALL rprint('no convergence of corrections')
+             CALL Rprint('NO convergence of corrections')
          end if
 
          Return
@@ -1515,9 +1455,6 @@ c
 
       Return
 
- 900  Format('** Warning - Possibly Approaching Machine Precision ',
-     *         'Beyond Epsilon  = ',D10.3)
-
       End
 
 c ===================================================================================
@@ -1536,8 +1473,6 @@ C      dimension t1(2),t2(2),t3(2),t4(2)
       external fsub
       integer nfunc, njac, nstep, nbound, njacbound
       common/diagnost/nfunc, njac, nstep, nbound, njacbound
-
-      character(len=150) msg
 
       logical use_c,comp_c
       integer nminit, iprint, idum
@@ -1626,8 +1561,6 @@ c ==============================================================================
       Logical Linear
       integer nfunc, njac, nstep, nbound, njacbound
       common/diagnost/nfunc, njac, nstep, nbound, njacbound
-
-      character(len=150) msg
 
       JC=0
 c      St1 --> Tmp(ncomp,13)
@@ -1743,7 +1676,7 @@ c      St4 --> Tmp(ncomp,16)
  80         Continue
 
          if (iprint.eq.1) then
-             CALL rprint('no convergence of 8th order defcors')
+             CALL Rprint('NO convergence of 8th order defcors')
          end if
 
       Return
@@ -1759,9 +1692,6 @@ c      St4 --> Tmp(ncomp,16)
  110     Continue
 
       Return
-
- 900  Format('** Warning - Possibly Approaching Machine Precision ',
-     *         'Beyond Epsilon  = ',D10.3)
 
       End
 
