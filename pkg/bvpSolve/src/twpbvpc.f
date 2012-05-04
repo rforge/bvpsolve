@@ -16,9 +16,9 @@ c ==============================================================================
 C
 *     OUTPUT
 *
-*     IFLBVP = 0   SUCCESFULL TERMINATION
+*     IFLBVP = 0   SUCCESSFULL TERMINATION
 *
-*     IFLBVP = -1 (SUCCESSFULL TERMINATION BUT CONDITIONING PARAMETER
+*     IFLBVP = -1 (SUCCESSFULL TERMINATION BUT CONDITIONING PARAMETERS
 *                    NOT STABILIZED (ONLY IF USE_C = .true.)
 *
 *     IFLBVP = 1   terminated too many mesh points
@@ -670,7 +670,7 @@ c
            CALL Rprintd1('stiffness = ', sigma)
            CALL Rprintd1('gamma1    = ', gamma1)
            CALL Rprintd1('kappa1    = ', ckappa1)
-           CALL Rprintd1('kappa     = ', ckappa)           
+           CALL Rprintd1('kappa     = ', ckappa)
            CALL Rprintd1('kappa2    = ', ckappa2)
           end if
 
@@ -732,7 +732,7 @@ c endif if (comp_c)
            CALL Rprintd1('stiffness = ', sigma)
            CALL Rprintd1('gamma1    = ', gamma1)
            CALL Rprintd1('kappa1    = ', ckappa1)
-           CALL Rprintd1('kappa     = ', ckappa)           
+           CALL Rprintd1('kappa     = ', ckappa)
            CALL Rprintd1('kappa2    = ', ckappa2)
           end if
 
