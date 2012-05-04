@@ -106,7 +106,7 @@ c-----------------------------------------------------------------------
 
       SUBROUTINE RESMBS(ITYP, IEQUA, ICALL,
      *                  T,X,XD,DELTA,IRES,RPAR,IPAR)
-      IMPLICIT   CHARACTER (A-Z)
+      IMPLICIT   NONE 
       INTEGER    ITYP, IEQUA, ICALL, IRES, IPAR(2)
       DOUBLE PRECISION
      *           T, X(*), XD(*), DELTA(*), RPAR(*)

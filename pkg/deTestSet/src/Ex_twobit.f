@@ -48,17 +48,11 @@ c-----------------------------------------------------------------------
       double precision t,y(NEQN),dy(NEQN),rpar(*)
       double precision x(175),res(175)
       external FCN,GCN
-      CHARACTER(LEN=80) MSG
 
       do 10 i=1,175
  10      x(i)=y(i+175)
       CALL FCN(175,t,x,res, ierr)
 
-c      IF ( IERR .EQ. -1 ) THEN
-c         WRITE(MSG, *)"AN ERROR OCCURRED in TWOBIT, at time", T
-c         call rexit(MSG)
-c        RETURN
-c      ENDIF
       do 20 i=1,175
  20      dy(i)=res(i)
       call GCN(175,x,res)
@@ -76,15 +70,13 @@ c-----------------------------------------------------------------------
       double precision t,y(NEQN),dy(NEQN),rpar(*)
       double precision x(175),res(175)
       external FCN,GCN
-      CHARACTER(LEN=80) MSG
 
       do 10 i=1,175
  10      x(i)=y(i+175)
       CALL FCN(175,t,x,res, ierr)
 
       IF ( IERR .EQ. -1 ) THEN
-         WRITE(MSG, *)"AN ERROR OCCURRED in TWOBIT, at time", T
-         call rexit(MSG)
+        CALL Rprintd1('An error occurred in TWOBIT, at time ', T)
         RETURN
       ENDIF
       do 20 i=1,175
@@ -1826,7 +1818,7 @@ C ---------------------------------------------------------------------------
       IMPLICIT NONE ! double precision (A-H,O-Z)
       DOUBLE PRECISION VDS, VGS, VBS, BETA, CGAMMA,PHI,VT0,VTE
       integer NED,ierr
-      CHARACTER(LEN=80) MSG
+
         DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
      *               CURIS, VTH, VDD, VBB, CLOAD, COUT
@@ -1864,9 +1856,8 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbs.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
-         WRITE(MSG, *)"Error in  TWOBIT due to Phi, vbs", phi, vbs
-c         call rwarn(MSG)
-          call rexit("Run aborted")
+        CALL Rprintd2('Error in  TWOBIT due to Phi, vbs ', phi, vbs)
+          call rexit('Run aborted')
          return
       end if
 
@@ -1888,7 +1879,6 @@ c         call rwarn(MSG)
       IMPLICIT NONE ! double precision (A-H,O-Z)
       DOUBLE PRECISION VDS,VGD,VBD,BETA,CGAMMA,PHI,VT0,VTE
       integer NED,ierr
-      CHARACTER(LEN=80) MSG
 
         DOUBLE PRECISION RGS, RGD, RBS, RBD, CGS, CGD, CBD, CBS,
      *               DELTA, CTIME, STIFF,
@@ -1925,9 +1915,8 @@ C --- Three enhancement-type transistors in series
 
       if(phi-vbd.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
-         WRITE(MSG, *)"Error in TWOBIT due to Phi, vbd", phi, vbd
-C         call rwarn(MSG)
-         call rexit("Run aborted")
+         CALL Rprintd2('Error in TWOBIT due to Phi, vbd ', phi, vbd)
+         call rexit('Run aborted')
          return
       end if
 

@@ -225,7 +225,6 @@ C *** *** *** *** *** *** *** *** *** *** *** *** ***
       DIMENSION Y(N),ATOL(*),RTOL(*),WORK(LWORK),IWORK(LIWORK)
       DIMENSION RPAR(*),IPAR(*),VSTI(N)
       DOUBLE PRECISION KAPPA, GAMMA,SIGMA,SIGMATOT
-      character(len=150) msg
       LOGICAL ARRET
       EXTERNAL FCN
       EXTERNAL SOLOUT
@@ -250,9 +249,7 @@ C -------- NMAX , THE MAXIMAL NUMBER OF STEPS -----
          NMAX=IWORK(1)
          IF(NMAX.LE.0)THEN
             IF (IPRINT.GT.0) THEN
-              WRITE(MSG,*)
-     &          ' WRONG INPUT IWORK(1)=',IWORK(1)
-              CALL RPRINT(MSG)
+        CALL Rprinti1('wrong input iwork(1) = ',IWORK(1))
             END IF
             ARRET=.TRUE.
          END IF
@@ -264,9 +261,7 @@ C -------- METH   COEFFICIENTS OF THE METHOD
          METH=IWORK(2)
          IF(METH.LE.0.OR.METH.GE.4)THEN
             IF (IPRINT.GT.0) THEN
-               WRITE(MSG,*)
-     &          ' CURIOUS INPUT IWORK(2)=',IWORK(2)
-               CALL RPRINT(MSG)
+        CALL Rprinti1('Curious input iwork(2) = ',IWORK(2))
             END IF
             ARRET=.TRUE.
          END IF
@@ -279,17 +274,13 @@ C -------- NRDENS   NUMBER OF DENSE OUTPUT COMPONENTS
       NRDENS=IWORK(5)
       IF(NRDENS.LT.0.OR.NRDENS.GT.N)THEN
          IF (IPRINT.GT.0) THEN
-            WRITE(MSG,*)
-     &           ' CURIOUS INPUT IWORK(5)=',IWORK(5)
-            CALL  RPRINT(MSG)
+        CALL Rprinti1('Curious input iwork(5) = ',IWORK(5))
          END IF
          ARRET=.TRUE.
       ELSE
             IF(NRDENS.GT.0.AND.IOUT.LT.2)THEN
                IF (IPRINT.GT.0)  THEN
-                  WRITE(MSG,*)
-     &      ' WARNING: PUT IOUT=2 FOR DENSE OUTPUT '
-                 CALL RPRINT(MSG)
+        CALL Rprint('Warning: put IOUT=2 for dense output ')
                END IF
             END IF
             IF (NRDENS.EQ.N) THEN
@@ -309,9 +300,8 @@ C -------- UROUND   SMALLEST NUMBER SATISFYING 1.D0+UROUND>1.D0
          UROUND=WORK(1)
          IF(UROUND.LE.1.D-35.OR.UROUND.GE.1.D0)THEN
             IF (IPRINT.GT.0) THEN
-              WRITE(MSG,*)
-     &        ' WHICH MACHINE DO YOU HAVE? YOUR UROUND WAS:',WORK(1)
-             CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &        ' Which machine do you have? Your uround was: ',WORK(1))
             END IF
             ARRET=.TRUE.
          END IF
@@ -323,9 +313,8 @@ C -------  SAFETY FACTOR -------------
          SAFE=WORK(2)
          IF(SAFE.GE.1.D0.OR.SAFE.LE.1.D-4)THEN
             IF (IPRINT.GT.0) THEN
-               WRITE(MSG,*)
-     &          ' CURIOUS INPUT FOR SAFETY FACTOR WORK(2)=',WORK(2)
-              CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &          'Curious input for safety factor work(2) = ',WORK(2))
             END IF
             ARRET=.TRUE.
          END IF
@@ -351,9 +340,7 @@ C --------- BETA FOR STEP CONTROL STABILIZATION -----------
             BETA=WORK(5)
             IF(BETA.GT.0.2D0)THEN
                IF (IPRINT.GT.0) THEN
-                  WRITE(MSG,*)
-     &          ' CURIOUS INPUT FOR BETA: WORK(5)=',WORK(5)
-                 CALL RPRINT(MSG)
+        CALL Rprintd1('Curious input for beta: work(5) = ',WORK(5))
                END IF
             ARRET=.TRUE.
          END IF
@@ -393,9 +380,7 @@ C ------ TOTAL STORAGE REQUIREMENT -----------
       ISTORE=IEYSTIS+7*NRDENS-1
       IF(ISTORE.GT.LWORK)THEN
         IF (IPRINT.GT.0)  THEN
-          WRITE(MSG,*)
-     &   ' INSUFFICIENT STORAGE FOR WORK, MIN. LWORK=',ISTORE
-          CALL RPRINT(MSG)
+        CALL Rprinti1('Insufficient storage for work, min. = ',ISTORE)
         END IF
         ARRET=.TRUE.
       END IF
@@ -403,9 +388,7 @@ C ------ TOTAL STORAGE REQUIREMENT -----------
       ISTORE=ICOMP+NRDENS-1
       IF(ISTORE.GT.LIWORK)THEN
         IF (IPRINT.GT.0) THEN
-          WRITE(MSG,*)
-     &   ' INSUFFICIENT STORAGE FOR IWORK, MIN. LIWORK=',ISTORE
-         CALL RPRINT(MSG)
+        CALL Rprinti1('Insufficient storage for iwork, min. = ',ISTORE)
         END IF
         ARRET=.TRUE.
       END IF
@@ -468,7 +451,6 @@ C ----------------------------------------------------------
       DOUBLE PRECISION ETAVE(N)
       DOUBLE PRECISION  D1,D3,D4,D5,D6,D7
       LOGICAL REJECT,LAST
-      character(len=150) msg
       EXTERNAL FCN
       LOGICAL HERMITE
       COMMON /CONTCKV/XOLD,HOUT,HERMITE
@@ -576,13 +558,6 @@ c  two norm of etave
           ENORMVE = MAX(ENORMVE,ABS(ETAVE(I)))
          END DO
 
-cF         if (iprint .gt. 0) then
-cF           write(msg,*) 'enormve', enormve, 'hst',hst
-cF           call rprint(msg)
-cF            write(msg,*) 'enormve >', enormve .GT. 1d300
-cF           call rprint(msg)
-cF         end if
-
          IF ( ENORMVE .GT. 0.0d0 .AND.
      +         (.NOT. (.NOT. ENORMVE .GT. 0.0d0))
      +     .AND.  (.NOT. ENORMVE .GT. 1d300)  ) THEN
@@ -625,10 +600,6 @@ C --- ERROR ESTIMATION
           END DO
         END IF
         ERR=SQRT(ERR/N)
-cF        if (iprint .gt. 0 ) then
-cF           write(msg,*) 'ERROR ESTIMATION', err, 'STEP', HST
-cF           call rprint(msg)
-cF        end if
       ENDIF
 
 
@@ -640,17 +611,11 @@ cF        end if
 
 
       if (iprint .gt. 0 ) then
-           write(msg,*)  'INITIAL STEP H', H
-           call rprint(msg)
+        CALL Rprintd1('Initial step h = ', H)
         end if
 cF end computation of eta for stiffness detection
 
-c       WRITE(6,*) 'ETAVE', (ETAVE(I),I=1,N)
-c       WRITE(6,*) 'Y1', (Y1(I),I=1,N)
-c       WRITE(6,*) 'YSTI', (YSTI(I),I=1,N)
-c       WRITE(6,*) 'HST', HST, 'H', H
-c       READ(*,*) ia
-CF
+
 CF normalization of etave using the input tolerances
 C
        SCAL_ETA = 1d-12
@@ -702,9 +667,8 @@ C removed ierr
        NFCN=NFCN+1
        IF (IERR .NE. 0  .OR.
      *             (.NOT. ENORMVE .GT. 0.0d0)  ) THEN
-          write(msg,*) 'Stiffness detection based on conditioning
-     * cannot start, we do not use it'
-          CALL RPRINT(MSG)
+        CALL Rprint
+     *   ('Stiffness detection based on conditioning cannot be used')
           NSTIFFCOND = 0
 
        ELSE
@@ -941,21 +905,17 @@ C ------- STIFFNESS DETECTION  based on approximation of eigenvalues
                STDEN=STDEN+(Y1(I)-YSTI(I))**2
  64         CONTINUE
             IF (STDEN.GT.0.D0) HLAMB=H*SQRT(STNUM/STDEN)
-cF            if (iprint .gt. 0) then
-cF              write(msg,188) iasti,hlamb,stden,stnum
-cF              call rprint(msg)
-cF            end if
- 188   format(1x,'the first est',i5,3g22.10)
+
+ 188   format(1x,'The first est',i5,3g22.10)
             IF (HLAMB.GT.3.25D0 .OR. .NOT.(HLAMB .GT. 0.0d0) ) THEN
                NONSTI=0
                IASTI=IASTI+1
                IF (IASTI.EQ.15) THEN
 C KARLINE: always print ...
 C                  IF (IPRINT.GT.0 .OR. NSTIFF .EQ. 1) THEN
-                    WRITE (msg,*)
-     &               'THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X,
-     &               'USING THE STANDARD CHECK OF EIGENVALUES'
-                    CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &               'The problem seems to become stiff at x = ',X)
+        CALL Rprint('using the standard check of eignevalues')
                     IF (NSTIFF .EQ. 2) GOTO 76
 C                  END IF
                END IF
@@ -974,11 +934,7 @@ cF approximation of the eiganvalues using ys
                STDEN=STDEN+(Y1(I)-YSTI(I)-Y1S(I)+YSTIS(I))**2
             END DO
             IF (STDEN.GT.0.D0) HLAMB=H*SQRT(STNUM/STDEN)
-cF            if (iprint .gt. 0) then
-cF               write(msg,189) iastis,hlamb,stden,stnum
-cF               CALL RPRINT(MSG)
-cF            end if
- 189       format(1x,'the first est using cond',i5,3g22.10)
+
             IF ((HLAMB .GT. 2.8D0  .AND. HLAMB .LT. 4.2d0)
      +               .OR. .NOT.(HLAMB .GT. 0.0d0) ) THEN
                NONSTIS=0
@@ -986,10 +942,9 @@ cF            end if
                IF (IASTIS.EQ.15) THEN
 C Karline: always print
 C                  IF (IPRINT.GT.0 .OR. NSTIFFCOND.EQ. 1) THEN
-                    WRITE (MSG,*)
-     &               'THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X,
-     &               'USING THE CHECK OF EIGENVALUES BASED ON YS'
-                    CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &               'The problem seems to become stiff at x = ',X)
+        CALL Rprint('using the check of eigenvalues based on YS')
 C                  END IF
                   IF (NSTIFFCOND .EQ. 2) GOTO 76
                END IF
@@ -1041,17 +996,6 @@ C --- ERROR ESTIMATION
         errta=sqrt(errta/n)
         ERR = ERRy
 
-
-       if (iprint .gt. 0 .AND.  NSTIFFERR .GT. 0) then
-
-cF          write(msg,477) x, erry,errta
-cF          call rprint(msg)
-cF          write(msg,*) 'nerrta = ', nerrta
-cF          call rprint(msg)
-        end if
- 477   format(1x,'Stiffness detection based on two error estimators:
-     +        time ', g22.10, 'erry',g22.10, 'errta',g22.10)
-
         IF (NSTIFFERR .GT. 0) THEN
           IF (ERRta .LT. 0.1d0*ERRY) THEN
             Nerrta = Nerrta+1
@@ -1063,14 +1007,9 @@ cF          call rprint(msg)
             END IF
           END IF
           IF (Nerrta .EQ. 15) THEN
-C            IF (iprint .GT. 0) THEN
-C               write(msg,*) 'Stiffness  based on error estimation'
-C               call rprint(msg)
-               write(msg,*)
-     &               'THE PROBLEM SEEMS TO BECOME STIFF AT X = ',X,
-     &               ' USING STIFFNESS DETECTION BASED ON ERROR',
-     &               ' ESTIMATION'
-              call rprint(msg)
+        CALL Rprinti1(
+     &               'The problem seems to become stiff at x = ',X)
+        CALL Rprint('using stiffness detection based on error estimate')
 C            END IF
             IF (NSTIFFERR .EQ. 2) THEN
                IDID = -5
@@ -1109,14 +1048,6 @@ c the error is the maximum of the three error estimation
          ELSE
             ERR = ERRy
          END IF
-cF         if (iprint .gt. 0 .AND. NSTIFFCOND .GT. 0) then
-cF           write(msg, 478) x, errys, erryys, ERRy
-cF                      call rprint(msg)
-cF 478       format(1x,'time ', g12.5,
-cF     &    '  the three error estimates based on ys',3g22.10)
-cF           write(msg,*) 'nst', nst, 'nest', nest
-cF               call rprint(msg)
-cF         end if
 
        END IF
 cF end if 444
@@ -1131,23 +1062,12 @@ C --- LUND-STABILIZATION
 C --- WE REQUIRE  FAC1 <= HNEW/H <= FAC2
       FAC=MAX(FACC2,MIN(FACC1,FAC/SAFE))
       HNEW=H/FAC
-C KARLINE: toggled this off
-C      if (iprint .gt.0) then
-C         write(msg,433) h, hnew, fac, err
-C         call rprint(msg)
-C      end if
-C 433   format(1x,'new h',4g18.10)
 
       IF(ERR.LE.1.D0)THEN
 C --- STEP IS ACCEPTED
          FACOLD=MAX(ERR,1.0D-4)
          NACCPT=NACCPT+1
-C KARLINE: toggled this off
-C        if (iprint .gt. 0 ) then
-C          write(msg,488) naccpt,iasti
-C          call rprint(msg)
-C        end if
-C 488    format(1x,'naccpt ',i8,'iasti ',i8)
+
 c        This is the end of the second stiffness detector.
 
 
@@ -1191,13 +1111,6 @@ c computation of kappa gamma and sigma
 
          sigma = (kappa/gamma)*(XPH-XST)
 
-cF         IF (IPRINT .GT. 0) THEN
-cF            write(msg,*) 'TIME = ',XPH, 'KAPPA = ',kappa/ENORMVE
-cF            CALL rprint(msg)
-cF            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-cF     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-cF            CALL rprint(msg)
-cF         END IF
 
 cf relation between erry and errys
          IF (ERRY .LT. 0.1d0*ERRYYS) THEN
@@ -1297,13 +1210,7 @@ cF initialization of the conditioning parameters
             GAMMA = 0d0
             XST = XPH
             SIGMATOT = MAX(SIGMA,SIGMATOT)
-cF            if (IPRINT .GT. 0 ) THEN
-cF               WRITE(msg,*) '-- RESTART -- '
-cF               CALL RPRINT(MSG)
-cF               WRITE(msg,*) 'SIGMATOT = ', SIGMATOT,'SIGMA =',
-cF     +          SIGMA,'XST = ',XST
-cF               CALL RPRINT(MSG)
-cF            END IF
+
          END IF
          IF (NRESTART .EQ. 0) SIGMATOT=SIGMA
 
@@ -1317,10 +1224,9 @@ C Karline: always print if nwarn1=0
 C              IF ( (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1)
 C     &          .AND. (NWARN1 .EQ. 0) ) THEN
                IF (NWARN1 .EQ. 0) THEN
-                 WRITE(msg,*)
-     &            'THE PROBLEM SEEMS TO BECOME STIFF AT  X = ', X,
-     &            'SIGMA = ', SIGMATOT
-                 CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &               'The problem seems to become stiff at x = ',X)
+        CALL Rprinti1('Sigma = ', SIGMATOT)
                  nwarn1 = 1
               END IF
                IDID=-6
@@ -1330,9 +1236,8 @@ C     &          .AND. (NWARN1 .EQ. 0) ) THEN
      &          .AND. (NWARN2 .EQ. 0) ) THEN
 
 c              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 ) THEN
-               WRITE(msg,*)'THE STEPSIZE IS RESTRICTED ONLY',
-     &          ' BY STABILITY REASON AT  X= ', X
-               CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &'The stepsize is restricted only by stability reason at x = ', X)
 c              END IF
               nwarn2=1
               IDID=-7
@@ -1342,9 +1247,7 @@ c              END IF
             if ((nst .GT. MAXnst .AND. kappa/ENORMVE .GT. 1.01)
      &          .AND. (NWARN3 .EQ. 0) ) THEN
 c               IF (IPRINT .GT. 0  .OR. NSTIFFCOND.EQ.1 ) THEN
-                WRITE(msg,*) '  KAPPA > 1 AT X = ', X,
-     &  'KAPPA = ',KAPPA/ENORMVE
-                CALL RPRINT(MSG)
+        CALL Rprintd2('Kappa > 1; x = , kappa = ', X, KAPPA/ENORMVE)
 c               END IF
                NWARN3=1
                IDID=-8
@@ -1352,9 +1255,8 @@ c               END IF
              endif
             if ( kappa/ENORMVE .GT. 1d20 .AND. (NWARN4.EQ.0)) THEN
 c              IF (IPRINT .GT. 0 .OR. NSTIFFCOND.EQ.1 )  THEN
-                WRITE(msg,*) 'THE NUMERICAL SOLUTION IS UNSTABLE,',
-     &   ' KAPPA  = ', KAPPA
-                CALL RPRINT(MSG)
+        CALL Rprintd1(
+     &   'The numerical solution is unstable, kappa = ',KAPPA)
 c               END IF
                NWARN4  = 1
              IDID=-9
@@ -1383,12 +1285,12 @@ C ------- NORMAL EXIT
              gamma =gamma/ENORMVE
              sigmatot=max(sigma,sigmatot)
              IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
-         END IF
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
+              END IF
             END IF
             IDID=1
             RETURN
@@ -1412,11 +1314,11 @@ C --- FAIL EXIT
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
              IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
          END IF
       END IF
       IDID=-4
@@ -1428,23 +1330,21 @@ C --- FAIL EXIT
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
             IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
          END IF
       END IF
 
       RETURN
   77  CONTINUE
       IF (IPRINT.GT.0) THEN
-         WRITE(MSG,979)X
-         CALL RPRINT(MSG)
+      CALL Rprintd1('Exit of CashKarp at x = ',X)
       END IF
       IF (IPRINT.GT.0) THEN
-        WRITE(MSG,*)' STEP SIZE T0O SMALL, H=',H
-        CALL RPRINT(MSG)
+        CALL Rprintd1('Step size too small, h = ',H)
       END IF
       IDID=-3
       IF (NSTIFFCOND .GT.0 ) THEN
@@ -1452,23 +1352,20 @@ C --- FAIL EXIT
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
           IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
          END IF
       END IF
       RETURN
   78  CONTINUE
       IF (IPRINT.GT.0) THEN
-         WRITE(MSG,979)X
-         CALL RPRINT(MSG)
+      CALL Rprintd1('Exit of CashKarp at x = ',X)
       END IF
       IF (IPRINT.GT.0) THEN
-         WRITE(MSG,*)
-     &     ' MORE THAN NMAX =',NMAX,'STEPS ARE NEEDED'
-         CALL RPRINT(MSG)
+        CALL Rprinti1('More than nmax steps are needed: ',NMAX)
       END IF
       IDID=-2
       IF (NSTIFFCOND .GT.0 ) THEN
@@ -1476,11 +1373,11 @@ C --- FAIL EXIT
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
             IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
             END IF
       END IF
       RETURN
@@ -1491,18 +1388,16 @@ C --- FAIL EXIT
             gamma =gamma/ENORMVE
             sigmatot=max(sigma,sigmatot)
             IF (IPRINT .GT. 0) THEN
-            write(msg,*) 'TIME = ',X, 'KAPPA = ',kappa/ENORMVE
-            CALL rprint(msg)
-            write(msg,*) 'GAMMA =',(gamma/ENORMVE)/(XPH-XST),
-     &     'SIGMA  = ',sigma,'SIGMATOT =',sigmatot
-            CALL rprint(msg)
+        CALL Rprintd1('Time     = ',X)
+        CALL Rprintd1('Kappa    = ',kappa/ENORMVE)
+        CALL Rprintd1('Gamma    = ',(gamma/ENORMVE)/(XPH-XST))
+        CALL Rprintd1('Sigma    = ',sigma)
+        CALL Rprintd1('Sigmatot = ',sigmatot)
             END IF
       END IF
       IF (IPRINT.GT.0) THEN
-         WRITE(msg,979)X
-         CALL RPRINT(MSG)
+      CALL Rprintd1('Exit of CashKarp at x = ',X)
       END IF
- 979  FORMAT(' EXIT OF CASHKARP AT X=',E18.4)
       IDID=2
       RETURN
       END
@@ -1682,7 +1577,6 @@ C ----------------------------------------------------------
       COMMON /CONCOEFF/ db31, db32,db33, db41,db42,db43,
      +                  db51,db52,db53, db61,db62,db63,
      +                  db71,db72,db73
-      CHARACTER (LEN=150) MSG
 
 C ----- COMPUTE PLACE OF II-TH COMPONENT
 c      db31 = 500.0d0/161.0d0
@@ -1706,8 +1600,7 @@ c      db73 = 5.0d0/2.0d0
       IF (ICOMP(J).EQ.II) I=J
    5  CONTINUE
       IF (I.EQ.0) THEN
-         WRITE (MSG,*) ' NO DENSE OUTPUT AVAILABLE FOR COMP.',II
-         CALL RPRINT(MSG)
+         CALL Rprinti1('No dense output available for comp. nr',II)
          RETURN
       END IF
 
@@ -1757,7 +1650,6 @@ C ----------------------------------------------------------
       COMMON /CONCOEFF/ db31, db32,db33, db41,db42,db43,
      +                  db51,db52,db53, db61,db62,db63,
      +                  db71,db72,db73
-      CHARACTER (LEN=150) MSG
 
       IF (hermite) THEN
         THETA=(X-XOLD)/H

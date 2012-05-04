@@ -272,7 +272,7 @@ C     resid(T,Y,Yprime, CJ, delta, ierr, rpar, ipar)
 C
 C
 C     UROUND   THIS IS THE UNIT ROUNDOFF AND HAS TO BE SET AS
-C                        UROUND = DLAMCH('Epsilon')
+C                        UROUND = DLAMCH('Epsilon') - karline: has been removed
 C     EPSJAC   = sqrt(UROUND).
 C
 C     HUSED  (=WORK(2))    LAST STEPSIZE SUCCESSFULLY USED BY THE INTEGRATOR
@@ -325,16 +325,12 @@ C     .. SAVE STATEMENT ..
       SAVE  I1,I2,I3,I4,I5,I6,I7,I8,I9,I10, I11, UROUND, EPSJAC
 C     ..
 
-      character (len=150) MSG
-
-
 C KS: hard-coded LOUT = 0 (never used anymore...)
       LOUT = 0
       IF (IDID.EQ.1) THEN
          IF (N.LE.0) THEN
-            WRITE (msg,9020) N
-            call rexit(msg)
-
+            CALL Rprinti1 ('Illegal value for number of equations ',N)
+            call rexit('stopped')
             IDID = -4
 
          ELSE
@@ -359,15 +355,17 @@ c            IF (LWORK.LT.(I10+1)) THEN  KS: CHANGED THAT:
 c Francesca added I11
            IF (LWORK.LT.(I11+1)) THEN
                IDID = -11
-               WRITE (msg,9000) I11 +1
-               call rexit(msg)
+      CALL Rprint('Real workspace is insufficient ')
+      CALL Rprint('Size of workspace must be at least ', I11 +1)
+               call rexit('stopped')
 
             ENDIF
 
             IF (LIWORK.LT.N+14) THEN
                IDID = -12
-               WRITE (msg,9010) N+14
-               call rexit(msg)
+      CALL Rprint('Integer workspace is insufficient ')
+      CALL Rprint('Size of workspace must be at least ', N +14)
+               call rexit('stopped')
             END IF
 
 
@@ -404,12 +402,6 @@ C     IF THE BANDED OPTION IS NOT BEING USED THEN MBND(4)=N.
 C     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       RETURN
 
- 9000 FORMAT (' >>> REAL WORKSPACE IS INSUFFICIENT <<< ',
-     +        ' WORKSPACE MUST BE AT LEAST ',I8,' ELEMENTS LONG')
- 9010 FORMAT (' >>> INTEGER WORKSPACE IS INSUFFICIENT <<< ',
-     +        ' WORKSPACE MUST BE AT LEAST ',I6,' ELEMENTS LONG')
- 9020 FORMAT (' >>> ILLEGAL VALUE FOR NUMBER OF EQUATIONS <<< ',
-     +        ' WITH N = ',I6)
       END
 C--------------------------------------------------------------------------
 C KS: added NPD to check pw and pwcopy
@@ -447,7 +439,6 @@ C     .. COMMON BLOCKS ..
      +     NEWPAR,NRE,NJE,NPSET,NQUSED,NRENEW,NSTEP
       SAVE T,H,HMIN,HMAX,KFLAG,JSTART
 C     ..
-      character (len=150) MSG
 
       IF (IDID.EQ.0) THEN
 C        I.E. NORMAL CONTINUATION OF INTEGRATION
@@ -493,8 +484,8 @@ C              SO REDUCE STEPSIZE TO HIT TOUT 'EXACTLY'
 C        NOT FIRST CALL BUT PARAMETERS RESET
          H = HO
          IF(H.LT.EPSJAC/100.0D+0) THEN
-            WRITE(msg,9160)
-            call rexit(msg)
+      CALL Rprint('Stepsize is too small')
+      call rexit('stopped')
 
             IDID = -7
             RETURN
@@ -502,8 +493,11 @@ C        NOT FIRST CALL BUT PARAMETERS RESET
          T0 = T
          IF ((T-TOUT)*H.GE.0.0D+0) THEN
 C           HAVE OVERSHOT TOUT
-            WRITE (msg,9080) T,TOUT,H
-            call rexit(msg)
+      CALL Rprintd1('IDID = -1 on input & (t-tout)*h .ge. 0. t= ', T)
+      CALL Rprintd2('tout and h = ', TOUT, H)
+      CALL Rprint(' interpolation was done as on normal return.')
+      CALL Rprintd1(' desired parameter changes were not made.')
+            call rexit('stopped')
 
             CALL INTERP(N,JSTART,H,T,Y,TOUT,Y0)
             HO = H
@@ -532,8 +526,8 @@ C        IDID SHOULD BE 1 AND THIS IS THE FIRST CALL FOR THIS PROBLEM
 C        CHECK THE ARGUMENTS THAT WERE PASSED FOR CORRECTNESS
          IF (IDID.NE.1) THEN
 C           VALUE OF IDID NOT ALLOWED
-            WRITE (msg,9070) IDID
-            call rexit(msg)
+      CALL Rprinti1('Illegal input.. idid =', IDID)
+            call rexit('stopped')
 
             IDID = -4
          END IF
@@ -543,8 +537,8 @@ C           VALUE OF IDID NOT ALLOWED
          DO 1 I=1,NN
             IF (RTOL(I).LT.0.0D+0) THEN
 C           ILLEGAL VALUE FOR RELATIVE ERROR TOLERENCE
-               WRITE (msg,9040)
-               call rexit(msg)
+      CALL Rprint('Illegal input.. rtol .le. 0.')
+               call rexit('stopped')
 
                IDID = -4
             END IF
@@ -555,16 +549,16 @@ C           ILLEGAL VALUE FOR RELATIVE ERROR TOLERENCE
          DO 2 I=1,NN
             IF (ATOL(I).LT.0.0D+0) THEN
 C           ILLEGAL ABSOLUTE ERROR TOLERANCE
-               WRITE(msg,9045)
-               call rexit(msg)
+      CALL Rprint('Illegal input.. atol .le. 0.')
+               call rexit('stopped')
 
                IDID=-4
             ENDIF
  2       CONTINUE
          IF(ITOL.EQ.1.AND.RTOL(1).EQ.0) THEN
 C           ILLEGAL ERROR TOLERANCE
-            WRITE(msg,9040)
-            call rexit(msg)
+      CALL Rprint('Illegal input.. rtol .le. 0.')
+            call rexit('stopped')
 
             IDID = -4
          ENDIF
@@ -584,8 +578,8 @@ C           ILLEGAL ERROR TOLERANCE
                   VHOLD = DMAX1(RTOL(I),ATOL(I))
                ENDIF
                IF(VHOLD.LE.0.0D+0) THEN
-                  WRITE(msg,9040)
-                  call rexit(msg)
+      CALL Rprint('Illegal input.. rtol .le. 0.')
+                  call rexit('stopped')
 
                   IDID = -4
                ENDIF
@@ -594,16 +588,16 @@ C           ILLEGAL ERROR TOLERANCE
 
          IF (N.LE.0) THEN
 C           ILLEGAL VALUE FOR THE NUMBER OF EQUATIONS
-            WRITE (msg,9050)
-            call rexit(msg)
+      CALL Rprint('Illegal input.. n .le. 0')
+            call rexit('stopped')
 
             IDID = -4
          END IF
 
          IF ((T0-TOUT)*HO.GE.0.0D+0) THEN
 C           PARAMETERS FOR INTEGRATION ARE ILLEGAL
-            WRITE (msg,9060)
-            call rexit(msg)
+      CALL Rprint('Illegal input.. (t0-tout)*h .ge. 0.')
+            call rexit('stopped')
 
             IDID = -4
          END IF
@@ -611,24 +605,22 @@ C           PARAMETERS FOR INTEGRATION ARE ILLEGAL
          IF ((MF.NE.21).AND.(MF.NE.22).AND.(MF.NE.23).AND.(MF.NE.24))
      +   THEN
 C           ILLEGAL VALUE FOR METHOD FLAG
-            WRITE (msg,9090) MF
-            call rwarn(msg)
+      CALL Rprinti1('Illegal input.. method flag, mf, = ',MF)
+      CALL Rprint  ('         allowed values are 21 or 22')
 
             IDID = -4
          END IF
 
          IF(ITOL.LT.1.OR.ITOL.GT.5) THEN
 C           ILLEGAL VALUE FOR ERROR CONTROL PARAMETER
-            WRITE (msg,9110)
-            call rwarn(msg)
+      CALL Rprint('Illegal value for itol')
 
             IDID=-4
          ENDIF
 
          IF(MAXDER.LT.1.OR.MAXDER.GT.7) THEN
 C        ILLEGAL VALUE FOR MAXIMUM ORDER
-            WRITE(msg,9120)
-            call rwarn(msg)
+      CALL Rprint('Illegal value for maxder')
 
             IDID = -4
          ENDIF
@@ -636,8 +628,7 @@ C        ILLEGAL VALUE FOR MAXIMUM ORDER
          IF(NIND1.EQ.0)  NIND1=N
          IF(NIND1 + NIND2 + NIND3 .NE. N) THEN
 C    SUM OF VARIABLES OF DIFFERENT INDEX SHOULD BE N.
-            WRITE(msg,9140)
-            call rwarn(msg)
+      CALL Rprintd1('Bad input for number of variables of index 1,2,3')
 
             IDID = -4
          ENDIF
@@ -677,8 +668,7 @@ C     <  TAKE A STEP  >
 C     <<<<<<<<<<<<<<<<<
 
  20   IF ((T+H).EQ.T) THEN
-         WRITE (msg,9000)
-          call rwarn(msg)
+      CALL Rprint('Warning.. T + H = T on next step.')
 
       END IF
 
@@ -689,10 +679,6 @@ C     <<<<<<<<<<<<<<<<<
      +    YNHOLD,ARH,IPIV,LOUT,MAXDER,ITOL,RTOL,ATOL,RPAR,IPAR,
      +    pderv,resid,NQUSED,NSTEP,NFAIL,NRE,NJE,NDEC,NBSOL,
      +    NPSET,NCOSET,MAXORD,MAXSTP,UROUND,EPSJAC,HUSED,IERR)
-C      IF(IERR.NE.0) THEN
-C      WRITE(LOUT,9150)
-C      RETURN
-C      ENDIF
 
       KGO = 1 - KFLAG
       IF (KGO.EQ.1) THEN
@@ -706,29 +692,30 @@ C        SO CHOP HMIN IF WE HAVEN'T DONE SO 10 TIMES
 
       ELSE IF (KGO.EQ.3) THEN
 C        ERROR REQUIREMENT SMALLER THAN CAN BE HANDLED FOR THIS PROBLEM
-         WRITE (msg,9010) T,H
-         call rwarn(msg)
+
+      CALL Rprintd2('KFLAG = -2 at t  and h = ',T,H)
+      CALL Rprint('The requested error is smaller than can be handled')
 
          GO TO 70
 
       ELSE IF (KGO.EQ.4) THEN
 C        COULD NOT ACHIEVE CONVERGENCE WITH HMIN
-         WRITE (msg,9030) T
-         call rwarn(msg)
+      CALL Rprintd1('FLAG = -3 from integrator at t = ', T)
+      CALL Rprint('corrector convergence could not be achieved')
 
          GO TO 60
 
       ELSE IF (KGO.EQ.6) THEN
 C        PASSED TOUT
-          WRITE (msg,9016) T,H
-         call rwarn(msg)
+      CALL Rprintd2('Kflag = -5 at t and h = ',T, H)
+      CALL Rprint('Overshoot Tout')
 
          GO TO 70
 
       ELSE IF (KGO.EQ.8) THEN
 C        STEPSIZE TOO SMALL
-         WRITE (msg,9015) T,H
-         call rwarn(msg)
+      CALL Rprintd2('Kflag = -7 at t and h = ', T, H)
+      CALL Rprint('Stepsize too small')
 
          GO TO 70
 
@@ -757,8 +744,7 @@ C --------------------------------------------------------------------
          KGO=5
          KFLAG=-6
 c   TOO MUCH WORK
-         WRITE(msg,9130)
-         call rwarn(msg)
+      CALL Rprint('Number of steps exceeds maximum')
 
          IDID = -6
          GOTO 70
@@ -829,8 +815,8 @@ C --------------------------------------------------------------------
  60   CONTINUE
       IF (NHCUT.EQ.10) THEN
 C        HAVE REDUCED H TEN TIMES
-         WRITE (msg,9100)
-         call rwarn(msg)
+      CALL Rprint('Problem appears unsolvable with given input')
+      CALL Rprint('         hmin reduced by a factor of 1.0e10')
 
          GO TO 70
 
@@ -858,40 +844,6 @@ C        HAVE PASSED TOUT SO INTERPOLATE
       IF(KFLAG.NE.0) IDID = KFLAG
       RETURN
 C -------------------------- END OF SUBROUTINE OVDRIV -----------------
- 9000 FORMAT (' WARNING.. T + H = T ON NEXT STEP.')
- 9010 FORMAT (' KFLAG = -2 FROM INTEGRATOR AT T = ',E16.8,'  H =',
-     +       E16.8,
-     +       '  THE REQUESTED ERROR IS SMALLER THAN CAN BE HANDLED')
- 9015 FORMAT (' KFLAG = -7 FROM INTEGRATOR AT T = ',E16.8,'  H =',
-     +       E16.8,
-     +       '  STEPSIZE TOO SMALL')
- 9016 FORMAT (' KFLAG = -5 FROM INTEGRATOR AT T = ',E16.8,'  H =',
-     +       E16.8,
-     +       '  OVERSHOOT TOUT')
- 9020 FORMAT (' INTEGRATION HALTED AT T = ',E16.8,
-     +     '  ERROR TOO SMALL TO BE ATTAINED FOR THE MACHINE PRECISION')
- 9030 FORMAT (' KFLAG = -3 FROM INTEGRATOR AT T = ',E16.8,
-     +       '  CORRECTOR CONVERGENCE COULD NOT BE ACHIEVED')
- 9040 FORMAT (' ILLEGAL INPUT.. RTOL .LE. 0.')
- 9045 FORMAT (' ILLEGAL INPUT.. ATOL .LE. 0.')
- 9050 FORMAT (' ILLEGAL INPUT.. N .LE. 0')
- 9060 FORMAT (' ILLEGAL INPUT.. (T0-TOUT)*H .GE. 0.')
- 9070 FORMAT (' ILLEGAL INPUT.. IDID =',I5)
- 9080 FORMAT (' IDID = -1 ON INPUT WITH (T-TOUT)*H .GE. 0.',
-     +       ' T =',E16.8,'   TOUT =',E16.8,'   H =',E16.8,
-     +       ' INTERPOLATION WAS DONE AS ON NORMAL RETURN.',
-     +       ' DESIRED PARAMETER CHANGES WERE NOT MADE.')
- 9090 FORMAT (' ILLEGAL INPUT.. METHOD FLAG, MF, = ',I6,
-     +       '         ALLOWED VALUES ARE 21 OR 22')
- 9100 FORMAT (' PROBLEM APPEARS UNSOLVABLE WITH GIVEN INPUT',
-     +       '         HMIN REDUCED BY A FACTOR OF 1.0E10')
- 9110 FORMAT (' ILLEGAL VALUE FOR ITOL')
- 9120 FORMAT (' ILLEGAL VALUE FOR MAXDER')
- 9130 FORMAT (' NUMBER OF STEPS EXCEEDS MAXIMUM')
- 9140 FORMAT ('BAD INPUT FOR NUMBER OF VARIABLES OF INDEX 1,2,3')
- 9150 FORMAT ('IERR IS NON-ZERO BECAUSE OF AN ILLEGAL FUNCTION
-     +CALL')
- 9160 FORMAT ('STEPSIZE IS TOO SMALL')
 
 
       END
@@ -1110,7 +1062,6 @@ C     .. INTRINSIC FUNCTIONS ..
 C     ..
 C     .. COMMON BLOCKS ..
       INTEGER NDEC,NRE,NJE,NPSET
-      character(len=150) msg
 
       NPSET = NPSET + 1
       ML = MBND(1)
@@ -1314,7 +1265,6 @@ C     ..
 C     .. ARRAY ARGUMENTS ..
       DIMENSION  A(NDIM,N)
       INTEGER IP(N)
-      CHARACTER(LEN=150) msg
 C     ..
 C     .. LOCAL SCALARS ..
       INTEGER I,J,K,KP1,M,NM1
@@ -2028,7 +1978,6 @@ CKS: add this save statement?
 C      SAVE D1
 C     ..
 C     .. DATA STATEMENTS ..
-      character(len=150) msg
 
       DATA  ZERO/0.0D+0/
 C     ..
@@ -2270,7 +2219,6 @@ C     .. DATA STATEMENTS ..
       DATA  EL(2),ELST(2),OLDLO/3*1.0D+0/
       DATA  ZERO,ONE/0.0D+0,1.0D+0/
 C     ..
-      character (len=150) MSG
 
  6000 TOLD = T
       KFLAG = 0
@@ -2823,7 +2771,6 @@ C
       IF(ITOL .EQ. 1) D = D/(RTOL(1)**2)
       IF ((D*DMIN1(ONE,2.0D+0*CRATE1)).LE.BND) GO TO 360
       IF (M3STEP.EQ.4) THEN
-c         WRITE (LOUT,9000)
          IJUS=1
          RED=0.5D+0
 C    ****  step 3 fails
@@ -3235,17 +3182,12 @@ C
 C     TRY AGAIN WITH UPDATED PARTIALS
 C
  8000 if (ierr .ne. 0) then
-         write(msg,1975)
-         call rwarn(msg)
 
- 1975    FORMAT ('IERR IS NON-ZERO BECAUSE OF AN ILLEGAL FUNCTION
-     +CALL')
+      CALL Rprint('IERR is non-zero due to an illegal function call')
          h= h/2
          IF(H.LT.EPSJAC/100.0D+0) THEN
-            WRITE(msg,9161)
-            call rwarn(msg)
 
- 9161       FORMAT ('STEPSIZE IS TOO SMALL')
+      CALL Rprint('Stepsize is too small')
             KFLAG = -7
             RETURN
          ENDIF
@@ -3274,7 +3216,6 @@ c
          RETURN
       END IF
 
- 9000 FORMAT (' CORRECTOR HAS NOT CONVERGED')
       END
 C ------------------- END OF SUBROUTINE STIFF --------------------------
 
@@ -3453,135 +3394,8 @@ C
       END
 C
 C  ************************************************************
-C
-      DOUBLE PRECISION FUNCTION DLAMCH( CMACH )
-*
-*  -- LAPACK auxiliary routine (version 2.0) --
-*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-*     Courant Institute, Argonne National Lab, and Rice University
-*     October 31, 1992
-*
-*     .. Scalar Arguments ..
-      CHARACTER          CMACH
-*     ..
-*
-*  Purpose
-*  =======
-*
-*  DLAMCH determines double precision machine parameters.
-*
-*  Arguments
-*  =========
-*
-*  CMACH   (input) CHARACTER*1
-*          Specifies the value to be returned by DLAMCH:
-*          = 'E' or 'e',   DLAMCH := eps
-*          = 'S' or 's ,   DLAMCH := sfmin
-*          = 'B' or 'b',   DLAMCH := base
-*          = 'P' or 'p',   DLAMCH := eps*base
-*          = 'N' or 'n',   DLAMCH := t
-*          = 'R' or 'r',   DLAMCH := rnd
-*          = 'M' or 'm',   DLAMCH := emin
-*          = 'U' or 'u',   DLAMCH := rmin
-*          = 'L' or 'l',   DLAMCH := emax
-*          = 'O' or 'o',   DLAMCH := rmax
-*
-*          where
-*
-*          eps   = relative machine precision
-*          sfmin = safe minimum, such that 1/sfmin does not overflow
-*          base  = base of the machine
-*          prec  = eps*base
-*          t     = number of (base) digits in the mantissa
-*          rnd   = 1.0 when rounding occurs in addition, 0.0 otherwise
-*          emin  = minimum exponent before (gradual) underflow
-*          rmin  = underflow threshold - base**(emin-1)
-*          emax  = largest exponent before overflow
-*          rmax  = overflow threshold  - (base**emax)*(1-eps)
-*
-* =====================================================================
-*
-*     .. Parameters ..
-      DOUBLE PRECISION   ONE, ZERO
-      PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
-*     ..
-*     .. Local Scalars ..
-      LOGICAL            FIRST, LRND
-      INTEGER            BETA, IMAX, IMIN, IT
-      DOUBLE PRECISION   BASE, EMAX, EMIN, EPS, PREC, RMACH, RMAX, RMIN,
-     $                   RND, SFMIN, SMALL, T
-*     ..
-*     .. External Functions ..
-      LOGICAL            LSAME
-      EXTERNAL           LSAME
-*     ..
-*     .. External Subroutines ..
-      EXTERNAL           DLAMC2
-*     ..
-*     .. Save statement ..
-      SAVE      EPS, SFMIN, BASE, T, RND, EMIN, RMIN,
-     $                   EMAX, RMAX, PREC
-      SAVE      FIRST
-*     ..
-*     .. Data statements ..
-      DATA               FIRST / .TRUE. /
-*     ..
-*     .. Executable Statements ..
-*
-      IF( FIRST ) THEN
-         FIRST = .FALSE.
-         CALL DLAMC2( BETA, IT, LRND, EPS, IMIN, RMIN, IMAX, RMAX )
-         BASE = BETA
-         T = IT
-         IF( LRND ) THEN
-            RND = ONE
-            EPS = ( BASE**( 1-IT ) ) / 2
-         ELSE
-            RND = ZERO
-            EPS = BASE**( 1-IT )
-         END IF
-         PREC = EPS*BASE
-         EMIN = IMIN
-         EMAX = IMAX
-         SFMIN = RMIN
-         SMALL = ONE / RMAX
-         IF( SMALL.GE.SFMIN ) THEN
-*
-*           Use SMALL plus a bit, to avoid the possibility of rounding
-*           causing overflow when computing  1/sfmin.
-*
-            SFMIN = SMALL*( ONE+EPS )
-         END IF
-      END IF
-*
-      IF( LSAME( CMACH, 'E' ) ) THEN
-         RMACH = EPS
-      ELSE IF( LSAME( CMACH, 'S' ) ) THEN
-         RMACH = SFMIN
-      ELSE IF( LSAME( CMACH, 'B' ) ) THEN
-         RMACH = BASE
-      ELSE IF( LSAME( CMACH, 'P' ) ) THEN
-         RMACH = PREC
-      ELSE IF( LSAME( CMACH, 'N' ) ) THEN
-         RMACH = T
-      ELSE IF( LSAME( CMACH, 'R' ) ) THEN
-         RMACH = RND
-      ELSE IF( LSAME( CMACH, 'M' ) ) THEN
-         RMACH = EMIN
-      ELSE IF( LSAME( CMACH, 'U' ) ) THEN
-         RMACH = RMIN
-      ELSE IF( LSAME( CMACH, 'L' ) ) THEN
-         RMACH = EMAX
-      ELSE IF( LSAME( CMACH, 'O' ) ) THEN
-         RMACH = RMAX
-      END IF
-*
-      DLAMCH = RMACH
-      RETURN
-*
-*     End of DLAMCH
-*
-      END
+C      DOUBLE PRECISION FUNCTION DLAMCH( CMACH ) - removed
+
 *
 ************************************************************************
 *
@@ -3645,7 +3459,6 @@ C
 *     .. External Functions ..
       DOUBLE PRECISION   DLAMC3
       EXTERNAL           DLAMC3
-      character (len=150) msg
 *     ..
 *     .. Save statement ..
       SAVE        FIRST, LIEEE1, LBETA, LRND, LT
@@ -3862,7 +3675,6 @@ C
 *     ..
 *     .. Data statements ..
       DATA               FIRST / .TRUE. / , IWARN / .FALSE. /
-      character (len=150) MSG
 
 *     ..
 *     .. Executable Statements ..
@@ -3987,8 +3799,7 @@ C
 * Comment out this if block if EMIN is ok
          IF( IWARN ) THEN
             FIRST = .TRUE.
-            WRITE( msg, FMT = 9999 )LEMIN
-            call rwarn(msg)
+      CALL Rprinti1('Warning. The value emin may be incorrect: ',LEMIN)
 
          END IF
 ***
@@ -4025,8 +3836,6 @@ C
 *
       RETURN
 *
- 9999 FORMAT( ' WARNING. The value EMIN may be incorrect:-',
-     $      '  EMIN = ', I8)
 *
 *     End of DLAMC2
 *
@@ -4315,93 +4124,7 @@ C
 *     End of DLAMC5
 *
       END
-      LOGICAL          FUNCTION LSAME( CA, CB )
-*
-*  -- LAPACK auxiliary routine (version 2.0) --
-*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-*     Courant Institute, Argonne National Lab, and Rice University
-*     September 30, 1994
-*
-*     .. Scalar Arguments ..
-      CHARACTER          CA, CB
-*     ..
-*
-*  Purpose
-*  =======
-*
-*  LSAME returns .TRUE. if CA is the same letter as CB regardless of
-*  case.
-*
-*  Arguments
-*  =========
-*
-*  CA      (input) CHARACTER*1
-*  CB      (input) CHARACTER*1
-*          CA and CB specify the single characters to be compared.
-*
-* =====================================================================
-*
-*     .. Intrinsic Functions ..
-      INTRINSIC          ICHAR
-*     ..
-*     .. Local Scalars ..
-      INTEGER            INTA, INTB, ZCODE
-*     ..
-*     .. Executable Statements ..
-*
-*     Test if the characters are equal
-*
-      LSAME = CA.EQ.CB
-      IF( LSAME )
-     $   RETURN
-*
-*     Now test for equivalence if both characters are alphabetic.
-*
-      ZCODE = ICHAR( 'Z' )
-*
-*     Use 'Z' rather than 'A' so that ASCII can be detected on Prime
-*     machines, on which ICHAR returns a value with bit 8 set.
-*     ICHAR('A') on Prime machines returns 193 which is the same as
-*     ICHAR('A') on an EBCDIC machine.
-*
-      INTA = ICHAR( CA )
-      INTB = ICHAR( CB )
-*
-      IF( ZCODE.EQ.90 .OR. ZCODE.EQ.122 ) THEN
-*
-*        ASCII is assumed - ZCODE is the ASCII code of either lower or
-*        upper case 'Z'.
-*
-         IF( INTA.GE.97 .AND. INTA.LE.122 ) INTA = INTA - 32
-         IF( INTB.GE.97 .AND. INTB.LE.122 ) INTB = INTB - 32
-*
-      ELSE IF( ZCODE.EQ.233 .OR. ZCODE.EQ.169 ) THEN
-*
-*        EBCDIC is assumed - ZCODE is the EBCDIC code of either lower or
-*        upper case 'Z'.
-*
-         IF( INTA.GE.129 .AND. INTA.LE.137 .OR.
-     $       INTA.GE.145 .AND. INTA.LE.153 .OR.
-     $       INTA.GE.162 .AND. INTA.LE.169 ) INTA = INTA + 64
-         IF( INTB.GE.129 .AND. INTB.LE.137 .OR.
-     $       INTB.GE.145 .AND. INTB.LE.153 .OR.
-     $       INTB.GE.162 .AND. INTB.LE.169 ) INTB = INTB + 64
-*
-      ELSE IF( ZCODE.EQ.218 .OR. ZCODE.EQ.250 ) THEN
-*
-*        ASCII is assumed, on Prime machines - ZCODE is the ASCII code
-*        plus 128 of either lower or upper case 'Z'.
-*
-         IF( INTA.GE.225 .AND. INTA.LE.250 ) INTA = INTA - 32
-         IF( INTB.GE.225 .AND. INTB.LE.250 ) INTB = INTB - 32
-      END IF
-      LSAME = INTA.EQ.INTB
-*
-*     RETURN
-*
-*     End of LSAME
-*
-      END
+      
 
 C----------------------------------------------------------------------------
 
@@ -4584,43 +4307,18 @@ C
                   LOG10(2) = 27223461
                   LOG10(2) = 10000000*LOG10(2) + 5232940
                ELSE
-                  WRITE(*,9000)
+              CALL rexit('Stopped in D1mach')
 C                  STOP 779
                   END IF
             ELSE
-               WRITE(*,9000)
+              CALL rexit('Stopped in D1mach')
 C               STOP 779
                END IF
             END IF
          SC = 987
          END IF
-C
-C  ***  ISSUE STOP 778 IF ALL DATA STATEMENTS ARE OBVIOUSLY WRONG...
-C      IF (DMACH(4) .GE. 1.0D0) STOP 778
-*C/6S
-*C     IF (I .LT. 1  .OR.  I .GT. 5)
-*C    1   CALL SETERR(24HD1MACH - I OUT OF BOUNDS,24,1,2)
-*C/7S
-*      IF (I .LT. 1  .OR.  I .GT. 5)
-*     1   CALL SETERR('D1MACH - I OUT OF BOUNDS',24,1,2)
-*C/
-c      IF (I .LT. 1 .OR. I .GT. 5) THEN
-c         WRITE(*,*) 'D1MACH(I): I =',I,' is out of bounds.'
-c         STOP
-c         END IF
       D1MACH = DMACH(I)
       RETURN
-C/6S
-C9000 FORMAT(/46H Adjust D1MACH by uncommenting data statements/
-C    *30H appropriate for your machine.)
-C/7S
- 9000 FORMAT('Adjust D1MACH by uncommenting data statements',
-     *' appropriate for your machine.')
 C/
 C
       END
-
-
-
-
-
