@@ -4524,11 +4524,10 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!EXTERNAL FCN, JAC, MAS, SOLOUT
     INTERFACE
        !!-----------------------------------------------------------------------
-       SUBROUTINE fcn(neqn,t,y,dy,ierr,rpar,ipar)
+       SUBROUTINE fcn(neqn,t,y,dy,rpar,ipar)
          USE PRECISION
          IMPLICIT NONE
          INTEGER, INTENT(IN) :: neqn, ipar(*)
-         INTEGER, INTENT(IN OUT):: ierr
          REAL(PREC), INTENT(IN) :: t,y(neqn),rpar(*)
          REAL(PREC), INTENT(OUT) :: dy(neqn)
        END SUBROUTINE fcn
@@ -4553,9 +4552,9 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
          USE PRECISION
          IMPLICIT NONE
          INTEGER, INTENT(IN) :: R, DBLK, ORD, IPAR(*),NT1
-         INTEGER, INTENT(IN OUT) :: IRTRN
+         INTEGER, INTENT(OUT) :: IRTRN
          REAL(PREC), INTENT(IN) :: TP(*),RPAR(*),F1(R,*)
-         REAL(PREC), INTENT(OUT) :: YP(R,*)
+         REAL(PREC), INTENT(IN) :: YP(R,*)
        END SUBROUTINE solout
     END INTERFACE
     !! -------------------------------------------------------------------------
