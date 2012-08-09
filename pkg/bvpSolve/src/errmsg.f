@@ -12,7 +12,7 @@
       subroutine intpr_k(label, nchar, data, ndata)
       integer nchar, ndata
       character*(*) label
-      double precision data(ndata)
+      integer data(ndata)
       integer nc
       nc = nchar
       if(nc .lt. 0) nc = len(label)
@@ -62,8 +62,9 @@ C printing with one integer and a double
 C printing with one double
       subroutine rprintd1(msg, d1)
       character (len=*) msg
-      double precision d1
-        call dblepr_k(msg, -1, d1, 1)
+      double precision d1, DBL(1)
+        DBL(1) = d
+        call dblepr_k(msg, -1, DBL, 1)
       end subroutine 
 
 C printing with two doubles
@@ -78,8 +79,9 @@ C printing with two doubles
 C printing with one integer
       subroutine rprinti1(msg, i1)
       character (len=*) msg
-      integer i1
-        call intpr_k(msg, -1, i1, 1)
+      integer i1, IN(1)
+        IN(1) = i1
+        call intpr_k(msg, -1, IN, 1)
       end subroutine 
 
       subroutine rprinti2(msg, i1, i2)
