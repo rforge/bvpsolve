@@ -2992,7 +2992,7 @@ C**********************************************************************
 C
       INTEGER INTEGS(3,NBLOKS),IPIVOT(*),INFO, I,INDEX,INDEXN,LAST,
      1        NCOL,NROW
-      DOUBLE PRECISION BLOKS(1),SCRTCH(1)
+      DOUBLE PRECISION BLOKS(*),SCRTCH(*)
       INFO = 0
       INDEXX = 1
       INDEXN = 1
