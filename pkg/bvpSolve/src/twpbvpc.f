@@ -692,11 +692,11 @@ c karline: added ill_con_newt
         ill_cond_newt = ckappa2 .ge.  1d10 .and. ckappa2 .lt. flmax
 
            if (iprint .eq. 1) then
-             CALL Rprintd1('stab_kappa = ', stab_kappa)
-             CALL Rprintd1('stab_kappa1 = ', stab_kappa1)
-             CALL Rprintd1('stab_gamma = ', stab_gamma)
-             CALL Rprintd1('stiff_cond = ', stiff_cond)
-             CALL Rprinti1('ill_cond   = ', ill_cond)
+             CALL Rprintl1('stab_kappa = ', stab_kappa)
+             CALL Rprintl1('stab_kappa1 = ', stab_kappa1)
+             CALL Rprintl1('stab_gamma = ', stab_gamma)
+             CALL Rprintl1('stiff_cond = ', stiff_cond)
+             CALL Rprintl1('ill_cond   = ', ill_cond)
            end if
            if (ill_cond .and. use_c) goto 2000
 
@@ -752,12 +752,12 @@ c endif if (comp_c)
 
          if (ill_cond .and. use_c) goto 2000
          if (iprint .eq. 1) then
-             CALL Rprintd1('stab_sigma = ',stab_sigma)
-             CALL Rprintd1('stab_kappa = ', stab_kappa)
-             CALL Rprintd1('stab_kappa1 = ', stab_kappa1)
-             CALL Rprintd1('stab_gamma = ', stab_gamma)
-             CALL Rprintd1('stiff_cond = ', stiff_cond)
-             CALL Rprinti1('ill_cond   = ', ill_cond)
+             CALL Rprintl1('stab_sigma = ',stab_sigma)
+             CALL Rprintl1('stab_kappa = ', stab_kappa)
+             CALL Rprintl1('stab_kappa1 = ', stab_kappa1)
+             CALL Rprintl1('stab_gamma = ', stab_gamma)
+             CALL Rprintl1('stiff_cond = ', stiff_cond)
+             CALL Rprintl1('ill_cond   = ', ill_cond)
          end if
          end if
        end if
