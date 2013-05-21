@@ -23,7 +23,6 @@ c ==============================================================================
        call intp0k(label, nc, data, ndata)
       end subroutine
 
-
 C just a string
       subroutine rprint(msg)
       character (len=*) msg
@@ -102,4 +101,4 @@ C printing with one integer
         IN(2) = i2
         IN(3) = i3
         call intpr_k(msg, -1, IN, 3)
-      end subroutine 
+      end subroutine

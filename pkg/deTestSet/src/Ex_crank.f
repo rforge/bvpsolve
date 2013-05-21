@@ -555,7 +555,7 @@ C     FORMS THE DOT PRODUCT OF TWO VECTORS.
 C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      DOUBLE PRECISION DX(1),DY(1),DTEMP
+      DOUBLE PRECISION DX(*),DY(*),DTEMP
       INTEGER I,INCX,INCY,IX,IY,M,MP1,N
 C
       PDOT = 0.0D0
@@ -601,7 +601,7 @@ C
 
       subroutine cranksoln(neqn,y)
       integer neqn
-      double precision  y(neqn)
+      double precision  y(24)
 c
 c     MEBDFI  applied to slider crank problem, tend = 0.1
 c

@@ -4497,9 +4497,9 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !!
     !!   INPUT VARIABLES
     !!------------------------------------
-    INTEGER, INTENT(IN) :: R, ITOL, IJAC, IMAS, IOUT, IPAR(1), LIWORK, LWORK
+    INTEGER, INTENT(IN) :: R, ITOL, IJAC, IMAS, IOUT, IPAR(*), LIWORK, LWORK
 
-    REAL(PREC), INTENT(IN) :: TEND, ATOL(1), RTOL(1), RPAR(1)
+    REAL(PREC), INTENT(IN) :: TEND, ATOL(*), RTOL(*), RPAR(*)
     !!
     !!   INPUT/OUTPUT VARIABLES
     !!------------------------------------
@@ -4986,7 +4986,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
     !! -------------------------------------------------------------------------
     !!     CALL TO CORE INTEGRATOR
     !! -------------------------------------------------------------------------
-    CALL ETRO(R, FCN, T0, Y0(1), TEND, HMAX, H, RTOL, ATOL, ITOL,                       &
+    CALL ETRO(R, FCN, T0, Y0, TEND, HMAX, H, RTOL, ATOL, ITOL,                       &
          &   JAC, IJAC, MLJAC, MUJAC, MAS, MLMAS, MUMAS, SOLOUT, IOUT, IDID, NMAX,   &
          &   UROUND, THET, FACNEWT, FACNORD, TETAK0, CS, FACL, FACR, SFDOWN,         &
          &   SFUP, SFSAME, SF, ORDMIN, ORDMAX, ITINT, ITMAX,                         &
@@ -5043,9 +5043,9 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       !!   INPUT VARIABLES
       !!------------------------------------
       INTEGER, INTENT(IN) ::  R, ORDMIN, ORDMAX,  ITOL, IJAC, MLJAC, MUJAC, MLMAS, MUMAS, IOUT, &
-           &         IPAR(1), ITINT(4),  IJOB, NMAX, LDJAC, LDLU, LDMAS, NIND1, NIND2, NIND3
+           &         IPAR(*), ITINT(4),  IJOB, NMAX, LDJAC, LDLU, LDMAS, NIND1, NIND2, NIND3
 
-      REAL(PREC), INTENT(IN)  :: TEND, ATOL(1), RTOL(1), RPAR(1), FACNORD(4),&
+      REAL(PREC), INTENT(IN)  :: TEND, ATOL(*), RTOL(*), RPAR(*), FACNORD(4),&
            &                  HMAX, THET, FACNEWT, TETAK0(4), CS(4), FACL, FACR,       &
            &                  SFDOWN, SFUP, SFSAME, SF, UROUND
 
@@ -5064,7 +5064,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       !!
       !!   LOCAL VARIABLES
       !!------------------------------------
-      REAL(PREC), ALLOCATABLE :: SCAL(:), YP(:,:), FP(:,:),             &
+      REAL(PREC), ALLOCATABLE :: SCAL(:), YP(:,:), FP(:,:),        &
            &       F(:,:),DN(:), F1(:,:), JF0(:,:), LU(:,:), FMAS(:,:)
 
       INTEGER, ALLOCATABLE :: IPIV(:)
@@ -5088,7 +5088,42 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       !!
       !!   EXTERNAL FUNCTIONS
       !!------------------------------------
-      EXTERNAL FCN,JAC,MAS,SOLOUT
+      !!EXTERNAL FCN,JAC,MAS,SOLOUT
+       INTERFACE
+       !!-----------------------------------------------------------------------
+       SUBROUTINE fcn(neqn,t,y,dy,rpar,ipar)
+         USE PRECISION
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: neqn, ipar(*)
+         REAL(PREC), INTENT(IN) :: t,y(neqn),rpar(*)
+         REAL(PREC), INTENT(OUT) :: dy(neqn)
+       END SUBROUTINE fcn
+       !!-----------------------------------------------------------------------
+       SUBROUTINE jac(neqn,t,y,mu,ml,jacob,ldim,rpar,ipar)
+         USE PRECISION
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: neqn,ldim,ipar(*),mu,ml
+         REAL(PREC), INTENT(IN) :: t,y(neqn),rpar(*)
+         REAL(PREC), INTENT(OUT) :: jacob(ldim,neqn)
+       END SUBROUTINE jac
+       !!-----------------------------------------------------------------------
+       SUBROUTINE mas(neqn,am,ldim,rpar,ipar)
+         USE PRECISION
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: neqn, ldim, ipar(*)
+         REAL(PREC), INTENT(IN) :: rpar(*)
+         REAL(PREC), INTENT(OUT) :: am(ldim,neqn)
+        END SUBROUTINE mas
+       !!-----------------------------------------------------------------------
+       SUBROUTINE SOLOUT(R,TP,YP,F1,NT1,DBLK,ORD,RPAR,IPAR,IRTRN)
+         USE PRECISION
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: R, DBLK, ORD, IPAR(*),NT1
+         INTEGER, INTENT(OUT) :: IRTRN
+         REAL(PREC), INTENT(IN) :: TP(*),RPAR(*),F1(R,*)
+         REAL(PREC), INTENT(IN) :: YP(R,*)
+       END SUBROUTINE solout
+    END INTERFACE
       !! -------- CONSTANTS
 
 
@@ -5564,7 +5599,9 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
                IF (IOUT.NE.0) THEN
                   !!--------- CALL SOLOUT
                   IRTRN = 0
-                  CALL SOLOUT(R,TP(1),YP(1,1),F1(1,1),NT1,DBLKOLD,ORDOLD,RPAR,IPAR,IRTRN)
+
+                  CALL SOLOUT(R,TP,YP,F1 &
+                             &      ,NT1,DBLKOLD,ORDOLD,RPAR,IPAR,IRTRN)
                   IF (IRTRN.LT.0) GOTO 800
                END IF
                IF (NSTEPS .EQ. 0) THEN
@@ -5608,7 +5645,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
             EXIT LOOP_TIME
          END IF
     END DO LOOP_TIME
-    DEALLOCATE( SCAL, YP, FP, F,DN, F1, JF0, LU, FMAS, IPIV  )
+    DEALLOCATE( SCAL, YP, FP, F,DN, F1, JF0, LU, FMAS, IPIV)
 
 800      RETURN
      END SUBROUTINE ETRO
@@ -5647,9 +5684,8 @@ SUBROUTINE contout(R,T,TP,FF,DBLK,NT1, CONTR)
   N = DBLK+1
   NTi = MAX(1,NT1)
   NT2 = NTi+1
-  YP = FF(I,NTi)
   DO I = 1, R
-    YP = FF(I,NT1)
+    YP = FF(I,NTi)
     DO J=NT2,N
        YP = YP*(T-TP(J)) + FF(I,J)
     ENDDO

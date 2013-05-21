@@ -356,7 +356,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
       subroutine andsoln(neqn,y)
       integer neqn
-      double precision y(neqn)
+      double precision y(27)
 c
 c computed at Cray C90, using Cray double precision:
 c Solving Andrews` squeezing mechanism using PSIDE

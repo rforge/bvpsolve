@@ -953,7 +953,7 @@ c----------------------------------------------------------------------
 
       subroutine emepsoln(neqn,y)
       integer neqn
-      double precision y(neqn)
+      double precision y(66)
 C
 C  RADAU5 applied to EMEP problem, Tend = 417600
 C

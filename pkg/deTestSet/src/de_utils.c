@@ -204,8 +204,13 @@ void F77_NAME(dblep0k) (const char *label, int *nchar, double *data, int *ndata)
 	for (k = 0; k < nc; k++)
 	    Rprintf("%c", label[k]);
     }
-    if(*ndata > 0) printRealVector(data, *ndata, 1);
-	Rprintf("\n");/* put that at end, so that vector is on same line as string*/
+    /*    if(*ndata > 0) printRealVector(data, *ndata, 1); */
+
+        if(*ndata > 0)
+          for (k = 0; k < *ndata; k++)
+            Rprintf("%g",data[k]);
+    	Rprintf("\n");/* put that at end, so that vector is on same line as string*/
+    /*    return(0);  and removed this one */
 /*    return(0);  and removed this one */
 }
 
@@ -221,7 +226,10 @@ void F77_NAME(intp0k) (const char *label, int *nchar, int *data, int *ndata)
 	for (k = 0; k < nc; k++)
 	    Rprintf("%c", label[k]);
     }
-    if(*ndata > 0) printIntegerVector(data, *ndata, 1);
-	Rprintf("\n");
-/*    return(0);  and removed this one */
+    /*    if(*ndata > 0) printIntegerVector(data, *ndata, 1); */
+          for (k = 0; k < *ndata; k++)
+            Rprintf("%i",data[k]);
+        	Rprintf("\n");
+    /*    return(0);  and removed this one */
+
 }

@@ -109,7 +109,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
       subroutine pleiasoln(neqn, y)
       integer neqn
-      double precision y(neqn)
+      double precision y(28)
 c
 c computed at Cray C90 using Cray double precision
 c Solving Pleiades problem using PSIDE

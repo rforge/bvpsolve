@@ -31,7 +31,7 @@ void F77_NAME(gamd)( int *,
  	       void (*)(int *, double *, int *, double *, int *),              // mas
 		     int *, int *, int *,
  	       void (*)(int *, double *, double *, double *,  // solout
-			            int *, int *, int *, double *, int *, int *),
+			            int *, int *, int *, double *, int *, int* ),
 		     int *, double *, int *, int *, int*, double *, int*, int*);
 
 void F77_NAME(contout)(int *, double *, double *, double *, int *, int *, double *);
@@ -393,6 +393,7 @@ SEXP call_gambim(SEXP y, SEXP times, SEXP derivfunc, SEXP parms, SEXP rtol,
   PROTECT(RWORK = allocVector(REALSXP, 3)); incr_N_Protect();
   REAL(RWORK)[0] = hini;
   REAL(RWORK)[1] = hini;
+
   REAL(RWORK)[2] = tin;
 
   PROTECT(ISTATE = allocVector(INTSXP, 6)); incr_N_Protect();
