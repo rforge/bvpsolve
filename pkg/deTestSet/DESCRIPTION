@@ -8,6 +8,6 @@ Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), ReacTran
 Description: Solvers and testset for stiff and nonstiff differential equations, and 
   differential algebraic equations
-License: GPL
+License: GPL | file LICENCE
 LazyData: yes
 
