@@ -14,6 +14,6 @@ Depends: R (>= 2.01), ReacTran
 Description: Solvers and testset for stiff and nonstiff differential equations, and 
   differential algebraic equations
 License: GPL 
-Copyright: inst/doc/COPYRIGHTS
+Copyright: inst/COPYRIGHTS
 LazyData: yes
 
