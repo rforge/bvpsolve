@@ -709,7 +709,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             as.double(Xguess), as.double(Yguess),
             as.double(rpar), as.integer(rpar), as.integer(cond),
             Func, JacFunc, Bound, JacBound, ModelInit, initpar,
-            flist, as.integer(lobatto), type = as.integer(1),
+            flist, as.integer(lobatto), 
             rho, PACKAGE="bvpSolve")
  else
   out <- .Call("call_acdc", as.integer(mstar), as.double(fixpt),
@@ -722,7 +722,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             as.double(epsini), as.double(eps),
             Func_eps, JacFunc_eps, Bound_eps, JacBound_eps,
             ModelInit, initpar,
-            flist, type = as.integer(0), rho, PACKAGE="bvpSolve")
+            flist, rho, PACKAGE="bvpSolve")
 
   EPS <- attributes(out)$eps
   nn <- attr(out,"istate")
