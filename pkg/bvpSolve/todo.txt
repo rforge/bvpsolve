@@ -12,5 +12,10 @@ version 1.2.2 - karline and Francesca
 - added fortran code bvptwpc ; triggered from bvptwp by setting "cond = TRUE"
 - forcings and compiled code in colmod/acdc
 
-todo:
+done:
 test forcings and compiled code
+
+version 1.3 - karline
+- added proper citation
+- made compatible with CFunc objects (inline compiled code)
+

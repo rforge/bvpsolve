@@ -60,8 +60,122 @@ typedef void C_deriv_func_DAE_type    (int *, double *, double *, double *, doub
 typedef void C_jac_func_DAE_type      (int *, double *, double *, double *, double *, double *, int *);
 typedef void C_guess_func_type2       (double *, double *, double *, double *, int *);
 typedef void C_guess_func_DAE_type    (double *, double *, double *, double *, double *, int *);
-C_deriv_func_DAE_type  *derfun_DAE = NULL;
+C_deriv_func_type  *derfun_DAE = NULL;
+C_jac_func_type *jacfundae = NULL;
+C_deriv_func_DAE_type  *jderfundae = NULL;
 int nalg;
+
+/* KARLINE -> FRANCESCA: NUMERICAL FUNCTIONS, IF NOT GIVEN */
+
+static void C_num_jac_func (int *n,  double *x, double *y, double *pd,
+                            double * rpar, int * ipar)
+{
+  int i, j;
+  double perturb;
+
+  for (i = 0; i < mstar; i++) ycopy[i]   = y[i];
+
+  jderfun(n, x, y, dy, rpar, ipar);
+  for (i = 0; i < n_eq; i++) dycopy[i]  = dy[i];
+  
+  for (j = 0; j < mstar; j++) {
+     if (y[j] > 1.)
+       perturb = y[j]*1e-8;
+     else
+       perturb = 1e-8 ;  
+     ycopy[j] = y[j] + perturb;
+     
+     jderfun(n, x, ycopy, dycopy, rpar, ipar);
+     
+     ycopy[j] = y[j];
+     
+     for (i = 0; i < n_eq; i++) 
+       pd[j* n_eq + i] = (dycopy[i] - dy[i])/perturb;
+
+  }
+}
+
+static void C_num_jac_func_DAE (int *n,  double *x, double *y, double *y2, double *pd,
+                            double * rpar, int * ipar)
+{
+  int i, j;
+  double perturb;
+
+  for (i = 0; i < mstar - nalg; i++) ycopy[i]   = y[i];
+  for (i = 0; i < nalg; i++) ycopy2[i]          = y2[i];
+
+  jderfundae(n, x, y, y2, dy, rpar, ipar);
+  for (i = 0; i < n_eq; i++) dycopy[i]  = dy[i];
+  
+  for (j = 0; j < mstar - nalg; j++) {
+     
+     if (y[j] > 1.)
+       perturb = y[j]*1e-8;
+     else
+       perturb = 1e-8 ;  
+     ycopy[j] = y[j] + perturb;
+     
+     jderfundae(n, x, ycopy, y2, dycopy, rpar, ipar);
+     
+     ycopy[j] = y[j];
+     
+     for (i = 0; i < n_eq; i++) 
+       pd[j* n_eq + i] = (dycopy[i] - dy[i])/perturb;
+
+  }
+  
+  for (j = 0; j < nalg; j++) {
+     
+     if (y2[j] > 1.)
+       perturb = y2[j]*1e-8;
+     else
+       perturb = 1e-8 ;  
+     ycopy2[j] = y2[j] + perturb;
+     
+     jderfundae(n, x, y, ycopy2, dycopy, rpar, ipar);
+     
+     ycopy2[j] = y2[j];
+     
+     for (i = 0; i < n_eq; i++) 
+       pd[(j + mstar - nalg)* n_eq + i] = (dycopy[i] - dy[i])/perturb;
+
+  }
+}
+
+static void C_num_bound_func (int *ii, int *n, double *y, double *gout,
+                              double * rpar, int * ipar)
+{
+   int i, ib;
+   i =  ii[0] - 1;        /*-1 to go from R to C indexing*/
+
+   ib = iibb[i] - 1;
+
+   gout[0] = y[ib] - bb[i];       
+}
+
+static void C_num_jacbound_func (int *ii, int *n, double *y, double *dg,
+                                 double * rpar, int * ipar)
+{
+  int i;
+  double perturb;
+
+  for (i = 0; i < mstar; i++) ycopy[i]  = y[i];
+
+  for (i = 0; i < mstar; i++) {
+    jbndfun(ii, n, y, g, rpar, ipar);
+
+    if (y[i] > 1.)
+       perturb = y[i]*1e-8;
+    else
+       perturb = 1e-8;  
+
+    ycopy[i] = y[i] + perturb;
+    jbndfun(ii, n, ycopy, gcopy, rpar, ipar);
+    ycopy[i] = y[i];
+    dg[i] = (gcopy[0] - g[0])/perturb;
+  }
+}
+
 
 /* -----------------------------------------------------------------------------
                         - when model in compiled code
@@ -81,9 +195,45 @@ static void dll_bvp_deriv_func_forc (int *neq, double *x, double *y,
 static void dll_bvp_deriv_func_DAE_forc (int *neq, double *x, double *y, double *y2,
                          double *ydot, double *rpar, int *ipar)
 {
+  int i;
   updatedeforc(x);
-  derfun_DAE(neq, x, y, y2, ydot, rpar, ipar);
-}
+  for (i = 0; i < mstar - nalg; i++) ycopy[i] = y[i];
+  for (i = 0; i < nalg; i++) ycopy[mstar - nalg + i] = y2[i];
+  
+  derfun_DAE(neq, x, ycopy, ydot, rpar, ipar);
+}                       
+
+static void dll_bvp_jac_func_DAE_forc (int *neq, double *x, double *y, double *y2,
+                         double *ydot, double *rpar, int *ipar)
+{
+  int i;
+  updatedeforc(x);
+  for (i = 0; i < mstar - nalg; i++) ycopy[i] = y[i];
+  for (i = 0; i < nalg; i++) ycopy[mstar - nalg + i] = y2[i];
+  
+  jacfundae(neq, x, ycopy, ydot, rpar, ipar);
+} 
+                      
+static void wrap_bvp_deriv_func_DAE (int *neq, double *x, double *y, double *y2,
+                         double *ydot, double *rpar, int *ipar)
+{
+  int i;
+  for (i = 0; i < mstar - nalg; i++) ycopy[i] = y[i];
+  for (i = 0; i < nalg; i++) ycopy[mstar - nalg + i] = y2[i];
+  
+  derfun_DAE(neq, x, ycopy, ydot, rpar, ipar);   /* user DLL */
+}                       
+
+
+static void wrap_bvp_jac_func_DAE (int *neq, double *x, double *y, double *y2,
+                         double *pd, double *rpar, int *ipar)
+{
+  int i;
+  for (i = 0; i < mstar - nalg; i++) ycopy[i] = y[i];
+  for (i = 0; i < nalg; i++) ycopy[mstar - nalg + i] = y2[i];
+  
+  jacfundae(neq, x, ycopy, pd, rpar, ipar); /* user-defined*/
+}                       
 
 /* -----------------------------------------------------------------------------
    interface between fortran function calls and R functions
@@ -183,7 +333,7 @@ static void C_bvp_jac_func_DAE (int *n, double *x, double *y, double *y2, double
   PROTECT(ans = eval(R_fcall, R_envir));   incr_N_Protect();
 
   for (i = 0; i < n_eq * mstar; i++)  pd[i] = REAL(ans)[i];
-// Rprintf("neq %i, mstar %i, jac y , %g, %g, y2 %g jac %g %g %g %g %g %g %g %g %g \n", n_eq, mstar, y[0],y[1],y2[0], pd[0], pd[1], pd[2], pd[3], pd[4], pd[5], pd[6], pd[7], pd[8]);
+
   my_unprotect(2);
 }
 
@@ -292,7 +442,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
     SEXP Tol, SEXP Fixpnt, SEXP Rpar, SEXP Ipar,
 		SEXP derivfunc, SEXP jacfunc, SEXP boundfunc,
     SEXP jacboundfunc, SEXP guessfunc, SEXP Initfunc, SEXP Parms, SEXP flist,
-    SEXP Type, SEXP rho)
+    SEXP Type, SEXP Absent, SEXP RRwork, SEXP rho)
 
 {
 /******************************************************************************/
@@ -306,13 +456,15 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   double aleft, aright, *zeta, *fspace, *tol, *fixpnt, *z, *yz, *rpar;
   double xout;
   int *m, *ispace, *iset, *icount, *ltol, *ipar, iflag, isDll, FullOut;
+  int *absent;
+  double *rwork;
 
   C_deriv_func_type        *deriv_func = NULL;
   C_jac_func_type          *jac_func = NULL;
   C_deriv_func_DAE_type    *deriv_func_DAE = NULL;
   C_jac_func_DAE_type      *jac_func_DAE = NULL;
-  C_bound_func_type        *bound_func;
-  C_jacbound_func_type     *jacbound_func;
+  C_bound_func_type        *bound_func = NULL;
+  C_jacbound_func_type     *jacbound_func = NULL;
   C_guess_func_type2       *guess_func = NULL;
   C_guess_func_DAE_type    *guess_func_DAE = NULL;
   
@@ -329,6 +481,15 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   ncomp = INTEGER(Ncomp)[0];     /* number of equations */
   type  = INTEGER(Type)[0];      /* 0=colnew, 1 = colsys, 2 = coldae */
   
+  ii = LENGTH(Absent);
+  absent = (int *) R_alloc(ii, sizeof(int));
+     for (j=0; j<ii; j++) absent[j] = INTEGER(Absent)[j];
+
+  ii = LENGTH(RRwork);
+  rwork = (double *) R_alloc(ii, sizeof(double));
+     for (j=0; j<ii; j++) rwork[j] = REAL(RRwork)[j];
+
+
   n_eq  = INTEGER(Ncomp)[0];     /* number of equations -global variable */
   mstar = INTEGER(Mstar)[0];     /* number of variables */
   if (type == 2) {
@@ -404,24 +565,37 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   initParms(Initfunc, Parms);
 
   R_envir = rho;
+  ycopy  = (double *) R_alloc(mstar, sizeof(double)); 
 
   /* pointers to functions passed to FORTRAN */
   if (isDll) {   /* DLL addresses passed to fortran */
-     if (type ==2) {
-      deriv_func_DAE   = (C_deriv_func_DAE_type *) R_ExternalPtrAddr(derivfunc);
-      jac_func_DAE      = (C_jac_func_DAE_type *)  R_ExternalPtrAddr(jacfunc);
+     if (type == 2) {
+      deriv_func_DAE = (C_deriv_func_DAE_type *) wrap_bvp_deriv_func_DAE;
+      derfun_DAE     = (C_deriv_func_type *)     R_ExternalPtrAddr(derivfunc);
      } else { 
-      deriv_func    = (C_deriv_func_type *)    R_ExternalPtrAddr(derivfunc);
-      jac_func      = (C_jac_func_type *)      R_ExternalPtrAddr(jacfunc);
+      deriv_func     = (C_deriv_func_type *)     R_ExternalPtrAddr(derivfunc);
      }
-      bound_func    = (C_bound_func_type *)    R_ExternalPtrAddr(boundfunc);
-      jacbound_func = (C_jacbound_func_type *) R_ExternalPtrAddr(jacboundfunc);
+     if (absent[0] == 0) { 
+       if (type == 2) {
+         jac_func_DAE = (C_jac_func_DAE_type *) wrap_bvp_jac_func_DAE;
+         jacfundae = (C_jac_func_type *)       R_ExternalPtrAddr(jacfunc);
+       } else {
+         jac_func      = (C_jac_func_type *)   R_ExternalPtrAddr(jacfunc);
+        }
+     }
+     
+     if (absent[1] == 0)
+        bound_func    = (C_bound_func_type *)  R_ExternalPtrAddr(boundfunc);
+
+     if (absent[2] == 0)   /* not given*/
+        jacbound_func = (C_jacbound_func_type *) R_ExternalPtrAddr(jacboundfunc);
 
 	  /* here overruling deriv_func if forcing */
-      if (isForcing) {
+     if (isForcing) {
         if (type ==2) {
-          derfun_DAE     = (C_deriv_func_DAE_type *) R_ExternalPtrAddr(derivfunc);
-          deriv_func_DAE = (C_deriv_func_DAE_type *) dll_bvp_deriv_func_DAE_forc;
+          deriv_func_DAE = dll_bvp_deriv_func_DAE_forc;
+        if (absent[0] == 0) 
+          jac_func_DAE   = (C_jac_func_DAE_type *) dll_bvp_jac_func_DAE_forc;
         } else {
           derfun =     (C_deriv_func_type *) R_ExternalPtrAddr(derivfunc);
           deriv_func = (C_deriv_func_type *) dll_bvp_deriv_func_forc;
@@ -429,34 +603,77 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
       }
 
   } else {      /* interface functions between fortran and R */
-     if (type ==2) 
+     
+    if (type ==2) 
       deriv_func_DAE = C_bvp_deriv_func_DAE;
-     else
+    else
       deriv_func = C_bvp_deriv_func;
      
-      R_bvp_deriv_func = derivfunc;
+    R_bvp_deriv_func = derivfunc;
 
-     if (type ==2) 
-      jac_func_DAE = C_bvp_jac_func_DAE;
-     else
-      jac_func = C_bvp_jac_func;
+    if (absent[0] == 0) {
+     
+      if (type ==2) 
+       jac_func_DAE = C_bvp_jac_func_DAE;
+      else
+       jac_func = C_bvp_jac_func;
 
       R_bvp_jac_func = jacfunc;
+    }
+    
+    if (absent[1] == 0) {
 
-     if (type ==2) 
-      bound_func = C_bvp_bound_func_DAE;
-     else
-      bound_func = C_bvp_bound_func;
+      if (type ==2) 
+       bound_func = C_bvp_bound_func_DAE;
+      else
+       bound_func = C_bvp_bound_func;
      
       R_bvp_bound_func = boundfunc;
+    }
 
-     if (type ==2) 
-      jacbound_func = C_bvp_jacbound_func_DAE;
-     else
-      jacbound_func = C_bvp_jacbound_func;
-
+    if (absent[2] == 0) {
+      if (type ==2) 
+       jacbound_func = C_bvp_jacbound_func_DAE;
+      else
+       jacbound_func = C_bvp_jacbound_func;
       R_bvp_jacbound_func = jacboundfunc;
     }
+  }
+
+/* if numerical approximates should be used */    
+    if (absent[0] == 1) {
+        dy     = (double *) R_alloc(ncomp, sizeof(double));
+        dycopy = (double *) R_alloc(ncomp, sizeof(double));
+      if (type ==2) {
+       jac_func_DAE = C_num_jac_func_DAE;
+       jderfundae  = deriv_func_DAE;
+       ycopy2  = (double *) R_alloc(mstar, sizeof(double)); 
+
+      } else {
+        jac_func = (C_jac_func_type *)      C_num_jac_func;
+        jderfun  = deriv_func;
+      }
+    }
+    
+    if (absent[1] == 1) {
+      bound_func = (C_bound_func_type *) C_num_bound_func;
+      iibb = (int *) R_alloc(mstar, sizeof(int));
+      for (j = 0; j < mstar; j++)
+        iibb[j] = absent[3 + j];
+      bb = (double *) R_alloc(mstar, sizeof(double));
+      for (j = 0; j < mstar; j++)
+        bb[j] = rwork[j];
+    }
+    
+    if (absent[2] == 1) {
+      jacbound_func = (C_jacbound_func_type *) C_num_jacbound_func;
+      jbndfun = bound_func;
+      g = (double *) R_alloc(1, sizeof(double));
+      gcopy = (double *) R_alloc(1, sizeof(double));
+      if (absent[0] != 1)
+        ycopy  = (double *) R_alloc(mstar, sizeof(double)); 
+    }
+    
 
      if (type ==2) 
       guess_func_DAE = (C_guess_func_DAE_type *) C_bvp_guess_func_DAE;

@@ -548,7 +548,7 @@ f2<- function(x, y, parms, R) {
 }
 
 df2 <- function(x, y, parms, R) {
- df <- matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
+  matrix(nrow = 4, ncol = 4, byrow = TRUE, data = c(
              0,        1,     0,     0,
              0,        0,     1,     0,
              0,        0,     0,     1,

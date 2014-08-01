@@ -26,14 +26,81 @@ void F77_NAME(acdc)(int*, int*, int*, double *, double *,  int *, double *,
                         - when model in compiled code
 ----------------------------------------------------------------------------- */
 
-/* wrapper above the derivate function that first estimates the
-values of the forcing functions and puts new value of eps in par              */
+static void C_num_acdcjac_func (int *n,  double *x, double *y, double *pd,
+                            double *eps, double * rpar, int * ipar)
+{
+  int i, j;
+  double perturb;
 
-static void dll_bvp_deriv_func_forc (int *n, double *x, double *y,
+  for (i = 0; i < *n; i++) ycopy[i]   = y[i];
+
+  jaderfun(n, x, y, dy, eps, rpar, ipar);
+  for (i = 0; i < *n; i++) dycopy[i]   = dy[i];
+  for (i = 0; i < *n * *n; i++) pd[i] = 0.;
+  
+  for (j = 0; j < *n; j++) {
+     if (y[j] > 1.)
+       perturb = y[j]*1e-8;
+     else
+       perturb = 1e-8 ;  
+     ycopy[j] = y[j] + perturb;
+     
+     jaderfun(n, x, ycopy, dycopy, eps, rpar, ipar);
+     
+     ycopy[j] = y[j];
+     
+     for (i = 0; i < *n; i++) 
+       pd[j* *n + i] = (dycopy[i] - dy[i])/perturb;
+
+  }
+
+}
+
+static void C_num_acdcbound_func (int *ii, int *n, double *y, double *gout,
+                              double *eps, double * rpar, int * ipar)
+{
+   int i, ib;
+   i =  ii[0] - 1;        /*-1 to go from R to C indexing*/
+
+   ib = iibb[i] - 1;
+
+   gout[0] = y[ib] - bb[i];       
+}
+
+static void C_num_acdcjacbound_func (int *ii, int *n, double *y, double *dg,
+                                 double *eps, double * rpar, int * ipar)
+{
+  int i;
+  double perturb;
+  double g, gcopy;
+//  warning("entering numerical BOUNDARY jacobian %i %i %g %g\n", *ii, *n, y[0], dg[0]);
+
+  for (i = 0; i < *n; i++) ycopy[i]  = y[i];
+  for (i = 0; i < *n; i++) dg[i] = 0.;
+  for (i = 0; i < *n; i++) {
+    jabndfun(ii, n, y, &g, eps, rpar, ipar);
+
+    if (y[i] > 1.)
+       perturb = y[i]*1e-8;
+    else
+       perturb = 1e-8;  
+
+    ycopy[i] = y[i] + perturb;
+    jabndfun(ii, n, ycopy, &gcopy, eps, rpar, ipar);
+    ycopy[i] = y[i];
+    dg[i] = (gcopy - g)/perturb;
+  }
+}
+
+/* wrapper above the derivate function that first estimates the
+values of the forcing functions and puts new value of eps in rpar              */
+
+static void dll_bvp_deriv_func_forc_eps (int *n, double *x, double *y,
                          double *ydot, double *eps, double *rpar, int *ipar)
 {
   updatedeforc(x);
-  epsval[0] = eps[0];
+  epsval[0] = eps[0];   /* value of parameter */
+  rpar[0] = eps[0];
   derfun(n, x, y, ydot, rpar, ipar);
 }
 
@@ -44,6 +111,7 @@ static void dll_bvp_deriv_func (int *n, double *x, double *y,
                          double *ydot, double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
+  rpar[0] = eps[0];   /* value of parameter */
   derfun(n, x, y, ydot, rpar, ipar);
 }
 
@@ -51,6 +119,7 @@ static void dll_bvp_jac_func (int *n, double *x, double *y,
                          double *pd, double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
+  rpar[0] = eps[0];   /* value of parameter */
   jacfun(n, x, y, pd, rpar, ipar);
 }
 
@@ -58,6 +127,7 @@ static void dll_bvp_bound_func (int *ii, int *n, double *y, double *gout,
                         double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
+  rpar[0] = eps[0];   /* value of parameter */
   boundfun(ii, n, y, gout, rpar, ipar);
 }
 static void dll_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
@@ -77,8 +147,8 @@ static void C_acdc_deriv_func (int *n, double *x, double *y,
 {
   int i;
   SEXP R_fcall, ans;
-                                REAL(EPS)[0] = *eps;
-                                REAL(X)[0]   = *x;
+                               REAL(EPS)[0] = *eps;
+                               REAL(X)[0]   = *x;
   for (i = 0; i < n_eq ; i++)  REAL(Y)[i]   = y[i];
 
   PROTECT(R_fcall = lang4(R_cont_deriv_func,X,Y,EPS)); incr_N_Protect();
@@ -95,8 +165,8 @@ static void C_acdc_jac_func (int *n, double *x, double *y, double *pd,
 {
   int i;
   SEXP R_fcall, ans;
-                              REAL(EPS)[0] = *eps;
-                              REAL(X)[0]   = *x;
+                             REAL(EPS)[0] = *eps;
+                             REAL(X)[0]   = *x;
   for (i = 0; i < n_eq; i++) REAL(Y)[i]   = y[i];
 
   PROTECT(R_fcall = lang4(R_cont_jac_func,X,Y,EPS));   incr_N_Protect();
@@ -145,14 +215,6 @@ static void C_acdc_jacbound_func (int *ii, int *n, double *y, double *dg,
   give name to data types
 ----------------------------------------------------------------------------- */
 
-typedef void C_acdc_deriv_func_type(int *, double *, double *,double *,
-                                    double *, double *, int *);
-typedef void C_acdc_bound_func_type(int *, int *, double *, double *,
-                                    double *, double *, int *);
-typedef void C_acdc_jac_func_type  (int *,  double *, double *, double *,
-                                    double *, double *, int *);
-typedef void C_acdc_jacbound_func_type(int *, int *, double *, double *,
-                                    double *, double *, int *);
 
 /* -----------------------------------------------------------------------------
                   MAIN C-FUNCTION, CALLED FROM R-code
@@ -163,7 +225,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     SEXP Nmesh, SEXP Nmax, SEXP Lwrkfl, SEXP Lwrkin, SEXP Xguess, SEXP Yguess,
     SEXP Rpar, SEXP Ipar, SEXP UseC, SEXP Epsini, SEXP Eps,
     SEXP derivfunc, SEXP jacfunc, SEXP boundfunc, SEXP jacboundfunc,
-    SEXP Initfunc, SEXP Parms, SEXP flist, SEXP rho)
+    SEXP Initfunc, SEXP Parms, SEXP flist, SEXP Absent, SEXP Rwork, SEXP rho)
 {
 /******************************************************************************/
 /******                   DECLARATION SECTION                            ******/
@@ -177,12 +239,14 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   double epsmin, epsini, aleft, aright, ckappa1, gamma1, sigma, ckappa, ckappa2;
   int *icount, *ltol, *iwrk, ntol, iflag, nfixpnt, linear, givmesh;
   int full, useC, givu, giveps, nmesh, isDll, nugdim, nmshguess;
+  int *absent;
+  double *rwork;
 
 /* pointers to functions passed to FORTRAN                                    */
   C_acdc_deriv_func_type    *deriv_func;
   C_acdc_jac_func_type      *jac_func;
   C_acdc_bound_func_type    *bound_func;
-  C_acdc_jacbound_func_type *jacbound_func;
+  C_acdc_jacbound_func_type *jacbound_func = NULL;
 
 /******************************************************************************/
 /******                         STATEMENTS                               ******/
@@ -207,6 +271,14 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   givmesh = INTEGER(Givmesh)[0]; /* true if initial mesh given */
   nmesh   = INTEGER(Nmesh)[0];   /* size of mesh */
   useC    = INTEGER(UseC)[0];    /* conditioning or not */
+
+  ii = LENGTH(Absent);
+  absent = (int *) R_alloc(ii, sizeof(int));
+     for (j=0; j<ii; j++) absent[j] = INTEGER(Absent)[j];
+
+  ii = LENGTH(Rwork);
+  rwork = (double *) R_alloc(ii, sizeof(double));
+     for (j=0; j<ii; j++) rwork[j] = REAL(Rwork)[j];
 
   /* is function a dll ?*/
   if (inherits(derivfunc, "NativeSymbol")) {
@@ -285,6 +357,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   }
 
   /* Initialization of Parameters and Forcings (DLL functions)   */
+  epsval = (double *) R_alloc(1, sizeof(double)); epsval[0] = 0.;
   isForcing = initForcings(flist);
   initParms(Initfunc, Parms);
 
@@ -292,10 +365,15 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   /* pointers to functions passed to FORTRAN */
   if (isDll) {
-      deriv_func    = (C_acdc_deriv_func_type *)    dll_bvp_deriv_func;
-      jac_func      = (C_acdc_jac_func_type *)      dll_bvp_jac_func;
-      bound_func    = (C_acdc_bound_func_type *)    dll_bvp_bound_func;
-      jacbound_func = (C_acdc_jacbound_func_type *) dll_bvp_jacbound_func;
+      deriv_func      = (C_acdc_deriv_func_type *)    dll_bvp_deriv_func;
+      if (absent[0] == 0)  
+        jac_func      = (C_acdc_jac_func_type *)      dll_bvp_jac_func;
+
+      if (absent[1] == 0)
+        bound_func    = (C_acdc_bound_func_type *)    dll_bvp_bound_func;
+
+      if (absent[2] == 0)
+        jacbound_func = (C_acdc_jacbound_func_type *) dll_bvp_jacbound_func;
 
       derfun        = (C_deriv_func_type *)         R_ExternalPtrAddr(derivfunc);
       jacfun        = (C_jac_func_type *)           R_ExternalPtrAddr(jacfunc);
@@ -304,21 +382,53 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
 	  /* here overruling deriv_func if forcing  */
       if (isForcing) {
-        deriv_func = (C_acdc_deriv_func_type *)     dll_bvp_deriv_func_forc;
+        deriv_func = (C_acdc_deriv_func_type *) dll_bvp_deriv_func_forc_eps;
       }
+
   } else {
-      deriv_func = C_acdc_deriv_func;
+      deriv_func = (C_acdc_deriv_func_type *)    C_acdc_deriv_func;
       R_cont_deriv_func = derivfunc;
 
-      jac_func = C_acdc_jac_func;
-      R_cont_jac_func = jacfunc;
+      if (absent[0] == 0) {
+        jac_func = C_acdc_jac_func;
+        R_cont_jac_func = jacfunc;
+      }
 
-      bound_func = C_acdc_bound_func;
-      R_cont_bound_func = boundfunc;
-
-      jacbound_func = C_acdc_jacbound_func;
-      R_cont_jacbound_func = jacboundfunc;
+      if (absent[1] == 0) {
+        bound_func = C_acdc_bound_func;
+        R_cont_bound_func = boundfunc;
+      }
+      
+      if (absent[0] == 0) {
+        jacbound_func = C_acdc_jacbound_func;
+        R_cont_jacbound_func = jacboundfunc;
+      } 
     }
+
+/* if numerical approximates should be used */    
+    if (absent[0] == 1) {
+        dy     = (double *) R_alloc(ncomp, sizeof(double));
+        dycopy = (double *) R_alloc(ncomp, sizeof(double));
+        ycopy  = (double *) R_alloc(ncomp, sizeof(double)); 
+        jac_func = (C_acdc_jac_func_type *)      C_num_acdcjac_func;
+        jaderfun  = (C_acdc_deriv_func_type *)    deriv_func;
+    }
+    if (absent[1] == 1) {
+      bound_func = (C_acdc_bound_func_type *) C_num_acdcbound_func;
+      iibb = (int *) R_alloc(ncomp, sizeof(int));
+      for (j = 0; j < ncomp; j++)
+        iibb[j] = absent[3 + j];
+      bb = (double *) R_alloc(ncomp, sizeof(double));
+      for (j = 0; j < ncomp; j++)
+        bb[j] = rwork[j];
+    }
+    if (absent[2] == 1) {
+        jacbound_func = (C_acdc_jacbound_func_type *) C_num_acdcjacbound_func;
+        jabndfun = (C_acdc_bound_func_type *) bound_func;
+        if (absent[0] != 1)
+          ycopy  = (double *) R_alloc(ncomp, sizeof(double)); 
+    }
+    
 
 /* Call the fortran function acdc               */
   nugdim = ncomp;
@@ -384,4 +494,3 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   unprotect_all();
   return(yout);
 }
-

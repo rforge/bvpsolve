@@ -1,6 +1,7 @@
 useDynLib(bvpSolve)
-export(bvpshoot, bvptwp, bvpcol, diagnostics.bvpSolve,approx)
-importFrom(deSolve,diagnostics)
+export(bvpshoot, bvptwp, bvpcol, diagnostics.bvpSolve, approx)
+importFrom(rootSolve, multiroot)
+importFrom(deSolve, diagnostics)
 
 S3method("print", "bvpSolve")
 S3method("plot", "bvpSolve")
