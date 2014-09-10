@@ -1,5 +1,5 @@
 Package: deTestSet
-Version: 1.1.1
+Version: 1.1.2
 Title: Testset for differential equations
 Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
                      email = "karline.soetaert@nioz.nl"),
@@ -8,9 +8,9 @@ Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"),
              person("Francesca","Mazzia", role = "aut", 
                      email = "mazzia@dm.uniba.it"),
              person("LAPACK authors", role = "cph"))
-Author: Karline Soetaert and Jeff Cash and Franscesca Mazzia
+Author: Karline Soetaert and Jeff Cash and Franscesca Mazzia and LAPACK authors
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
-Depends: R (>= 2.01), ReacTran
+Depends: R (>= 2.01), deSolve 
 Description: Solvers and testset for stiff and nonstiff differential equations, and 
   differential algebraic equations
 License: GPL 
