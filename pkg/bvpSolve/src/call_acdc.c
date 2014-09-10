@@ -146,17 +146,17 @@ static void C_acdc_deriv_func (int *n, double *x, double *y,
                         double *ydot, double *eps, double *rpar, int *ipar)
 {
   int i;
-  SEXP R_fcall, ans;
+  SEXP R_fcall, X, ans;
                                REAL(EPS)[0] = *eps;
-                               REAL(X)[0]   = *x;
   for (i = 0; i < n_eq ; i++)  REAL(Y)[i]   = y[i];
 
+  PROTECT(X = ScalarReal(*x));                         incr_N_Protect();
   PROTECT(R_fcall = lang4(R_cont_deriv_func,X,Y,EPS)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));               incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* interface between fortran call to jacobian and R function                  */
@@ -164,16 +164,16 @@ static void C_acdc_jac_func (int *n, double *x, double *y, double *pd,
                         double *eps, double *rpar, int *ipar)
 {
   int i;
-  SEXP R_fcall, ans;
+  SEXP R_fcall, X, ans;
                              REAL(EPS)[0] = *eps;
-                             REAL(X)[0]   = *x;
   for (i = 0; i < n_eq; i++) REAL(Y)[i]   = y[i];
 
+  PROTECT(X = ScalarReal(*x));                         incr_N_Protect();
   PROTECT(R_fcall = lang4(R_cont_jac_func,X,Y,EPS));   incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));               incr_N_Protect();
 
   for (i = 0; i < n_eq * n_eq; i++)  pd[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* interface between fortran call to boundary condition and R function        */
@@ -182,16 +182,16 @@ static void C_acdc_bound_func (int *ii, int *n, double *y, double *gout,
                         double *eps, double *rpar, int *ipar)
 {
   int i;
-  SEXP R_fcall, ans;
+  SEXP R_fcall, J, ans;
                              REAL(EPS)[0]  = *eps;
-                             INTEGER(J)[0] = *ii;
   for (i = 0; i < n_eq ; i++)  REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                     incr_N_Protect();
   PROTECT(R_fcall = lang4(R_cont_bound_func,J,Y,EPS)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));               incr_N_Protect();
   /* only one element returned... */
   gout[0] = REAL(ans)[0];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 /*interface between fortran call to jacobian of boundary and R function      */
 
@@ -199,16 +199,17 @@ static void C_acdc_jacbound_func (int *ii, int *n, double *y, double *dg,
                            double *eps, double *rpar, int *ipar)
 {
   int i;
-  SEXP R_fcall, ans;
+  SEXP R_fcall, J, ans;
                              REAL(EPS)[0]  = *eps;
-                             INTEGER(J)[0] = *ii;
+
   for (i = 0; i < n_eq; i++) REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                        incr_N_Protect();
   PROTECT(R_fcall = lang4(R_cont_jacbound_func,J,Y,EPS)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));                  incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++)  dg[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* -----------------------------------------------------------------------------
@@ -350,9 +351,7 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
 
   /* initialise global R-variables... */
   if (isDll == 0) {
-    PROTECT(X  = NEW_NUMERIC(1));               incr_N_Protect();
     PROTECT(EPS = NEW_NUMERIC(1));              incr_N_Protect();
-    PROTECT(J = NEW_INTEGER(1));                incr_N_Protect();
     PROTECT(Y = allocVector(REALSXP,ncomp));    incr_N_Protect();
   }
 

@@ -246,10 +246,9 @@ static void C_bvp_guess_func (double *x, double *y,  double *ydot,
 {
   int i;
   double p;
-  SEXP R_fcall, ans, R_fcall2, ans2;
-//   Rprintf("guess y , %g, %g, x %g", y[0],y[1],x[0]);
-  REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans, R_fcall2, ans2;
 
+  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang2(R_bvp_guess_func, X));    incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
 
@@ -271,16 +270,16 @@ static void C_bvp_deriv_func (int * n, double *x, double *y,
                               double *ydot, double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                                REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i]   = y[i];
 
+  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_deriv_func,X,Y)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));     incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* jacobian                                                                   */
@@ -288,15 +287,16 @@ static void C_bvp_jac_func (int *n, double *x, double *y, double *pd,
                             double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                              REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans;
+  
   for (i = 0; i < mstar; i++) REAL(Y)[i]   = y[i];
 
+  PROTECT(X = ScalarReal(*x));                  incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));   incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));        incr_N_Protect();
 
   for (i = 0; i < n_eq * mstar; i++)  pd[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 
@@ -305,18 +305,18 @@ static void C_bvp_deriv_func_DAE (int * n, double *x, double *y, double *y2,
                               double *ydot, double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                                     REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans;
+
   for (i = 0; i < mstar-nalg ; i++)  REAL(Y)[i]    = y[i];
   for (i = 0; i < nalg; i++) REAL(Y)[i+mstar-nalg] = y2[i];
 
+  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_deriv_func,X,Y)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));     incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
-//  Rprintf("func mstar %i, nalg %i, neq %i,  y , %g, %g, y2  %g, dy, %g, %g, %g\n", mstar, nalg, n_eq, y[0],y[1],y2[0],ydot[0],ydot[1],ydot[2]);
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* jacobian                                                                   */
@@ -324,17 +324,18 @@ static void C_bvp_jac_func_DAE (int *n, double *x, double *y, double *y2, double
                             double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                              REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans;
+
   for (i = 0; i < mstar-nalg; i++) REAL(Y)[i]      = y[i];
   for (i = 0; i < nalg; i++) REAL(Y)[i+mstar-nalg] = y2[i];
 
+  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));   incr_N_Protect();
 
   for (i = 0; i < n_eq * mstar; i++)  pd[i] = REAL(ans)[i];
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* initialisation function                                                    */
@@ -343,10 +344,9 @@ static void C_bvp_guess_func_DAE (double *x, double *y, double *y2, double *ydot
 {
   int i;
   double p;
-  SEXP R_fcall, ans, R_fcall2, ans2;
-//   Rprintf("guess y , %g, %g, x %g", y[0],y[1],x[0]);
-  REAL(X)[0]   = *x;
+  SEXP R_fcall, X, ans, R_fcall2, ans2;
 
+  PROTECT(X = ScalarReal(*x));                      incr_N_Protect();
   PROTECT(R_fcall = lang2(R_bvp_guess_func, X));    incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
 
@@ -362,7 +362,7 @@ static void C_bvp_guess_func_DAE (double *x, double *y, double *y2, double *ydot
   for (i = 0; i <  mstar-nalg; i++) ydot[i]           = (REAL(ans2)[i]-y[i])/p;
 //  for (i = 0; i < nalg; i++)       ydot[i+mstar-nalg] = (REAL(ans2)[i+mstar-nalg]-y2[i])/p;
 
-  my_unprotect(4);
+  my_unprotect(5);
 
 }
 
@@ -371,16 +371,16 @@ static void C_bvp_bound_func (int *ii, int * n, double *y, double *gout,
                               double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                                INTEGER(J)[0] = *ii;
+  SEXP R_fcall, J, ans;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                  incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_bound_func,J,Y));   incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
   /* only one element returned... */
   gout[0] = REAL(ans)[0];
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* jacobian of boundary condition                                             */
@@ -388,15 +388,15 @@ static void C_bvp_jacbound_func (int *ii, int *n, double *y, double *dg,
                                  double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                             INTEGER(J)[0] = *ii;
+  SEXP R_fcall, J, ans;
   for (i = 0; i < mstar; i++) REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                   incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_jacbound_func,J,Y)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));             incr_N_Protect();
 
   for (i = 0; i < mstar ; i++)  dg[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /*  boundary condition                                                        */
@@ -404,16 +404,17 @@ static void C_bvp_bound_func_DAE (int *ii, int * n, double *y, double *gout,
                               double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                                     INTEGER(J)[0] = *ii;
+  SEXP R_fcall, J, ans;
+
   for (i = 0; i < mstar -nalg; i++)  REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                  incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_bound_func,J,Y));   incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
   /* only one element returned... */
   gout[0] = REAL(ans)[0];
 
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /* jacobian of boundary condition                                             */
@@ -421,15 +422,16 @@ static void C_bvp_jacbound_func_DAE (int *ii, int *n, double *y, double *dg,
                                  double * rpar, int * ipar)
 {
   int i;
-  SEXP R_fcall, ans;
-                                   INTEGER(J)[0] = *ii;
+  SEXP R_fcall, J, ans;
+
   for (i = 0; i < mstar-nalg; i++) REAL(Y)[i] = y[i];
 
+  PROTECT(J = ScalarInteger(*ii));                   incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_jacbound_func,J,Y)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));             incr_N_Protect();
 
   for (i = 0; i < mstar-nalg ; i++)  dg[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 
@@ -555,9 +557,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 
 /* initialise global R-variables... */
 
-  PROTECT(X  = NEW_NUMERIC(1));                 incr_N_Protect();
   if (isDll == 0) {
-    PROTECT(J  = NEW_INTEGER(1));               incr_N_Protect();
     PROTECT(Y = allocVector(REALSXP,mstar));    incr_N_Protect();
   }
   /* Initialization of Parameters and Forcings (DLL functions)  */
