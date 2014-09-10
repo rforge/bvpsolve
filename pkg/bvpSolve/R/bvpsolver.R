@@ -45,7 +45,7 @@ bvptwp<- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL,
 ## using collocation method "colnew", "colsys", "colmod", "coldae"
 ##==============================================================================
 
-bvpcol<- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL, 
+bvpcol <- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL, 
      ynames = NULL, xguess = NULL, yguess = NULL, jacfunc = NULL, bound = NULL, 
      jacbound = NULL, leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
      ncomp = NULL, atol = 1e-8, colp=NULL, bspline = FALSE, fullOut = TRUE, 
@@ -119,13 +119,16 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
          stop("If 'func' is a list that contains jacbound, argument 'jacbound' should be NULL")
       if (!is.null(initfunc) & "initfunc" %in% names(func))
          stop("If 'func' is a list that contains initfunc, argument 'initfunc' should be NULL")
+      if (!is.null(dllname) & "dllname" %in% names(func))
+         stop("If 'func' is a list that contains dllname, argument 'dllname' should be NULL")
       if (!is.null(initforc) & "initforc" %in% names(func))
          stop("If 'func' is a list that contains initforc, argument 'initforc' should be NULL")
-     jacfunc <- func$jacfunc
-     bound <- func$bound
-     jacbound <- func$jacbound
-     initfunc <- func$initfunc
-     initforc <- func$initforc
+     if (! is.null(func$jacfunc))  jacfunc <- func$jacfunc
+     if (! is.null(func$bound))    bound <- func$bound
+     if (! is.null(func$jacbound)) jacbound <- func$jacbound
+     if (! is.null(func$initfunc)) initfunc <- func$initfunc
+     if (! is.null(func$dllname))  dllname  <- func$dllname
+     if (! is.null(func$initforc)) initforc <- func$initforc
      func <- func$func
   }
   
