@@ -53,6 +53,7 @@ static void C_num_epsbound_func (int *ii, double *y, double *gout,
                               double * eps, double * rpar, int * ipar)
 {
    int i, ib;
+   
    i =  ii[0] - 1;        /*-1 to go from R to C indexing*/
 
    ib = iibb[i] - 1;
@@ -145,7 +146,7 @@ static void C_colmod_guess (double *x, double *y,
   int i;
   double p;
   SEXP R_fcall, X, ans, R_fcall2, ans2;
-  
+
   PROTECT(X = ScalarReal(*x));                     incr_N_Protect();
   PROTECT(R_fcall = lang2(R_cont_guess_func, X));  incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));           incr_N_Protect();
@@ -168,10 +169,11 @@ static void C_colmod_derivs (double *x, double *y,
 {
   int i;
   SEXP R_fcall, X, ans;
+
                                 REAL(EPS)[0] = *eps;
   for (i = 0; i < mstar ; i++)  REAL(Y)[i]   = y[i];
 
-  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
+  PROTECT(X = ScalarReal(*x));                         incr_N_Protect();
   PROTECT(R_fcall = lang4(R_cont_deriv_func,X,Y,EPS)); incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));               incr_N_Protect();
 
@@ -187,6 +189,7 @@ static void C_colmod_jac (double *x, double *y, double *pd, int *neq,
 {
   int i;
   SEXP R_fcall, X, ans;
+
                               REAL(EPS)[0] = *eps;
   for (i = 0; i < mstar; i++) REAL(Y)[i]   = y[i];
 
@@ -195,7 +198,7 @@ static void C_colmod_jac (double *x, double *y, double *pd, int *neq,
   PROTECT(ans = eval(R_fcall, R_envir));             incr_N_Protect();
 
   for (i = 0; i < *neq * mstar; i++)  pd[i] = REAL(ans)[i];
-  my_unprotect(2);
+  my_unprotect(3);
 }
 
 /*  boundary condition                                                        */
@@ -204,6 +207,7 @@ static void C_colmod_bound (int *ii, double *y, double *gout, double *eps,
 {
   int i;
   SEXP R_fcall, J, ans;
+  
                              REAL(EPS)[0]  = *eps;
 
   for (i = 0; i < mstar ; i++)  REAL(Y)[i] = y[i];
@@ -222,6 +226,7 @@ static void C_colmod_jacbound (int *ii, double *y, double *dg, double *eps,
 {
   int i;
   SEXP R_fcall, J, ans;
+  
                              REAL(EPS)[0]  = *eps;
 
   for (i = 0; i < mstar; i++) REAL(Y)[i] = y[i];
@@ -396,6 +401,7 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
         deriv_func = (C_deriv_func2_type *) dll_colmod_deriv_func_forc;
       }
   } else {      /* interface functions between fortran and R */
+
       deriv_func = (C_deriv_func2_type *) C_colmod_derivs;
       R_cont_deriv_func = derivfunc;
 
@@ -438,14 +444,14 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
       jepsbndfun = bound_func;
       g = (double *) R_alloc(1, sizeof(double));
       gcopy = (double *) R_alloc(1, sizeof(double));
-      if (absent[0] != 1)
-        ycopy  = (double *) R_alloc(mstar, sizeof(double)); 
-    }
 
+    }
+   ycopy  = (double *) R_alloc(mstar, sizeof(double)); 
    guess_func = (C_guess_func2_type *) C_colmod_guess;
    R_cont_guess_func = guessfunc;
 
 /* Call the fortran function                                                  */
+
 	  F77_CALL(colmod) (&ncomp, m, aleft, aright, zeta, iset, ltol,
         tol, fixpnt, ispace, fspace, &iflag, &epsini, &epsmin,
         deriv_func,jac_func,bound_func,jacbound_func,
