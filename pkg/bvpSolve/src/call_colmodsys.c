@@ -98,15 +98,15 @@ static void dll_colmod_deriv_func_forc (double *x, double *y,
 {
   updatedeforc(x);
   epsval[0] = eps[0];
-  rpar[0] = eps[0];
+  rpar[ipar[0]] = eps[0];
   derfun(&n_eq, x, y, ydot, rpar, ipar);
 }
 
 static void dll_colmod_deriv_func (double *x, double *y,
                          double *ydot, double *eps, double *rpar, int *ipar)
 {
-  epsval[0] = eps[0];   /* value of parameter */
-  rpar[0] = eps[0];   /* value of parameter */
+  epsval[0] = eps[0];       /* value of parameter */
+  rpar[ipar[0]] = eps[0];   /* value of parameter */
   derfun(&n_eq, x, y, ydot, rpar, ipar);
 }
 
@@ -114,7 +114,7 @@ static void dll_colmod_jac_func (double *x, double *y,
                          double *pd, int * n, double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
-  rpar[0] = eps[0];   /* value of parameter */
+  rpar[ipar[0]] = eps[0];   /* value of parameter */
   jacfun(n, x, y, pd, rpar, ipar);
 }
 
@@ -122,7 +122,7 @@ static void dll_colmod_bound_func (int *ii, double *y, double *gout,
                         double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
-  rpar[0] = eps[0];   /* value of parameter */
+  rpar[ipar[0]] = eps[0];   /* value of parameter */
   boundfun(ii, &n_eq, y, gout, rpar, ipar);
 }
 
@@ -130,7 +130,7 @@ static void dll_colmod_jacbound_func (int *ii, double *y, double *dg,
                         double *eps, double *rpar, int *ipar)
 {
   epsval[0] = eps[0];   /* value of parameter */
-  rpar[0] = eps[0];     /* value of parameter */
+  rpar[ipar[0]] = eps[0];     /* value of parameter */
   jacboundfun(ii, &n_eq, y, dg, rpar, ipar);
 }
 

@@ -248,7 +248,7 @@ static void C_bvp_guess_func (double *x, double *y,  double *ydot,
   double p;
   SEXP R_fcall, X, ans, R_fcall2, ans2;
 
-  PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
+  PROTECT(X = ScalarReal(*x));                      incr_N_Protect();
   PROTECT(R_fcall = lang2(R_bvp_guess_func, X));    incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));            incr_N_Protect();
 
@@ -261,7 +261,7 @@ static void C_bvp_guess_func (double *x, double *y,  double *ydot,
   for (i = 0; i < n_eq; i++) y[i] = REAL(ans)[i];
   for (i = 0; i < n_eq; i++) ydot[i] = (REAL(ans2)[i]-y[i])/p;
 
-  my_unprotect(4);
+  my_unprotect(5);
 
 }
 
@@ -275,7 +275,7 @@ static void C_bvp_deriv_func (int * n, double *x, double *y,
 
   PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_deriv_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));     incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
 
@@ -312,7 +312,7 @@ static void C_bvp_deriv_func_DAE (int * n, double *x, double *y, double *y2,
 
   PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_deriv_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));     incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
 
   for (i = 0; i < n_eq ; i++) ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
 
@@ -330,8 +330,8 @@ static void C_bvp_jac_func_DAE (int *n, double *x, double *y, double *y2, double
   for (i = 0; i < nalg; i++) REAL(Y)[i+mstar-nalg] = y2[i];
 
   PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
-  PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y)); incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, R_envir));   incr_N_Protect();
+  PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y));   incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
 
   for (i = 0; i < n_eq * mstar; i++)  pd[i] = REAL(ans)[i];
 

@@ -13,7 +13,7 @@ bvptwp<- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL,
      jacbound = NULL, leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
      ncomp = NULL, atol = 1e-8, cond = FALSE, lobatto = FALSE, allpoints = TRUE,
      dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
-     forcings = NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
+     outnames = NULL, forcings = NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
      epsini = NULL, eps = epsini,  ...)   {
    if (is.null(eps))
     bvpsolver(1,       # type 1 = bvptwp
@@ -22,7 +22,7 @@ bvptwp<- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL,
      yguess, jacfunc, bound, 
      jacbound, leftbc, posbound, 
      islin, nmax, ncomp, atol, 
-     dllname, initfunc, rpar, ipar, nout,
+     dllname, initfunc, rpar, ipar, nout, outnames, 
      forcings, initforc, fcontrol, verbose,
      cond, lobatto, allpoints, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = NULL, epsini = NULL, dae = NULL, ... )
@@ -34,7 +34,7 @@ bvptwp<- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL,
      order, ynames, xguess, yguess,
      jacfunc, bound, jacbound, leftbc,
      posbound, islin, nmax, ncomp, atol,
-     dllname, initfunc, rpar, ipar, nout,
+     dllname, initfunc, rpar, ipar, nout, outnames,
      forcings, initforc, fcontrol, verbose,
      cond, lobatto = FALSE, allpoints, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = eps, epsini = epsini, dae = NULL,  ... )
@@ -49,7 +49,8 @@ bvpcol <- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL
      ynames = NULL, xguess = NULL, yguess = NULL, jacfunc = NULL, bound = NULL, 
      jacbound = NULL, leftbc = NULL, posbound = NULL, islin = FALSE, nmax = 1000, 
      ncomp = NULL, atol = 1e-8, colp=NULL, bspline = FALSE, fullOut = TRUE, 
-    dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
+    dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, 
+    nout = 0, outnames = NULL, 
     forcings = NULL, initforc = NULL, fcontrol = NULL, verbose = FALSE,
     epsini = NULL, eps = epsini, dae = NULL, ...)   {
 
@@ -60,7 +61,7 @@ bvpcol <- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL
      yguess, jacfunc, bound, 
      jacbound, leftbc, posbound, 
      islin, nmax, ncomp, atol, 
-     dllname, initfunc, rpar, ipar, nout,
+     dllname, initfunc, rpar, ipar, nout, outnames,
      forcings, initforc, fcontrol, verbose,
      cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
      bspline = bspline, eps = NULL, epsini = NULL, dae = dae,... )
@@ -75,7 +76,7 @@ bvpcol <- function(yini = NULL, x, func, yend = NULL, parms = NULL, order = NULL
      yguess, jacfunc, bound,
      jacbound, leftbc, posbound,
      islin, nmax, ncomp, atol,
-     dllname, initfunc, rpar, ipar, nout,
+     dllname, initfunc, rpar, ipar, nout, outnames, 
      forcings, initforc, fcontrol, verbose,
      cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = colp, fullOut = fullOut,
      bspline = bspline, eps = eps, epsini = epsini, dae = NULL, ... )
@@ -96,7 +97,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
      jacbound = NULL, leftbc = NULL, posbound = NULL,
      islin = FALSE, nmax = 1000, ncomp = NULL, atol = 1e-8,
      dllname = NULL, initfunc = dllname, rpar = NULL, ipar = NULL, nout = 0,
-     forcings = NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
+     outnames = NULL, forcings = NULL, initforc = NULL, fcontrol=NULL, verbose = FALSE,
      cond = FALSE, lobatto = FALSE, allpoints = TRUE, colp = NULL, fullOut = TRUE,
      bspline = TRUE, eps = NULL, epsini = NULL, dae = NULL, ...)   {
 
@@ -732,9 +733,25 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   else  if (length(atol) != mstar)
     stop("tol must either be one number or a vector with length=number of state variables")
   
+# Karline: nout
+  if (nout > 0) {
   
-  if (is.null(ipar)) ipar <- 1
-  if (is.null(rpar)) rpar <- 1
+    if (! is.compiled(func))
+      stop("'nout' > 0 makes sense only for compiled code")
+
+    if (! is.null(outnames) & length(outnames) != nout)
+      stop ("length of 'outnames' should be equal to 'nout'") 
+
+    ipar <- c(nout, ipar)
+    rpar <- c(rep(0., nout), rpar) 
+  } else if (! is.null(outnames))
+    stop ("if 'outnames' is given, 'nout' should be equal to its length")  
+
+  if (! is.null(eps))
+    rpar <- c(rpar, 0.)
+
+  if (is.null(ipar)) ipar <- 0
+  if (is.null(rpar)) rpar <- 1.
   
   if(is.null(initfunc))
     initpar <- NULL # parameter initialisation not needed if function is not a DLL
@@ -769,7 +786,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             as.integer(givmesh),as.integer(givu),as.integer(nmesh),
             as.integer(nmax),as.integer(lwrkfl),as.integer(lwrkin),
             as.double(Xguess), as.double(Yguess),
-            as.double(rpar), as.integer(rpar), as.integer(cond),
+            as.double(rpar), as.integer(ipar), as.integer(cond),
             Func, JacFunc, Bound, JacBound, ModelInit, initpar,
             flist, as.integer(lobatto), as.integer(absent), 
             as.double(rwork), rho, PACKAGE="bvpSolve")
@@ -821,11 +838,30 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
                                      as.character((mstar+1) : (mstar + Nglobal)))
   }
   dimnames(out) <- list(NULL,nm)
-  class(out) <- c("bvpSolve","matrix")  # a boundary value problem
 
   nn[2] <- nn[2] + 1  # add test function evaluation
   if (!jacPresent)
        nn[2] <- nn[2] + nn[3] * (mstar+1)
+
+# Karline: nout
+  if (nout > 0) {
+    vout <- matrix(nrow = nrow(out), ncol = nout, data = NA)
+    if (! is.null(outnames)) 
+      colnames(vout) <- outnames
+    if (class(func) == "CFunc") {
+      for (j in 1:nrow(out)) 
+      vout[j,] <- DLLfunc(func, parms = parms, y = out[j,-1], 
+         times = out[j,1], dllname = NA, nout = nout, 
+         initfunc = NULL)$var      
+   } else if (is.loaded(funcname, PACKAGE = dllname)) {
+      for (j in 1:nrow(out)) 
+        vout[j,] <- DLLfunc(funcname, parms = parms, y = out[j,-1], 
+         times = out[j,1], dllname = dllname, initfunc = initfunc)$var      
+   }
+   out <- cbind(out, vout) 
+  }
+
+  class(out) <- c("bvpSolve","matrix")  # a boundary value problem
 
   if (type == 1) attr(out,"acdc") <- FALSE else attr(out,"acdc") <- TRUE
   names(nn) <- c("flag",	"nfunc", "njac", "nbound", "njacbound", "nstep",
@@ -944,7 +980,22 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   iset[5] = max(iset[5], length(rwork))     # length of fspace
 
   iset[10] <- 0
-  if (is.null(ipar)) ipar <- 1
+
+# Karline: nout
+  if (nout > 0) {
+    if (! is.compiled(func))
+      stop("'nout' > 0 makes sense only for compiled code")
+
+    if (! is.null(outnames) & length(outnames) != nout)
+      stop ("length of 'outnames' should be equal to 'nout'") 
+  
+    ipar <- c(nout, ipar)
+    rpar <- c(rep(0., nout), rpar) 
+  } else if (! is.null(outnames))
+    stop ("if 'outnames' is given, 'nout' should be equal to its length")  
+  if (! is.null(eps))
+    rpar <- c(rpar, 0.)
+  if (is.null(ipar)) ipar <- 0
   if (is.null(rpar)) rpar <- 1
 
   if (type == 3){
@@ -1028,13 +1079,31 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
                 if (!is.null(Nmtot)) Nmtot else
                                      as.character((mstar+1) : (mstar + Nglobal)))
   }
+  dimnames(out) <- list(nm,NULL)
+
+# Karline: nout - note: out is transposed here...
+  if (nout > 0) {
+    vout <- matrix(nrow = ncol(out), ncol = nout, data = NA)
+    if (! is.null(outnames)) 
+      colnames(vout) <- outnames
+    if (class(func) == "CFunc") {
+      for (j in 1:ncol(out)) 
+      vout[j,] <- DLLfunc(func, parms = parms, y = out[-1,j], 
+         times = out[1,j], dllname = NA, nout = nout, 
+         initfunc = NULL)$var      
+   } else if (is.loaded(funcname, PACKAGE = dllname)) {
+      for (j in 1:ncol(out))     
+        vout[j,] <- DLLfunc(funcname, parms = parms, y = out[-1,j], 
+         times = out[1,j], dllname = dllname, initfunc = initfunc)$var      
+   }
+   out <- rbind(out, t(vout) )
+  }  
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
   attr(out,"name")    <- "bvpcol"
   if (type == 2) attr(out,"colmod") <- FALSE else attr(out,"colmod") <- TRUE
 
   attr(out,"bspline") <- bspline
   attr(out,"eps")     <- EPS
-  dimnames(out) <- list(nm,NULL)
 
   names(ic)[1:6] <- c("nfunc", "njac", "nbound", "njacbound","ncont", "nsuccescont")
   names(nn)[1:10] <- c("flag", "nfunc", "njac", "nbound", "njacbound","ncont", "nmesh","ncoll","neqs","ncomps")
