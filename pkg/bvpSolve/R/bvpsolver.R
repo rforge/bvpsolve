@@ -1,4 +1,4 @@
-
+#
   is.compiled <- function (FF)
    (is.character(FF) || class(FF) == "CFunc")
 
