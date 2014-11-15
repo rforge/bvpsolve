@@ -537,6 +537,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 
   ii = iset[5];
   ispace = (int *) R_alloc(ii, sizeof(int));
+  for (j = 0; j < ii; j++) ispace[j] = 0;
 
   ii = iset[4];
   fspace = (double *) R_alloc(ii, sizeof(double));
