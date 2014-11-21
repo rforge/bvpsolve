@@ -2271,6 +2271,16 @@ C
       ENDIF
       INFC = (MSTAR+NY) * NCOMP
       M1 = MODE + 1
+
+C..Francesca Mazzia Added initialization
+
+      DO  I=1,MSTAR
+        ZVAL(I) = 0.D0
+      END DO
+      DO  I=1,NY
+         YVAL(I) = 0.D0
+      ENDDO
+
       GO TO (10, 30, 30, 30, 310), M1
 C
 C...  linear problem initialization
@@ -2352,10 +2362,12 @@ C
 C...       other nonlinear case
 C
   102      IF ( MODE .NE. 1 )                       GO TO 106
+C.. Francesca Mazzia  y--> yval ?
        CALL APPROX_DAE (IOLD, XII, ZVAL, Y, AT, COEF, XIOLD, NOLD,
      1          Z, DMZ, K, NCOMP, NY, MMAX, M, MSTAR, 2, DUMMY, 0)
        GO TO 110
-  106      CALL APPROX_DAE (I, XII, ZVAL, Y, AT, DUMMY, XI, N, Z, DMZ,
+C.. Francesca Mazzia  y--> yval  ?
+  106    CALL APPROX_DAE (I, XII, ZVAL, Y, AT, DUMMY, XI, N, Z, DMZ,
      1                  K, NCOMP, NY, MMAX, M, MSTAR, 1, DUMMY, 0)
   108      IF ( MODE .EQ. 3 )                       GO TO 120
 C
@@ -2414,7 +2426,8 @@ c karline: added
 C
 C...         evaluate former collocation solution
 C
-  190        CALL APPROX_DAE (I, XCOL, ZVAL, Y, ACOL(1,J), COEF, XI, N,
+C.. Francesca Mazzia  y--> yval ?
+  190      CALL APPROX_DAE (I, XCOL, ZVAL, Y, ACOL(1,J), COEF, XI, N,
      1            Z, DMZ, K, NCOMP, NY, MMAX, M, MSTAR, 4, DUMMY, 0)
          IF ( MODE .EQ. 3 )                     GO TO 210
 C
@@ -2509,10 +2522,12 @@ C
 C...       other nonlinear case
 C
   245      IF ( MODE .NE. 1 )                       GO TO 246
+C.. Francesca Mazzia  y--> yval  ?
        CALL APPROX_DAE (NOLD+1, ARIGHT, ZVAL, Y, AT, COEF,
      +          XIOLD, NOLD, Z, DMZ,
      1          K, NCOMP, NY, MMAX, M, MSTAR, 1, DUMMY, 0)
        GO TO 250
+C.. Francesca Mazzia  y--> yval  ?
   246      CALL APPROX_DAE (N+1, ARIGHT, ZVAL, Y, AT, COEF, XI, N,
      1       Z, DMZ, K, NCOMP, NY, MMAX, M, MSTAR, 1, DUMMY, 0)
   248      IF ( MODE .EQ. 3 )                       GO TO 260

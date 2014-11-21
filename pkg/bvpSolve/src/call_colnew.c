@@ -159,9 +159,9 @@ static void C_num_jacbound_func (int *ii, int *n, double *y, double *dg,
   int i;
   double perturb;
 
-  for (i = 0; i < mstar; i++) ycopy[i]  = y[i];
+  for (i = 0; i < mstar-nalg; i++) ycopy[i]  = y[i];
 
-  for (i = 0; i < mstar; i++) {
+  for (i = 0; i < mstar-nalg; i++) {
     jbndfun(ii, n, y, g, rpar, ipar);
 
     if (y[i] > 1.)
