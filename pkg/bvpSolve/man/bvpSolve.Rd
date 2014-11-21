@@ -21,7 +21,6 @@
   \tabular{ll}{
     Package: \tab bvpSolve\cr
     Type:    \tab Package\cr
-    Version: \tab 1.2.2\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
@@ -52,6 +51,8 @@
   Francesca Mazzia
 }
 \references{
+  Francesca Mazzia, Jeff R. Cash, Karline Soetaert (2014).  Solving boundary value problems in the open source software R: Package bvpSolve.  Opuscula mathematica, 34(2), 387--403.  URL http://dx.doi.org/10.7494/OpMath.2014.34.2.387
+
   J.R. Cash and M.H. Wright, (1991) A deferred correction method for nonlinear
   two-point boundary value problems: implementation and numerical evaluation,
   SIAM J. Sci. Stat. Comput. 12,  971-989.
