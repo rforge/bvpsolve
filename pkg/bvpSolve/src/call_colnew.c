@@ -494,7 +494,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 
   n_eq  = INTEGER(Ncomp)[0];     /* number of equations -global variable */
   mstar = INTEGER(Mstar)[0];     /* number of variables */
-  nalg = 0; /* Francesca Mazzia: needed by C_num_jacbound_func
+  nalg = 0; /* Francesca Mazzia: needed by C_num_jacbound_func */
   if (type == 2) {
     nalg = INTEGER(Mstar)[1]; 
     ncomp = ncomp  - nalg;       /* number of differential equations */
