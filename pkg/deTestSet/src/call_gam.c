@@ -155,7 +155,7 @@ static void saveOut (double t, double *y) {
 static void C_solout_gam (int * neq, double * tp, double * yp, double * ff,
   int *nt, int * dblk, int * ord, double * rpar, int * ipar, int * irtrn)
 {
-
+  *irtrn = 1;
   while ((tp[0] <= tt[it]) && (tt[it] < tp[*dblk])) {
  	  F77_CALL(contout) (neq, &tt[it], tp, ff, dblk, nt, ytmp);
     saveOut(tt[it], ytmp);
@@ -169,6 +169,7 @@ static void C_solout_bim (int * m, int *k, int * ord,
    double * t0, double * tstep, double * y, double * f,
    double *dd, double * rpar, int * ipar, int * irtrn)
 {
+  *irtrn = 1;
   while ((*t0 <= tt[it]) && (tt[it] < tstep[*k-1])) {
  	  F77_CALL(contsolall) (&tt[it], m, k, t0, tstep, dd, ytmp);
     saveOut(tt[it], ytmp);
