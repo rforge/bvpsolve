@@ -2,10 +2,6 @@
 ## Creates the Runge-Kutta figure from the initial value problem chapter
 ## =============================================================================
 
-require(deSolve)
-require(rootSolve)
-require(shape)
-
 # Take an explicit Runge-Kutta step and return the coefficients 
 rkfixed <- function(y, t, h, f, A, b1, b2, c, k) {            
 

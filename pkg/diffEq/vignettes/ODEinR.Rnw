@@ -65,6 +65,7 @@ Of course, much more information about each problem can be found in the book.
 \SweaveOpts{keep.source = TRUE}
 <<preliminaries, echo = FALSE, results = hide>>=
 require(diffEq)
+require(scatterplot3d)
 options(prompt = " ")
 options(continue = " ")
 options(width = 90)

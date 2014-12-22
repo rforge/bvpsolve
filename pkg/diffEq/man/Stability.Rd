@@ -117,9 +117,9 @@ rkstabfunc <- function (z, order = 1) {
    return (abs(ss) <= 1) 
  }
 
-# regions for stability orders 5 to 1
-Rez <- seq(-5, 1, by = 0.02)
-Imz <- seq(-3, 3, by = 0.02) 
+# regions for stability orders 5 to 1 - rather crude
+Rez <- seq(-5, 1, by = 0.1)
+Imz <- seq(-3, 3, by = 0.1) 
 
 stability.bruteforce(main = "Explicit RK", 
    func = function(z) rkstabfunc(z, order = 5),
