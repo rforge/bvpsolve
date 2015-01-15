@@ -1179,7 +1179,7 @@ Elastica <- function (x, y, pars) {
           0))
 }
 
-Sol <- bvptwp(func = Elastica,
+Sol <- bvpcol(func = Elastica,
               yini = c(x = 0,  y = 0, p = NA,   k = 0,  F = NA),
               yend = c(x = NA, y = 0, p = -pi/2,k = NA, F = NA),
               x = seq(0, 0.5, len = 16))
@@ -1211,8 +1211,6 @@ Now several extra functions are defined, specifying
 
 This is done in the \R-code below:
 <<>>=
-
-
 jacfunc <- function (x, y, pars) {
       Jac <- matrix(nrow = 5, ncol = 5, data = 0)
       Jac[3,4] <- 1.0
@@ -1247,7 +1245,7 @@ If this input is used, the number of left boundary conditions (\code{leftbc}),
 and either the number of state variables (\code{ncomp}), or their names
 (\code{ynames}) needs to be specified.
 <<>>=
-Sol4 <- bvptwp(leftbc = 3, ynames = c("x", "y", "p", "k", "F"),
+Sol4 <- bvpcol(leftbc = 3, ynames = c("x", "y", "p", "k", "F"),
               func = Elastica, jacfunc = jacfunc,
               bound = bound, jacbound = jacbound,
               x = seq(0, 0.5, len=16))
@@ -1470,7 +1468,7 @@ the name of the DLL):
 
 dyn.load("elastica.dll")
 
-outF <- bvptwp(ncomp = 5,
+outF <- bvpcol(ncomp = 5,
                x = seq(0, 0.5, len = 16), leftbc = 3, func = "fsub", 
                jacfunc = "dfsub", bound = "gsub", jacbound = "dgsub",
                dllname = "elastica")
@@ -1480,7 +1478,7 @@ dyn.unload("elastica.dll")
 \end{verbatim}
 %% the elastica problem implemented in C has been made a part of the package
 <<include=FALSE, echo = FALSE>>=
-outF <- bvptwp(ncomp = 5,
+outF <- bvpcol(ncomp = 5,
                x = seq(0, 0.5, len = 16), leftbc = 3, func = "fsub", 
                jacfunc = "dfsub", bound = "gsub", jacbound = "dgsub",
                dllname = "bvpSolve")
