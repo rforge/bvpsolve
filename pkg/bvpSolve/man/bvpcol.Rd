@@ -1,8 +1,7 @@
 \name{bvpcol}
 \alias{bvpcol}
 \title{
-  Solves multipoint boundary value problems of ordinary differential equations
-  or differential algebraic equations, using a collocation method.
+  Solves multipoint boundary value problems of ordinary differential equations or differential algebraic equations, using a collocation method.
 }
 \description{
   Solves Boundary Value Problems For Ordinary Differential Equations (ODE)
