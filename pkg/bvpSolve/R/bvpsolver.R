@@ -816,6 +816,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
           if (!is.null(Ynames)) Ynames else as.character(1:mstar))
   out <- cbind(out[1:mesh],matrix(data=out[-(1:mesh)],nrow=mesh,byrow=TRUE))
   # select only the rows corresponding to x-values
+
   if (! allpoints)
     if (nrow(out) > length(x))
       out <- out [which(out[,1]%in% x),]
@@ -843,6 +844,21 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   if (!jacPresent)
        nn[2] <- nn[2] + nn[3] * (mstar+1)
 
+   
+   if (nout > 0) {
+	   
+	   if (! is.compiled(func))
+		   stop("'nout' > 0 makes sense only for compiled code")
+	   
+	   if (! is.null(outnames) & length(outnames) != nout)
+		   stop ("length of 'outnames' should be equal to 'nout'") 
+	   
+	   ipar <- c(nout, ipar)
+	   rpar <- c(rep(0., nout), rpar) 
+   } else if (! is.null(outnames))
+	   stop ("if 'outnames' is given, 'nout' should be equal to its length")  
+   
+   
 # Karline: nout
   if (nout > 0) {
     vout <- matrix(nrow = nrow(out), ncol = nout, data = NA)

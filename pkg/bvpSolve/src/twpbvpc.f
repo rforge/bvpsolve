@@ -591,6 +591,9 @@ cf       number of failure of Newton iteration
        indnms = indnms + 1
        iseries(indnms) = nmsh
        indnmsold = nmsh
+       if (iprint .eq. 1) THEN
+            CALL Rprinti1('Start 4th order, indnms', indnms)
+       ENDIF
        endif
 
        if (indnms .ge. liseries) then
@@ -1047,6 +1050,9 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
              end if
        end if
 
+       if (iprint .eq. 1) THEN
+         CALL Rprinti1('Exit main', iflbvp)
+       ENDIF
 
       return
 
