@@ -275,7 +275,11 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   // check this - Francesca/Jeff:
   nxdim = nmax;
   xx   =(double *) R_alloc(nmax, sizeof(double));
+  if (givmesh) {
   for (j = 0; j < nmesh; j++) xx[j] = REAL(Xguess)[j];
+  } else {
+  for (j = 0; j < nmesh; j++) xx[j] = 0;
+  }
   for (j = nmesh; j < nmax; j++) xx[j] = 0;
 
   // to be used in fortran code initu
