@@ -300,7 +300,11 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   
   ii = nmax*ncomp;
   u   =(double *) R_alloc(ii, sizeof(double));
+   if (givu) {
    for (j = 0; j < nmesh*ncomp; j++) u[j] = REAL(Yguess)[j];
+   } else { 
+   for (j = 0; j < nmesh*ncomp; j++) u[j] = 0;
+   }
    for (j = nmesh*ncomp; j < nmax*ncomp; j++) u[j] = 0;
       
   wrk = (double *) R_alloc(lwrkfl, sizeof(double));
@@ -401,12 +405,19 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
     
 /* Call the fortran function twpbvpc
 // CHECK liseries with jeff/francesca!
+// francesca liseries is the maximum possible different mesh, 
+// it is not related to nmax, usually 500 is ok.
 
 */
-  liseries = nmax;
+  liseries = 500;
   iseries = (int *)    R_alloc(liseries, sizeof(int));
   nugdim = ncomp;
+  if (givu){
   nmshguess = nmesh;
+  } else
+  { 
+  nmshguess = 1;
+  }
 
   if (lobatto == 1)
 	F77_CALL(twpbvplc) (&ncomp, &nlbc, &aleft, &aright, &nfixpnt, fixpnt,
@@ -453,6 +464,8 @@ SEXP call_bvptwp(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   INTEGER(ISTATE)[0] = iflag;
   for (j = 0; j < 6; j++)
     INTEGER(ISTATE)[1+j] = iset[j];
+  INTEGER(ISTATE)[7]=0;
+  INTEGER(ISTATE)[8]=0;  
   INTEGER(ISTATE)[9] = nmax;
   INTEGER(ISTATE)[10] = nmesh;
   INTEGER(ISTATE)[11] = lwrkfl;

@@ -523,7 +523,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
      stop("Model function must return a list\n")
   NN  <- length(tmp[[1]])    # number of differential equations
   if (type >= 2 & NN > 20)
-    stop ("number of equnations must be <= 20 for bvpcol")
+    stop ("number of equations must be <= 20 for bvpcol")
   if (NN != neq)
     if (mstar !=  neq)
     stop(paste("The number of function evaluations returned by func() (",
@@ -803,10 +803,18 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
             ModelInit, initpar, flist, as.integer(absent), 
             as.double(rwork), rho, PACKAGE="bvpSolve")
 
+
   EPS <- attributes(out)$eps
+  
   nn <- attr(out,"istate")
   rn <- attr(out,"rstate")
   mesh <- nn[11]
+
+
+  if (!jacPresent)
+     nn[2] <- nn[2] + nn[3] * (mstar+1)
+  nn[2] <- nn[2] + 1  # add test function evaluation
+
   attr(out,"istate") <- NULL
 
 #(  if(verbose) print(names(baseenv()$last.warning))  # dangerous...
@@ -838,13 +846,10 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
                 if (!is.null(Nmtot)) Nmtot else
                                      as.character((mstar+1) : (mstar + Nglobal)))
   }
-  dimnames(out) <- list(NULL,nm)
 
-  nn[2] <- nn[2] + 1  # add test function evaluation
-  if (!jacPresent)
-       nn[2] <- nn[2] + nn[3] * (mstar+1)
 
-   
+dimnames(out) <- list(NULL,nm)
+
    if (nout > 0) {
 	   
 	   if (! is.compiled(func))
@@ -878,7 +883,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   }
 
   class(out) <- c("bvpSolve","matrix")  # a boundary value problem
-
+  
   if (type == 1) attr(out,"acdc") <- FALSE else attr(out,"acdc") <- TRUE
   names(nn) <- c("flag",	"nfunc", "njac", "nbound", "njacbound", "nstep",
     "ureset","","","nmax","nmesh","nrwork","niwork")
@@ -887,6 +892,7 @@ bvpsolver <- function(type = 1,       # 0 = acdc, 1 = bvptwp, 2 = bvpcol, 3 = bv
   attr(out,"rstate") <- rn
   attr(out,"name") <- "bvptwp"
   attr(out,"eps")     <- EPS
+  
   out
 
 ## =============================================

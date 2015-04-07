@@ -393,6 +393,8 @@ c ksks: add precis as argument: machine precision...
       iset(5) = nstep
       iset(6) = ureset
 
+
+
       return
       end
 
@@ -928,9 +930,9 @@ c     call dcopy(nmold, xx, 1, xxold, 1)
 
 
       call matcop(nudim, ncomp, ncomp, nmsh, u, uold)
-*  Copy the current mesh into the xxold array. KSKS THIS WAS TOGGLED OFF - RESET IT....
-      nmold = nmsh
-      call dcopy(nmold, xx, 1, xxold, 1)
+*  Copy the current mesh into the xxold array. KSKS THIS WAS TOGGLED OFF - RESET IT.... Francesca this was again commented
+c      nmold = nmsh
+c      call dcopy(nmold, xx, 1, xxold, 1)
 
 
 *  Save the old deferred correction vector def in def6.

@@ -321,9 +321,8 @@ c computation of kappa
            DO l=nrwtop+1,N-ncomp+nrwtop
               kappa2_n = kappa2_n+ abs(WORK(l))
            END DO
-
+         CKAPPA2 = kappa2_n
          IF ( kappa1_n + kappa2_n .gt. CKAPPA ) THEN
-           CKAPPA2 = kappa2_n
            CKAPPA = kappa1_n+kappa2_n
            CKAPPA1 = kappa1_n
          ELSEIF (itmax .ne. 0) THEN

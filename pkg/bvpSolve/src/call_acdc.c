@@ -465,6 +465,8 @@ SEXP call_acdc(SEXP Ncomp, SEXP Fixpnt, SEXP Aleft, SEXP Aright,
   }
 
   PROTECT(ISTATE = allocVector(INTSXP, 13)); incr_N_Protect();
+  for (j = 0; j < 13; j++)
+    INTEGER(ISTATE)[j] = 0;
   INTEGER(ISTATE)[0] = iflag;
   for (j = 0; j < 7; j++)
     INTEGER(ISTATE)[1+j] = icount[j];
