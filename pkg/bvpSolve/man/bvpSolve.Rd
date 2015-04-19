@@ -69,8 +69,6 @@
   U. Ascher, J. Christiansen and R. D. Russell,  (1981)
   collocation software for boundary-value odes,
   acm trans. math software 7, 209-222.
-
-  \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
 \seealso{
   \code{\link{bvptwp}}, a deferred correction method based on mono-

@@ -91,7 +91,7 @@
   Sea Research (NIOZ)\\
   4401 NT Yerseke, Netherlands \\
   E-mail: \email{karline.soetaert@nioz.nl}\\
-  URL: \url{http://www.nioz.nl}\\
+  URL: \url{https://www.nioz.nl/staff-detail?id=784400}\\
    \\
   Jeff Cash\\
   Imperial College London\\
@@ -107,7 +107,7 @@
   70125 BARI                 \\
   Italy 
   E-mail: \email{mazzia@dm.uniba.it}\\
-  URL: \url{http://pitagora.dm.uniba.it/\~mazzia}\\
+  URL: \url{http://www.dm.uniba.it/~mazzia/mazzia/}\\
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
@@ -223,7 +223,7 @@ options(width=70)
   \begin{itemize}
     \item We start with a simple example, comprising one second-order ODE (
       test problem 7 from the website of Jeff Cash 
-      (\url{http://www.ma.ic.ac.uk/~jcash/BVP_software/readme.php})
+      (\url{http://wwwf.imperial.ac.uk/~jcash/BVP_software/PROBLEMS.PDF})
     \item This is followed by a more complex example, which consists of 
       6 first-order ODEs, the ''swirling flow III'' problem \citep{Asher95}. 
       This example is used to demonstrate how to
@@ -262,7 +262,7 @@ options(width=70)
 \section{A Simple BVP Example}
 
   Here is a simple BVP ODE (which is problem 7 from the test problems available
-  from \url{http://www.ma.ic.ac.uk/~jcash/BVP_software/readme.php} ):
+  from \url{http://wwwf.imperial.ac.uk/~jcash/BVP_software/PROBLEMS.PDF} ):
 
   \begin{eqnarray*}
     \xi y'' + x y' - y &=&  -(1 + \xi \pi ^2) \cos(\pi x) -\pi x \sin(\pi x)\\
@@ -1148,7 +1148,7 @@ conditions, are estimated numerically. It is however possible - and faster -
 to provide the analytical solution of the Jacobian.
 
 As an example, the \code{elastica} problem is implemented
-(\url{http://www.ma.ic.ac.uk/~jcash/BVP_software}).
+(\url{http://wwwf.imperial.ac.uk/~jcash/BVP_software/readme.php}).
 
 The original system reads:
 \begin{eqnarray}
@@ -1281,7 +1281,7 @@ interface needed by the integrator source codes.
 
 \subsection{The Elastica Problem in FORTRAN}
 Below is an implementation of the elastica model in \proglang{FORTRAN}:
-(slightly modified from \url{http://www.ma.ic.ac.uk/~jcash/BVP_software}):
+(slightly modified from \url{http://wwwf.imperial.ac.uk/~jcash/BVP_software/readme.php}):
 
 \begin{verbatim}
 c  The differential system:

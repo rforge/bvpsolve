@@ -426,8 +426,6 @@ bvptwp(yini = NULL, x, func, yend = NULL, parms = NULL,
       Hybrid Mesh Selection Algorithms Based on Conditioning for
       Two-Point Boundary Value Problems, Journal of Numerical Analysis,
      Industrial and Applied Mathematics.
-
-  \url{http://www.ma.ic.ac.uk/~jcash/BVP\_software}
 }
 
 \examples{
