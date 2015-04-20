@@ -350,7 +350,7 @@ SEXP call_colmodsys(SEXP Ncomp, SEXP Mstar, SEXP M, SEXP Xout, SEXP Aleft,
   ii =  LENGTH(Ipar);
   ipar = (int *) R_alloc(ii, sizeof(int));
     for (j = 0; j < ii;j++) ipar[j] = INTEGER(Ipar)[j];
-  icount = (int *)  R_alloc(6, sizeof(int));
+  icount = (int *)  R_alloc(7, sizeof(int));
 
 /* initialise global R-variables...                                           */
   /* is function a dll ?*/
