@@ -6,7 +6,7 @@ Author: Karline Soetaert <karline.soetaert@nioz.nl>,
         Francesca Mazzia <mazzia@dm.uniba.it>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), deSolve
-Imports: rootSolve     
+Imports: rootSolve, stats, graphics, grDevices     
 Description: Functions that solve boundary value problems ('BVP') of systems of ordinary
              differential equations ('ODE') and differential algebraic equations ('DAE').
              The functions provide an interface to the FORTRAN functions
