@@ -332,7 +332,7 @@ static void C_bvp_jac_func_DAE (int *n, double *x, double *y, double *y2, double
   PROTECT(X = ScalarReal(*x));                    incr_N_Protect();
   PROTECT(R_fcall = lang3(R_bvp_jac_func,X,Y));   incr_N_Protect();
   PROTECT(ans = eval(R_fcall, R_envir));          incr_N_Protect();
-
+  
   for (i = 0; i < n_eq * mstar; i++)  pd[i] = REAL(ans)[i];
 
   my_unprotect(3);
@@ -360,7 +360,7 @@ static void C_bvp_guess_func_DAE (double *x, double *y, double *y2, double *ydot
   for (i = 0; i < nalg; i++)       y2[i] = REAL(ans)[i+mstar-nalg] ;
 
   for (i = 0; i <  mstar-nalg; i++) ydot[i]           = (REAL(ans2)[i]-y[i])/p;
-//  for (i = 0; i < nalg; i++)       ydot[i+mstar-nalg] = (REAL(ans2)[i+mstar-nalg]-y2[i])/p;
+  for (i = 0; i < nalg; i++)       ydot[i+mstar-nalg] = (REAL(ans2)[i+mstar-nalg]-y2[i])/p;
 
   my_unprotect(5);
 
@@ -644,8 +644,8 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
 
 /* if numerical approximates should be used */    
     if (absent[0] == 1) {
-        dy     = (double *) R_alloc(ncomp, sizeof(double));
-        dycopy = (double *) R_alloc(ncomp, sizeof(double));
+        dy     = (double *) R_alloc(n_eq, sizeof(double));
+        dycopy = (double *) R_alloc(n_eq, sizeof(double));
       if (type ==2) {
        jac_func_DAE = C_num_jac_func_DAE;
        jderfundae  = deriv_func_DAE;
@@ -766,7 +766,10 @@ C....         = -3  If There Is An Input Data Error.
                  for (j=0;j < nalg; j++) REAL(yout)[k*(mstar+1) + mstar -nalg +  j+1] = yz[ j];
       }  /* end main x loop */
     }
-  ii = ncomp+7;
+  if (type <= 1)
+     ii = ncomp+7;
+  else
+	 ii = ncomp+8;
   PROTECT(ICOUNT = allocVector(INTSXP, 6));incr_N_Protect();
   PROTECT(ISTATE = allocVector(INTSXP, ii+6));incr_N_Protect();
   INTEGER(ISTATE)[0] = iflag;
@@ -774,7 +777,10 @@ C....         = -3  If There Is An Input Data Error.
   for (k = 0; k < 5; k++)  INTEGER(ISTATE)[k+1] = icount[k];
   for (k = 0; k < ii; k++) INTEGER(ISTATE)[k+6] = ispace[k];
   if (FullOut) 
-    ii = ispace[6]; 
+	if (type == 2)
+       ii = ispace[7];
+	else
+	   ii = ispace[6];
   else 
     ii = 1;
 
