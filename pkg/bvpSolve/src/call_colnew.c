@@ -507,7 +507,7 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
   }
 
   m  = (int *) R_alloc(n_eq, sizeof(int));  /* order of diff eqns */
-  for (j = 0; j < n_eq; j++) m[j] = INTEGER(M)[j];
+  for (j = 0; j < ncomp; j++) m[j] = INTEGER(M)[j];
 
 
   ii = LENGTH(Zeta);
@@ -659,11 +659,11 @@ SEXP call_colnew(SEXP Ncomp, SEXP Xout, SEXP Aleft, SEXP Aright,
     
     if (absent[1] == 1) {
       bound_func = (C_bound_func_type *) C_num_bound_func;
-      iibb = (int *) R_alloc(mstar, sizeof(int));
-      for (j = 0; j < mstar; j++)
+      iibb = (int *) R_alloc(mstar-nalg, sizeof(int));
+      for (j = 0; j < mstar-nalg; j++)
         iibb[j] = absent[3 + j];
-      bb = (double *) R_alloc(mstar, sizeof(double));
-      for (j = 0; j < mstar; j++)
+      bb = (double *) R_alloc(mstar-nalg, sizeof(double));
+      for (j = 0; j < mstar-nalg; j++)
         bb[j] = rwork[j];
     }
     
