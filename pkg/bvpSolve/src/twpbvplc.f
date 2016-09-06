@@ -856,7 +856,7 @@ c        If(Chstif) Then
            Bigdef=0.0D+0
            Icmph = 1
            Ix = 1
-           Do 405 Iv=1,Nmsh-1
+           Do 406 Iv=1,Nmsh-1
            Do 405 Iu = 1,Ntol
              Ipoint = Ltol(Iu)
              Holdef=Abs(Def8(Ipoint,Iv))
@@ -868,6 +868,7 @@ c        If(Chstif) Then
               intol = Iu
              Endif
  405       Continue
+ 406       Continue
 c   Biggest deferred correction is in component Icmph and
 c   at the mesh interval Ix.
 c   Now compute an explicit deferred correction for this.
