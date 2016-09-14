@@ -2251,11 +2251,12 @@ c      St4 --> Tmp(ncomp,16)
 
       call dcopy(nlbc, rhs, 1, rhstri, 1)
       ind = nlbc
-      do 10 im = 1, ninter
+      do 11 im = 1, ninter
       do 10 ic = 1, ncomp
          ind = ind + 1
          rhstri(ind) = rhs(ind) + defnew(ic, im)
  10       continue
+ 11   continue
       ind = ninter*nmsh + nlbc + 1
       call dcopy(ncomp-nlbc, rhs, 1, rhstri, 1)
 
@@ -2355,7 +2356,7 @@ c      St4 --> Tmp(ncomp,16)
 *  Test For Convergence Using The Ratio Abs((Change In U)/Max(U,1)).
 
 
-      do 150 im = 1, nmsh
+      do 160 im = 1, nmsh
       do 150 it = 1, ntol
          itol = ltol(it)
 c Francesca using rhs instead of delu
@@ -2364,7 +2365,7 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
          if (er .gt. tolfct*tol(it).and. er .gt. epsmch
      +              ) go to 100
  150      continue
-
+ 160   continue
 *  To exit from the loop here, the convergence tests have
 *  been passed.
 
@@ -2853,13 +2854,13 @@ c  at the initial point of the line search.
 *  If the test fails for any element of u, branch back to the
 *  top of the Newton iteration.
 
-      do 160 im = 1, nmsh
+      do 170 im = 1, nmsh
       do 160 it = 1, ntol
          icmp = ltol(it)
          er = abs(delu(icmp,im))/max(abs(u(icmp,im)), one)
          if (er .gt. cnvfct*tol(it)) go to 100
  160      continue
-
+ 170   continue
 
       if (iprint .ge. 0) then
       CALL Rprintid('Convergence, iter = ,  rnsq =', iter+1, rnsq)
@@ -3729,7 +3730,7 @@ C
 
       Errok = .true.
 
-      Do 10 Im = 1, Nmsh
+      Do 20 Im = 1, Nmsh
       Do 10 It = 1, Ntol
          Icmp = Ltol(It)
          Er = U(Icmp,Im) - Uold(Icmp,Im)
@@ -3737,7 +3738,7 @@ C
          Errel = Abs(Er/(Tol(It)*Denom))
          If (Errel .gt. Etest(It)) Errok = .false.
    10 Continue
-
+   20 Continue
       Return
       End
 

@@ -1876,16 +1876,17 @@ c ==============================================================================
          call dscal(ncomp*ncomp, (-half*hmsh), bhold(1,1,im), 1)
    10 continue
 
-      do 20 im = 1, ninter
+      do 25 im = 1, ninter
       do 20 ic = 1, ncomp
          bhold(ic,ic,im) = bhold(ic,ic,im) + one
    20 continue
-
-      do 30 im = 1, ninter
+   25 continue
+      do 35 im = 1, ninter
       do 30 ic = 1, ncomp
          dfrat(ic,im) = ddot(ncomp, bhold(ic,1,im), ncomp,
      *                        defimp(1,im), 1)
    30 continue
+   35 continue
       return
       end
 
@@ -2056,11 +2057,12 @@ c ==============================================================================
 
       call dcopy(nlbc, rhs, 1, rhstri, 1)
       ind = nlbc
-      do 10 im = 1, ninter
+      do 15 im = 1, ninter
       do 10 ic = 1, ncomp
          ind = ind + 1
          rhstri(ind) = rhs(ind) + defnew(ic, im)
    10 continue
+   15 continue
       ind = ninter*nmsh + nlbc + 1
       call dcopy(ncomp-nlbc, rhs, 1, rhstri, 1)
 
@@ -2160,13 +2162,13 @@ c ==============================================================================
 
 *  Test for convergence using the ratio abs((change in u)/max(u,1)).
 
-      do 150 im = 1, nmsh
+      do 155 im = 1, nmsh
       do 150 it = 1, ntol
          itol = ltol(it)
          er = abs(delu(itol,im))/max(abs(u(itol,im)), one)
          if (er .gt. tolfct*tol(it) .and. er .gt. 1.0d2*epsmch)go to 100
   150 continue
-
+  155 continue
 *  To exit from the loop here, the convergence tests have
 *  been passed.
 
@@ -2658,13 +2660,13 @@ c  at the initial point of the line search.
 *  If the test fails for any element of u, branch back to the
 *  top of the Newton iteration.
 
-      do 160 im = 1, nmsh
+      do 165 im = 1, nmsh
       do 160 it = 1, ntol
          icmp = ltol(it)
          er = abs(delu(icmp,im))/max(abs(u(icmp,im)), one)
          if (er .gt. cnvfct*tol(it)) go to 100
   160 continue
-
+  165 continue
 
       if (iprint .ge. 0) THEN
        CALL Rprintid('Convergence, iter, rnsq =',iter+1, rnsq)
@@ -3191,12 +3193,13 @@ c ==============================================================================
 *  Multiply error measures by erdcid**ii.
 
          errmax = decii*errmax
-         do 140 im = 1, ninter
+         do 145 im = 1, ninter
             ermx(im) = decii*ermx(im)
             do 140 it = 1, ntol
                jcomp = ltol(it)
                ermeas(jcomp,im) = decii*ermeas(jcomp,im)
-  140    continue
+  140      continue
+  145    continue
       endif
 
   200 continue
@@ -3926,7 +3929,7 @@ cf      errsum = zero
       errmax = zero
       errok = .true.
 
-      do 10 im = 1, nmsh
+      do 15 im = 1, nmsh
       do 10 it = 1, ntol
          icmp = ltol(it)
          er = u(icmp,im) - uold(icmp,im)
@@ -3936,7 +3939,7 @@ cf      errsum = zero
 cf         errsum = errsum + errel
          if (errel .gt. etest(it)) errok = .false.
    10 continue
-
+   15 continue
       return
       end
 
@@ -4701,12 +4704,13 @@ c ==============================================================================
 *  Adjust the rerr array if it may be used later in selective
 *  mesh refinement.
 
-         do 150 it = 1, ntol
+         do 155 it = 1, ntol
             icmp = ltol(it)
             do 150 im = 1, nmold - 1
                rerr(icmp,im) = max(rerr(icmp,im),
      *                              rerr(icmp, im+1))
   150    continue
+  155    continue
       endif
 
       return
@@ -4870,12 +4874,13 @@ cf   the conditioning and the error
 *  Multiply error measures by erdcid**ii.
 
          errmax = decii*errmax
-         do 140 im = 1, ninter
+         do 145 im = 1, ninter
             ermx(im) = decii*ermx(im)
             do 140 it = 1, ntol
                jcomp = ltol(it)
                ermeas(jcomp,im) = decii*ermeas(jcomp,im)
-  140    continue
+  140       continue
+  145    continue
       endif
 
   200 continue
@@ -5924,7 +5929,18 @@ C
          RETURN
       ENDIF
 C
-      GOTO (100, 200, 300, 400, 500) JUMP
+      IF (JUMP .EQ. 1) THEN
+        GOTO 100
+      ELSE IF (JUMP. EQ. 2) THEN
+        GOTO 200  
+      ELSE IF (JUMP. EQ. 3) THEN
+        GOTO 300  
+      ELSE IF (JUMP. EQ. 4) THEN
+        GOTO 400  
+      ELSE IF (JUMP. EQ. 5) THEN
+        GOTO 500  
+      ENDIF
+C      GOTO (100, 200, 300, 400, 500) JUMP
 C
 C     ................ ENTRY   (JUMP = 1)
 C     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
@@ -7748,10 +7764,11 @@ c ==============================================================================
 *  On output, (new ymat) is alpha*xmat+ (old ymat), by analogy
 *  with the vector blas routine saxpy.
 
-      do 100 j = 1, ncol
+      do 110 j = 1, ncol
       do 100 i = 1, nrow
          ymat(i,j) = ymat(i,j) + alpha*xmat(i,j)
   100 continue
+  110 continue
       return
       end
 
@@ -7769,10 +7786,11 @@ c ==============================================================================
 
 
       if (nrow .le. 0 .or. ncol .le. 0) return
-      do 100 j = 1, ncol
+      do 110 j = 1, ncol
       do 100 i = 1, nrow
            xmat2(i,j) = xmat1(i,j)
   100 continue
+  110 continue
       return
       end
 
@@ -7787,10 +7805,11 @@ c ==============================================================================
 *  scalar value const.
 
       if (nrow .le. 0 .or. ncol .le. 0)  return
-      do 100 j = 1, ncol
+      do 110 j = 1, ncol
       do 100 i = 1, nrow
          xmat(i,j) = const
   100 continue
+  110 continue
       return
       end
 
@@ -7813,7 +7832,7 @@ c ==============================================================================
       scale = zero
       sumsq = one
       if( nrow.ge.1 .and. ncol .ge. 1) then
-         do 10 i = 1, nrow
+         do 11 i = 1, nrow
          do 10 j = 1, ncol
             if( xmat(i,j) .ne. zero )then
                absxij = abs(xmat(i,j))
@@ -7825,6 +7844,7 @@ c ==============================================================================
                end if
             end if
    10    continue
+   11    continue
       end if
       return
       end

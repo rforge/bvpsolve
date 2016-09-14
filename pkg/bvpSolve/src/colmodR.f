@@ -712,10 +712,12 @@ C
    30 Continue
       If ( K .eq. 0 )   K = Max( Mmax + 1 , 5 - Mmax )
       Do 40 I = 1, Mstar
-   40 Tzeta(I) = Zeta(I)
+        Tzeta(I) = Zeta(I)
+   40 Continue
       Do 50 I = 1, Ntol
          Lttol(I) = Ltol(I)
-   50 Tolin(I) = Tol(I)
+         Tolin(I) = Tol(I)
+   50 Continue
       Tleft = Aleft
       Tright = Aright
       Nc = Ncomp
@@ -829,17 +831,21 @@ C.... Locations In  Fspace.
       Np1 = N + 1
       If ( Iguess .eq. 4 )  Np1 = Np1 + Nold + 1
       Do 120 I = 1,Nz
-  120 Fspace( Lz+I-1 )  =  Fspace( Np1+I )
+        Fspace( Lz+I-1 )  =  Fspace( Np1+I )
+  120 Continue
       Idmz = Np1 + Nz
       Do 125 I = 1,Ndmz
-  125 Fspace( Ldmz+I-1 )  =  Fspace( Idmz+I )
+        Fspace( Ldmz+I-1 )  =  Fspace( Idmz+I )
+  125 Continue
       Np1 = Nold + 1
       If ( Iguess .eq. 4 )                          Go To 140
       Do 130 I = 1,Np1
-  130 Fspace( Lxiold+I-1 )  =  Fspace( Lxi+I-1 )
+        Fspace( Lxiold+I-1 )  =  Fspace( Lxi+I-1 )
+  130 Continue
       Go To 160
   140 Do 150 I = 1,Np1
-  150 Fspace( Lxiold+I-1 )  =  Fspace( N+1+I )
+        Fspace( Lxiold+I-1 )  =  Fspace( N+1+I )
+  150 Continue
   160 Continue
 
 C.... Initialize Collocation Points And Constants.
@@ -857,7 +863,8 @@ C.... Determine First Approximation, If The Problem Is Nonlinear.
       If (Iguess .ge. 2)                            Go To 200
       Np1 = N + 1
       Do 170 I = 1, Np1
- 170     Fspace( I + Lxiold - 1 ) = Fspace( I + Lxi - 1 )
+         Fspace( I + Lxiold - 1 ) = Fspace( I + Lxi - 1 )
+ 170  Continue
       Nold = N
       If ( Nonlin .eq. 0  .or. Iguess .eq. 1 )      Go To 200
 
@@ -865,9 +872,11 @@ C.... System Provides First Approximation Of The Solution.
 C.... Choose Z(J) = 0  For J = 1,...,Mstar.
 
       Do 180 I = 1, Nz
- 180     Fspace( Lz-1+I ) = 0.5d0
+         Fspace( Lz-1+I ) = 0.5d0
+ 180  Continue
       Do 190 I = 1, Ndmz
- 190     Fspace( Ldmz-1+I ) = 0.5d0
+         Fspace( Ldmz-1+I ) = 0.5d0
+ 190  Continue
  200  Continue
       If (Iguess .ge. 2)  Iguess = 0
 
@@ -1275,7 +1284,7 @@ C KARLINE: added...
       CALL Rprintd1('Continuation steps too small-Change eps to',Epsmin)
                Else
       CALL Rprintd1('Storage limit approached-Change eps to ',Epsmin)
-	           Endif
+               Endif
             Endif
             Emin = Ep
             Iback = 1
@@ -1567,16 +1576,19 @@ C.... *****************************************************************
       K2 = K * K
       Ispace(7) = Ispace(6) + K2 - 1
       Do 350 I = 1, Ncomp
- 350     Ispace(7+I) = M(I)
+         Ispace(7+I) = M(I)
+ 350  Continue
       Do 360 I = 1, Nz
- 360     Fspace( N+1+I ) = Fspace( Lz-1+I )
+         Fspace( N+1+I ) = Fspace( Lz-1+I )
+ 360  Continue
       Idmz = N + 1 + Nz
       Do 370 I = 1, Ndmz
- 370     Fspace( Idmz+I ) = Fspace( Ldmz-1+I )
+         Fspace( Idmz+I ) = Fspace( Ldmz-1+I )
+ 370  Continue
       Ic = Idmz + Ndmz
       Do 380 I = 1, K2
- 380     Fspace( Ic+I ) = Coef(I)
-
+         Fspace( Ic+I ) = Coef(I)
+ 380  Continue
       icount(1) = nfunc
       icount(2) = njac
       icount(3) = nbound
@@ -1681,7 +1693,8 @@ C.... Compute The Maximum Tolerance
 C
       Check = 0.d0
       Do 10 I = 1, Ntol
-   10   Check = Max ( Tolin(I), Check )
+        Check = Max ( Tolin(I), Check )
+   10 Continue
       Imesh = 1
       Iconv = 0
       If ( Nonlin .eq. 0 ) Iconv = 1
@@ -1806,12 +1819,13 @@ C
 C
 C.... Check Convergence (Iconv = 1).
 C
-      Do 120 It = 1, Ntol
+      Do 125 It = 1, Ntol
          Inz = Ltol(It)
          Do 120 Iz = Inz, Nz, Mstar
             If ( Abs(Delz(Iz))  .gt.
      +           Tolin(It) * (Abs(Z(Iz)) + 1.d0))  Go To 60
  120  Continue
+ 125  Continue
 C
 C.... Convergence Obtained
 C
@@ -2011,12 +2025,13 @@ C
 C.... Check Convergence (Iconv = 0).
 C
  350  Continue
-      Do 360 It = 1, Ntol
+      Do 365 It = 1, Ntol
          Inz = Ltol(It)
          Do 360 Iz = Inz, Nz, Mstar
             If ( Abs(Dqz(Iz))  .gt.
      +           Tolin(It) * (Abs(Z(Iz)) + 1.d0) )   Go To 170
  360  Continue
+ 365  Continue
 C
 C.... Convergence Obtained
 C
@@ -2290,7 +2305,16 @@ C
 C
       Nfxp1 = Nfxpnt +1
       Iprec = Min(Iprec,1)
-      Go To (180, 100, 50, 20), Mode
+      IF (Mode .EQ. 1) THEN
+        GOTO  180
+      ELSE IF (Mode .EQ. 2) THEN
+        GOTO  100
+      ELSE IF (Mode .EQ. 3) THEN
+        GOTO  50
+      ELSE IF (Mode .EQ. 4) THEN
+        GOTO  20
+      ENDIF        
+C      Go To (180, 100, 50, 20), Mode
 C
 C.... Mode = 4   The User-Specified Initial Mesh Is Already In Place.
 C
@@ -2309,7 +2333,8 @@ C
       I = 0
       Do 30 J = 1, Nold, 2
            I = I + 1
-   30 Xi(I) = Xiold(J)
+           Xi(I) = Xiold(J)
+   30 Continue
    40 Continue
       Np1 = N + 1
       Xi(1) = Aleft
@@ -2350,7 +2375,8 @@ C
            If ( Nregn .eq. 0 )                      Go To 80
            Dx = (Xright - Xleft) / Dfloat(Nregn+1)
            Do 70 I = 1, Nregn
-   70      Xi(Ileft+I) = Xleft  +  Dfloat(I) * Dx
+             Xi(Ileft+I) = Xleft  +  Dfloat(I) * Dx
+   70      Continue
    80      Ileft = Iright
            Xleft = Xright
    90 Continue
@@ -2405,7 +2431,7 @@ C.... At The Relative Positions 1/6, 2/6, 4/6 And 5/6 In
 C.... Each Subinterval.
 C
   140 Kstore = 1
-      Do 150 I = 1, N
+      Do 155 I = 1, N
          X = Xi(I)
          Hd6 = (Xi(I+1) - Xi(I)) / 6.d0
          Do 150 J = 1, 4
@@ -2415,6 +2441,7 @@ C
      +          Nold, Z, Dmz, K, Ncomp, Mmax, M, Mstar, 4, Dummy, 0)
            Kstore = Kstore  +  Mstar
   150 Continue
+  155 Continue
   160 Mshflg = 0
 C
 C.... Generate The Halved Mesh.
@@ -2423,7 +2450,8 @@ C
       Do 170 I = 1, N
            Xi(J) = (Xiold(I) + Xiold(I+1)) / 2.d0
            Xi(J+1) = Xiold(I+1)
-  170 J = J + 2
+           J = J + 2
+  170 Continue
       N = N2
       Go To 320
 C
@@ -2660,8 +2688,9 @@ C
   270        Continue
   280        Continue
              Lold = Lcarry
-  290      Xi(In) = Xiold(Lold-1) + (Temp - Accum(Lold-1)) /
+         Xi(In) = Xiold(Lold-1) + (Temp - Accum(Lold-1)) /
      +     Slope(Lold-1)
+  290     Continue
   300      In = In + 1
            Accl = Accr
            Lold = Lnew
@@ -2873,12 +2902,13 @@ C.... Assign Weights For Error Estimate
 C
       Koff = K * ( K + 1 ) / 2
       Iz = 1
-      Do 10 J = 1, Ncomp
+      Do 15 J = 1, Ncomp
            Mj = M(J)
            Do 10 L = 1, Mj
              Wgterr(Iz) = Cnsts1(Koff - Mj + L)
              Iz = Iz + 1
    10 Continue
+   15 Continue
 C
 C.... Assign Array Values For Mesh Selection: Wgtmsh, Jtol, And Root
 C
@@ -2899,7 +2929,22 @@ C
 C
 C.... Specify Collocation Points
 C
-      Go To (50,60,70,80,90,100,110), K
+      IF (K .EQ. 1) THEN
+        GOTO 50
+      ELSE IF (K .EQ. 2) THEN
+        GOTO 60
+      ELSE IF (K .EQ. 3) THEN
+        GOTO 70
+      ELSE IF (K .EQ. 4) THEN
+        GOTO 80
+      ELSE IF (K .EQ. 5) THEN
+        GOTO 90
+      ELSE IF (K .EQ. 6) THEN
+        GOTO 100
+      ELSE IF (K .EQ. 7) THEN
+        GOTO 110
+      ENDIF          
+C      Go To (50,60,70,80,90,100,110), K
    50 Rho(1) = 0.d0
       Go To 120
    60 Rho(2) = .57735026918962576451d0
@@ -2947,7 +2992,8 @@ C.... The Values Of Asave Are To Be Used In  Newmsh  And Errchk .
 C
       Do 140 J = 1, K
          Do 135 I = 1, K
-  135      Coef(I,J) = 0.d0
+           Coef(I,J) = 0.d0
+  135    Continue
          Coef(J,J) = 1.d0
          Call MVmonde (Rho, Coef(1,J), K)
   140 Continue
@@ -3004,7 +3050,8 @@ C
       Ifin = 1
       Mshflg = 1
       Do 10 J = 1, Mstar
-   10   Errest(J) = 0.d0
+        Errest(J) = 0.d0
+   10 Continue
       Do 60 Iback = 1, N
            I = N + 1 - Iback
 C
@@ -3146,12 +3193,24 @@ c karline: added counters
       common/Mcoldiag/nfunc, njac,  nbound, njacbound, maxmesh
 C
       M1 = Mode + 1
-      Go To (10, 30, 30, 30, 310), M1
+      IF (M1 .EQ. 1) THEN
+        GOTO 10
+      ELSE IF (M1 .EQ. 2) THEN
+        GOTO 30
+      ELSE IF (M1 .EQ. 3) THEN
+        GOTO 30
+      ELSE IF (M1 .EQ. 4) THEN
+        GOTO 30
+      ELSE IF (M1 .EQ. 5) THEN
+        GOTO 310
+      ENDIF          
+C      Go To (10, 30, 30, 30, 310), M1
 C
 C.... Linear Problem Initialization
 C
    10 Do 20 I = 1,Mstar
-   20 Zval(I) = 0.d0
+        Zval(I) = 0.d0
+   20 Continue
 C
 C.... Initialization
 C
@@ -3182,7 +3241,8 @@ C
            Lside = Lside + 1
            Go To 50
    60      Nrow = Mstar + Lside
-   70 Integs(1,I) = Nrow
+        Integs(1,I) = Nrow
+   70  Continue
    80 Continue
       If ( Mode .eq. 2 )                            Go To 90
 C
@@ -3190,7 +3250,8 @@ C.... Zero The Matrices To Be Computed
 C
       Lw = Kd * Kd * N
       Do 84 L = 1, Lw
-   84   W(L) = 0.d0
+        W(L) = 0.d0
+   84 Continue
 C
 C.... The Do Loop 290 Sets Up The Linear System Of Equations.
 C
@@ -3493,7 +3554,8 @@ C
 C.... Zero Jacobian Dg
 C
       Do 10 J = 1,Mstar
-   10   Dg(J) = 0.d0
+        Dg(J) = 0.d0
+   10 Continue
 C
 C.... Evaluate Jacobian Dg
 C
@@ -3505,7 +3567,8 @@ C
       If (Nonlin .eq. 0 .or. Iter .gt. 0)           Go To 30
       Dot = 0.d0
       Do 20 J = 1, Mstar
-   20   Dot = Dot  +  Dg(J) * Zval(J)
+        Dot = Dot  +  Dg(J) * Zval(J)
+   20 Continue
       Dgz(Izeta) = Dot
 C
 C.... Branch According To  M O D E
@@ -3521,14 +3584,16 @@ C.... Handle An Initial Condition
 C
       Do 40 J = 1, Mstar
         Gi(Irow,J) =  Dg(J)
-   40 Gi(Irow,Mstar+J) = 0.d0
+        Gi(Irow,Mstar+J) = 0.d0
+   40 Continue
       Return
 C
 C.... Handle A Final Condition
 C
    50 Do 60 J =  1, Mstar
         Gi(Irow,J) = 0.d0
-   60 Gi(Irow,Mstar+J) = Dg(J)
+        Gi(Irow,Mstar+J) = Dg(J)
+   60 Continue
       Return
       End
       Subroutine MVwblok (Xcol, Hrho, Jj, Wi, Vi, Ipvtw, Kd, Zval,
@@ -3576,18 +3641,21 @@ C
 C.... Calculate Local Basis
 C
    30        Fact = 1.d0
-             Do 150 L = 1,Mmax
+             Do 151 L = 1,Mmax
                 Fact = Fact * Hrho / Dfloat(L)
                 Basm(L) = Fact
                 Do 150 J = 1,K
                    Ha(J,L) = Fact * Acol(J,L)
   150        Continue
+  151        Continue
 C
 C....zero Jacobian
 C
-      Do 40 Jcol = 1, Mstar
+      Do 45 Jcol = 1, Mstar
         Do 40 Ir = 1, Ncomp
-   40 Df(Ir,Jcol) = 0.d0
+          Df(Ir,Jcol) = 0.d0
+   40   Continue
+   45 Continue
 C
 C.... Build Ncomp Rows For Interior Collocation Point X.
 C.... The Linear Expressions To Be Constructed Are:
@@ -3605,19 +3673,21 @@ C
 C.... Evaluate  Dmzo = Dmz - Df * Zval  Once For A New Mesh
 C
       If (Nonlin .eq. 0 .or. Iter .gt. 0)          Go To 60
-      Do 50 J = 1, Mstar
+      Do 55 J = 1, Mstar
         Fact = - Zval(J)
         Do 50 Id = 1, Ncomp
           Dmzo(I0+Id) = Dmzo(I0+Id)  +  Fact * Df(Id,J)
   50  Continue
+  55  Continue
 C
 C.... Loop Over The  Ncomp  Expressions To Be Set Up For The
 C.... Current Collocation Point.
 C
-   60 Do 70 J = 1, Mstar
+   60 Do 75 J = 1, Mstar
         Do 70 Id = 1, Ncomp
           Vi(I0+Id,J) = Df(Id,J)
    70 Continue
+   75 Continue
       Jn = 1
       Do 140 Jcomp = 1, Ncomp
          Mj = M(Jcomp)
@@ -3630,7 +3700,8 @@ C
               Do 80 Iw = I1, I2
                  Wi(Iw,Jw) = Wi(Iw,Jw)  +  Ajl * Vi(Iw,Jv)
    80         Continue
-   90       Jw = Jw + Ncomp
+            Jw = Jw + Ncomp
+   90   Continue
             Lp1 = L + 1
             If ( L .eq. Mj )                        Go To 130
             Do 110 Ll = Lp1, Mj
@@ -3705,12 +3776,18 @@ C
          Fact = Fact * H / Dfloat(L)
          Basm(L+1) = Fact
          Do 20 J = 1,K
-   20       Hb(J,L) = Fact * B(J,L)
+           Hb(J,L) = Fact * B(J,L)
+   20    Continue
    30 Continue
 C
 C.... Branch According To  M O D E
 C
-      Go To (40, 110), Mode
+      IF (MODE .EQ. 1) THEN
+        GOTO 40
+      ELSE IF (MODE .EQ. 2) THEN
+        GOTO 110
+      ENDIF          
+C      Go To (40, 110), Mode
 C
 C.... Set Right Gi-Block To Identity
 C
@@ -3718,8 +3795,10 @@ C
       Do 60 J = 1, Mstar
         Do 50 Ir = 1, Mstar
           Gi(Irow-1+Ir,J) = 0.d0
-   50   Gi(Irow-1+Ir,Mstar+J) = 0.d0
-   60 Gi(Irow-1+J,Mstar+J) = 1.d0
+          Gi(Irow-1+Ir,Mstar+J) = 0.d0
+   50   Continue
+        Gi(Irow-1+J,Mstar+J) = 1.d0
+   60 Continue
 C
 C.... Compute The Block Gi
 C
@@ -3734,7 +3813,8 @@ C
                Rsum = 0.d0
                Do 70 J = 1, K
                   Rsum = Rsum  -  Hb(J,L) * Vi(Ind,Jcol)
-   70          Ind = Ind + Ncomp
+                  Ind = Ind + Ncomp
+   70          Continue
                Gi(Id,Jcol) = Rsum
    80       Continue
             Jd = Id - Irow
@@ -3758,7 +3838,8 @@ C
             Rsum = 0.d0
             Do 120 J = 1, K
                Rsum = Rsum  +  Hb(J,L) * Rhsdmz(Ind)
-  120       Ind = Ind + Ncomp
+               Ind = Ind + Ncomp
+  120       Continue
             Rhsz(Ir-L) = Rsum
   130    Continue
   140 Continue
@@ -3827,7 +3908,16 @@ C
 C
       Common /MColout/ Precis, Iprint
 C
-      Go To (10, 30, 80, 90), Mode
+      IF (MODE .EQ. 1) THEN
+        GOTO 10
+      ELSE IF (MODE .EQ. 2) THEN
+        GOTO 30
+      ELSE IF (MODE .EQ. 3) THEN
+        GOTO 80
+      ELSE IF (MODE .EQ. 4) THEN
+        GOTO 90
+      ENDIF          
+C      Go To (10, 30, 80, 90), Mode
 C
 C.... Mode = 1 , Retrieve  Z( U(X) )  Directly For X = Xi(I).
 C
@@ -3892,18 +3982,22 @@ C
              Zsum = 0.d0
              Do 110 J = 1, K
                Zsum = Zsum  +  A(J,L) * Dmz(Ind)
-  110        Ind = Ind + Ncomp
+               Ind = Ind + Ncomp
+  110        Continue
              Do 120 Ll = 1, L
                Lb = L + 1 - Ll
-  120          Zsum = Zsum * Bm(Lb)  +  Z(Iz-Ll)
-  130     Zval(Ir-L) = Zsum
+             Zsum = Zsum * Bm(Lb)  +  Z(Iz-Ll)
+  120     Continue
+          Zval(Ir-L) = Zsum
+  130  Continue
   140 Continue
       If ( Modm .eq. 0 )                            Return
 C
 C.... For Modm = 1 Evaluate  Dmval(J) = Mj-Th Derivative Of Uj.
 C
       Do 150 Jcomp = 1, Ncomp
-  150 Dmval(Jcomp) = 0.d0
+        Dmval(Jcomp) = 0.d0
+  150 Continue
       Idmz = Idmz + 1
       Do 170 J = 1, K
          Fact = Dm(J)
@@ -3939,7 +4033,8 @@ C
       If ( K .eq. 1 )                            Go To 70
       Kpm1 = K + M - 1
       Do 10 I = 1, Kpm1
-   10   T(I) = S / Dfloat(I)
+        T(I) = S / Dfloat(I)
+   10 Continue
       Do 40 L = 1, M
          Lb = K + L + 1
          Do 30 I = 1, K
@@ -3954,7 +4049,8 @@ C
       Do 60 I = 1, K
          P = Coef(1,I)
          Do 50 J = 2, K
-   50       P = P * T(K+1-J) + Coef(J,I)
+           P = P * T(K+1-J) + Coef(J,I)
+   50    Continue
          Dm(I) = P
    60 Continue
       Return
@@ -3977,17 +4073,19 @@ C
 C
       If ( K .eq. 1 )                             Return
       Km1 = K - 1
-      Do 10 I = 1, Km1
+      Do 15 I = 1, Km1
          Kmi = K - I
          Do 10 J = 1, Kmi
            Coef(J) = (Coef(J+1) - Coef(J)) / (Rho(J+I) - Rho(J))
   10  Continue
+  15  Continue
 C
       Ifac = 1
       Do 40 I = 1, Km1
          Kmi = K + 1 - I
          Do 30 J = 2, Kmi
-  30        Coef(J) = Coef(J) - Rho(J+I-1) * Coef(J-1)
+           Coef(J) = Coef(J) - Rho(J+I-1) * Coef(J-1)
+  30     Continue
          Coef(Kmi) = Dfloat(Ifac) * Coef(Kmi)
          Ifac = Ifac * I
   40  Continue
@@ -4178,10 +4276,11 @@ C
       Do 10 I = 1, Nrow
         D(I) = 0.d0
    10 Continue
-      Do 20 J = 1, Ncol
+      Do 25 J = 1, Ncol
         Do 20 I = 1, Nrow
           D(I) = Max( D(I) , Abs(W(I,J)))
    20 Continue
+   25 Continue
 C
 C.... Gauss Elimination With Pivoting Of Scaled Rows, Loop Over
 C.... K = 1,.,Last
@@ -4230,7 +4329,8 @@ C....     For High Performance Do This Operations Column Oriented.
 C
            T = -1.0d0/T
            Do 60 I = Kp1, Nrow
-   60        W(I,K) = W(I,K) * T
+              W(I,K) = W(I,K) * T
+   60      Continue
            Do 70 J = Kp1,Ncol
              T = W(L,J)
              If ( L .eq. K )                        Go To 62
@@ -4238,7 +4338,8 @@ C
                W(K,J) = T
    62        If ( T .eq. 0.d0 )                     Go To 70
              Do 64 I = Kp1, Nrow
-   64           W(I,J) = W(I,J) + W(I,K) * T
+                W(I,J) = W(I,J) + W(I,K) * T
+   64        Continue
    70      Continue
            K = Kp1
 C
@@ -4300,17 +4401,22 @@ C
 C
 C.... Put The Remainder Of Block I Into Ai1
 C
-      Do 10 J = 1,Jmax
+      Do 15 J = 1,Jmax
            Do 10 M = 1,Mmax
-   10 Ai1(M,J) = Ai(Last+M,Last+J)
+              Ai1(M,J) = Ai(Last+M,Last+J)
+   10      Continue
+   15 Continue
+   
       If (Jmax .eq. Ncoli1)                         Return
 C
 C.... Zero Out The Upper Right Corner Of Ai1
 C
       Jmaxp1 = Jmax + 1
-      Do 20 J = Jmaxp1,Ncoli1
+      Do 25 J = Jmaxp1,Ncoli1
            Do 20 M = 1,Mmax
-   20 Ai1(M,J) = 0.d0
+             Ai1(M,J) = 0.d0
+   20      Continue
+   25 Continue
       Return
       End
       Subroutine MSbblok ( Bloks, Integs, Nbloks, Ipivot, X )
@@ -4345,7 +4451,8 @@ C
            Call MSubfor ( Bloks(Index), Ipivot(Indexx), Nrow, Last,
      +                   X(Indexx) )
            Index = Nrow * Integs(2,I) + Index
-   10 Indexx = Indexx + Last
+           Indexx = Indexx + Last
+   10 Continue
 C
 C.... Back Substitution Pass
 C
@@ -4357,7 +4464,8 @@ C
            Last = Integs(3,I)
            Index = Index - Nrow * Ncol
            Indexx = Indexx - Last
-   20 Call MSubbak ( Bloks(Index), Nrow, Ncol, Last, X(Indexx) )
+      Call MSubbak ( Bloks(Index), Nrow, Ncol, Last, X(Indexx) )
+   20 Continue 
       Return
       End
       Subroutine MSubfor ( W, Ipivot, Nrow, Last, X )
@@ -4391,7 +4499,8 @@ C
            X(K) = T
            If ( T .eq. 0.d0 )                       Go To 20
            Do 10 I = Kp1, Nrow
-   10         X(I) = X(I) + W(I,K) * T
+              X(I) = X(I) + W(I,K) * T
+   10      Continue
    20 Continue
    30 Return
       End
@@ -4424,7 +4533,8 @@ C
          T = - X(J)
          If ( T .eq. 0.d0 )                         Go To 20
          Do 10 I = 1, Last
-   10       X(I) = X(I) + W(I,J) * T
+           X(I) = X(I) + W(I,J) * T
+   10    Continue
    20 Continue
    30 If ( Last .eq. 1 )                            Go To 60
       Lm1 = Last - 1
@@ -4435,7 +4545,8 @@ C
         T = - X(K)
         If ( T .eq. 0.d0 )                          Go To 50
         Do 40 I = 1, Km1
-   40     X(I) = X(I) + W(I,K) * T
+         X(I) = X(I) + W(I,K) * T
+   40   Continue
    50 Continue
    60 X(1) = X(1)/W(1,1)
       Return
