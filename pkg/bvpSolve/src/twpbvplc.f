@@ -356,15 +356,15 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       call bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
      *   nfxpnt, fixpnt, ntol, ltol, tol, nmax, linear,
      *   giveu, givmsh, xx, nudim, u,
-     *   wrk(idefex), wrk(idefim), wrk(idef), wrk(idelu),
+     *   wrk(idef), wrk(idelu),
      *   wrk(irhs), wrk(ifval),
      *   wrk(itpblk), wrk(ibtblk), wrk(iajac), wrk(ibhold),
      *   wrk(ichold), wrk(idhold), iwrk(iipvbk), iwrk(iipvlu),
-     *   iwrk(iisign), wrk(iuint), wrk(iftmp), wrk(itmrhs),
+     *   wrk(iuint), wrk(iftmp), wrk(itmrhs),
      *   wrk(idftm1), wrk(idftm2), wrk(idgtm),
      *   wrk(iutri), wrk(irhtri), wrk(ixmer),
      *   wrk(ixxold), wrk(iuold), wrk(iusve),
-     *   wrk(itmp), wrk(idsq), wrk(idexr), wrk(irtdc),
+     *   wrk(itmp),  wrk(irtdc),
      *   wrk(irerr), wrk(ietst6), wrk(ietst8), wrk(iermx),
      *   iwrk(iihcom), iwrk(iiref), wrk(idef6), wrk(idef8),
      *   fsub,dfsub,gsub,dgsub,iflbvp,
@@ -390,12 +390,12 @@ c ==============================================================================
       subroutine bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
      *   nfxpnt, fixpnt,
      *   ntol, ltol, tol, nmax, linear, giveu, givmsh,
-     *   xx, nudim, u, defexp, defimp, def, delu, rhs, fval,
+     *   xx, nudim, u,  def, delu, rhs, fval,
      *   topblk, botblk, ajac, bhold, chold, dhold,
-     *   ipvblk, ipivlu,isign,
+     *   ipvblk, ipivlu,
      *   uint, ftmp, tmprhs, dftmp1, dftmp2, dgtm,
      *   utrial, rhstri, xmerit, xxold, uold, usave,
-     *   tmp, dsq, dexr, ratdc, rerr,
+     *   tmp,  ratdc, rerr,
      *   etest6, etest8, ermx, ihcomp, irefin,
      *   def6, def8, fsub, dfsub, gsub, dgsub, iflbvp,
      *   amg, c1, wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2,r4,
@@ -407,12 +407,12 @@ c ==============================================================================
       dimension rpar(*), ipar(*), precis(3)
       dimension  fixpnt(*), ltol(ntol), tol(ntol)
       dimension  xx(*), u(nudim, *), xguess(*), yguess(nygdim,*)
-      dimension  defexp(ncomp,*), defimp(ncomp,*), def(ncomp,*)
+      dimension  def(ncomp,*)
       dimension  delu(ncomp, *), rhs(*), fval(ncomp,*)
       dimension  topblk(nlbc,*), botblk(ncomp-nlbc,*)
       dimension  ajac(ncomp, 2*ncomp, *)
       dimension  bhold(ncomp, ncomp, *), chold(ncomp, ncomp, *)
-      dimension  ipivlu(*), ipvblk(*), isign(*)
+      dimension  ipivlu(*), ipvblk(*)
       dimension  uint(ncomp), ftmp(ncomp)
       dimension  dgtm(ncomp), tmprhs(*)
       dimension  dftmp1(ncomp, ncomp), dftmp2(ncomp, ncomp)
@@ -420,7 +420,6 @@ c ==============================================================================
       dimension  xmerit(ncomp, *)
       dimension  xxold(*), uold(ncomp,*), usave(ncomp,*)
       dimension  tmp(ncomp,*)
-      dimension  dsq(ncomp,ncomp), dexr(ncomp)
       dimension  ratdc(*), rerr(ncomp,*)
       dimension  etest6(*), etest8(*), ermx(*)
       dimension  ihcomp(*), irefin(*)
@@ -458,7 +457,7 @@ c      save frscal
 
 
       logical stab_kappa, stab_gamma, stab_cond, stiff_cond, ill_cond
-      logical stab_kappa1, ill_cond_newt, stab_sigma, comparekappa
+      logical stab_kappa1, ill_cond_newt, stab_sigma
       logical errok
 
       parameter (zero = 0.0d+0, one = 1.0d+0)
@@ -529,8 +528,8 @@ c Karline: use precis instead of d1mach
       Chstif = .true.
       ddouble = .false.
 
-
-      if (comp_c) then
+*Francesca now are always initialized
+*      if (comp_c) then
 *     initialize parameter for the conditioning estimation
       gamma1old  = flmax
       gamma1     = flmax
@@ -544,7 +543,7 @@ c Karline: use precis instead of d1mach
       stiff_cond = .false.
       stab_cond  = .false.
       ill_cond   = .false.
-      endif
+*      endif
 *     initialize parameter for the conditioning estimation
       if (linear) then
          sfatt_alpha = 1e-5
@@ -679,9 +678,9 @@ c       BY BRUGNANO & TRIGIANTE, AND HIGHAM
           ckappa1old = ckappa1
           ckappaold = ckappa
           sigmaold=sigma
-            call CONDESTIM(aleft,aright,nmsh,ncomp,N,xx,topblk,nlbc,
+            call CONDESTIM(aleft,aright,ncomp,N,xx,topblk,nlbc,
      *       ncomp, ajac, ncomp,2*ncomp,ninter,botblk,ncomp-nlbc,
-     *   ipvblk,isign,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
+     *   ipvblk,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
 
 
            if (iprint .ge. 0) then
@@ -747,9 +746,9 @@ c
            sigmaold=sigma
            N =nmsh*ncomp
            ninter=nmsh-1
-          call CONDESTIM(aleft,aright,nmsh,ncomp,N,xx,topblk,nlbc,
+          call CONDESTIM(aleft,aright,ncomp,N,xx,topblk,nlbc,
      *       ncomp, ajac, ncomp,2*ncomp,ninter,botblk,ncomp-nlbc,
-     *   ipvblk,isign,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
+     *   ipvblk,amg,c1,wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2)
 
 
 
@@ -808,8 +807,8 @@ C karline: added , after ipar
      *           nmold, xxold, uold, ratdc,
      *           iorder, iflnwt, itnwt, ddouble, maxmsh,
      *           numbig, nummed,wrkrhs,amg,stab_cond,stiff_cond,
-     *           ill_cond_newt,nfail4,
-     *           nfxpnt, fixpnt, irefin,itcond,itcondmax,rpar,ipar,
+     *           nfail4,
+     *           nfxpnt, fixpnt, irefin,itcond,itcondmax,
      *           nmguess,xguess,nygdim,yguess)
 
 
@@ -883,8 +882,9 @@ c   Now compute an explicit deferred correction for this.
 
         if (use_c) then
          if ((stiff_cond)) then
-             drat = bigdef/
-     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
+CFrancesca drat is not used
+c             drat = bigdef/
+c     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
 
 c            numadd = drat**power
              numadd = 15
@@ -893,8 +893,9 @@ c            numadd = drat**power
      *        nmold, xxold, ddouble, maxmsh,r4,amg)
               itcond=itcond+1
          else
-             drat = bigdef/
-     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
+CFrancesca drat is not used
+c             drat = bigdef/
+c     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
 
 c            numadd = drat**power
              numadd = 15
@@ -902,8 +903,9 @@ c            numadd = drat**power
      *             nmold, xxold, maxmsh)
          endif
        else
-             drat = bigdef/
-     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
+CFrancesca drat is not used
+C             drat = bigdef/
+C     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
             numadd = 15
 c            numadd = drat**power
             call smpmsh (nmsh, nmax, xx, Ix, numadd,
@@ -1025,7 +1027,7 @@ c     *             trst6, onto8, reaft6, linear, succes)
      *              rerr, ermx, ratdc,
      *              reaft6, ddouble, succes, maxmsh,
      *              numbig, nummed,
-     *              wrkrhs,amg, stab_cond,ckappa1,gamma1,ckappa,
+     *              wrkrhs,amg, stab_cond,
      *              stiff_cond,itcond, itcondmax)
 
 
@@ -1178,12 +1180,12 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
          call conv8( ncomp, nmsh, ntol, ltol, tol,
      *              nfxpnt, fixpnt, linear, nmax,
-     *              xx, nudim, u, def, def6, def8, uold,
+     *              xx, nudim, u,  def6, def8, uold,
      *              ihcomp, irefin, ermx, err6,
      *              etest8, strctr,
      *              ddouble, nmold, xxold, maxmsh, succes, first8,
-     *              wrkrhs,amg, stab_cond,ckappa1,gamma1,ckappa,
-     *              stiff_cond,rpar,ipar,nmguess, xguess,nygdim, yguess)
+     *              wrkrhs,amg, stab_cond,
+     *              stiff_cond,nmguess, xguess,nygdim, yguess)
 
 
 
