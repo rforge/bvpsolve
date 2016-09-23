@@ -563,9 +563,8 @@ c
 c...  print the input data for checking.
 c
 
-   80 continue
 
-  100 continue
+
 c
 c...  check for correctness of data
 c
@@ -731,7 +730,7 @@ c...  prepare output
       do 250 i=1,naldif
         fspace(n+1+i) = fspace(laldif-1+i)
   250 Continue
-  259 icount(1) = nfunc
+      icount(1) = nfunc
       icount(2) = njac
       icount(3) = nbound
       icount(4) = njacbound
@@ -805,6 +804,8 @@ c
       relmin = 1.d-3
       rstart = 1.d-2
       lmtfrz = 4
+      anscl = 1.d0
+      ifrz = 0
 c
 c...  compute the maximum tolerance
 c
@@ -1188,7 +1189,7 @@ c
 c
 c...       check for error tolerance satisfaction
 c
-  450      call syserrchk(imesh,xiold,aldif,valstr,a,mstar,ifin)
+  450      call syserrchk(imesh,xiold,aldif,valstr,mstar,ifin)
            if (imesh .eq. 1 .or. ifin .eq. 0 .and.
      1          icare .ne. 2)                       go to 460
            iflag = 1
@@ -1380,7 +1381,7 @@ c...       determine where the j-th fixed point should fall in the
 c...       new mesh - this is xi(iright) and the (j-1)st fixed
 c...       point is in xi(ileft)
 c
-           nmin = (xright-aleft) / (aright-aleft) * dfloat(n) + 1.5d0
+           nmin = int((xright-aleft)/(aright-aleft)*dfloat(n) + 1.5d0)
            if (nmin .gt. n-nfxpnt+j)  nmin = n - nfxpnt + j
            iright = max0 (ileft+1, nmin)
    60      xi(iright) = xright
@@ -1536,7 +1537,7 @@ c
 c
 c...  naccum=expected n to achieve .1x user requested tolerances
 c
-      naccum = accum(nold+1) + 1.d0
+      naccum = int(accum(nold+1) + 1.d0)
       if (iprint .lt. 0)  then
       CALL Rprintd1('Mesh info, degree of equidistribution = ',Degequ)
       CALL Rprinti1('Prediction for required N =  ', Naccum)
@@ -1584,13 +1585,14 @@ c
       xi(n+1) = aright
       do 310 i = 1, nfxp1
            if (i .eq. nfxp1)                        go to 250
+           lnew=lold
            do 230 j = lold, noldp1
              lnew = j
              if (fixpnt(i) .le. xiold(j))           go to 240
   230      continue
   240      continue
            accr = accum(lnew) + (fixpnt(i)-xiold(lnew))*slope(lnew-1)
-           nregn = (accr-accl) / accum(noldp1) * dfloat(n) - .5d0
+           nregn = int((accr-accl) / accum(noldp1) * dfloat(n) - .5d0)
            nregn = min0(nregn, n - in - nfxp1 + i)
            xi(in + nregn + 1) = fixpnt(i)
            go to 260
@@ -1603,6 +1605,7 @@ c
            do 290 j = 1, nregn
              in = in + 1
              temp = temp + tsum
+             lcarry = lold
              do 270 l = lold, lnew
                lcarry = l
                if (temp .le. accum(l))              go to 280
@@ -1794,7 +1797,7 @@ c
       call sysbspfix (1.d0/6.d0, vnsave(1,5), k, ncomp, m)
       return
       end
-      subroutine syserrchk(imesh,xiold,aldif,valstr,work,mstar,ifin)
+      subroutine syserrchk(imesh,xiold,aldif,valstr,mstar,ifin)
 c
 c***********************************************************************
 c
@@ -1811,6 +1814,7 @@ c                 estimate. the array values are assigned in
 c                 subroutine  sysconsts.
 c        errest - storage for error estimates
 c        err    - temporary storage used for error estimates
+c Francesca eliminated unused argment
 c        work   - space to be used to store values of z at the
 c                 mesh points for printout. its dimension is
 c                 mstar * nmax.
@@ -1828,7 +1832,7 @@ c
 c**********************************************************************
 c
       implicit real(kind=8) (a-h,o-z)
-      dimension err(40),z(40),errest(40) ,dmval(20)
+      dimension err(40),z(40),errest(40)
       common /order/k,ncomp,mstr,kd,kdm,mnsum,m(20)
       common /appr/ n,nold,nmax,nalpha,mshflg,mshnum,mshlmt,mshalt
       common /side/  zeta(40), aleft, aright, izeta
@@ -1838,7 +1842,7 @@ c
       common /nonln/ precis,nonlin,iter,limit,icare,iprint,iguess,ifreez
       common /bsplin/ vncol(66,7), vnsave(66,5), vn(66)
 C Karline: added dumm(1)      
-      dimension xiold(*), aldif(*), valstr(*), work(mstar,*),dumm(1)
+      dimension xiold(*), aldif(*), valstr(*),dumm(1)
 c
       ifin = 1
       noldp1 = nold + 1
@@ -2520,6 +2524,8 @@ c
       common /side/  zeta(40), aleft, aright, izeta
       dimension z(*), vn(*), xi(*), aldif(*), m(*), dmval(*)
 c
+      dnk2  = 0.0d0
+      ivnhi = 1
       IF (MODE .EQ. 1) THEN
         GOTO  10
       ELSE IF (MODE .EQ. 2) THEN

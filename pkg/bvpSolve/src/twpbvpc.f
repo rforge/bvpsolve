@@ -372,7 +372,7 @@ c ksks: add precis as argument: machine precision...
      *   wrk(idefex), wrk(idefim), wrk(idef), wrk(idelu),
      *   wrk(irhs), wrk(ifval),
      *   wrk(itpblk), wrk(ibtblk), wrk(iajac), wrk(ibhold),
-     *   wrk(ichold), iwrk(iipvbk), iwrk(iipvlu),
+     *   wrk(ichold), iwrk(iipvbk), iwrk(iipvlu),iwrk(iisign),
      *   wrk(iuint), wrk(iftmp), wrk(itmrhs),
      *   wrk(idftm1), wrk(idftm2), wrk(idgtm),
      *   wrk(iutri), wrk(irhtri), wrk(ixmer),
@@ -381,7 +381,7 @@ c ksks: add precis as argument: machine precision...
      *   wrk(irerr), wrk(ietst6), wrk(ietst8), wrk(iermx),
      *   iwrk(iihcom), iwrk(iiref), wrk(idef6), wrk(idef8),
      *   fsub,dfsub,gsub,dgsub,iflbvp,
-     *   wrk(iamg),wrk(ic1),wrk(iwrkrhs),
+     *   wrk(iamg),wrk(ic1),wrk(idelta0),wrk(iwrkrhs),
      *   ckappa1,gamma1,ckappa,
      *   ckappa2, sigma,rpar, ipar,liseries,iseries,indnms,precis,
      *   nmguess,xguess, nygdim, yguess )
@@ -405,13 +405,13 @@ c ksks: add precis as argument: machine precision...
      *   nfxpnt, fixpnt,
      *   ntol, ltol, tol, nmax, linear, giveu, givmsh,
      *   xx, nudim, u, defexp, defimp, def, delu, rhs, fval,
-     *   topblk, botblk, ajac, bhold, chold, ipvblk, ipivlu,
+     *   topblk, botblk, ajac, bhold, chold, ipvblk, ipivlu,isign,
      *   uint, ftmp, tmprhs, dftmp1, dftmp2, dgtm,
      *   utrial, rhstri, xmerit, xxold, uold, usave,
      *   tmp, dsq, dexr, ratdc, rerr,
      *   etest6, etest8, ermx, ihcomp, irefin,
      *   def6, def8, fsub, dfsub, gsub, dgsub, iflbvp,
-     *   amg, c1, wrkrhs,ckappa1,gamma1,ckappa,
+     *   amg, c1,delta0, wrkrhs,ckappa1,gamma1,ckappa,
      *   ckappa2,sigma,rpar,ipar,liseries,iseries,indnms,precis,
      *   nmguess,xguess, nygdim, yguess)
 
@@ -424,7 +424,7 @@ c ksks: add precis as argument: machine precision...
       dimension  topblk(nlbc,*), botblk(ncomp-nlbc,*)
       dimension  ajac(ncomp, 2*ncomp, *)
       dimension  bhold(ncomp, ncomp, *), chold(ncomp, ncomp, *)
-      dimension  ipivlu(*), ipvblk(*)
+      dimension  ipivlu(*), ipvblk(*), isign(*)
       dimension  uint(ncomp), ftmp(ncomp)
       dimension  dgtm(ncomp), tmprhs(*)
       dimension  dftmp1(ncomp, ncomp), dftmp2(ncomp, ncomp)
@@ -437,7 +437,7 @@ c ksks: add precis as argument: machine precision...
       dimension  etest6(*), etest8(*), ermx(*)
       dimension  ihcomp(*), irefin(*)
       dimension  def6(ncomp,*), def8(ncomp,*)
-      dimension  amg(*), c1(ncomp,*), wrkrhs(*)
+      dimension  amg(*), c1(ncomp,*), wrkrhs(*), delta0(ncomp,2)
       dimension  iseries(*)
 
       logical linear, giveu, givmsh, ddouble
@@ -1007,7 +1007,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
 
          call conv8( ncomp, nmsh, ntol, ltol, tol,
      *              nfxpnt, fixpnt, linear, nmax,
-     *              xx, nudim, u, def6, def8, uold,
+     *              xx, nudim, u,  def6, def8, uold,
      *              ihcomp, irefin, ermx, err6,
      *              etest8, strctr,
      *              ddouble , nmold, xxold, maxmsh, succes, first8,

@@ -662,7 +662,7 @@ c      if (stiff_cond .and. stab_cond) onto6 = .true.
              drat = dfexmx/
      *               (max(one, abs(u(incmp,inmsh)))*tol(intol))
 
-            numadd = int(drat**power)
+            numadd = nint(drat**power)
 
          if ((use_c) .AND. (stiff_cond)) then
 
@@ -3185,7 +3185,7 @@ c ==============================================================================
             ii = 1
             decii = erdcid
          else
-            ilg = int(-dlog(errmax)/rlndec)
+            ilg = -nint(dlog(errmax)/rlndec)
             ii = 2 + ilg
             decii = erdcid**ii
          endif
@@ -3627,7 +3627,7 @@ c ==============================================================================
 *  fall in the mesh.
 
             xright = fixpnt(j)
-            nmin = int(ninter*(xright-aleft)/totint + 1.5d+0)
+            nmin = NINT(ninter*(xright-aleft)/totint + 1.5d+0)
             if (nmin .gt. ndif+j) nmin = ndif + j
             iright = max(ileft+1, nmin)
          else
@@ -3809,7 +3809,7 @@ c     *   .and. (use_c))
 
 cf the mesh if not doubled if the problem is stiff and the order is 4
        if (nodouble .and. .not. forcedouble) then
-          call selcondmsh( nmsh,
+          call selcondmsh(nmsh,
      *     nfxpnt, fixpnt,  nmax, xx,  irefin,
      *     nmold, xxold, ddouble , maxmsh,r4,amg)
            ddouble = .false.
@@ -3945,7 +3945,7 @@ cf         errsum = errsum + errel
 
 c ===================================================================================
 
-      subroutine getptq( mfsrch,  alfmax, alfsml, alfuzz,
+      subroutine getptq(  mfsrch,  alfmax, alfsml, alfuzz,
      *                   epsaf, epsag,  ftry, oldf, oldg,
      *                   rmu, tolabs, tolrel, toltny, imprvd,
      *                   inform, nfsrch, alfa, alfbst, fbest,
@@ -3977,8 +3977,7 @@ c
 c
 c  input parameters (relevant to the calling program)
 c  --------------------------------------------------
-c
-c Francesca unuse eliminated
+cFrancesca eliminated
 c  debug         specifies whether detailed output is wanted.
 c
 c  inform        must be nonzero on the first entry (e.g., -1).
@@ -3987,8 +3986,7 @@ c
 c  mfsrch        is an upper limit on the number of times  getptq  is
 c                to be entered consecutively with  inform = 0
 c                (following an initial entry with  inform lt 0).
-c
-c Francesca unused eliminated
+cFrancesca eliminated
 c  nout          is the file number to be used for printed output
 c                if debug is true.
 c
@@ -4007,8 +4005,7 @@ c                alfmax .le. alfsml).
 c
 c  epsaf         is an estimate of the absolute precision in the
 c                computed values of  f.
-c
-cFrancesca unused eliminated
+cFrancesca eliminated
 c  eta           controls the accuracy of the search.  it must lie
 c                in the range   0.0  le  eta  lt  1.0.  decreasing
 c                eta  tends to increase the accuracy of the search.
@@ -4869,7 +4866,7 @@ cf   the conditioning and the error
             ii = 1
             decii = erdcid
          else
-            ilg = int(-dlog(errmax)/rlndec)
+            ilg = -nint(dlog(errmax)/rlndec)
             ii = 2 + ilg
             decii = erdcid**ii
          endif
@@ -5139,7 +5136,7 @@ c   endif use the conditioning and the error
 
 c ===================================================================================
 
-      subroutine selcondmsh(nmsh,
+      subroutine selcondmsh( nmsh,
      *     nfxpnt, fixpnt,  nmax, xx,  irefin,
      *     nmold, xxold, ddouble , maxmsh, r4, amg)
 

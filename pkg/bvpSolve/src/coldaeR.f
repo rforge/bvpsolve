@@ -829,7 +829,7 @@ C
       DO 258 I = 1, K2
         FSPACE( IC+I ) = COEF(I)
   258 CONTINUE
-  259 icount(1) = nfunc
+      icount(1) = nfunc
       icount(2) = njac
       icount(3) = nbound
       icount(4) = njacbound
@@ -1614,7 +1614,7 @@ C...       determine where the j-th fixed point should fall in the
 C...       new mesh - this is xi(iright) and the (j-1)st fixed
 C...       point is in xi(ileft)
 C
-       NMIN = (XRIGHT-ALEFT) / (ARIGHT-ALEFT) * FLOAT(N) + 1.5D0
+       NMIN = int((XRIGHT-ALEFT) / (ARIGHT-ALEFT) * FLOAT(N) + 1.5D0)
        IF (NMIN .GT. N-NFXPNT+J)  NMIN = N - NFXPNT + J
        IRIGHT = MAX0 (ILEFT+1, NMIN)
    60      XI(IRIGHT) = XRIGHT
@@ -1875,7 +1875,7 @@ C
 C
 C...  naccum=expected n to achieve .1x user requested tolerances
 C
-      NACCUM = ACCUM(NOLD+1) + 1.D0
+      NACCUM = int(ACCUM(NOLD+1) + 1.D0)
       IF ( IPRINT .LT. 0 ) THEN 
       CALL Rprintd1('Mesh degree of equidistribution =',DEGEQU)
       CALL Rprinti1('Prediction for required N = ', NACCUM)
@@ -1924,13 +1924,14 @@ C
       XI(N+1) = ARIGHT
       DO 310 I = 1, NFXP1
        IF ( I .EQ. NFXP1 )                      GO TO 250
+       LNEW=LOLD
        DO 230 J = LOLD, NOLDP1
          LNEW = J
          IF ( FIXPNT(I) .LE. XIOLD(J) )         GO TO 240
   230      CONTINUE
   240      CONTINUE
        ACCR = ACCUM(LNEW) + (FIXPNT(I)-XIOLD(LNEW))*SLOPE(LNEW-1)
-       NREGN = (ACCR-ACCL) / ACCUM(NOLDP1) * FLOAT(N) - .5D0
+       NREGN = int((ACCR-ACCL) / ACCUM(NOLDP1) * FLOAT(N) - .5D0)
        NREGN = MIN0(NREGN, N - IN - NFXP1 + I)
        XI(IN + NREGN + 1) = FIXPNT(I)
        GO TO 260
@@ -1943,6 +1944,7 @@ C
        DO 290 J = 1, NREGN
          IN = IN + 1
          TEMP = TEMP + TSUM
+         LCARRY=LOLD
          DO 270 L = LOLD, LNEW
            LCARRY = L
            IF ( TEMP .LE. ACCUM(L) )            GO TO 280
@@ -2445,7 +2447,7 @@ C.. Francesca Mazzia  y--> yval ?
 C.. Francesca Mazzia  y--> yval  ?
   106    CALL APPROX_DAE (I, XII, ZVAL, Y, AT, DUMMY, XI, N, Z, DMZ,
      1                  K, NCOMP, NY, MMAX, M, MSTAR, 1, DUMMY, 0)
-  108      IF ( MODE .EQ. 3 )                       GO TO 120
+         IF ( MODE .EQ. 3 )                       GO TO 120
 C
 C...       find  rhs  boundary value.
 C
@@ -2607,7 +2609,7 @@ C.. Francesca Mazzia  y--> yval  ?
 C.. Francesca Mazzia  y--> yval  ?
   246      CALL APPROX_DAE (N+1, ARIGHT, ZVAL, Y, AT, COEF, XI, N,
      1       Z, DMZ, K, NCOMP, NY, MMAX, M, MSTAR, 1, DUMMY, 0)
-  248      IF ( MODE .EQ. 3 )                       GO TO 260
+           IF ( MODE .EQ. 3 )                       GO TO 260
 C
 C...       find  rhs  boundary value.
 C
@@ -2860,8 +2862,8 @@ C
 C
 C...  calculate local basis
 C
-   30        FACT = 1.D0
-         DO 37 L=1,MMAX
+        FACT = 1.D0
+        DO 37 L=1,MMAX
         FACT = FACT * HRHO / FLOAT(L)
         BASM(L) = FACT
         DO 35 J=1,K
@@ -3513,7 +3515,7 @@ C
 C
 C...  evaluate  z( u(x) ).
 C
-  100 IR = 1
+      IR = 1
       NCY = NCOMP + NY
       IZ = (I-1) * MSTAR + 1
       IDMZ = (I-1) * K * NCY

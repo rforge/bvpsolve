@@ -727,7 +727,7 @@ C.... Print The Input Data For Checking.
 
 C ... Karline: removed a lot of unnecessary printing
 C...
-   80 Continue
+C   80 Continue
 
 C.... Check For Correctness Of Data
 
@@ -1002,6 +1002,17 @@ C.... Tolerance.
       Epold = Zero
       Hsmlpv = Zero
       Htpv = Zero
+      H1 = Zero
+      GG2 = Zero
+      Fmax = Zero
+      FF2 = Zero
+      F2 = Zero
+      F1 = Zero
+      C1H=Zero
+      Phit = Zero
+      G1 = Zero
+      Hmult1 = Zero
+      Hmult=Zero
 
 C.... We Predict That For Epsilon = 1 The Maximum Value Of The
 C.... Monitor Function Is Minimised By Phi(3). We Will Use This Value
@@ -2071,7 +2082,7 @@ C ... karline: toggled off
 
 C.... Check For Error Tolerance Satisfaction
 
- 420  Ifin = 1
+      Ifin = 1
       If (Imesh .eq. 2) Call MErrchk (Xi, Z, Dmz, Valstr, Ifin)
       If ( Imesh .eq. 1  .or. Ifin .eq. 0 )     Go To 460
 C
@@ -2303,6 +2314,8 @@ C
       Common /Flags/ Ifinal,Iatt,Iback,Iprec
       Common /Mshvar/ Pmax,Hord,Hsml
 C
+      Imreg = 1
+      Nmax2 = Nmax / 2
       Nfxp1 = Nfxpnt +1
       Iprec = Min(Iprec,1)
       IF (Mode .EQ. 1) THEN
@@ -2388,7 +2401,7 @@ C
 C
 C.... Check That N Does Not Exceed Storage Limitations
 C
- 112  If ( N2 .le. Nmax )                           Go To 120
+      If ( N2 .le. Nmax )                           Go To 120
 C
 C.... If Possible, Try With N = Nmax. Redistribute First.
 C
@@ -2504,6 +2517,7 @@ C
          Call MHorder ( I+1, D3, Hiold1, Dmz, Ncomp, K)
          Rat1 = Max(Hiold/Hioldm1,Hioldm1/Hiold)
          Rat2 = Max(Hiold/Hiold1,Hiold1/Hiold)
+         Oneovh1 = 0.0d0
          If (Rat1 .le. 2.d0 .and. Rat2 .le. 2.d0) Then
             Lsrs = -1
             Oneovh = 2.d0 / ( Hiold + Hioldm1 )
@@ -2575,6 +2589,7 @@ C
       Slphmx = 0.0d0
       Philrg = 0.d0
       Hordlrg = 0.d0
+      Imreg = 1
       Do 225 J = 1,Nold
          Temp = Slope(J)*(Xiold(J+1)-Xiold(J))
          Slphmx = Max(Slphmx,Temp)
@@ -2662,7 +2677,9 @@ C
       Xi(1) = Aleft
       Xi(N+1) = Aright
       Do 310 I = 1, Nfxp1
+
            If ( I .eq. Nfxp1 )                      Go To 250
+           Lnew = Lold
            Do 230 J = Lold, Noldp1
              Lnew = J
              If ( Fixpnt(I) .le. Xiold(J) )         Go To 240
@@ -2679,6 +2696,7 @@ C
   260      If ( Nregn .eq. 0 )                      Go To 300
            Temp = Accl
            Tsum = (Accr - Accl) / Dfloat(Nregn+1)
+           Lcarry = Lold
            Do 290 J = 1, Nregn
              In = In + 1
              Temp = Temp + Tsum
@@ -3288,7 +3306,7 @@ C
            Go To 110
   106      Call MApprox (I, Xii, Zval, At, Dummy, Xi, N, Z, Dmz,
      +                  K, Ncomp, Mmax, M, Mstar, 1, Dummy, 0)
-  108      If ( Mode .eq. 3 )                       Go To 120
+           If ( Mode .eq. 3 )                       Go To 120
 C
 C....     Find  Rhs  Boundary Value.
 C
@@ -3398,7 +3416,7 @@ C
            Go To 250
   246      Call MApprox (N+1, Aright, Zval, At, Coef, Xi, N,
      +          Z, Dmz, K, Ncomp, Mmax, M, Mstar, 1, Dummy, 0)
-  248      If ( Mode .eq. 3 )                       Go To 260
+           If ( Mode .eq. 3 )                       Go To 260
 C
 C....     Find  Rhs  Boundary Value.
 C
@@ -3970,7 +3988,7 @@ C
 C
 C.... Evaluate  Z( U(X) ).
 C
-  100 Ir = 1
+      Ir = 1
       Iz = (I-1) * Mstar + 1
       Idmz = (I-1) * K * Ncomp
       Do 140 Jcomp = 1, Ncomp
@@ -4502,7 +4520,7 @@ C
               X(I) = X(I) + W(I,K) * T
    10      Continue
    20 Continue
-   30 Return
+      Return
       End
       Subroutine MSubbak ( W, Nrow, Ncol, Last, X )
 C

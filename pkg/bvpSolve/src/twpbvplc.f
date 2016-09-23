@@ -356,15 +356,15 @@ C     SCMODIFIED add an extra condition to avoid accessing xx(0)
       call bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
      *   nfxpnt, fixpnt, ntol, ltol, tol, nmax, linear,
      *   giveu, givmsh, xx, nudim, u,
-     *   wrk(idef), wrk(idelu),
+     *   wrk(idefex), wrk(idefim), wrk(idef), wrk(idelu),
      *   wrk(irhs), wrk(ifval),
      *   wrk(itpblk), wrk(ibtblk), wrk(iajac), wrk(ibhold),
      *   wrk(ichold), wrk(idhold), iwrk(iipvbk), iwrk(iipvlu),
-     *   wrk(iuint), wrk(iftmp), wrk(itmrhs),
+     *   iwrk(iisign), wrk(iuint), wrk(iftmp), wrk(itmrhs),
      *   wrk(idftm1), wrk(idftm2), wrk(idgtm),
      *   wrk(iutri), wrk(irhtri), wrk(ixmer),
      *   wrk(ixxold), wrk(iuold), wrk(iusve),
-     *   wrk(itmp),  wrk(irtdc),
+     *   wrk(itmp), wrk(idsq), wrk(idexr), wrk(irtdc),
      *   wrk(irerr), wrk(ietst6), wrk(ietst8), wrk(iermx),
      *   iwrk(iihcom), iwrk(iiref), wrk(idef6), wrk(idef8),
      *   fsub,dfsub,gsub,dgsub,iflbvp,
@@ -390,12 +390,12 @@ c ==============================================================================
       subroutine bvpsol_l(ncomp, nmsh, nlbc, aleft, aright,
      *   nfxpnt, fixpnt,
      *   ntol, ltol, tol, nmax, linear, giveu, givmsh,
-     *   xx, nudim, u,  def, delu, rhs, fval,
+     *   xx, nudim, u, defexp, defimp, def, delu, rhs, fval,
      *   topblk, botblk, ajac, bhold, chold, dhold,
-     *   ipvblk, ipivlu,
+     *   ipvblk, ipivlu,isign,
      *   uint, ftmp, tmprhs, dftmp1, dftmp2, dgtm,
      *   utrial, rhstri, xmerit, xxold, uold, usave,
-     *   tmp,  ratdc, rerr,
+     *   tmp, dsq, dexr, ratdc, rerr,
      *   etest6, etest8, ermx, ihcomp, irefin,
      *   def6, def8, fsub, dfsub, gsub, dgsub, iflbvp,
      *   amg, c1, wrkrhs,ckappa1,gamma1,sigma,ckappa,ckappa2,r4,
@@ -407,12 +407,12 @@ c ==============================================================================
       dimension rpar(*), ipar(*), precis(3)
       dimension  fixpnt(*), ltol(ntol), tol(ntol)
       dimension  xx(*), u(nudim, *), xguess(*), yguess(nygdim,*)
-      dimension  def(ncomp,*)
+      dimension  defexp(ncomp,*), defimp(ncomp,*), def(ncomp,*)
       dimension  delu(ncomp, *), rhs(*), fval(ncomp,*)
       dimension  topblk(nlbc,*), botblk(ncomp-nlbc,*)
       dimension  ajac(ncomp, 2*ncomp, *)
       dimension  bhold(ncomp, ncomp, *), chold(ncomp, ncomp, *)
-      dimension  ipivlu(*), ipvblk(*)
+      dimension  ipivlu(*), ipvblk(*), isign(*)
       dimension  uint(ncomp), ftmp(ncomp)
       dimension  dgtm(ncomp), tmprhs(*)
       dimension  dftmp1(ncomp, ncomp), dftmp2(ncomp, ncomp)
@@ -420,6 +420,7 @@ c ==============================================================================
       dimension  xmerit(ncomp, *)
       dimension  xxold(*), uold(ncomp,*), usave(ncomp,*)
       dimension  tmp(ncomp,*)
+      dimension  dsq(ncomp,ncomp), dexr(ncomp)
       dimension  ratdc(*), rerr(ncomp,*)
       dimension  etest6(*), etest8(*), ermx(*)
       dimension  ihcomp(*), irefin(*)
@@ -528,7 +529,7 @@ c Karline: use precis instead of d1mach
       Chstif = .true.
       ddouble = .false.
 
-*Francesca now are always initialized
+
 *      if (comp_c) then
 *     initialize parameter for the conditioning estimation
       gamma1old  = flmax
@@ -823,7 +824,7 @@ c       ratdc=dfexmx/defimp , they only use the storage
 
 
 c      if (nodouble .and. .not. forcedouble) then
-c         call selcondmsh(ncomp, nmsh,
+c         call selcondmsh(nmsh,
 c    *     nfxpnt, fixpnt,  nmax, xx,  irefin,
 c    *     nmold, xxold, ddouble, maxmsh,r4,amg)
 c          ddouble = .false.
@@ -882,18 +883,16 @@ c   Now compute an explicit deferred correction for this.
 
         if (use_c) then
          if ((stiff_cond)) then
-CFrancesca drat is not used
 c             drat = bigdef/
 c     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
 
 c            numadd = drat**power
              numadd = 15
-            call smpselcondmsh(ncomp, nmsh,
+            call smpselcondmsh( nmsh,
      *        nfxpnt, fixpnt,  nmax, xx,  irefin,Ix,numadd,
      *        nmold, xxold, ddouble, maxmsh,r4,amg)
               itcond=itcond+1
          else
-CFrancesca drat is not used
 c             drat = bigdef/
 c     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
 
@@ -903,9 +902,8 @@ c            numadd = drat**power
      *             nmold, xxold, maxmsh)
          endif
        else
-CFrancesca drat is not used
-C             drat = bigdef/
-C     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
+c             drat = bigdef/
+c     *               (max(one, abs(u(icmph,Ix)))*tol(intol))
             numadd = 15
 c            numadd = drat**power
             call smpmsh (nmsh, nmax, xx, Ix, numadd,
@@ -1105,7 +1103,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
        endif
 
        if (nodouble .and. .not. forcedouble) then
-          call selcondmsh(ncomp, nmsh,
+          call selcondmsh( nmsh,
      *     nfxpnt, fixpnt,  nmax, xx,  irefin,
      *     nmold, xxold, ddouble, maxmsh,r4,amg)
            ddouble = .false.
