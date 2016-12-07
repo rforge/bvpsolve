@@ -38,15 +38,14 @@ C ------------------------------------------------------------------------------
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                         c
 c     In case the ISNAN function is not supported.        c
-c   karline: added underscore                             c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      logical function isnan_(A)
+      logical function isnan(A)
       implicit none
       double precision A, B
       logical X
       B = A
       X = ( A .EQ. B )
-      isnan_ = (.NOT.X)
+      isnan = (.NOT.X)
       return
       end
 
