@@ -1623,7 +1623,8 @@ c      db73 = 5.0d0/2.0d0
    5  CONTINUE
       IF (I.EQ.0) THEN
          CALL Rprinti1('No dense output available for comp. nr',II)
-         RETURN
+         CONTCK = 0.D0
+         GOTO 100
       END IF
 
       IF (hermite) THEN
@@ -1647,7 +1648,7 @@ c      db73 = 5.0d0/2.0d0
      &                     b6*CON(5*ND+I) + b7*CON(6*ND+I) )
 
       END IF
-      RETURN
+100   RETURN
       END
 
 C
