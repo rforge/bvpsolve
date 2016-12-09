@@ -242,7 +242,7 @@ C --- Enhancement-type
       END IF
       if(phi-vbs.lt.0d0.or.phi.lt.0d0)then
          ierr=-1
-         return
+!         return
          nandGDSP = 0.D0
          goto 100
       end if

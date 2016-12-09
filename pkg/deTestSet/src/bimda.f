@@ -39,13 +39,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c                                                         c
 c     In case the ISNAN function is not supported.        c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      logical function isnan(A)
+      logical function isnanum(A)
       implicit none
       double precision A, B
       logical X
       B = A
       X = ( A .EQ. B )
-      isnan = (.NOT.X)
+      isnanum = (.NOT.X)
       return
       end
 
@@ -2637,7 +2637,7 @@ C      goto (10,20,30,40,50) ord_ind
       end do
       return
 
-40    continue
+      continue
       do i=1,m
            Z(i)=h*(PSI10_1*f0(i) +PSI10_2*F(i,1)+
      &             PSI10_3*F(i,2)+PSI10_4*F(i,3)+
