@@ -613,8 +613,8 @@ C --- ERROR ESTIMATION
        HMAX=ABS(HMAX)
        IORD=5
 
-       IF (H.EQ.0.D0) H=HINITCKSTIFF(N,X,Y,XEND,POSNEG,K1,K2,Y1,IORD,
-     &                HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL,RPAR,IPAR)
+       IF (H.EQ.0.D0) H=HINITCKSTIFF(N,Y,POSNEG,K1,K2,IORD,
+     &                HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL)
 
 
       if (iprint .gt. 0 ) then
@@ -726,7 +726,7 @@ C removed ierr
        CALL FCN(N,X,Y,K1,RPAR,IPAR)
        HMAX=ABS(HMAX)
        IORD=5
-       IF (H.EQ.0.D0) H=HINITck(N,FCN,X,Y,XEND,POSNEG,K1,K2,K3,IORD,
+       IF (H.EQ.0.D0) H=HINITck(N,FCN,X,Y,POSNEG,K1,K2,K3,IORD,
      &                       HMAX,ATOL,RTOL,ITOL,RPAR,IPAR)
        NFCN=NFCN+2
       END IF
@@ -1415,7 +1415,7 @@ C --- FAIL EXIT
       RETURN
       END
 C
-      FUNCTION HINITck(N,FCN,X,Y,XEND,POSNEG,F0,F1,Y1,IORD,
+      FUNCTION HINITck(N,FCN,X,Y,POSNEG,F0,F1,Y1,IORD,
      &                 HMAX,ATOL,RTOL,ITOL,RPAR,IPAR)
 C ----------------------------------------------------------
 C ----  COMPUTATION OF AN INITIAL STEP SIZE GUESS
@@ -1451,7 +1451,7 @@ C ---- COMPARED TO THE SOLUTION
          H=SQRT(DNY/DNF)*0.01D0
       END IF
       H=MIN(H,HMAX)
-      IERR = 1.0d0
+      IERR = 1
       DO WHILE (IERR .NE.0)
         H=SIGN(H,POSNEG)
 C ---- PERFORM AN EXPLICIT EULER STEP
@@ -1491,15 +1491,15 @@ C ----  H**IORD * MAX ( NORM (F0), NORM (DER2)) = 0.01
       END
 
 
-      FUNCTION HINITCKSTIFF(N,X,Y,XEND,POSNEG,F0,F1,Y1,IORD,
-     &                 HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL,RPAR,IPAR)
+      FUNCTION HINITCKSTIFF(N,Y,POSNEG,F0,F1,IORD,
+     &                 HMAX,HST,ERR,EXPO1,ATOL,RTOL,ITOL)
 C ----------------------------------------------------------
 C ----  COMPUTATION OF AN INITIAL STEP SIZE  USING THE
 C ----  INFORMATION OBTAINED AFTER THE COMPUTATION OF ETA
 C ----------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      DIMENSION Y(N),Y1(N),F0(N),F1(N),ATOL(*),RTOL(*)
-      DIMENSION RPAR(*),IPAR(*)
+      DIMENSION Y(N),F0(N),F1(N),ATOL(*),RTOL(*)
+
 
 C ---- COMPUTE A FIRST GUESS
 C ----   H = 0.01 * NORM (Y0) / NORM (F0)
