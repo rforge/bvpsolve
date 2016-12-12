@@ -1991,12 +1991,14 @@ C     .. COMMON BLOCKS ..
       INTEGER NBSOL,NRE
 
 CKS: add this save statement?
-C      SAVE D1
+      SAVE D1
 C     ..
 C     .. DATA STATEMENTS ..
 
       DATA  ZERO/0.0D+0/
 C     ..
+
+
 
       DO 5 I=1,N
          AYI = DABS(Y(I,1))
@@ -2844,6 +2846,7 @@ C
       HOLD = H
 C FM: added FFAIL=0.0d0 to avoid uninitialised value(s)
       FFAIL = 0.5d0
+      FRFAIL = 0.5d0
       IF(NQ.GT.1) FFAIL = 0.5D+0/DBLE(FLOAT(NQ))
       IF(NQ.GT.2) FRFAIL = 0.5D+0/DBLE(FLOAT(NQ-1))
       EFAIL = 0.5D+0/DBLE(FLOAT(L))
@@ -3004,6 +3007,7 @@ C **********************************************************************
          PR3 = 1.D+20
          FAC = 1.5D+0
          IF(IEMB.EQ.1) FAC = 1.8D+0
+         VHOLD = 0.0d0
          DO 400 I = 1,N
             AYI = DABS(Y(I,1))
             IF(ITOL.EQ.1) THEN
@@ -4120,6 +4124,7 @@ C      DOUBLE PRECISION FUNCTION DLAMCH( CMACH ) - removed
       RECBAS = ONE / BETA
       Z = BETA - ONE
       Y = ZERO
+      OLDY = ZERO
       DO 20 I = 1, P
          Z = Z*RECBAS
          IF( Y.LT.ONE )
