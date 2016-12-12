@@ -476,6 +476,9 @@ C --- INITIAL PREPARATIONS
       IASTI=0
       IASTIS=0
       NONSTI=0
+      ENORMVE = 0.0d0
+      errz = 0.0d0
+      enormz1 = 0.0d0
       
 cF we use the shampine algorithm to compute the contnuous
 cF extension
@@ -484,6 +487,7 @@ cF computation of eta vector in the direction of
 cF dominant eigenvalue of the Jacobian for stiffness detection
       IERR = 0
 cF used in the error check
+
 
       IF (NSTIFFCOND .GT. 0) THEN
 
@@ -990,6 +994,8 @@ cf estimation of the error using ys
 
 C --- ERROR ESTIMATION
         ERRy=0.D0
+        ERRys=0.D0
+        erryys=0.0D+0
         errta=0.0D+0
         IF (ITOL.EQ.0) THEN
           DO 41 I=1,N
