@@ -814,8 +814,8 @@ CONTAINS
     !!   EXECUTABLE STATEMENTS
     !!---------------------------------
     !!
+    FAC = 1.0d0
     SELECT CASE(ORD)
-
     CASE(1)
        FAC = -L31*H
     CASE(2)
