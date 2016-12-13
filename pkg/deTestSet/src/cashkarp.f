@@ -930,7 +930,7 @@ C KARLINE: always print ...
 C                  IF (IPRINT.GT.0 .OR. NSTIFF .EQ. 1) THEN
         CALL Rprintd1(
      &               'The problem seems to become stiff at x = ',X)
-        CALL Rprint('using the standard check of eignevalues')
+        CALL Rprint('using the standard check of eigenvalues')
                     IF (NSTIFF .EQ. 2) GOTO 76
 C                  END IF
                END IF
