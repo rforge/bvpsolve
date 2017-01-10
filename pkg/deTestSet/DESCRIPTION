@@ -1,6 +1,6 @@
 Package: deTestSet
 Version: 1.1.5
-Title: Testset for Differential Equations
+Title: Test Set for Differential Equations
 Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
                      email = "karline.soetaert@nioz.nl"),
              person("Jeff","Cash", role = "aut", 
@@ -15,7 +15,7 @@ Author: Karline Soetaert [aut, cre],
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), deSolve 
 Imports: graphics, grDevices, stats
-Description: Solvers and testset for stiff and nonstiff differential equations, and 
+Description: Solvers and test set for stiff and non-stiff differential equations, and 
   differential algebraic equations.
 License: GPL 
 Copyright: inst/COPYRIGHTS
