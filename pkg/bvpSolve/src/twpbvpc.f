@@ -441,7 +441,10 @@ c ksks: add precis as argument: machine precision...
       dimension  iseries(*)
 
       logical linear, giveu, givmsh, ddouble
-
+      
+      double precision dummy  ! ks: to avoid a warning...
+      integer idummy
+      
       external fsub
       external dfsub
       external gsub
@@ -479,6 +482,10 @@ c karline: added ill_cond_newt
       data maxmsh/.false./
 
       frscal = .true.
+      
+      dummy = delta0(1,1)   ! karline: to avoid a warning of delta0 not being used...
+      idummy = isign(1)
+      
       if (mchset) then
 c Karline: use precis instead of d1mach
 

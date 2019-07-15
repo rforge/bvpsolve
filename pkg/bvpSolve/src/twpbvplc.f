@@ -404,7 +404,7 @@ c ==============================================================================
 
       implicit double precision (a-h,o-z)
 
-      dimension rpar(*), ipar(*), precis(3)
+      dimension  rpar(*), ipar(*), precis(3)
       dimension  fixpnt(*), ltol(ntol), tol(ntol)
       dimension  xx(*), u(nudim, *), xguess(*), yguess(nygdim,*)
       dimension  defexp(ncomp,*), defimp(ncomp,*), def(ncomp,*)
@@ -455,7 +455,10 @@ c ==============================================================================
       save mchset
       logical frscal
 c      save frscal
-
+      
+      ! karline: to avoid warnings during compilation - unused dummy
+      double precision dummy
+      integer idummy
 
       logical stab_kappa, stab_gamma, stab_cond, stiff_cond, ill_cond
       logical stab_kappa1, ill_cond_newt, stab_sigma
@@ -475,7 +478,16 @@ c      save frscal
       data maxmsh/.false./
       data itcond/0/
       data frscal/.true./
+
 c      frscal = .true.
+
+c karline: to avoid warnings of unused dummies
+      dummy = defexp(1,1)
+      dummy = defimp(1,1)
+      dummy = dexr(1)
+      dummy = dsq(1,1)
+      idummy = isign(1)
+      
       if (mchset) then
 c Karline: use precis instead of d1mach
 
@@ -1324,7 +1336,7 @@ C Karline: moved this statement upward
       Common /Cons1/ A21,A22,A23,A24,A31,A32,A33,A34,C1,C2,
      +       C16,C26,C123,C223,C14,C24
       Common /Algprs/nminit,Iprint,idum,use_c,comp_c
-      Common /Flags/ Ifinal,Iback,Iprec
+      Common /Flags/ Ifinal,Iatt,Iback,Iprec   ! karline: not really needed
       integer nfunc, njac, nstep, nbound, njacbound
       common/diagnost/nfunc, njac, nstep, nbound, njacbound
 

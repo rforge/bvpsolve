@@ -54,7 +54,7 @@ void F77_NAME(coldae)(int*, int*, int *, double *, double *, double *,
          double *, int *, int*) ;
 
 void F77_NAME(appsln)(double *, double *, double *, int *);
-void F77_NAME(sysappsln)(double *, double *, double *, int *);
+void F77_NAME(sysappsln)(double *, double *, double *, int *);   /*also defined in init..?*/  
 void F77_NAME(appsln_dae)(double *, double *, double *, double *, int *);
 
 typedef void C_deriv_func_DAE_type    (int *, double *, double *, double *, double *, double *, int *);

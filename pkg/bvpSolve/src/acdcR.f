@@ -108,7 +108,7 @@ c Francesca: added use_c and comp_c
       Common /acMshvar/ Hsml,Npr,Pmax,Hord
 c Francesca: added counters
       integer nfunc, njac, nstep, nbound, njacbound
-      common /Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common /Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
 
       Parameter ( Zero = 0.0d+0, One = 1.0d+0, Two = 2.0d+0 )
       Parameter ( Three = 3.0d+0, Third = 1.0d+0/3.0d+0, Huge = 1.d+30 )
@@ -1154,7 +1154,7 @@ C.... This Subroutine Is Used For Saving And Re-Inserting Solutions.
       External acdfsub
       External acgsub
       External acdgsub
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       Common/Mchprs/ flmin, Flmax, Epsmch
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
       Common /acConvg/ Nits
@@ -1790,7 +1790,7 @@ c              Call Initu(Ncomp, Nmsh, Nudim, U)
       common/algprs/ nminit, iprint, idum, use_c, comp_c
       Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
 c       St1 --> Tmp(ncomp,10)
 c       St2 --> Tmp(ncomp,11)
 c       St3 --> Tmp(ncomp,12)
@@ -1964,7 +1964,7 @@ c      end do
       common/algprs/ nminit, iprint, idum, use_c, comp_c
       Common/acAlgprs/Maxcon,Itsaim,Uval0
       Common /acFlags/ Ifinal,Iatt,Iback,Iprec,Iucond
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       Logical Linear
 
 c      St1 --> Tmp(ncomp,13)
@@ -2979,7 +2979,7 @@ c  at the initial point of the line search.
       Implicit Double Precision (A-H,O-Z)
       Dimension rpar(*),ipar(*)
       Dimension Xx(Nmsh), U(Nudim,Nmsh), Fval(Ncomp,Nmsh)
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       External acfsub
 
 *  Fneval Evaluates The Function Values (From acfsub) For
@@ -3012,7 +3012,7 @@ c  at the initial point of the line search.
       dimension topblk(nlbc, ncomp), botblk(ncomp-nlbc,ncomp)
       dimension bhold(ncomp, ncomp, nmsh-1),
      *             chold(ncomp, ncomp, nmsh-1)
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       external  acdfsub
       external  acdgsub
 
@@ -3110,7 +3110,7 @@ c  at the initial point of the line search.
 
       parameter ( zero = 0.0d+0, half = 0.5d+0, eighth = 0.125d+0 )
       parameter ( one = 1.0d+0, four = 4.0d+0, six = 6.0d+0 )
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       common/mchprs/ flmin, flmax, epsmch
       intrinsic abs
 
@@ -3177,7 +3177,7 @@ c  at the initial point of the line search.
       dimension  xx(nmsh), u(nudim,nmsh), defcor(ncomp,nmsh-1)
       dimension  rhs(ncomp*nmsh), fval(ncomp,nmsh)
       dimension  ftmp(ncomp), uint(ncomp)
-      common/Mcoldiag/nfunc, njac, nstep, nbound, njacbound, maxmesh
+      common/Mcoldiagac/nfunc, njac, nstep, nbound, njacbound, maxmesh
       external   acfsub
       external   acgsub
 
