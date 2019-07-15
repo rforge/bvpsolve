@@ -35,9 +35,7 @@ C printing with one integer and a double
       character (len=*) msg
       double precision d1
       integer i1
-      double precision DBL(1)
-        DBL(1)=d1
-        call dblepr(msg, -1, DBL, 1)
+        call dblepr(msg, -1, d1, 1)
         call intpr(' ', -1, i1, 1)
       end subroutine 
 
