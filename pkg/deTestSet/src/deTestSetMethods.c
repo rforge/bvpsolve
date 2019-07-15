@@ -52,4 +52,4 @@ void R_init_deTestSet(DllInfo *dll) {
 
   R_useDynamicSymbols(dll, TRUE); // enable dynamic searching
 
-};
+}
