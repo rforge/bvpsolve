@@ -9,7 +9,7 @@ c ==============================================================================
       integer nc
        nc = nchar
        if(nc .lt. 0) nc = len(label)
-       call dblep0k(label, nc, data, ndata)
+       call dblep0k(label//char(0), nc, data, ndata)
       end subroutine
 
 
@@ -20,13 +20,13 @@ c ==============================================================================
       integer nc
        nc = nchar
        if(nc .lt. 0) nc = len(label)
-       call intp0k(label, nc, data, ndata)
+       call intp0k(label//char(0), nc, data, ndata)
       end subroutine
 
 C just a string
       subroutine rprint(msg)
       character (len=*) msg
-           call dblepr(msg, -1, 0, 0)
+           call dblepr(msg//char(0), -1, 0.D0, 0)
       end subroutine 
 
 
@@ -35,7 +35,7 @@ C printing with one integer and a double
       character (len=*) msg
       double precision d1
       integer i1
-        call dblepr(msg, -1, d1, 1)
+        call dblepr(msg//char(0), -1, d1, 1)
         call intpr(' ', -1, i1, 1)
       end subroutine 
 
@@ -48,7 +48,7 @@ C printing with one integer and a double
         DBL(3) = d3
         DBL(4) = d4
 
-        call dblepr(msg, -1, dbl, 4)
+        call dblepr(msg//char(0), -1, dbl, 4)
       end subroutine 
 
       subroutine rprintd3(msg, d1, d2, d3)
@@ -58,7 +58,7 @@ C printing with one integer and a double
         DBL(2) = d2
         DBL(3) = d3
 
-        call dblepr(msg, -1, dbl, 3)
+        call dblepr(msg//char(0), -1, dbl, 3)
       end subroutine 
 
 C printing with one double
@@ -66,7 +66,7 @@ C printing with one double
       character (len=*) msg
       double precision d1, DBL(1)
         DBL(1) = d1
-        call dblepr_k(msg, -1, DBL, 1)
+        call dblepr_k(msg//char(0), -1, DBL, 1)
       end subroutine 
 
 C printing with two doubles
@@ -75,7 +75,7 @@ C printing with two doubles
       double precision DBL(2), d1, d2
         DBL(1) = d1
         DBL(2) = d2
-        call dblepr_k(msg, -1, DBL, 2)
+        call dblepr_k(msg//char(0), -1, DBL, 2)
       end subroutine 
 
 C printing with one integer
@@ -83,7 +83,7 @@ C printing with one integer
       character (len=*) msg
       integer IN(1), i1
         IN(1) = i1
-        call intpr_k(msg, -1, IN, 1)
+        call intpr_k(msg//char(0), -1, IN, 1)
       end subroutine 
 
       subroutine rprinti2(msg, i1, i2)
@@ -91,7 +91,7 @@ C printing with one integer
       INTEGER IN(2), i1, i2
         IN(1) = i1
         IN(2) = i2
-        call intpr_k(msg, -1, IN, 2)
+        call intpr_k(msg//char(0), -1, IN, 2)
       end subroutine 
 
       subroutine rprinti3(msg, i1, i2, i3)
@@ -100,5 +100,5 @@ C printing with one integer
         IN(1) = i1
         IN(2) = i2
         IN(3) = i3
-        call intpr_k(msg, -1, IN, 3)
+        call intpr_k(msg//char(0), -1, IN, 3)
       end subroutine

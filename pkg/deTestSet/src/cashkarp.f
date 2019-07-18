@@ -1025,7 +1025,7 @@ C --- ERROR ESTIMATION
             END IF
           END IF
           IF (Nerrta .EQ. 15) THEN
-        CALL Rprinti1(
+        CALL Rprintd1(
      &               'The problem seems to become stiff at x = ',X)
         CALL Rprint('using stiffness detection based on error estimate')
 C            END IF
