@@ -96,10 +96,10 @@ example(bvpshoot)
 example(bvpcol)
 
 ## open the directory with R- examples
-browseURL(paste(system.file(package = "bvpSolve"), "doc/examples", sep = ""))
+browseURL(paste(system.file(package = "bvpSolve"), "/doc/examples", sep = ""))
 
 ## open the directory with examples in compiled code
-browseURL(paste(system.file(package = "bvpSolve"), "doc/dynload", sep = ""))
+browseURL(paste(system.file(package = "bvpSolve"), "/doc/dynload", sep = ""))
 
 ## show package vignette with how to use bvpSolve
 ## + source code of the vignette
