@@ -372,10 +372,11 @@ SEXP call_mebdfi(SEXP y, SEXP yprime, SEXP times, SEXP resfunc, SEXP parms,
 
 	/* redimension yout */
    	PROTECT(yout2 = allocMatrix(REALSXP,ntot+1,(i+2)));incr_N_Protect();
-  	for (k = 0; k < i+2; k++)
+  	for (k = 0; k < i+2; k++){
 	   for (j = 0; j < ntot+1; j++)
 	    REAL(yout2)[k*(ntot+1) + j] = REAL(yout)[k*(ntot+1) + j];
-	   break;
+      }
+	  break;
     }
   }    /* end main time loop */
 

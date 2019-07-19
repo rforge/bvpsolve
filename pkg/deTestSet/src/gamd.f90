@@ -5185,7 +5185,7 @@ SUBROUTINE   GAMD(R,FCN,T0,Y0,TEND,H,            &
       NFCN = NFCN + 1
       IF (IERR.NE.0) THEN
          IDID=-5
-      CALL Rprint('GAM: ERROR: cannot handle IERR = -1 in (T0,Y0)')
+      CALL Rprint('GAM:ERROR: cannot handle IERR= -1 in (T0,Y0)')
           RETURN
       ENDIF
 

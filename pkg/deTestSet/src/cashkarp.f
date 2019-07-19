@@ -1245,7 +1245,7 @@ C     &          .AND. (NWARN1 .EQ. 0) ) THEN
                IF (NWARN1 .EQ. 0) THEN
         CALL Rprintd1(
      &               'The problem seems to become stiff at x = ',X)
-        CALL Rprinti1('Sigma = ', SIGMATOT)
+        CALL Rprintd1('Sigma = ', SIGMATOT)
                  nwarn1 = 1
               END IF
                IDID=-6
