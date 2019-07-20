@@ -22,24 +22,24 @@
 /* .C calls */
 /* extern void unlock_solver();*/
 
-extern void fsub(int *n, double *x, double *z, double *f,
+extern void fsub_el(int *n, double *x, double *z, double *f,
                  double * RPAR, int * IPAR);
                  
-extern void dfsub(int * n, double *x, double *z, double * df,
+extern void dfsub_el(int * n, double *x, double *z, double * df,
       double *RPAR, int *IPAR);  
                  
-extern void gsub(int *i, int *n, double *z, double *g,
+extern void gsub_el(int *i, int *n, double *z, double *g,
       double *RPAR, int *IPAR);  
       
-extern void dgsub(int *i, int *n, double *z, double *dg,
+extern void dgsub_el(int *i, int *n, double *z, double *dg,
       double *RPAR, int *IPAR);  
 
 static const R_CMethodDef CEntries[] = {
 /*    {"unlock_solver", (DL_FUNC) &unlock_solver, 0},*/
-    {"fsub",          (DL_FUNC) &fsub,          6},
-    {"dfsub",         (DL_FUNC) &dfsub,         6},
-    {"gsub",          (DL_FUNC) &gsub,          6},
-    {"dgsub",         (DL_FUNC) &dgsub,         6},
+    {"fsub_el",          (DL_FUNC) &fsub_el,          6},
+    {"dfsub_el",         (DL_FUNC) &dfsub_el,         6},
+    {"gsub_el",          (DL_FUNC) &gsub_el,          6},
+    {"dgsub_el",         (DL_FUNC) &dgsub_el,         6},
     {NULL, NULL, 0}
 };
 
