@@ -47,10 +47,10 @@ c ==============================================================================
          logi ='  FALSE'
       endif
 
-      call rprint(MSG//logi)
-
+      call rprint(MSG//logi//char(0))
 
       end subroutine
+
 c ===================================================================================
 c print R-messages
 c ===================================================================================
@@ -64,13 +64,40 @@ C just a string
 
 
 C printing with one logical
-      subroutine rprintl1(msg, d1)
+      subroutine rprintl1(msg, l1)
       character (len=*) msg
-      logical d1
+      logical l1
+      character (len=8) logi
 
-      call logpr(msg, -1, d1)
+       if (l1) then
+         logi ='  TRUE '
+       else
+         logi ='  FALSE'
+       endif
+       call rprint(MSG//logi//char(0))
 
       end subroutine
+
+C  two logicals
+      subroutine rprintl2(msg, l1, l2)
+      character (len=*) msg
+      character (len=8) logi, logi2
+      logical l1, l2
+
+       if (l1) then
+         logi ='  TRUE '
+       else
+         logi ='  FALSE'
+       endif
+      
+       if (l2) then
+         logi2 ='  TRUE '
+       else
+         logi2 ='  FALSE'
+       endif
+       call rprint(msg//logi//logi2//char(0))
+
+      end subroutine 
 
 C printing with one integer and a double
       subroutine rprintid(msg, i1, d1)

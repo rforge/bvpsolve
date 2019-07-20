@@ -81,9 +81,9 @@ c
 c karline: added 'Full' to set output level
 c          added 'useC' for specification of conditioning
       Subroutine acdc(Ncomp, Nlbc, Nucol, Aleft, Aright, Nfxpnt, Fixpnt,
-     +            Ntol, Ltol, Tol, Linear, Givmsh, Giveu,
-     +            Full,nmshguess, xguess, nugdim, uguess,Nmsh, Xx,
-     +            Nudim, U, Nmax, Lwrkfl, Wrk, Lwrkin, Iwrk, Giveps,
+     +            Ntol, Ltol, Tol, LinearInt, GivmshInt, GiveuInt,
+     +            FullInt,nmshguess, xguess, nugdim, uguess,Nmsh, Xx,
+     +            Nudim, U, Nmax, Lwrkfl, Wrk, Lwrkin, Iwrk, GivepsInt,
      +            Eps, Epsmin, acfsub, acdfsub, acgsub, acdgsub,
      +            ckappa1,gamma1,sigma,ckappa,ckappa2,rpar,ipar,icount,
      +            precis, useC, Iflbvp)
@@ -94,6 +94,8 @@ c          added 'useC' for specification of conditioning
       Dimension Xx(*), U(Nudim,*), Xguess(*), Uguess(Nugdim,*)
       Dimension Wrk(Lwrkfl), Iwrk(Lwrkin), precis(3)
       Dimension Phi(3), E(3), Npr(2), Pmax(2), Hord(2)
+      integer linearInt, givmshInt, giveuInt, fullInt, useCInt
+      integer givepsInt
       Logical Linear, Givmsh, Giveu, Giveps, eps_changed, Full, useC
       External acfsub
       External acdfsub
@@ -386,6 +388,19 @@ C.... The Precision Of The Machine.
 C.... Epsp Is The Value Of Eps Beyond Which The Machine Precision Is
 C.... (Possibly) Not Sufficient To Solve The Given Problem.
 
+
+      linear = .FALSE.
+      if (linearInt > 0) linear = .TRUE.
+      givmsh = .FALSE.
+      if (givmshInt > 0) givmsh = .TRUE.
+      giveu = .FALSE.
+      if (giveuInt > 0) giveu = .TRUE.
+      full = .FALSE.
+      if (fullInt > 0) full = .TRUE.
+      useC = .FALSE.
+      if (useCInt > 0) useC = .TRUE.
+      giveps = .FALSE.
+      if (givepsInt > 0) giveps = .TRUE.
       Ifinal = 0
       Iback = 0
       Iprec = 0

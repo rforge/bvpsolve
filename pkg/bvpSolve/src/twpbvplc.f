@@ -5,13 +5,13 @@ c ==============================================================================
 
        subroutine twpbvplc(ncomp, nlbc, aleft, aright,
      *       nfxpnt, fixpnt, ntol, ltol, tol,
-     *       linear, givmsh, giveu, nmsh,
+     *       linearInt, givmshInt, giveuInt, nmsh,
      *       nxxdim, xx, nudim, u, nmax,
      *       lwrkfl, wrk, lwrkin, iwrk, precis,
      *       fsub, dfsub, gsub, dgsub,
      *       ckappa1,gamma1,sigma,ckappa,
      *       ckappa2,rpar,ipar,iflbvp,liseries,iseries,indnms,
-     *       full, useC,  nmguess, xguess, nygdim,yguess, iset)
+     *       fullInt, useCInt,  nmguess, xguess, nygdim,yguess, iset)
 
 *     OUTPUT
 *
@@ -97,6 +97,7 @@ c ==============================================================================
       dimension xx(*), u(nudim,*), xguess(*), yguess(nygdim,*)
       dimension wrk(lwrkfl), iwrk(lwrkin)
       dimension iseries(*)
+      integer linearInt, givmshInt, giveuInt, fullInt, useCInt
       logical linear, givmsh, giveu, full, useC
       external fsub
       external dfsub
@@ -115,6 +116,16 @@ C Karline: added
       intrinsic  min
       parameter ( zero = 0.0d+0 )
 
+      linear = .FALSE.
+      if (linearInt > 0) linear = .TRUE.
+      givmsh = .FALSE.
+      if (givmshInt > 0) givmsh = .TRUE.
+      giveu = .FALSE.
+      if (giveuInt > 0) giveu = .TRUE.
+      full = .FALSE.
+      if (fullInt > 0) full = .TRUE.
+      useC = .FALSE.
+      if (useCInt > 0) useC = .TRUE.
 
       use_c = useC
 
@@ -1106,7 +1117,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
       forcedouble = .false.
 
        if (iprint .eq. 1) then
-         CALL Rprinti2('Forcedouble, itcond', nodouble, itcond)
+         CALL Rprintl2('Forcedouble, itcond', nodouble, itcond)
        end if
 
        if (use_c .and.  itcond .eq. itcondmax) then

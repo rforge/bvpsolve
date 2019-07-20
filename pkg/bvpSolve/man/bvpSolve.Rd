@@ -35,10 +35,10 @@
     \item All test problems from the website of J.R. Cash
       (http://www.ma.ic.ac.uk/~jcash/BVP_software/PROBLEMS.PDF) are
       implemented in package vignette "bvpTests"
-    \item Other test problems, in \R code are in the packages \url{doc/example}
+    \item Other test problems, in \R code are in the packages \code{doc/example}
       subdirectory.
     \item Test problems implemented in compiled code can be found in the
-      packages \url{doc/dynload} subdirectory.
+      packages \code{doc/dynload} subdirectory.
     \item Still more examples, both in R and compiled code are in the package
       vignette "bvpSolve".
   }
