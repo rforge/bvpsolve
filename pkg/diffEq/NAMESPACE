@@ -4,7 +4,10 @@ import (bvpSolve)
 import (ReacTran) 
 import (deTestSet)
 
-importFrom(shape, writelabel)
+importFrom("graphics", "abline", "axis", "lines", "par", "plot",
+     "points", "polygon", "segments", "text")
+importFrom("stats", "runif")
+importFrom(shape, "writelabel")
 
 export(stability.multistep, stability.bruteforce, rkMethodPlot)
                                                                            
