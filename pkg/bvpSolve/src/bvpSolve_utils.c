@@ -5,23 +5,16 @@
 #include "bvpSolve.h"
 #include "externalptr.h"
 
-/* some functions for keeping track of how many SEXPs 
- * 	are PROTECTed, and UNPROTECTing them in the case of a fortran stop.
- */
- 
+/* functions for keeping track of how many SEXPs not used anymore.
 long int N_Protected;
-
 void init_N_Protect(void) { N_Protected = 0; }
-
 void incr_N_Protect(void) { N_Protected++; }
-
 void unprotect_all(void) { UNPROTECT((int) N_Protected); }
-
 void my_unprotect(int n)
 {
     UNPROTECT(n);
     N_Protected -= n;
-}
+}  */
 /* */
 int Leftbc;
 double A;
@@ -45,21 +38,10 @@ SEXP R_envir;
 SEXP bvp_gparms;
 
 /*==================================================
-Parameter initialisation functions
+Parameter initialisation functions - removed
 note: forcing initialisation ftion is in forcings.c
 ===================================================*/
 
-void initParms(SEXP Initfunc, SEXP Parms) {
-  // ks: added this to prevent entering this if initfunc does not exist
-  if (Initfunc == NA_STRING) return;
-  if (inherits(Initfunc, "NativeSymbol"))  {
-    init_func *initializer;
-
-    PROTECT(bvp_gparms = Parms);     incr_N_Protect();
-    initializer = (init_func *) R_ExternalPtrAddrFn_(Initfunc);
-    initializer(Initbvpparms);
-  }
-}
 
 void Initbvpparms(int *N, double *parms) {
   int i, Nparms;

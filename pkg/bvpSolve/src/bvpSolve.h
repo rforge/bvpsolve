@@ -100,15 +100,16 @@ extern SEXP R_cont_guess_func;
 extern SEXP R_envir;
 
 
-/* utilities */
+/* utilities -not used anymore
 void init_N_Protect(void);
 void incr_N_Protect(void);
 void unprotect_all(void);
 void my_unprotect(int);
+void initParms(SEXP Initfunc, SEXP Parms);
+*/
 
 /* declarations for initibvpparms;*/
 void Initbvpparms(int *, double *);
-void initParms(SEXP Initfunc, SEXP Parms);
 typedef void init_func (void (*)(int *, double *));
 
 /* forcings */
