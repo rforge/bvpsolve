@@ -1,5 +1,5 @@
 Package: deTestSet
-Version: 1.1.6
+Version: 1.1.7
 Title: Test Set for Differential Equations
 Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
                      email = "karline.soetaert@nioz.nl"),
@@ -7,11 +7,19 @@ Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"),
                      email = "j.cash@imperial.ac.uk"),
              person("Francesca","Mazzia", role = "aut", 
                      email = "mazzia@dm.uniba.it"),
-             person("LAPACK authors", role = "cph"))
-Author: Karline Soetaert [aut, cre],  
-        Jeff Cash [aut],  
-        Francesca Mazzia [aut], 
-        LAPACK authors [cph]
+             person("Ernst","Hairer", role = "ctb", 
+                     comment = "files dopri8.f, dopri6.f"),
+             person("Gerard","Wanner", role = "ctb", 
+                     comment = "files dopri8.f, dopri6.f"),
+             person("T.","Abdulla", role = "ctb", 
+                     comment = "file mebdfi.f"),
+             person("Cecilia","Magherini", role = "ctb", 
+                     comment = "files bimd.f, bimda.f"),
+             person("Luigi","Brugnano", role = "ctb", 
+                     comment = "files bimd.f, bimda.f"),
+			 person("Cleve","Moler", role = "ctb", 
+                     comment = "file bimda.f")
+			)
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), deSolve 
 Imports: graphics, grDevices, stats
