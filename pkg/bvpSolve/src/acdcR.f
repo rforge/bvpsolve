@@ -2457,6 +2457,9 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
 
 *  blas: dcopy, dload
 
+* KARLINE: WROTE DCOPY FOR 2D IN FULL - 12-11-2019
+      INTEGER :: IDC
+
       parameter  ( one = 1.0d+0, zero = 0.0d+0 )
 
 *  The routine lineq calculates the Newton step for a linear
@@ -2511,7 +2514,13 @@ c         er = abs(rhs( itol+(im-1)*ncomp))/max(abs(u(itol,im)), one)
          call dload(nlbc, zero, tmprhs(1), 1)
          do 100 im = 1, ninter
             loc = (im-1)*ncomp + nlbc + 1
-            call dcopy(ncomp, defcor(1,im), 1, tmprhs(loc), 1)
+*KS        call dcopy(ncomp, defcor(1,im), 1, tmprhs(loc), 1)  KARLINE
+      
+      DO IDC = 1, Ncomp
+        tmprhs (loc-1+IDC) = defcor(IDC, im) 
+      ENDDO
+
+            
  100            continue
          nrhs = ninter*ncomp + nlbc + 1
          call dload(ncomp-nlbc, zero, tmprhs(nrhs), 1)
@@ -3031,7 +3040,8 @@ c  at the initial point of the line search.
       external  acdfsub
       external  acdgsub
 
-
+* KARLINE: WROTE DCOPY IN FULL FOR 2D MATRICES
+      INTEGER :: IDC
 
 
 *  blas: dcopy, ddot
@@ -3046,7 +3056,12 @@ c  at the initial point of the line search.
       do 110 i = 1, nlbc
          call acdgsub (i, ncomp, u(1,1), dgtm,eps,rpar,ipar)
          njacbound=njacbound+1
-         call dcopy(ncomp, dgtm(1), 1, topblk(i,1), nlbc)
+*KS         call dcopy(ncomp, dgtm(1), 1, topblk(i,1), nlbc)  KARLINE - NOTE nlbc INCREMENT!
+      DO IDC = 1, Ncomp
+        topblk (i, IDC) = dgtm(IDC) 
+      ENDDO
+         
+         
  110      continue
 
       call acdfsub (ncomp, xx(1), u(1,1), dftm1(1,1),eps,rpar,ipar)
@@ -3086,10 +3101,20 @@ c  at the initial point of the line search.
                ajac(ic,jc+ncomp,im) = -hmsh*(dftm1(ic,jc)/six
      *               + dftm2(ic,jc)/three - hmsh*dsq/twelve)
  160                  continue
-            call dcopy(ncomp, ajac(ic,ncomp+1,im), ncomp,
-     *                   chold(ic,1,im), ncomp)
-            call dcopy(ncomp, dftm1(ic,1), ncomp,
-     *                   bhold(ic,1,im), ncomp)
+*KS            call dcopy(ncomp, ajac(ic,ncomp+1,im), ncomp, NOTE OFFSETS!!!
+*KS     *                   chold(ic,1,im), ncomp)
+     
+        DO IDC = 1, Ncomp
+          chold (ic, IDC, im) = ajac(ic,ncomp+IDC,im)
+        ENDDO
+     
+*KS            call dcopy(ncomp, dftm1(ic,1), ncomp,  KARLINE - NOTE OFFSET
+*KS     *                   bhold(ic,1,im), ncomp)
+        DO IDC = 1, Ncomp
+          bhold (ic, IDC, im) = dftm1(ic,IDC)
+        ENDDO
+     
+     
             ajac(ic,ic+ncomp,im) = ajac(ic,ic+ncomp,im) + one
             chold(ic,ic,im) = ajac(ic,ic+ncomp,im)
  170            continue
@@ -3099,7 +3124,11 @@ c  at the initial point of the line search.
       do 220 i = nlbc+1, ncomp
          call acdgsub (i, ncomp, u(1, nmsh), dgtm,eps,rpar,ipar)
          njacbound=njacbound+1
-         call dcopy(ncomp, dgtm(1), 1, botblk(i-nlbc,1), ncomp-nlbc)
+*KS         call dcopy(ncomp, dgtm(1), 1, botblk(i-nlbc,1), ncomp-nlbc) KARLINE-NOTE OFFSET
+        DO IDC = 1, Ncomp
+          botblk (i-nlbc, IDC) = dgtm(IDC)
+        ENDDO
+         
  220      continue
 
       return
@@ -4440,6 +4469,8 @@ c  end of getptq
       Implicit Double Precision (A-H, O-Z)
       Dimension Xx(*), U(Nudim,*), Xxold(*), Uold(Nuold_dim,*)
 
+*  KARLINE: WROTE Dcopy IN FULL for 2D arrays - 12-11-2019!
+      INTEGER:: IDC
 * Blas: Dcopy
 
       Parameter (Zero = 0.0d+0)
@@ -4456,7 +4487,10 @@ c  end of getptq
 *  Components Of Uold Into Those Of U.
 
 
-      Call Dcopy(Ncomp, Uold(1,1), 1, U(1,1), 1)
+*KS      Call Dcopy(Ncomp, Uold(1,1), 1, U(1,1), 1)  ! KARLINE - 
+      DO IDC = 1, Ncomp
+        U (IDC, 1) = Uold(IDC, 1) 
+      ENDDO
 
       I = 2
       Do 100 Im = 2, Nmsh-1
@@ -4478,7 +4512,11 @@ c  end of getptq
 
 *  Xx(Im) And Xxold(I) Are Identical.
 
-               Call Dcopy(Ncomp, Uold(1,I), 1, U(1,Im), 1)
+*KS            Call Dcopy(Ncomp, Uold(1,I), 1, U(1,Im), 1)    ! KARLINE
+               DO IDC = 1, Ncomp
+                  U (IDC, Im) = Uold(IDC, I) 
+               ENDDO
+
                I = I + 1
             Else
                Xint = Xxold(I) - Xxold(I-1)
@@ -4490,7 +4528,11 @@ c  end of getptq
          Endif
 
   100 Continue
-      Call Dcopy(Ncomp, Uold(1,Nmold), 1, U(1,Nmsh), 1)
+*KS      Call Dcopy(Ncomp, Uold(1,Nmold), 1, U(1,Nmsh), 1)   ! KARLINE
+               DO IDC = 1, Ncomp
+                  U (IDC, Nmsh) = Uold(IDC, Nmold) 
+               ENDDO
+      
       Return
       End
 

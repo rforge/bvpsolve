@@ -776,7 +776,7 @@ c endif if (comp_c)
 
          if (ill_cond .and. use_c) goto 2000
          if (iprint .eq. 1) then
-             CALL Rprintl1('stab_sigma = ',stab_sigma)
+*  KS        CALL Rprintl1('stab_sigma = ',stab_sigma) * KARLINE:REMOVED-stab_sigma undefined
              CALL Rprintl1('stab_kappa = ', stab_kappa)
              CALL Rprintl1('stab_kappa1 = ', stab_kappa1)
              CALL Rprintl1('stab_gamma = ', stab_gamma)
