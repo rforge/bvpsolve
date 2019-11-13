@@ -135,7 +135,21 @@ C     intialise counters
       nbound = 0
       njacbound = 0
 
+      full = .FALSE.
+      if (fullInt > 0) full = .TRUE.
+      linear = .FALSE.
+      if (linearInt > 0) linear = .TRUE.
+      givmsh = .FALSE.
+      if (givmshInt > 0) givmsh = .TRUE.
+      giveu = .FALSE.
+      if (giveuInt > 0) giveu = .TRUE.
+      useC = .FALSE.
+      if (useCInt > 0) useC = .TRUE.
+      giveps = .FALSE.
+      if (givepsInt > 0) giveps = .TRUE.
+
 C.... Output Details Of The Problem
+
       IF (Full) THEN
         iprint = 1
       ELSE
@@ -389,18 +403,6 @@ C.... Epsp Is The Value Of Eps Beyond Which The Machine Precision Is
 C.... (Possibly) Not Sufficient To Solve The Given Problem.
 
 
-      linear = .FALSE.
-      if (linearInt > 0) linear = .TRUE.
-      givmsh = .FALSE.
-      if (givmshInt > 0) givmsh = .TRUE.
-      giveu = .FALSE.
-      if (giveuInt > 0) giveu = .TRUE.
-      full = .FALSE.
-      if (fullInt > 0) full = .TRUE.
-      useC = .FALSE.
-      if (useCInt > 0) useC = .TRUE.
-      giveps = .FALSE.
-      if (givepsInt > 0) giveps = .TRUE.
       Ifinal = 0
       Iback = 0
       Iprec = 0
