@@ -86,7 +86,7 @@ c          added 'useC' for specification of conditioning
      +            Nudim, U, Nmax, Lwrkfl, Wrk, Lwrkin, Iwrk, GivepsInt,
      +            Eps, Epsmin, acfsub, acdfsub, acgsub, acdgsub,
      +            ckappa1,gamma1,sigma,ckappa,ckappa2,rpar,ipar,icount,
-     +            precis, useC, Iflbvp)
+     +            precis, useCInt, Iflbvp)
 
       Implicit Double Precision (A-H,O-Z)
       DIMENSION RPAR(*), IPAR(*)
@@ -125,7 +125,6 @@ c KS:   initialise block data
        Itsaim = 7
        Maxcon = 100
        Uval0 = 0.0d+0
-       use_C = useC
        comp_C = .TRUE.
 
 C     intialise counters
@@ -147,6 +146,8 @@ C     intialise counters
       if (useCInt > 0) useC = .TRUE.
       giveps = .FALSE.
       if (givepsInt > 0) giveps = .TRUE.
+
+      use_C = useC
 
 C.... Output Details Of The Problem
 
