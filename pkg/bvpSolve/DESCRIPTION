@@ -15,14 +15,6 @@ Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"),
                      comment = "file colsysR.f"),
              person("Robert R.","Russell", role = "ctb", 
                      comment = "file colsysR.f"))
-Author: Karline Soetaert [aut, cre]
-        Jeff Cash [aut],
-        Francesca Mazzia [aut],
-        Uri M. Ascher [ctb],
-        G. Bader [ctb],
-        J. Christiansen [ctb],
-        Robert R. Russell [ctb]
-Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), deSolve
 Imports: rootSolve, stats, graphics, grDevices     
 Description: Functions that solve boundary value problems ('BVP') of systems of ordinary
