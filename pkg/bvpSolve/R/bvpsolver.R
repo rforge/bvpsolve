@@ -1042,6 +1042,7 @@ dimnames(out) <- list(NULL,nm)
   }
   
  absent <- c(0, 0, 0) # do not use compiled code for jac, bnd, jacbnd
+ if (is.null(rho)) rho <- environment()  # KARLINE: ADDED 19-11-2019
  rrwork <- 0
  if (is.null(jacfunc)) absent[1] <- 1
  if (is.null(jacbound)) absent[3] <- 1
