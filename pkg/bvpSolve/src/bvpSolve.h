@@ -1,3 +1,6 @@
+#ifndef BVPSOLVE_H
+#define BVPSOLVE_H
+
 #include <R.h>
 #include <Rdefines.h>
 
@@ -120,3 +123,5 @@ int initForcings(SEXP list);
 
 SEXP getListElement(SEXP list, const char *str);
 
+
+#endif
