@@ -21,6 +21,15 @@ Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"),
                      comment = "file bimda.f")
 			)
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
+Author: Karline Soetaert [aut, cre],
+  Jeff Cash [aut],
+  Francesca Mazzia [aut],
+  Ernst Hairer [ctb] (files dopri8.f, dopri6.f),
+  Gerard Wanner [ctb] (files dopri8.f, dopri6.f),
+  T. Abdulla [ctb] (file mebdfi.f),
+  Cecilia Magherini [ctb] (files bimd.f, bimda.f),
+  Luigi Brugnano [ctb] (files bimd.f, bimda.f),
+  Cleve Moler [ctb] (file bimda.f)
 Depends: R (>= 2.01), deSolve 
 Imports: graphics, grDevices, stats
 Description: Solvers and test set for stiff and non-stiff differential equations, and 
