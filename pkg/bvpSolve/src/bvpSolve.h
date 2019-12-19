@@ -1,44 +1,50 @@
-#ifndef BVPSOLVE_H
-#define BVPSOLVE_H
+#ifndef R_R_H
+#  include <R.h>
+#endif
 
-#include <R.h>
-#include <Rdefines.h>
+#ifndef R_DEFINES_H
+#  include <Rdefines.h>
+#endif
+
+#ifndef R_INTERNALS_H_
+#  include <Rinternals.h>
+#endif
 
 
 /*============================================================================
   global R variables 
 ============================================================================*/
-SEXP Y, EPS;
+extern SEXP Y, EPS;
 
 /*============================================================================
   global C variables 
 ============================================================================*/
-long int nforc;  /* the number of forcings */
+extern long int nforc;  /* the number of forcings */
 /* use in colnew */
-int n_eq;   /* number of equations */
-int ng;     /* number of boundary conditions */
-int mstar;  /* number of derivates (including higher order ones) */
-int ml;
-int nrowpd;
+extern int n_eq;   /* number of equations */
+extern int ng;     /* number of boundary conditions */
+extern int mstar;  /* number of derivates (including higher order ones) */
+extern int ml;
+extern int nrowpd;
 
 /* Input data. three vectors:
   tmat, fmat: time, forcing function data value
   imat: index to start of each forcing function in tmat, fmat*/
-double * tvec;
-double * fvec;
-int    * ivec;
-int    fmethod;
+extern double * tvec;
+extern double * fvec;
+extern int    * ivec;
+extern int    fmethod;
 
 /* for each forcing function: index to current position in tmat, fmat,
  current value, interpolation factor, current forcing time, next forcing time,
  max time (to be removed).....
 */
-int    * findex;
-double * intpol;
-int    * maxindex;
+extern int    * findex;
+extern double * intpol;
+extern int    * maxindex;
 
-double * forcings;
-double * epsval;    /* when eps and model in compiled code */
+extern double * forcings;
+extern double * epsval;    /* when eps and model in compiled code */
 
 /*============================================================================
  type definitions for C functions
@@ -49,12 +55,12 @@ typedef void C_jac_func_type      (int *, double *, double *,double *, double *,
 typedef void C_jacbound_func_type (int *, int *, double *, double *, double *, int *);
 typedef void C_guess_func_type    (double *, double *, double *);
 
-C_deriv_func_type    *jderfun;    /* if DLL */
-C_deriv_func_type    *derfun;    /* if DLL */
-C_bound_func_type    *boundfun;
-C_bound_func_type    *jbndfun;
-C_jac_func_type      *jacfun;
-C_jacbound_func_type *jacboundfun;
+extern C_deriv_func_type    *jderfun;    /* if DLL */
+extern C_deriv_func_type    *derfun;    /* if DLL */
+extern C_bound_func_type    *boundfun;
+extern C_bound_func_type    *jbndfun;
+extern C_jac_func_type      *jacfun;
+extern C_jacbound_func_type *jacboundfun;
 
 typedef void C_acdc_deriv_func_type(int *, double *, double *,double *,
                                     double *, double *, int *);
@@ -64,8 +70,8 @@ typedef void C_acdc_jac_func_type  (int *,  double *, double *, double *,
                                     double *, double *, int *);
 typedef void C_acdc_jacbound_func_type(int *, int *, double *, double *,
                                     double *, double *, int *);
-C_acdc_deriv_func_type    *jaderfun;    /* if DLL */
-C_acdc_bound_func_type    *jabndfun;
+extern C_acdc_deriv_func_type    *jaderfun;    /* if DLL */
+extern C_acdc_bound_func_type    *jabndfun;
 
 typedef void C_deriv_func2_type(double *, double *,double *, double *,
                                 double *, int *);
@@ -77,10 +83,10 @@ typedef void C_jacbound_func2_type(int *, double *, double *, double *,
                                 double *, int *);
 typedef void C_guess_func2_type(double *, double *, double *, double *, 
                                 double *, int *);
-C_deriv_func2_type     *jepsderfun;
-C_bound_func2_type     *jepsbndfun;
-double *dy, *dycopy, *ycopy, *ycopy2, *bb, *g, *gcopy;
-int * iibb;
+extern C_deriv_func2_type     *jepsderfun;
+extern C_bound_func2_type     *jepsbndfun;
+extern double *dy, *dycopy, *ycopy, *ycopy2, *bb, *g, *gcopy;
+extern int * iibb;
 
 /*============================================================================
   solver R- global functions 
@@ -123,5 +129,3 @@ int initForcings(SEXP list);
 
 SEXP getListElement(SEXP list, const char *str);
 
-
-#endif

@@ -6,8 +6,10 @@
 # include <R_ext/Rdynload.h>
 #endif
 
+#define extern
 #include "bvpSolve.h"
-
+#undef extern
+ 
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
 

@@ -2,6 +2,13 @@
 /* Patterned on code odesolve_utils.c from package odesolve */
 #include <R.h>
 #include <Rdefines.h>
+#ifndef  R_INTERNALS_H_
+#include <Rinternals.h>
+#endif
+
+#include <R_ext/Applic.h>
+#include <R_ext/Rdynload.h>
+
 #include "bvpSolve.h"
 #include "externalptr.h"
 
@@ -23,19 +30,19 @@ double yguess;
 
 /* Globals : the R-functions, R-environment, R-parameters */
 
-SEXP R_bvp_deriv_func;
-SEXP R_bvp_jac_func;
-SEXP R_bvp_bound_func;
-SEXP R_bvp_jacbound_func;
-SEXP R_bvp_guess_func;
-SEXP R_cont_deriv_func;
-SEXP R_cont_jac_func;
-SEXP R_cont_bound_func;
-SEXP R_cont_jacbound_func;
-SEXP R_cont_guess_func;
+//SEXP R_bvp_deriv_func;
+//SEXP R_bvp_jac_func;
+//SEXP R_bvp_bound_func;
+//SEXP R_bvp_jacbound_func;
+//SEXP R_bvp_guess_func;
+//SEXP R_cont_deriv_func;
+//SEXP R_cont_jac_func;
+//SEXP R_cont_bound_func;
+//SEXP R_cont_jacbound_func;
+//SEXP R_cont_guess_func;
 
-SEXP R_envir;
-SEXP bvp_gparms;
+//SEXP R_envir;
+//SEXP bvp_gparms;
 
 /*==================================================
 Parameter initialisation functions - removed
