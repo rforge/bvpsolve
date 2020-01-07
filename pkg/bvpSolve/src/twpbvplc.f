@@ -1117,7 +1117,7 @@ c      call dcopy(nmold, xx, 1, xxold, 1)
       forcedouble = .false.
 
        if (iprint .eq. 1) then
-         CALL Rprintl2('Forcedouble, itcond', nodouble, itcond)
+         CALL Rprintli('Forcedouble, itcond', nodouble, itcond)
        end if
 
        if (use_c .and.  itcond .eq. itcondmax) then

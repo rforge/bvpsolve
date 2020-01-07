@@ -156,3 +156,21 @@ C
       INTEGER i1, i2, i3
         call rprintfi3(msg//char(0), i1, i2, i3)
       end subroutine
+
+C  one logical, one integer
+      subroutine rprintli(msg, l1, i1)
+      character (len=*) msg
+      character (len=8) logi
+      logical l1
+      integer i1
+
+       if (l1) then
+         logi ='  TRUE '
+       else
+         logi ='  FALSE'
+       endif
+      
+       call rprint(msg//logi//char(0))
+       call rprintfi1(msg//char(0), i1)
+
+      end subroutine 
