@@ -33,7 +33,9 @@ Yerseke, The Netherlands
 \Abstract{This vignette contains the R-examples of chapter 12 from the book:
 
 Soetaert, K., Cash, J.R. and Mazzia, F. (2012).
-Solving Differential Equations in R. that will be published by Springer.
+Solving Differential Equations in R. UseR series, Springer, 248 pp. 
+
+www.springer.com/statistics/computational+statistics/book/978-3-642-28069-6
 
 Chapter 12. Solving Boundary Value Problems in R.
 
@@ -64,6 +66,7 @@ Of course, much more information about each problem can be found in the book.
 \SweaveOpts{engine = R, eps = FALSE}
 \SweaveOpts{keep.source = TRUE}
 <<preliminaries, echo = FALSE, results = hide>>=
+require(bvpSolve)
 require(diffEq)
 options(prompt = " ")
 options(continue = " ")

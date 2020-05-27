@@ -33,7 +33,9 @@ Yerseke, The Netherlands
 \Abstract{This vignette contains the R-examples of chapter 6 from the book:
 
 Soetaert, K., Cash, J.R. and Mazzia, F. (2012).
-Solving Differential Equations in R. that will be published by Springer.
+Solving Differential Equations in R. UseR series, Springer, 248 pp. 
+
+www.springer.com/statistics/computational+statistics/book/978-3-642-28069-6.
 
 Chapter 6. Solving Differential Algebraic Equations in R.
 

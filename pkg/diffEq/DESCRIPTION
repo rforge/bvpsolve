@@ -1,14 +1,17 @@
 Package: diffEq
 Version: 1.0-2
 Title: Functions from the Book Solving Differential Equations in R
-Author: Karline Soetaert <karline.soetaert@nioz.nl>
+Author: Karline Soetaert  [aut, cre]
+Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
+                     email = "karline.soetaert@nioz.nl", 
+					 comment = c(ORCID = "0000-0003-4603-7100")))
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.01), deSolve, rootSolve, bvpSolve, ReacTran, deTestSet
 Imports: shape
 Suggests: scatterplot3d
 Description: Functions and examples from the book Solving Differential 
    Equations in R by Karline Soetaert, Jeff R Cash and Francesca Mazzia.
-   Springer, 2012.
+   Springer, 2012, 248 pp.
 License: GPL
 LazyData: yes
 
