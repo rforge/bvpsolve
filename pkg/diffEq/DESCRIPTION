@@ -1,7 +1,6 @@
 Package: diffEq
 Version: 1.0-2
 Title: Functions from the Book Solving Differential Equations in R
-Author: Karline Soetaert  [aut, cre]
 Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
                      email = "karline.soetaert@nioz.nl", 
 					 comment = c(ORCID = "0000-0003-4603-7100")))
