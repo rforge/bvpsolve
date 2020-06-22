@@ -199,6 +199,7 @@ C ---------------------------------------------------------------------------
       double precision VDS, VGS, VBS, VGD, VBD,nandGDSP, nandGDSM
       EXTERNAL nandGDSP, nandGDSM
 
+      nandIDS = 0.D0 !Karline: to initialise
       IF ( VDS .GT. 0.D0 ) THEN
        nandIDS = nandGDSP (NED,VDS, VGS, VBS,ierr)
       ELSE IF ( VDS .EQ. 0.D0) THEN

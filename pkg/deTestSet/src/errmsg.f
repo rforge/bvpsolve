@@ -6,7 +6,7 @@ c ==============================================================================
       integer nchar, ndata
       character*(*) label
       integer data(ndata)
-      integer nc
+
        if (ndata .eq. 1) then
          call rprintfi1(label//char(0), data(1))
        else if (ndata .eq. 2) then

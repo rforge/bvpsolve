@@ -1,5 +1,5 @@
 Package: deTestSet
-Version: 1.1.7.1
+Version: 1.1.7.2
 Title: Test Set for Differential Equations
 Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"), 
                      email = "karline.soetaert@nioz.nl"),
