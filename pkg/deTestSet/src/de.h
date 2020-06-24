@@ -66,7 +66,9 @@ EXTERN int *svarevent, *methodevent;
  type definitions for C functions
 ============================================================================*/
 typedef void C_deriv_func_type(int*, double*, double*, double*, double*, int*);
-EXTERN C_deriv_func_type* DLL_deriv_func;
+EXTERN C_deriv_func_type *DLL_deriv_func;
+
+EXTERN  C_deriv_func_type *deriv_func;  
 
 typedef void C_res_func_type(double*, double*, double*, double*, double*,
                              int*, double*, int*);
@@ -80,9 +82,12 @@ typedef void init_func_type (void (*)(int*, double*));
 EXTERN double             *tt, *ytmp;
 EXTERN int                isDll;
 
+EXTERN  int maxt;
+
 /*============================================================================
   solver R- global functions 
 ============================================================================*/
+
 /* DAE globals */
 EXTERN  SEXP R_res_func;
 EXTERN  SEXP R_daejac_func;
