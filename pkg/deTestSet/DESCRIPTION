@@ -34,7 +34,7 @@ Depends: R (>= 2.01), deSolve
 Imports: graphics, grDevices, stats
 Description: Solvers and test set for stiff and non-stiff differential equations, and 
   differential algebraic equations. 
-  'Mazzia, F., Cash, J.R. and K. Soetaert, 2012. DOI: 10.1016/j.cam.2012.03.014'.
+  See Mazzia, F., Cash, J.R., and K. Soetaert (2012) <DOI:10.1016/j.cam.2012.03.014>.
 License: GPL 
 Copyright: inst/COPYRIGHTS
 LazyData: yes
