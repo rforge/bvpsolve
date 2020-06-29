@@ -13,14 +13,14 @@ int initForcings(SEXP flist) {
     SEXP Tvec, Fvec, Ivec, initforc;
     int i, j, isForcing = 0;
     init_func  *initforcings;
-    int nprot = 0;
 
-    PROTECT(initforc = getListElement(flist,"ModelForc")); nprot++;
+
+    initforc = getListElement(flist,"ModelForc");
     if (!isNull(initforc))
     	{
-    	 PROTECT(Tvec = getListElement(flist,"tmat")); nprot++;
-       PROTECT(Fvec = getListElement(flist,"fmat")); nprot++;
-       PROTECT(Ivec = getListElement(flist,"imat")); nprot++;
+    	 Tvec = getListElement(flist,"tmat");
+       Fvec = getListElement(flist,"fmat");
+       Ivec = getListElement(flist,"imat");
        nforc =LENGTH(Ivec)-2; /* nforc, fvec, ivec =globals */
 
        i = LENGTH(Fvec);
@@ -41,8 +41,6 @@ int initForcings(SEXP flist) {
 
        isForcing = 1;
        }
-       UNPROTECT(nprot);
-       
        return(isForcing);
 }
 
