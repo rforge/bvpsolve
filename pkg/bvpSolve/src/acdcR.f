@@ -1,3 +1,7 @@
+c  Francesca Mazzia (5/2/2021): modified the flag iprec
+c   if no convergence of correction,
+c   now is 2 in dfexcl and df8cal
+c
 C Francesca: September 2011, changed again the exit strategy
 c francesca: add precis as argument: machine precision...
 c changed acinitu, added in input more information about xguess,uguess
@@ -1920,10 +1924,11 @@ c
 
          If (Iprec .eq. 0) Then
             If (Iprint .ge. 0) then
-      CALL Rprint('** Warning - possibly approaching machine precision')
+            CALL Rprint('NO convergence of corrections')
+      CALL Rprint('** Warning-possibly approaching machine precision')
         CALL Rprintd1('beyond Epsilon  = ', Eps)
             end if
-            Iprec = 1
+            Iprec = 2
          Endif
 
  70      Continue
@@ -2111,10 +2116,11 @@ c      St4 --> Tmp(ncomp,16)
 
          If (Iprec .eq. 0) Then
             If (Iprint .ge. 0)  then
+              CALL Rprint('NO convergence of 8th order defcors')     
       CALL Rprint('** Warning -possibly approaching machine precision')
       CALL Rprintd1('beyond Epsilon  = ',Eps)
              end if
-            Iprec = 1
+            Iprec = 2
          Endif
 
 
