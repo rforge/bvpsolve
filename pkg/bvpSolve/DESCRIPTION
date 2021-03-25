@@ -19,7 +19,7 @@ Authors@R: c(person("Karline","Soetaert", role = c("aut","cre"),
 Author: Karline Soetaert [aut, cre] (<https://orcid.org/0000-0003-4603-7100>),
   Jeff Cash [aut],
   Francesca Mazzia [aut],
-  Uri M. Asher [ctb] (files colsysR.f, colnewR.f, coldaeR.f),
+  Uri M. Ascher [ctb] (files colsysR.f, colnewR.f, coldaeR.f),
   G. Bader [ctb] (file colnewR.f),
   J. Christiansen [ctb] (file colsysR.f),
   Robert R. Russell [ctb] (file colsysR.f)
